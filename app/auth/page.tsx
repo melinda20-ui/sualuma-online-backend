@@ -25,58 +25,25 @@ export default function AuthPage() {
             >
               Voltar para home
             </Link>
-
-            <Link
-              href="/member-user"
-              className="rounded-2xl bg-[#7A00FF] px-5 py-3 text-sm font-semibold text-white"
-            >
-              Ver painel de exemplo
-            </Link>
           </div>
         </section>
 
         <section className="flex items-center justify-center px-6 py-16 md:px-10">
           <div className="w-full max-w-md rounded-[32px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_0_40px_rgba(122,0,255,0.08)] backdrop-blur-xl">
-            <div className="mb-6 flex rounded-2xl border border-white/10 bg-[#0b0d12] p-1">
-              <button className="flex-1 rounded-2xl bg-[#7A00FF] px-4 py-3 text-sm font-semibold text-white">
-                Entrar
-              </button>
-              <button className="flex-1 rounded-2xl px-4 py-3 text-sm text-white/65">
-                Criar conta
-              </button>
-            </div>
-
             <div className="space-y-4">
-              <div>
-                <label className="mb-2 block text-xs text-white/45">E-mail</label>
-                <input
-                  type="email"
-                  placeholder="voce@exemplo.com"
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b0d12] px-4 py-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#00F0FF]"
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-xs text-white/45">Senha</label>
-                <input
-                  type="password"
-                  placeholder="••••••••••"
-                  className="w-full rounded-2xl border border-white/10 bg-[#0b0d12] px-4 py-4 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#00F0FF]"
-                />
-              </div>
-
-              <button className="w-full rounded-2xl bg-[#7A00FF] px-4 py-4 text-sm font-semibold text-white shadow-[0_0_24px_rgba(122,0,255,0.28)]">
+              <Link
+                href="/sign-in"
+                className="block w-full rounded-2xl bg-[#7A00FF] px-4 py-4 text-center text-sm font-semibold text-white shadow-[0_0_24px_rgba(122,0,255,0.28)]"
+              >
                 Entrar no Luma OS
-              </button>
+              </Link>
 
-              <button className="w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-4 text-sm text-white/80">
-                Continuar com Google
-              </button>
-
-              <div className="pt-2 text-center text-xs text-white/40">
-                Ao continuar, você concorda com os termos, política de privacidade
-                e regras de uso da plataforma.
-              </div>
+              <Link
+                href="/sign-up"
+                className="block w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-4 text-center text-sm text-white/80"
+              >
+                Criar conta
+              </Link>
             </div>
           </div>
         </section>
@@ -84,3 +51,4 @@ export default function AuthPage() {
     </main>
   );
 }
+
