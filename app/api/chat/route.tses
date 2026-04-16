@@ -1,0 +1,48 @@
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const message = body?.message?.trim();
+
+    if (!message) {
+      return NextResponse.json(
+        { ok: false, error: "Mensagem vazia." },
+        { status: 400 }
+      );
+    }
+
+    const lower = message.toLowerCase();
+
+    let reply = "Recebi seu comando. Vamos construir isso juntas.";
+
+    if (lower.includes("site")) {
+      reply =
+        "Entendido. Posso estruturar um site completo com páginas, copy inicial e fluxo de execução.";
+    } else if (lower.includes("n8n")) {
+      reply =
+        "Perfeito. Posso transformar isso em uma automação com gatilho, lógica e ações no n8n.";
+    } else if (lower.includes("whatsapp")) {
+      reply =
+        "Certo. Posso preparar uma estrutura para receber ordens por WhatsApp e disparar agentes.";
+    } else if (lower.includes("agente")) {
+      reply =
+        "Ótimo. Posso desenhar um agente especialista com função, contexto, memória e execução.";
+    }
+
+    return NextResponse.json({
+      ok: true,
+      reply,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Erro interno no backend.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
