@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const projects = [
   {
@@ -27,14 +29,20 @@ const projects = [
   },
 ];
 
-export default function MemberServicesPage() {
+export default async function MemberServicesPage() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
   return (
     <main className="min-h-screen bg-[#050507] text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-16 pt-5 md:px-6">
         <header className="mb-8 flex items-center justify-between border-b border-white/10 pb-4">
           <div className="flex items-center gap-3">
             <Link
-              href="/"
+              href="/member-user"
               className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/80"
             >
               ←

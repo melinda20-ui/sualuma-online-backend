@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const shortcuts = [
   {
@@ -33,7 +35,13 @@ const shortcuts = [
   },
 ];
 
-export default function MemberUserPage() {
+export default async function MemberUserPage() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect("/sign-in");
+  }
+
   return (
     <main className="min-h-screen bg-[#050507] text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 pb-16 pt-5 md:px-6">
