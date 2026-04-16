@@ -10,6 +10,7 @@ type Message = {
 export default function Home() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -17,6 +18,31 @@ export default function Home() {
         "Olá, Luma. Seu centro de comando está pronto para construir experiências, sistemas e negócios inteiros.",
     },
   ]);
+
+function speakText(text: string) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "pt-BR";
+  utterance.rate = 1;
+  utterance.pitch = 1;
+
+  const voices = window.speechSynthesis.getVoices();
+  const ptVoice = voices.find((voice) =>
+    voice.lang.toLowerCase().includes("pt")
+  );
+
+  if (ptVoice) utterance.voice = ptVoice;
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+}
 
   async function handleSend() {
     if (!input.trim() || loading) return;
@@ -38,13 +64,19 @@ export default function Home() {
 
       const data = await res.json();
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data?.reply || "Não consegui responder agora.",
-        },
-      ]);
+      const resposta = data?.reply || "Não consegui responder.";
+
+setMessages((prev) => [
+  ...prev,
+  {
+    role: "assistant",
+    content: resposta,
+  },
+]);
+
+if (autoSpeak) {
+  speakText(resposta);
+}
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -180,6 +212,38 @@ export default function Home() {
                     placeholder="Digite um comando..."
                     className="w-full rounded-2xl border border-white/10 bg-[#0b0d12] px-4 py-4 text-white outline-none placeholder:text-white/30 focus:border-[#00F0FF] focus:shadow-[0_0_20px_rgba(0,240,255,0.12)]"
                   />
+
+
+
+                  <button
+  onClick={() => setAutoSpeak(!autoSpeak)}
+  style={{
+    marginBottom: "10px",
+    padding: "8px 12px",
+    borderRadius: "10px",
+    background: autoSpeak ? "#7A00FF" : "#222",
+    color: "white",
+    border: "none",
+  }}
+>
+  {autoSpeak ? "🔊 Voz ON" : "🔇 Voz OFF"}
+</button>
+
+
+<button
+  onClick={() => speakText("Teste de voz do Luma OS")}
+  style={{
+    marginBottom: "10px",
+    padding: "8px 12px",
+    borderRadius: "10px",
+    background: "#00F0FF",
+    color: "black",
+    border: "none",
+  }}
+>
+  Testar voz
+</button>
+                  
                   <button
                     onClick={handleSend}
                     className="rounded-2xl bg-[#7A00FF] px-6 font-semibold text-white shadow-[0_0_30px_rgba(122,0,255,0.32)] transition hover:bg-[#8d28ff] hover:shadow-[0_0_40px_rgba(122,0,255,0.4)] disabled:opacity-50"
