@@ -9,7 +9,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama3",
+        model: "qwen2.5:3b",
         prompt: message,
         stream: false,
       }),
