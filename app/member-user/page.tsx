@@ -1,11 +1,36 @@
 import Link from "next/link";
 
 const shortcuts = [
-  { title: "Histórico de chats", desc: "Retome conversas e contextos anteriores." },
-  { title: "Dashboard de agentes", desc: "Veja agentes ativos e funções disponíveis." },
-  { title: "Dashboard de automações", desc: "Acompanhe status, falhas e revisões." },
-  { title: "Áreas de membros", desc: "Acesse serviços e cursos adquiridos." },
-  { title: "Mini Empresa", desc: "Central operacional do seu negócio." },
+  {
+    title: "Histórico de chats",
+    desc: "Retome conversas e contextos anteriores.",
+    href: "/coming-soon",
+  },
+  {
+    title: "Dashboard de agentes",
+    desc: "Veja agentes ativos e funções disponíveis.",
+    href: "/coming-soon",
+  },
+  {
+    title: "Dashboard de automações",
+    desc: "Acompanhe status, falhas e revisões.",
+    href: "/automations",
+  },
+  {
+    title: "Área de membros - Serviços",
+    desc: "Acesse seus serviços contratados e projetos em andamento.",
+    href: "/member-services",
+  },
+  {
+    title: "Área de membros - Cursos",
+    desc: "Acesse os cursos adquiridos e continue seus estudos.",
+    href: "/member-courses",
+  },
+  {
+    title: "Mini Empresa",
+    desc: "Central operacional do seu negócio.",
+    href: "/mini-company",
+  },
 ];
 
 export default function MemberUserPage() {
@@ -22,7 +47,9 @@ export default function MemberUserPage() {
             </Link>
             <div>
               <p className="text-sm font-semibold text-white">Painel do usuário</p>
-              <p className="text-xs text-white/40">Seu centro principal dentro do Luma OS</p>
+              <p className="text-xs text-white/40">
+                Seu centro principal dentro do Luma OS
+              </p>
             </div>
           </div>
 
@@ -41,8 +68,8 @@ export default function MemberUserPage() {
           </h1>
 
           <p className="mt-4 max-w-3xl text-sm leading-7 text-white/55 md:text-base">
-            Acesse chats, agentes, automações, áreas de membros e sua mini empresa
-            com uma navegação clara e centralizada.
+            Acesse chats, agentes, automações, serviços contratados, cursos e sua
+            mini empresa com uma navegação clara e centralizada.
           </p>
         </section>
 
@@ -80,10 +107,16 @@ export default function MemberUserPage() {
             </p>
 
             <div className="mt-5 flex flex-col gap-3">
-              <Link href="/chat" className="rounded-2xl bg-[#7A00FF] px-4 py-3 text-sm font-semibold text-white">
+              <Link
+                href="/chat"
+                className="rounded-2xl bg-[#7A00FF] px-4 py-3 text-sm font-semibold text-white"
+              >
                 Abrir chat
               </Link>
-              <Link href="/automations" className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-white/80">
+              <Link
+                href="/automations"
+                className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm text-white/80"
+              >
                 Ver automações
               </Link>
             </div>
@@ -99,9 +132,12 @@ export default function MemberUserPage() {
               <h2 className="text-xl font-semibold text-white">{item.title}</h2>
               <p className="mt-3 text-sm leading-6 text-white/55">{item.desc}</p>
 
-              <button className="mt-6 rounded-2xl border border-[#00F0FF]/20 bg-[#00F0FF]/10 px-4 py-3 text-sm font-medium text-[#00F0FF]">
+              <Link
+                href={item.href}
+                className="mt-6 inline-flex rounded-2xl border border-[#00F0FF]/20 bg-[#00F0FF]/10 px-4 py-3 text-sm font-medium text-[#00F0FF]"
+              >
                 Acessar
-              </button>
+              </Link>
             </article>
           ))}
         </section>
