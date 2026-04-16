@@ -10,6 +10,10 @@ type Message = {
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
+  const [listening, setListening] = useState(false);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -18,22 +22,113 @@ export default function ChatPage() {
     },
   ]);
 
-  function handleSend() {
-    if (!input.trim()) return;
+  function speakText(text: string) {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
-    const userMessage = input.trim();
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "pt-BR";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    const voices = window.speechSynthesis.getVoices();
+    const ptVoice = voices.find((voice) =>
+      voice.lang.toLowerCase().includes("pt")
+    );
+
+    if (ptVoice) utterance.voice = ptVoice;
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function stopSpeaking() {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+  }
+
+  async function handleSend(textoOpcional?: string) {
+    const userMessage = textoOpcional || input.trim();
+    if (!userMessage || loading) return;
 
     setMessages((prev) => [
       ...prev,
       { role: "user", content: userMessage },
-      {
-        role: "assistant",
-        content:
-          "Recebi seu comando. Na próxima etapa vamos ligar essa tela ao backend real.",
-      },
     ]);
 
     setInput("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: userMessage }),
+      });
+
+      const data = await res.json();
+      const resposta = data?.reply || "Não consegui responder agora.";
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: resposta },
+      ]);
+
+      if (autoSpeak) {
+        speakText(resposta);
+      }
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Erro ao conectar com o backend.",
+        },
+      ]);
+    }
+
+    setLoading(false);
+  }
+
+  function startListening() {
+    if (typeof window === "undefined") return;
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("Reconhecimento de voz não suportado neste navegador.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    setListening(true);
+    recognition.start();
+
+    recognition.onresult = (event: any) => {
+      const texto = event.results[0][0].transcript;
+      setInput(texto);
+
+      setTimeout(() => {
+        handleSend(texto);
+      }, 400);
+    };
+
+    recognition.onerror = () => {
+      setListening(false);
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+    };
   }
 
   return (
@@ -59,7 +154,7 @@ export default function ChatPage() {
           </div>
         </header>
 
-        <section className="flex-1 px-3 pb-36 pt-4 md:px-6">
+        <section className="flex-1 px-3 pb-40 pt-4 md:px-6">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
             {messages.map((message, index) => (
               <div
@@ -85,20 +180,55 @@ export default function ChatPage() {
                 </p>
               </div>
             ))}
+
+            {loading && (
+              <div className="mr-auto max-w-[88%] rounded-[24px] border border-white/10 bg-[#0b0d12] px-4 py-4 md:max-w-[75%]">
+                <p className="mb-2 text-sm font-semibold text-[#A855F7]">
+                  Agente
+                </p>
+                <p className="text-[15px] leading-7 text-white/60">Pensando...</p>
+              </div>
+            )}
           </div>
         </section>
 
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-[#050507]/92 px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:px-6">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
             <div className="flex flex-wrap gap-2">
-              <button className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/75">
-                🔇 Voz OFF
+              <button
+                onClick={() => setAutoSpeak(!autoSpeak)}
+                className={`rounded-xl border px-3 py-2 text-xs ${
+                  autoSpeak
+                    ? "border-[#7A00FF]/30 bg-[#7A00FF]/20 text-white"
+                    : "border-white/10 bg-white/[0.05] text-white/75"
+                }`}
+              >
+                {autoSpeak ? "🔊 Voz ON" : "🔇 Voz OFF"}
               </button>
-              <button className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/75">
-                🎙 Falar
+
+              <button
+                onClick={startListening}
+                className={`rounded-xl border px-3 py-2 text-xs ${
+                  listening
+                    ? "border-[#00F0FF]/30 bg-[#00F0FF]/20 text-[#00F0FF]"
+                    : "border-white/10 bg-white/[0.05] text-white/75"
+                }`}
+              >
+                {listening ? "🎤 Ouvindo..." : "🎙 Falar"}
               </button>
-              <button className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/75">
-                🧠 Agente
+
+              <button
+                onClick={() => speakText("Teste de voz do Luma OS")}
+                className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/75"
+              >
+                🧪 Testar voz
+              </button>
+
+              <button
+                onClick={stopSpeaking}
+                className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-xs text-white/75"
+              >
+                🛑 Parar voz
               </button>
             </div>
 
@@ -118,8 +248,9 @@ export default function ChatPage() {
               />
 
               <button
-                onClick={handleSend}
-                className="inline-flex h-14 min-w-[92px] items-center justify-center rounded-[20px] bg-[#7A00FF] px-5 text-sm font-semibold text-white shadow-[0_0_30px_rgba(122,0,255,0.32)] transition hover:bg-[#8d28ff]"
+                onClick={() => handleSend()}
+                disabled={loading}
+                className="inline-flex h-14 min-w-[92px] items-center justify-center rounded-[20px] bg-[#7A00FF] px-5 text-sm font-semibold text-white shadow-[0_0_30px_rgba(122,0,255,0.32)] transition hover:bg-[#8d28ff] disabled:opacity-50"
               >
                 Enviar
               </button>
