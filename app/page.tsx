@@ -11,6 +11,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(false);
+  const [listening, setListening] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -42,6 +43,42 @@ function speakText(text: string) {
 function stopSpeaking() {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
+}
+
+function startListening() {
+  if (typeof window === "undefined") return;
+
+  const SpeechRecognition =
+    (window as any).SpeechRecognition ||
+    (window as any).webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    alert("Reconhecimento de voz não suportado neste navegador.");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "pt-BR";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  setListening(true);
+
+  recognition.onresult = (event: any) => {
+    const transcript = event.results[0][0].transcript;
+    setInput(transcript);
+    setListening(false);
+  };
+
+  recognition.onerror = () => {
+    setListening(false);
+  };
+
+  recognition.onend = () => {
+    setListening(false);
+  };
+
+  recognition.start();
 }
 
   async function handleSend() {
@@ -240,7 +277,20 @@ if (autoSpeak) {
     color: "black",
     border: "none",
   }}
+
+<button
+  onClick={startListening}
+  style={{
+    marginBottom: "10px",
+    padding: "8px 12px",
+    borderRadius: "10px",
+    background: listening ? "#00F0FF" : "#333",
+    color: listening ? "black" : "white",
+    border: "none",
+  }}
 >
+  {listening ? "🎤 Ouvindo..." : "🎙 Falar"}
+</button>>
   Testar voz
 </button>
                   
