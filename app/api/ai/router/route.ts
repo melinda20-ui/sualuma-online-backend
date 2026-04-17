@@ -1,105 +1,190 @@
-import { NextRequest } from "next/server";
-import { AI_MODELS, detectMode, type AIModelMode } from "@/lib/ai-models";
-import { askOllama } from "@/lib/ollama";
-
-function getSystemPrompt(mode: AIModelMode) {
-  switch (mode) {
-    case "chat":
-      return `
-Você é a IA central do Luma OS.
-Responda em português do Brasil.
-Seja clara, estratégica e útil.
-Se a tarefa parecer técnica demais, explique de modo simples e objetivo.
-`;
-
-    case "code":
-      return `
-Você é a IA programadora do Luma OS.
-Responda em português do Brasil.
-Seu foco é:
-- corrigir código
-- gerar código limpo
-- explicar erros
-- criar JSON válido
-- pensar em Next.js, React, TypeScript, APIs e integrações
-
-Quando o usuário pedir código, priorize respostas práticas e executáveis.
-`;
-
-    case "vision":
-      return `
-Você é a IA visual do Luma OS.
-Responda em português do Brasil.
-Seu foco é analisar:
-- prints
-- imagens
-- layouts
-- interface
-- estética
-- UX
-
-Se a imagem não tiver sido enviada de fato, explique isso claramente.
-`;
-
-    case "automation":
-      return `
-Você é a IA de automações do Luma OS.
-Responda em português do Brasil.
-Seu foco é:
-- entender processos
-- sugerir fluxos
-- pensar em n8n
-- gerar estruturas de automação
-- organizar gatilhos, ações, condições e integrações
-
-Quando fizer sentido, responda em passos claros.
-Se o usuário pedir workflow, pense como arquiteta de automação.
-`;
-
-    default:
-      return `Você é a IA do Luma OS.`;
-  }
-}
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const prompt = String(body?.prompt || "").trim();
-    const forcedMode = body?.mode as AIModelMode | undefined;
+    const originalPrompt = body.prompt || "";
+    const prompt = originalPrompt.toLowerCase();
 
     if (!prompt) {
-      return Response.json(
-        { ok: false, error: "Prompt não informado." },
-        { status: 400 }
-      );
+      return Response.json({
+        ok: false,
+        error: "Prompt vazio",
+      });
     }
 
-    const mode = forcedMode || detectMode(prompt);
-    const model = AI_MODELS[mode];
-    const system = getSystemPrompt(mode);
+    const automationHints = [
+      "n8n",
+      "workflow",
+      "automação",
+      "automacao",
+      "fluxo",
+      "pipeline",
+      "webhook",
+      "gatilho",
+      "trigger",
+      "popup",
+      "formulário",
+      "formulario",
+      "google sheets",
+      "planilha",
+      "email",
+      "e-mail",
+    ];
 
-    const result = await askOllama({
-      model,
-      system,
-      prompt,
+    const isAutomation = automationHints.some((hint) =>
+      prompt.includes(hint)
+    );
+
+    if (isAutomation) {
+      let workflowName = "Workflow Personalizado";
+      let description = "Fluxo automatizado criado com base no pedido do usuário.";
+      let steps: string[] = [];
+      let nodes: { type: string; name: string }[] = [];
+
+      const wantsPopup = prompt.includes("popup");
+      const wantsEmail =
+        prompt.includes("email") || prompt.includes("e-mail");
+      const wantsSheets =
+        prompt.includes("google sheets") ||
+        prompt.includes("planilha") ||
+        prompt.includes("excel");
+      const wantsLeadCapture =
+        prompt.includes("lead") || prompt.includes("captar");
+
+      if (wantsPopup && wantsEmail && wantsSheets) {
+        workflowName = "Captura de e-mail em popup + Google Sheets";
+        description =
+          "Captura o e-mail digitado no popup, valida os dados e salva automaticamente em uma planilha do Google Sheets.";
+
+        steps = [
+          "Exibir popup com campo de e-mail",
+          "Receber o e-mail enviado pelo usuário",
+          "Validar se o e-mail foi preenchido corretamente",
+          "Enviar os dados para o workflow",
+          "Salvar o e-mail em uma planilha do Google Sheets",
+          "Retornar confirmação de cadastro",
+        ];
+
+        nodes = [
+          {
+            type: "trigger",
+            name: "Receber envio do popup",
+          },
+          {
+            type: "validation",
+            name: "Validar e-mail",
+          },
+          {
+            type: "google_sheets",
+            name: "Salvar na planilha",
+          },
+          {
+            type: "response",
+            name: "Confirmar cadastro",
+          },
+        ];
+      } else if (wantsLeadCapture) {
+        workflowName = "Lead Capture Workflow";
+        description =
+          "Fluxo para captar leads e iniciar contato automático.";
+
+        steps = [
+          "Receber lead por formulário ou webhook",
+          "Validar dados obrigatórios",
+          "Salvar no CRM ou banco de dados",
+          "Enviar mensagem inicial",
+          "Notificar equipe comercial",
+          "Agendar follow-up",
+        ];
+
+        nodes = [
+          {
+            type: "webhook",
+            name: "Receber Lead",
+          },
+          {
+            type: "validation",
+            name: "Validar Dados",
+          },
+          {
+            type: "database",
+            name: "Salvar Lead",
+          },
+          {
+            type: "notification",
+            name: "Avisar Comercial",
+          },
+        ];
+      } else {
+        workflowName = "Automação personalizada";
+        description =
+          "Fluxo criado com base na solicitação enviada pelo usuário.";
+
+        steps = [
+          "Interpretar o pedido do usuário",
+          "Estruturar a automação",
+          "Organizar as etapas principais",
+          "Preparar para importação no n8n",
+        ];
+
+        nodes = [
+          {
+            type: "trigger",
+            name: "Entrada inicial",
+          },
+          {
+            type: "logic",
+            name: "Processamento",
+          },
+          {
+            type: "output",
+            name: "Saída final",
+          },
+        ];
+      }
+
+      return Response.json({
+        ok: true,
+        mode: "automation",
+        reply: "Automação estruturada com base no seu pedido.",
+        askToImport: true,
+        json: {
+          name: workflowName,
+          description,
+          sourcePrompt: originalPrompt,
+          steps,
+          nodes,
+        },
+      });
+    }
+
+    const response = await fetch("http://127.0.0.1:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama3.2:3b",
+        prompt: originalPrompt,
+        stream: false,
+      }),
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error("Erro no Ollama: " + errorText);
+    }
+
+    const data = await response.json();
 
     return Response.json({
       ok: true,
-      mode,
-      model,
-      reply: result.text,
+      mode: "chat",
+      reply: data.response,
     });
   } catch (error: any) {
-    console.error("ERRO /api/ai/router:", error);
-
-    return Response.json(
-      {
-        ok: false,
-        error: error?.message || "Erro ao consultar a IA.",
-      },
-      { status: 500 }
-    );
+    return Response.json({
+      ok: false,
+      error: error.message,
+    });
   }
 }
-
