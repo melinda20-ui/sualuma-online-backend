@@ -1,41 +1,44 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const portfolio = [
   {
     title: "Site institucional premium",
     type: "Site empresarial",
     description:
-      "Estrutura ideal para empresas que querem presença profissional, autoridade e geração de leads.",
+      "Para empresas que querem presença forte, confiança e captação de clientes.",
   },
   {
     title: "Landing page de alta conversão",
     type: "Página de vendas",
     description:
-      "Página pensada para campanhas, lançamentos, captação de leads e ofertas com foco em conversão.",
+      "Ideal para campanhas, ofertas, lançamentos e captação de leads.",
   },
   {
     title: "Blog estratégico com SEO",
     type: "Blog",
     description:
-      "Estrutura de conteúdo para atrair tráfego orgânico, educar o público e vender com artigos bem posicionados.",
+      "Estrutura pensada para atrair tráfego orgânico, ranquear e vender com conteúdo.",
   },
   {
-    title: "Loja virtual leve e elegante",
+    title: "Loja virtual elegante",
     type: "E-commerce",
     description:
-      "Visual mais clean e moderno, com foco em experiência mobile, confiança e jornada de compra.",
+      "Visual moderno, experiência mobile e foco em compra com confiança.",
   },
   {
-    title: "Portal de serviços com área privada",
+    title: "Portal com área privada",
     type: "Área de membros",
     description:
-      "Ideal para prestação de serviços, acompanhamento de projetos, briefings e comunicação com clientes.",
+      "Perfeito para serviços, acompanhamento de projetos e comunicação com clientes.",
   },
   {
-    title: "Site para expert ou curso online",
+    title: "Site para expert ou curso",
     type: "Infoproduto",
     description:
-      "Perfeito para quem vende consultoria, mentorias, cursos e treinamentos com posicionamento premium.",
+      "Ideal para especialistas, mentorias, consultorias e produtos digitais.",
   },
 ];
 
@@ -43,61 +46,88 @@ const faq = [
   {
     question: "Como funciona a demonstração grátis?",
     answer:
-      "Você preenche o formulário, informa seu segmento e suas referências, e nós criamos três modelos visuais para você avaliar.",
+      "Você envia seu segmento, referências e objetivo. Depois disso, criamos 3 propostas visuais para você avaliar qual direção faz mais sentido para o seu negócio.",
   },
   {
-    question: "Em quanto tempo recebo os modelos?",
+    question: "O que acontece depois que eu escolho o modelo?",
     answer:
-      "Em até 3 horas você recebe os modelos e o orçamento por e-mail, além de um aviso no WhatsApp.",
+      "Depois da escolha, você recebe o orçamento. Com o pagamento aprovado, começamos a construção do seu site.",
   },
   {
-    question: "Preciso já ter um site?",
+    question: "Quanto tempo leva a entrega?",
     answer:
-      "Não. Se você já tiver um site, analisamos o atual. Se não tiver, criamos com base no seu objetivo e referências.",
+      "Sites comuns costumam levar cerca de 15 dias. Projetos maiores, com mais de 8 páginas ou e-commerce, podem chegar a 30 dias.",
   },
   {
-    question: "Vocês fazem só o design ou também o site completo?",
+    question: "Vocês entregam backup?",
     answer:
-      "Podemos fazer o visual, a estrutura estratégica e também a construção completa do site, dependendo do pacote escolhido.",
+      "Sim. Entregamos backup e mantemos uma cópia de segurança para garantir estabilidade e segurança do projeto.",
   },
   {
-    question: "O site pode ter blog, automações ou área de membros?",
+    question: "Tem garantia?",
     answer:
-      "Sim. A proposta pode incluir blog, integração com automações, captação de leads, área de membros e outros recursos.",
+      "Sim. Após a entrega, você tem 15 dias de garantia para correções de erros ou problemas sem custo adicional.",
+  },
+  {
+    question: "O que vem como bônus?",
+    answer:
+      "Você recebe indexação inicial no Google, SEO estrutural do que for escrito no site e acesso à área de membros de serviços para acompanhar tudo.",
   },
 ];
 
-const storeProducts = [
-  { name: "Conjunto Elegance", price: "R$ 129,90" },
+const products = [
   { name: "Vestido Aura", price: "R$ 149,90" },
-  { name: "Blazer Lumière", price: "R$ 189,90" },
-  { name: "Body Premium", price: "R$ 79,90" },
+  { name: "Conjunto Glow", price: "R$ 129,90" },
+  { name: "Blazer Lumi", price: "R$ 189,90" },
+  { name: "Body Signature", price: "R$ 79,90" },
 ];
 
 export default function SiteServicePage() {
+  const [seconds, setSeconds] = useState(15 * 60);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) return 15 * 60;
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const secs = String(seconds % 60).padStart(2, "0");
+
   return (
-    <main className="min-h-screen bg-[#f7f4ef] text-[#1e1d1a]">
-      <div className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
-        <header className="mb-10 flex flex-col gap-4 border-b border-black/10 pb-6 md:flex-row md:items-center md:justify-between">
+    <main className="relative min-h-screen overflow-hidden bg-[#0b1020] text-white">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl animate-pulse" />
+        <div className="absolute right-0 top-40 h-80 w-80 rounded-full bg-fuchsia-500/15 blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 left-1/3 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl animate-pulse" />
+      </div>
+
+      <div className="relative mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
+        <header className="mb-10 flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold tracking-[0.3em] text-[#6a7c6f]">
+            <p className="text-sm font-semibold tracking-[0.3em] text-cyan-300">
               LUMA STUDIO
             </p>
-            <p className="mt-2 text-sm text-black/55">
-              Construção de sites, páginas de vendas, blogs e áreas estratégicas
+            <p className="mt-2 text-sm text-white/55">
+              Sites, páginas de vendas, blogs e estruturas digitais que passam confiança e vendem mais
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
             <Link
               href="https://wa.me/5500000000000"
-              className="rounded-2xl border border-[#6a7c6f]/30 bg-white px-4 py-3 text-sm font-medium text-[#4a5f53]"
+              className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-200"
             >
-              Falar no WhatsApp
+              WhatsApp ao vivo
             </Link>
             <Link
               href="/site-demo-request"
-              className="rounded-2xl bg-[#4a5f53] px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(74,95,83,0.18)]"
+              className="rounded-2xl bg-fuchsia-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(217,70,239,0.4)] animate-pulse"
             >
               Peça sua demonstração grátis agora
             </Link>
@@ -106,83 +136,85 @@ export default function SiteServicePage() {
 
         <section className="grid grid-cols-1 gap-8 pb-12 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
-            <div className="mb-4 inline-flex rounded-full border border-[#d6c7b1] bg-[#fffaf4] px-3 py-1 text-xs text-[#8c6f48]">
-              Sites com estratégia, identidade e conversão
+            <div className="mb-4 inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-200">
+              Apresente sua empresa com mais autoridade, clareza e conversão
             </div>
 
-            <h1 className="max-w-4xl text-4xl font-semibold leading-tight md:text-6xl">
-              Nós criamos sites que passam confiança, vendem melhor e ajudam sua empresa a crescer com estrutura.
+            <h1 className="max-w-5xl text-4xl font-semibold leading-tight md:text-6xl">
+              Nós criamos sites que fazem sua empresa parecer maior, mais profissional e mais confiável.
             </h1>
 
-            <p className="mt-5 max-w-2xl text-sm leading-8 text-black/65 md:text-base">
-              Criamos sites institucionais, páginas de vendas, blogs, áreas de membros
-              e estruturas digitais pensadas para pequenas empresas, autônomos e
-              negócios que querem se posicionar com mais clareza e profissionalismo.
+            <p className="mt-5 max-w-2xl text-sm leading-8 text-white/70 md:text-base">
+              Se hoje você sente que sua empresa não transmite o nível que ela realmente tem,
+              nós resolvemos isso criando 3 propostas visuais baseadas no que você quer:
+              uma mais futurista, uma mais moderna e uma mais institucional.
+              Você escolhe a direção. Depois disso, seguimos para produção.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/site-demo-request"
-                className="rounded-2xl bg-[#4a5f53] px-5 py-4 text-sm font-semibold text-white"
+                className="rounded-2xl bg-fuchsia-500 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_25px_rgba(217,70,239,0.4)] animate-pulse"
               >
                 Peça sua demonstração grátis agora
               </Link>
               <Link
                 href="https://wa.me/5500000000000"
-                className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm text-black/75"
+                className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/80"
               >
-                Chat ao vivo no WhatsApp
+                Falar com atendimento
               </Link>
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-              <div className="rounded-[24px] border border-black/10 bg-white p-4">
-                <p className="text-xs text-black/45">Entrega</p>
-                <p className="mt-2 text-2xl font-semibold">Rápida</p>
-              </div>
-              <div className="rounded-[24px] border border-black/10 bg-white p-4">
-                <p className="text-xs text-black/45">Modelos iniciais</p>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur">
+                <p className="text-xs text-white/45">Modelos iniciais</p>
                 <p className="mt-2 text-2xl font-semibold">3</p>
               </div>
-              <div className="rounded-[24px] border border-black/10 bg-white p-4">
-                <p className="text-xs text-black/45">Foco</p>
-                <p className="mt-2 text-2xl font-semibold">Conversão</p>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur">
+                <p className="text-xs text-white/45">Prazo médio</p>
+                <p className="mt-2 text-2xl font-semibold">15–30d</p>
               </div>
-              <div className="rounded-[24px] border border-black/10 bg-white p-4">
-                <p className="text-xs text-black/45">Suporte</p>
-                <p className="mt-2 text-2xl font-semibold">Humano</p>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur">
+                <p className="text-xs text-white/45">Garantia</p>
+                <p className="mt-2 text-2xl font-semibold">15d</p>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-4 backdrop-blur">
+                <p className="text-xs text-white/45">Bônus</p>
+                <p className="mt-2 text-2xl font-semibold">SEO</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-[36px] border border-black/10 bg-white p-6 shadow-[0_20px_50px_rgba(0,0,0,0.06)]">
-            <div className="mb-4 rounded-[28px] border border-[#d6c7b1] bg-[#fffaf4] p-5">
-              <p className="text-sm font-semibold text-[#8c6f48]">Promoção relâmpago</p>
-              <h2 className="mt-3 text-3xl font-semibold text-[#1e1d1a]">
-                15:00
+          <div className="rounded-[36px] border border-white/10 bg-white/5 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">
+            <div className="mb-4 rounded-[28px] border border-fuchsia-400/20 bg-fuchsia-500/10 p-5">
+              <p className="text-sm font-semibold text-fuchsia-200">Promoção relâmpago</p>
+              <h2 className="mt-3 text-4xl font-semibold text-white">
+                {minutes}:{secs}
               </h2>
-              <p className="mt-2 text-sm text-black/60">
-                Use o código <span className="font-semibold text-[#4a5f53]">LUMA15</span> na sua proposta inicial.
+              <p className="mt-2 text-sm text-white/70">
+                Código de condição especial:{" "}
+                <span className="font-semibold text-cyan-200">LUMA15</span>
               </p>
             </div>
 
-            <div className="mb-5 aspect-video rounded-[28px] border border-black/10 bg-[#efebe5] p-4">
-              <div className="flex h-full items-center justify-center rounded-[22px] border border-dashed border-black/15 text-center text-black/45">
+            <div className="mb-5 aspect-video rounded-[28px] border border-white/10 bg-[#121a31] p-4">
+              <div className="flex h-full items-center justify-center rounded-[22px] border border-dashed border-white/15 text-center text-white/45">
                 Espaço para vídeo de vendas
               </div>
             </div>
 
-            <div className="space-y-4 rounded-[28px] border border-black/10 bg-[#faf8f4] p-5">
-              <p className="text-sm font-semibold text-[#4a5f53]">
+            <div className="space-y-4 rounded-[28px] border border-white/10 bg-[#121a31] p-5">
+              <p className="text-sm font-semibold text-cyan-200">
                 Como funciona nosso trabalho
               </p>
 
-              <div className="space-y-3 text-sm leading-7 text-black/65">
-                <p>1. Você envia seu segmento, referências e objetivo.</p>
-                <p>2. Criamos 3 modelos visuais para você comparar.</p>
-                <p>3. Enviamos orçamento junto com os modelos.</p>
-                <p>4. Você escolhe qual direção quer seguir.</p>
-                <p>5. Depois seguimos para aprovação e construção.</p>
+              <div className="space-y-3 text-sm leading-7 text-white/70">
+                <p>1. Você envia seu segmento, referências e o que quer comunicar.</p>
+                <p>2. Nós montamos 3 direções visuais para você comparar.</p>
+                <p>3. Você escolhe a que mais combina com sua empresa.</p>
+                <p>4. Após o pagamento, começamos a construção localmente.</p>
+                <p>5. Depois entregamos, subimos na sua hospedagem e mantemos backup.</p>
               </div>
             </div>
           </div>
@@ -191,17 +223,17 @@ export default function SiteServicePage() {
         <section className="pb-12">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-[#8c6f48]">
+              <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">
                 Portfólio
               </p>
               <h2 className="mt-2 text-3xl font-semibold md:text-4xl">
-                Exemplos de estruturas que podemos criar
+                Estruturas que podemos criar para o seu negócio
               </h2>
             </div>
 
             <Link
               href="/site-demo-request"
-              className="hidden rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-black/75 md:inline-flex"
+              className="hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/80 md:inline-flex"
             >
               Quero meus modelos
             </Link>
@@ -211,14 +243,14 @@ export default function SiteServicePage() {
             {portfolio.map((item) => (
               <article
                 key={item.title}
-                className="rounded-[28px] border border-black/10 bg-white p-5 shadow-[0_14px_30px_rgba(0,0,0,0.04)]"
+                className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-[0_14px_30px_rgba(0,0,0,0.15)]"
               >
-                <div className="mb-4 aspect-[16/10] rounded-[22px] border border-black/10 bg-[#efe8df]" />
-                <div className="mb-3 inline-flex rounded-full border border-[#d6c7b1] bg-[#fffaf4] px-3 py-1 text-xs text-[#8c6f48]">
+                <div className="mb-4 aspect-[16/10] rounded-[22px] bg-gradient-to-br from-cyan-300/20 to-fuchsia-500/20" />
+                <div className="mb-3 inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs text-cyan-200">
                   {item.type}
                 </div>
                 <h3 className="text-xl font-semibold">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-black/60">
+                <p className="mt-3 text-sm leading-7 text-white/65">
                   {item.description}
                 </p>
               </article>
@@ -227,25 +259,57 @@ export default function SiteServicePage() {
         </section>
 
         <section className="pb-12">
-          <div className="rounded-[34px] border border-black/10 bg-white p-6 md:p-8">
+          <div className="rounded-[34px] border border-white/10 bg-white/5 p-6 md:p-8">
             <h2 className="text-3xl font-semibold md:text-4xl">
-              Loja integrada no mesmo ecossistema
+              O que está incluso no serviço
             </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-black/60 md:text-base">
-              Também podemos estruturar uma vitrine moderna inspirada em grandes
-              e-commerces, com visual clean, jornada mobile e foco em confiança.
-              Abaixo está uma referência visual para a integração da sua loja.
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-white/65 md:text-base">
+              Depois que você escolhe um dos modelos, seguimos para a construção do seu site,
+              preparamos backups, subimos tudo para a sua plataforma e entregamos com organização
+              e segurança.
             </p>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-              {storeProducts.map((product) => (
+            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {[
+                "3 modelos iniciais para decisão",
+                "Construção completa do site",
+                "Backup entregue + backup reserva",
+                "SEO estrutural e indexação inicial no Google",
+                "Acesso à área de membros de serviços",
+                "Prazo entre 15 e 30 dias",
+                "15 dias de garantia após entrega",
+                "Organização para futura manutenção",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-[22px] border border-white/10 bg-[#121a31] p-4 text-sm leading-7 text-white/75"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-12">
+          <div className="rounded-[34px] border border-white/10 bg-[#121a31] p-6">
+            <h2 className="text-3xl font-semibold md:text-4xl">
+              Vitrine da loja integrada ao ecossistema
+            </h2>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-white/65">
+              Também podemos construir uma experiência de vitrine inspirada em grandes
+              e-commerces, com visual mais clean e compra mais agradável.
+            </p>
+
+            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+              {products.map((product) => (
                 <div
                   key={product.name}
-                  className="rounded-[24px] border border-black/10 bg-[#faf8f4] p-4"
+                  className="rounded-[22px] border border-white/10 bg-white/5 p-4"
                 >
-                  <div className="mb-4 aspect-[3/4] rounded-[18px] bg-[#e7dfd4]" />
+                  <div className="mb-4 aspect-[3/4] rounded-[16px] bg-gradient-to-b from-[#1f2948] to-[#11182e]" />
                   <h3 className="text-sm font-semibold">{product.name}</h3>
-                  <p className="mt-1 text-sm text-[#4a5f53]">{product.price}</p>
+                  <p className="mt-1 text-sm text-cyan-200">{product.price}</p>
                 </div>
               ))}
             </div>
@@ -254,41 +318,43 @@ export default function SiteServicePage() {
 
         <section className="pb-12">
           <div className="mb-6">
-            <p className="text-xs uppercase tracking-[0.24em] text-[#8c6f48]">
-              Perguntas frequentes
+            <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">
+              FAQ
             </p>
-            <h2 className="mt-2 text-3xl font-semibold md:text-4xl">FAQ</h2>
+            <h2 className="mt-2 text-3xl font-semibold md:text-4xl">
+              Perguntas frequentes
+            </h2>
           </div>
 
           <div className="space-y-4">
             {faq.map((item) => (
               <article
                 key={item.question}
-                className="rounded-[24px] border border-black/10 bg-white p-5"
+                className="rounded-[24px] border border-white/10 bg-white/5 p-5"
               >
                 <h3 className="text-lg font-semibold">{item.question}</h3>
-                <p className="mt-3 text-sm leading-7 text-black/60">{item.answer}</p>
+                <p className="mt-3 text-sm leading-7 text-white/65">{item.answer}</p>
               </article>
             ))}
           </div>
         </section>
 
-        <section className="rounded-[34px] border border-black/10 bg-[#4a5f53] p-8 text-white">
+        <section className="rounded-[34px] border border-fuchsia-400/20 bg-gradient-to-r from-fuchsia-500/15 to-cyan-400/10 p-8 text-white">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <h2 className="text-3xl font-semibold md:text-4xl">
-                Pronta para ver 3 modelos do seu site?
+                Agora é a hora de ver 3 modelos do seu futuro site
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-white/75 md:text-base">
-                Clique no botão abaixo, envie seus dados e receba seus modelos iniciais
-                e orçamento por e-mail e WhatsApp.
+                Clique no botão, envie suas referências e em até 3 horas você recebe
+                seus modelos e o orçamento por e-mail e WhatsApp.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/site-demo-request"
-                className="rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-[#4a5f53]"
+                className="rounded-2xl bg-fuchsia-500 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_25px_rgba(217,70,239,0.4)] animate-pulse"
               >
                 Peça sua demonstração grátis agora
               </Link>

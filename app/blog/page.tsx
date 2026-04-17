@@ -71,14 +71,13 @@ const storeProducts = [
 
 export default function BlogPage() {
   return (
-    <main className="min-h-screen bg-[#f5f5f1] text-[#1f211f]">
-      <div className="border-b border-black/10 bg-[#eef3ee]">
+    <main className="min-h-screen bg-[#f3f6f4] text-[#16202a]">
+      <div className="border-b border-black/10 bg-[#dff1e9]">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 text-sm md:px-6">
-          <p className="font-medium text-[#4a5f53]">
-            Criamos nosso primeiro modelo de IA orquestrador para ajudar autônomos
-            e pequenos negócios a automatizar tarefas e vender mais.
+          <p className="font-medium text-[#0f766e]">
+            Criamos nosso primeiro modelo de IA orquestrador para ajudar autônomos e pequenos negócios a automatizar tarefas e vender mais.
           </p>
-          <Link href="/coming-soon" className="font-semibold text-[#4a5f53]">
+          <Link href="/coming-soon" className="font-semibold text-[#0f766e]">
             Saiba mais aqui
           </Link>
         </div>
@@ -87,7 +86,7 @@ export default function BlogPage() {
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 py-8 md:px-6 xl:grid-cols-[1fr_320px]">
         <div>
           <header className="mb-8">
-            <div className="mb-4 inline-flex rounded-full border border-[#d6c7b1] bg-white px-3 py-1 text-xs text-[#8c6f48]">
+            <div className="mb-4 inline-flex rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs text-emerald-700">
               Blog Luma
             </div>
 
@@ -96,8 +95,8 @@ export default function BlogPage() {
             </h1>
 
             <p className="mt-4 max-w-3xl text-sm leading-8 text-black/60 md:text-base">
-              Um blog com estrutura editorial forte, visual mais claro e foco em SEO,
-              conteúdo útil e autoridade digital.
+              Um blog com estrutura editorial forte, design leve, SEO e conteúdo pensado
+              para gerar autoridade, retenção e conexão.
             </p>
           </header>
 
@@ -109,7 +108,7 @@ export default function BlogPage() {
                   key={card}
                   className="rounded-[28px] border border-black/10 bg-white p-4 shadow-[0_12px_30px_rgba(0,0,0,0.04)]"
                 >
-                  <div className="mb-4 aspect-[16/10] rounded-[20px] bg-[#dde5dd]" />
+                  <div className="mb-4 aspect-[16/10] rounded-[20px] bg-[#dce9e2]" />
                   <h3 className="text-lg font-semibold">{card}</h3>
                   <p className="mt-3 text-sm leading-7 text-black/60">
                     Artigo com SEO, escaneabilidade, profundidade e foco em retenção.
@@ -123,7 +122,7 @@ export default function BlogPage() {
             <section key={section.title} className="mb-10">
               <div className="mb-5 flex items-center justify-between gap-3">
                 <h2 className="text-2xl font-semibold md:text-3xl">{section.title}</h2>
-                <Link href="/coming-soon" className="text-sm font-medium text-[#4a5f53]">
+                <Link href="/coming-soon" className="text-sm font-medium text-[#0f766e]">
                   Ver tudo
                 </Link>
               </div>
@@ -134,7 +133,7 @@ export default function BlogPage() {
                     key={post}
                     className="rounded-[26px] border border-black/10 bg-white p-5"
                   >
-                    <div className="mb-4 aspect-[16/10] rounded-[18px] bg-[#e6ece6]" />
+                    <div className="mb-4 aspect-[16/10] rounded-[18px] bg-[#e5efe9]" />
                     <h3 className="text-lg font-semibold">{post}</h3>
                     <p className="mt-3 text-sm leading-7 text-black/60">
                       Conteúdo estruturado para ranquear, educar e posicionar.
@@ -156,21 +155,21 @@ export default function BlogPage() {
               {storeProducts.map((product) => (
                 <div
                   key={product.name}
-                  className="rounded-[22px] border border-black/10 bg-[#faf8f4] p-4"
+                  className="rounded-[22px] border border-black/10 bg-[#fafaf8] p-4"
                 >
-                  <div className="mb-4 aspect-[3/4] rounded-[16px] bg-[#eadfd3]" />
+                  <div className="mb-4 aspect-[3/4] rounded-[16px] bg-[#e7ddd2]" />
                   <h3 className="text-sm font-semibold">{product.name}</h3>
-                  <p className="mt-1 text-sm text-[#4a5f53]">{product.price}</p>
+                  <p className="mt-1 text-sm text-[#0f766e]">{product.price}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="rounded-[32px] border border-black/10 bg-[#4a5f53] p-8 text-white">
+          <section className="rounded-[32px] border border-black/10 bg-[#0f766e] p-8 text-white">
             <h2 className="text-3xl font-semibold md:text-4xl">
               Assine nossa newsletter
             </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/75">
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80">
               Receba artigos, insights e novidades sobre negócios, vendas,
               automação, posicionamento e crescimento.
             </p>
@@ -178,9 +177,9 @@ export default function BlogPage() {
             <div className="mt-6 flex flex-col gap-3 md:flex-row">
               <input
                 placeholder="Digite seu melhor e-mail"
-                className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-4 text-sm text-white outline-none placeholder:text-white/60"
+                className="w-full rounded-2xl border border-white/15 bg-white/10 px-4 py-4 text-sm text-white outline-none placeholder:text-white/70"
               />
-              <button className="rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-[#4a5f53]">
+              <button className="rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-[#0f766e]">
                 Quero receber
               </button>
             </div>
@@ -212,7 +211,7 @@ export default function BlogPage() {
 
           <section className="rounded-[28px] border border-black/10 bg-white p-5">
             <h2 className="text-lg font-semibold">Nossas redes sociais</h2>
-            <div className="mt-4 space-y-2 text-sm text-[#4a5f53]">
+            <div className="mt-4 space-y-2 text-sm text-[#0f766e]">
               <p>Instagram</p>
               <p>YouTube</p>
               <p>Pinterest</p>
@@ -223,13 +222,13 @@ export default function BlogPage() {
           <section className="rounded-[28px] border border-black/10 bg-white p-5">
             <h2 className="text-lg font-semibold">Ver nossos outros blogs</h2>
             <div className="mt-4 space-y-2">
-              <Link href="/coming-soon" className="block text-sm text-[#4a5f53]">
+              <Link href="/coming-soon" className="block text-sm text-[#0f766e]">
                 Blog de vendas
               </Link>
-              <Link href="/coming-soon" className="block text-sm text-[#4a5f53]">
+              <Link href="/coming-soon" className="block text-sm text-[#0f766e]">
                 Blog de identidade
               </Link>
-              <Link href="/coming-soon" className="block text-sm text-[#4a5f53]">
+              <Link href="/coming-soon" className="block text-sm text-[#0f766e]">
                 Blog de produtividade
               </Link>
             </div>
@@ -239,3 +238,4 @@ export default function BlogPage() {
     </main>
   );
 }
+
