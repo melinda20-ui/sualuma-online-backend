@@ -157,8 +157,8 @@
       "providerId": "prestador-site",
       "title": "Solicitação de reunião com Prestador de Site",
       "description": "Teste do fluxo de negar e sugerir nova data.",
-      "scheduledAt": "2026-05-12T18:00:00.000Z",
-      "status": "nova_data_proposta",
+      "scheduledAt": "2026-05-15T20:20:00.000Z",
+      "status": "data_aceita_cliente",
       "link": "",
       "providerName": "Prestador de Site",
       "providerEmail": "emaildoprestador@email.com",
@@ -168,7 +168,8 @@
       "createdAt": "2026-04-27T20:19:21.445Z",
       "proposedAt": "2026-05-15T20:20:00.000Z",
       "providerRefusalReason": "Motivo não posso teste",
-      "updatedAt": "2026-04-27T20:20:54.982Z"
+      "updatedAt": "2026-04-27T20:57:44.520Z",
+      "clientAcceptedAt": "2026-04-27T20:57:44.520Z"
     },
     {
       "id": "reuniao-1777320607826-qph1h1",
@@ -325,6 +326,5 @@
       "service": "Automação e atendimento",
       "calendarType": "manual"
     }
-  ],
-  "internalNotifications": []
+  ]
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readProviderDashboard, saveProviderDashboard } from '@/lib/provider-dashboard-store'
+import { readScopedDashboard, saveScopedDashboard } from '@/lib/scoped-dashboard-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -73,8 +73,8 @@ function addNotification(data: any, title: string, message: string, type = 'syst
   })
 }
 
-export async function GET() {
-  const data = await readProviderDashboard()
+export async function GET(request: NextRequest) {
+  const data = await readScopedDashboard(request, 'provider')
   refreshStats(data)
 
   return json({
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({} as any))
     const action = text(body.action)
     const now = new Date().toISOString()
-    const data = await readProviderDashboard()
+    const data = await readScopedDashboard(request, 'provider')
 
     if (!action) {
       return json({ ok: false, error: 'Ação não informada.' }, 400)
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
 
       addNotification(data, 'Projeto recuperado', 'O painel marcou a última versão como recuperada.', 'github')
 
-      const saved = await saveProviderDashboard(data)
+      const saved = await saveScopedDashboard(request, 'provider', data)
 
       return json({
         ok: true,
@@ -300,7 +300,7 @@ export async function POST(request: NextRequest) {
           updatedAt: now
         }
 
-        const saved = await saveProviderDashboard(data)
+        const saved = await saveScopedDashboard(request, 'provider', data)
 
         return json({
           ok: false,
@@ -350,7 +350,7 @@ export async function POST(request: NextRequest) {
     }
 
     refreshStats(data)
-    const saved = await saveProviderDashboard(data)
+    const saved = await saveScopedDashboard(request, 'provider', data)
 
     return json({
       ok: true,
