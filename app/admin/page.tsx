@@ -1,32 +1,34 @@
-import Link from "next/link";
+'use client'
+
+const card: React.CSSProperties = {
+  padding: 30,
+  borderRadius: 16,
+  background: 'linear-gradient(145deg,#111,#1a1a2e)',
+  textDecoration: 'none',
+  color: '#fff',
+  fontSize: 18
+}
 
 export default function AdminHome() {
   return (
-    <main className="min-h-screen bg-[#050507] text-white px-6 py-10">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="text-4xl font-semibold">Painel de Conteúdo</h1>
-        <p className="mt-3 text-white/60">
-          Gerencie posts e páginas do blog e do site.
-        </p>
-
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <Link
-            href="/admin/posts"
-            className="rounded-3xl border border-white/10 bg-white/[0.04] p-6"
-          >
-            <h2 className="text-2xl font-semibold">Posts</h2>
-            <p className="mt-2 text-white/60">Criar, editar e publicar artigos.</p>
-          </Link>
-
-          <Link
-            href="/admin/pages"
-            className="rounded-3xl border border-white/10 bg-white/[0.04] p-6"
-          >
-            <h2 className="text-2xl font-semibold">Páginas</h2>
-            <p className="mt-2 text-white/60">Editar páginas fixas do site.</p>
-          </Link>
-        </div>
+    <div style={{
+      height: '100vh',
+      background: '#0b0b0f',
+      color: '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'column'
+    }}>
+      <h1 style={{ fontSize: 32 }}>Painel Sualuma</h1>
+      <div style={{ display: 'flex', gap: 20, marginTop: 40 }}>
+        <a href="/admin/conteudo" style={card}>
+          📚 Admin Blog
+        </a>
+        <a href="/admin/emails" style={card}>
+          📧 Admin Emails
+        </a>
       </div>
-    </main>
-  );
+    </div>
+  )
 }

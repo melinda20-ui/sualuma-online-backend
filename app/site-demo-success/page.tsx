@@ -1,45 +1,91 @@
-import Link from "next/link";
+'use client'
 
-export default function SiteDemoSuccessPage() {
+export default function Page() {
   return (
-    <main className="min-h-screen bg-[#eef3f1] text-[#17212b]">
-      <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center px-4 py-16 text-center">
-        <div className="mb-4 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs text-emerald-700">
-          Solicitação recebida
+    <main style={styles.page}>
+      <div style={styles.container}>
+        
+        {/* 🎁 ANIMAÇÃO / DESTAQUE */}
+        <div style={styles.giftBox}>
+          🎁
         </div>
 
-        <h1 className="max-w-3xl text-4xl font-semibold leading-tight md:text-6xl">
-          Bem-vinda(o). Nós vamos criar 3 modelos do site que você solicitou.
+        {/* TÍTULO */}
+        <h1 style={styles.title}>
+          Seu presente está pronto!
         </h1>
 
-        <p className="mt-5 max-w-2xl text-sm leading-8 text-black/60 md:text-base">
-          Você vai receber os modelos por e-mail, junto com o orçamento, e também
-          um aviso no WhatsApp. Em até 3 horas, você terá esse retorno.
+        {/* SUBTEXTO */}
+        <p style={styles.subtitle}>
+          Liberamos seus 3 modelos exclusivos de site.
         </p>
 
-        <div className="mt-6 rounded-[28px] border border-black/10 bg-white p-6 text-left shadow-[0_15px_35px_rgba(0,0,0,0.05)]">
-          <p className="text-sm leading-7 text-black/65">
-            Enquanto aguarda, vá para o nosso blog e explore conteúdos sobre negócios,
-            marketing, produtividade, finanças e identidade.
-          </p>
-        </div>
+        {/* BOTÃO PRINCIPAL */}
+        <a
+          href="https://sualuma.online/blog"
+          style={styles.button}
+        >
+          Ver meus modelos agora 🚀
+        </a>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/blog"
-            className="rounded-2xl bg-[#0f766e] px-5 py-4 text-sm font-semibold text-white"
-          >
-            Ir para o blog
-          </Link>
+        {/* INFO EXTRA */}
+        <p style={styles.small}>
+          ⚡ Enviado também no seu e-mail
+        </p>
 
-          <Link
-            href="/site-service"
-            className="rounded-2xl border border-black/10 bg-white px-5 py-4 text-sm text-black/75"
-          >
-            Voltar para a página de sites
-          </Link>
-        </div>
       </div>
     </main>
-  );
+  )
+}
+
+const styles: Record<string, any> = {
+  page: {
+    minHeight: '100vh',
+    background: '#050507',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#fff',
+    fontFamily: 'Inter, sans-serif'
+  },
+
+  container: {
+    textAlign: 'center',
+    padding: 30,
+    maxWidth: 500
+  },
+
+  giftBox: {
+    fontSize: 60,
+    marginBottom: 20,
+    animation: 'pulse 1.5s infinite'
+  },
+
+  title: {
+    fontSize: 32,
+    fontWeight: 800,
+    marginBottom: 10
+  },
+
+  subtitle: {
+    color: '#aaa',
+    marginBottom: 25
+  },
+
+  button: {
+    display: 'inline-block',
+    padding: '16px 28px',
+    borderRadius: 12,
+    background: 'linear-gradient(90deg,#22d3ee,#8b5cf6)',
+    color: '#fff',
+    fontWeight: 700,
+    textDecoration: 'none',
+    fontSize: 16
+  },
+
+  small: {
+    marginTop: 20,
+    fontSize: 13,
+    color: '#666'
+  }
 }

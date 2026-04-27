@@ -6,7 +6,7 @@ export default function HomePage() {
     <main className="page">
       <nav className="nav">
         <Link href="/" className="brand">
-          <img src="/images/logolumaso.png" alt="Sualuma Online" />
+          <img src="/images/logodosite.png" alt="Sualuma Online" />
           <span>Sualuma Online</span>
         </Link>
 
@@ -219,7 +219,7 @@ export default function HomePage() {
       <section id="lista" className="section leadSection">
         <div className="leadBox">
           <div className="leadHeader">
-            <img src="/images/logolumaso.png" alt="Sualuma Online" />
+            <img src="/images/logodosite.png" alt="Sualuma Online" />
             <div>
               <p className="sectionLabel">Lista de espera</p>
               <h2>Entre no acesso antecipado</h2>
@@ -244,7 +244,7 @@ export default function HomePage() {
 
       <footer className="footer">
         <div>
-          <img src="/images/logolumaso.png" alt="Sualuma Online" />
+          <img src="/images/logodosite.png" alt="Sualuma Online" />
           <strong>Sualuma Online</strong>
         </div>
         <p>© 2026 Sualuma Online. Ecossistema de IA para autônomos.</p>

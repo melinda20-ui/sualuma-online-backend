@@ -1,33 +1,52 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { createLead } from "@/app/actions/leads";
+import { useState } from "react";
 
 export default function LeadCaptureForm() {
   const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(formData: FormData) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const nome = String(formData.get("nome") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+
+    if (!nome || !email || !email.includes("@")) {
+      setMessage("Preencha seu nome e um e-mail válido.");
+      return;
+    }
+
+    setLoading(true);
     setMessage("Enviando...");
 
-    startTransition(async () => {
-      const result = await createLead(formData);
-      setMessage(result.message);
-
-      if (result.ok) {
-        const form = document.getElementById("lead-capture-form") as HTMLFormElement | null;
-        form?.reset();
-      }
+    const response = await fetch("/api/leads", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome, email }),
     });
+
+    if (!response.ok) {
+      setLoading(false);
+      setMessage("Não conseguimos salvar agora. Tente novamente.");
+      return;
+    }
+
+    window.location.href = "https://sospublicidade.sualuma.online/obrigada";
   }
 
   return (
-    <form id="lead-capture-form" action={handleSubmit} className="lead-form">
+    <form onSubmit={handleSubmit} className="lead-form">
       <input type="text" name="nome" placeholder="Seu nome" required />
       <input type="email" name="email" placeholder="Seu melhor e-mail" required />
 
-      <button type="submit" disabled={isPending}>
-        {isPending ? "Enviando..." : "Entrar na lista"}
+      <button type="submit" disabled={loading}>
+        {loading ? "Enviando..." : "Entrar na lista"}
       </button>
 
       {message && <p className="lead-message">{message}</p>}
