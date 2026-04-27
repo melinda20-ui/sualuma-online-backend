@@ -22,89 +22,137 @@ function now() {
   return new Date().toISOString()
 }
 
-function ensureChats(data: any) {
-  if (!data.providerChats) {
-    data.providerChats = {
-      clientMessages: [
-        {
-          id: 'client-chat-demo-1',
-          from: 'client',
-          name: 'Cliente Sualuma',
-          message: 'Oi, gostaria de confirmar os próximos passos do projeto.',
-          createdAt: now(),
-        },
-        {
-          id: 'client-chat-demo-2',
-          from: 'provider',
-          name: 'Prestador',
-          message: 'Claro! Vou organizar as etapas e te aviso por aqui.',
-          createdAt: now(),
-        },
-      ],
-      aiMessages: [
-        {
-          id: 'ai-chat-demo-1',
-          from: 'ai',
-          name: 'Sualuma IA',
-          message: 'Olá! Eu posso te ajudar a montar propostas, organizar entregas, criar checklists, responder clientes e preparar próximos passos.',
-          createdAt: now(),
-        },
-      ],
-    }
-  }
+function slug(value: string) {
+  return String(value || 'cliente-sualuma')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '') || 'cliente-sualuma'
+}
 
-  if (!Array.isArray(data.providerChats.clientMessages)) {
-    data.providerChats.clientMessages = []
+function ensureChats(data: any) {
+  if (!data.providerChats) data.providerChats = {}
+
+  if (!data.providerChats.clientThreads) {
+    data.providerChats.clientThreads = {}
+
+    const oldMessages = Array.isArray(data.providerChats.clientMessages)
+      ? data.providerChats.clientMessages
+      : []
+
+    data.providerChats.clientThreads['cliente-sualuma'] = oldMessages.length ? oldMessages : [
+      {
+        id: 'client-chat-demo-1',
+        from: 'client',
+        name: 'Cliente Sualuma',
+        message: 'Oi, gostaria de confirmar os próximos passos do projeto.',
+        createdAt: now(),
+      },
+      {
+        id: 'client-chat-demo-2',
+        from: 'provider',
+        name: 'Prestador',
+        message: 'Claro! Vou organizar as etapas e te aviso por aqui.',
+        createdAt: now(),
+      },
+    ]
   }
 
   if (!Array.isArray(data.providerChats.aiMessages)) {
-    data.providerChats.aiMessages = []
+    data.providerChats.aiMessages = [
+      {
+        id: 'ai-chat-demo-1',
+        from: 'ai',
+        name: 'Sualuma IA',
+        message: 'Olá! Posso ajudar a montar propostas, organizar entregas, responder clientes, criar checklists e planejar execução.',
+        createdAt: now(),
+      },
+    ]
   }
 
   return data
+}
+
+function getClients(data: any) {
+  const names = new Set<string>()
+
+  ;(data.projects || []).forEach((p: any) => {
+    if (p.clientName) names.add(p.clientName)
+  })
+
+  ;(data.proposals || []).forEach((p: any) => {
+    if (p.clientName) names.add(p.clientName)
+  })
+
+  if (!names.size) names.add('Cliente Sualuma')
+
+  return Array.from(names).map((name) => ({
+    key: slug(name),
+    name,
+  }))
 }
 
 function aiReply(message: string) {
   const text = message.toLowerCase()
 
   if (text.includes('proposta')) {
-    return 'Perfeito. Para montar uma proposta forte, separe: objetivo do cliente, escopo, prazo, valor, etapas de entrega, revisões inclusas e próximos passos para aprovação.'
+    return 'Vamos montar uma proposta forte: comece com uma saudação, cite o problema do cliente, explique o escopo, informe prazo, valor, revisões inclusas e próximos passos para aprovação.'
   }
 
   if (text.includes('cliente')) {
-    return 'Você pode responder de forma profissional assim: “Perfeito, recebi sua mensagem. Vou revisar os detalhes e te retorno com o próximo passo organizado ainda hoje.”'
+    return 'Sugestão de resposta: “Perfeito, recebi sua mensagem. Vou revisar os detalhes e te retorno com o próximo passo organizado ainda hoje.”'
+  }
+
+  if (text.includes('kanban') || text.includes('etapa')) {
+    return 'Sugestão de kanban: Briefing recebido → Em execução → Aguardando revisão → Ajustes finais → Concluído.'
+  }
+
+  if (text.includes('reunião') || text.includes('reuniao')) {
+    return 'Para reunião, envie objetivo, data, horário, link e pauta. Depois registre o resumo no projeto para o cliente acompanhar.'
   }
 
   if (text.includes('github') || text.includes('salvar')) {
-    return 'Antes de alterar o projeto, salve uma versão. Depois registre o que mudou: página alterada, arquivo mexido, motivo da alteração e ponto de recuperação.'
+    return 'Antes de alterar o projeto, salve uma versão. Depois registre: o que mudou, onde mudou e qual é o ponto de recuperação.'
   }
 
-  if (text.includes('entrega') || text.includes('projeto')) {
-    return 'Organize a entrega em 4 blocos: briefing confirmado, execução, revisão do cliente e aprovação final. Isso evita confusão e aumenta a confiança.'
-  }
-
-  return 'Entendi. Transformando isso em ação prática: defina o objetivo, liste as tarefas, escolha a prioridade de agora e registre o próximo passo no projeto.'
+  return 'Transformando isso em ação prática: defina o objetivo, liste tarefas, escolha a prioridade de agora e registre o próximo passo no projeto.'
 }
 
 export async function GET(request: NextRequest) {
   try {
     const type = request.nextUrl.searchParams.get('type') === 'ai' ? 'ai' : 'client'
+    const clientKey = request.nextUrl.searchParams.get('clientKey') || 'cliente-sualuma'
 
     const data = ensureChats(await readScopedDashboard(request, 'provider'))
+    const clients = getClients(data)
+
+    if (type === 'ai') {
+      return json({
+        ok: true,
+        type,
+        clients,
+        messages: data.providerChats.aiMessages,
+        updatedAt: data.updatedAt || now(),
+      })
+    }
+
+    const safeClientKey = clientKey || clients[0]?.key || 'cliente-sualuma'
+
+    if (!data.providerChats.clientThreads[safeClientKey]) {
+      data.providerChats.clientThreads[safeClientKey] = []
+    }
 
     return json({
       ok: true,
       type,
-      messages: type === 'ai'
-        ? data.providerChats.aiMessages
-        : data.providerChats.clientMessages,
+      clients,
+      clientKey: safeClientKey,
+      messages: data.providerChats.clientThreads[safeClientKey],
       updatedAt: data.updatedAt || now(),
     })
   } catch (error: any) {
-    return json({
-      ok: false,
-      error: error?.message || 'Erro ao carregar chat.',
-    }, error?.status || 500)
+    return json({ ok: false, error: error?.message || 'Erro ao carregar chat.' }, error?.status || 500)
   }
 }
 
@@ -113,6 +161,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}))
     const type = body.type === 'ai' ? 'ai' : 'client'
     const message = String(body.message || '').trim()
+    const clientKey = String(body.clientKey || 'cliente-sualuma')
+    const clientName = String(body.clientName || 'Cliente Sualuma')
 
     if (!message) {
       return json({ ok: false, error: 'Mensagem vazia.' }, 400)
@@ -121,10 +171,15 @@ export async function POST(request: NextRequest) {
     const data = ensureChats(await readScopedDashboard(request, 'provider'))
 
     if (type === 'client') {
-      data.providerChats.clientMessages.push({
+      if (!data.providerChats.clientThreads[clientKey]) {
+        data.providerChats.clientThreads[clientKey] = []
+      }
+
+      data.providerChats.clientThreads[clientKey].push({
         id: `client-msg-${Date.now()}`,
         from: body.from || 'provider',
         name: body.name || 'Prestador',
+        clientName,
         message,
         createdAt: now(),
       })
@@ -151,15 +206,12 @@ export async function POST(request: NextRequest) {
     return json({
       ok: true,
       type,
+      data: saved,
       messages: type === 'ai'
         ? saved.providerChats.aiMessages
-        : saved.providerChats.clientMessages,
-      data: saved,
+        : saved.providerChats.clientThreads[clientKey],
     })
   } catch (error: any) {
-    return json({
-      ok: false,
-      error: error?.message || 'Erro ao enviar mensagem.',
-    }, error?.status || 500)
+    return json({ ok: false, error: error?.message || 'Erro ao enviar mensagem.' }, error?.status || 500)
   }
 }
