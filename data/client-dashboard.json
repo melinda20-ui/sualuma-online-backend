@@ -152,6 +152,25 @@
   ],
   "meetings": [
     {
+      "id": "reuniao-1777321161445-57bk5l",
+      "projectId": "",
+      "providerId": "prestador-site",
+      "title": "Solicitação de reunião com Prestador de Site",
+      "description": "Teste do fluxo de negar e sugerir nova data.",
+      "scheduledAt": "2026-05-12T18:00:00.000Z",
+      "status": "nova_data_proposta",
+      "link": "",
+      "providerName": "Prestador de Site",
+      "providerEmail": "emaildoprestador@email.com",
+      "clientName": "Cliente Sualuma",
+      "clientEmail": "cliente@sualuma.online",
+      "notes": "Teste do fluxo de negar e sugerir nova data.",
+      "createdAt": "2026-04-27T20:19:21.445Z",
+      "proposedAt": "2026-05-15T20:20:00.000Z",
+      "providerRefusalReason": "Motivo não posso teste",
+      "updatedAt": "2026-04-27T20:20:54.982Z"
+    },
+    {
       "id": "reuniao-1777320607826-qph1h1",
       "projectId": "",
       "providerId": "prestador-site",
@@ -306,5 +325,6 @@
       "service": "Automação e atendimento",
       "calendarType": "manual"
     }
-  ]
+  ],
+  "internalNotifications": []
 }

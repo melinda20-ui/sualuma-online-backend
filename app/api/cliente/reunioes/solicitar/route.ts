@@ -130,6 +130,7 @@ export async function POST(req: Request) {
 
     const publicBaseUrl = 'https://dashboardcliente.sualuma.online'
     const confirmUrl = `${publicBaseUrl}/api/cliente/reunioes/confirmar?meetingId=${encodeURIComponent(meetingId)}`
+    const denyUrl = `${publicBaseUrl}/api/cliente/reunioes/negar?meetingId=${encodeURIComponent(meetingId)}`
     const dataFormatada = formatDateBR(scheduledAt)
 
     const providerEmailResult = await sendSingleEmail({
@@ -146,6 +147,11 @@ export async function POST(req: Request) {
         <p>
           <a href="${confirmUrl}" style="display:inline-block;background:#2563eb;color:white;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold;">
             Informar link e confirmar reunião
+          </a>
+        </p>
+        <p>
+          <a href="${denyUrl}" style="display:inline-block;background:#dc2626;color:white;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:bold;">
+            Negar e sugerir nova data
           </a>
         </p>
       `,
