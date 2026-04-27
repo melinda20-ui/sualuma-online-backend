@@ -7,6 +7,8 @@ export type Customer = {
   email: string
   plan: string
   avatar: string
+  hasProviderAccess?: boolean
+  serviceDashboardUrl?: string
 }
 
 export type ClientProject = {
@@ -18,6 +20,11 @@ export type ClientProject = {
   nextStep: string
   createdAt: string
   updatedAt: string
+  kanban?: {
+    todo?: Array<Record<string, unknown>>
+    doing?: Array<Record<string, unknown>>
+    done?: Array<Record<string, unknown>>
+  }
 }
 
 export type ClientDelivery = {
@@ -50,6 +57,12 @@ export type ClientMeeting = {
   status: string
   link?: string
   createdAt: string
+  providerName?: string
+  providerEmail?: string
+  clientName?: string
+  clientEmail?: string
+  notes?: string
+  confirmedAt?: string
 }
 
 export type ClientAgent = {
@@ -60,6 +73,15 @@ export type ClientAgent = {
   category: string
 }
 
+export type ServiceProvider = {
+  id: string
+  name: string
+  email: string
+  role: string
+  service: string
+  calendarType?: string
+}
+
 export type ClientDashboardData = {
   customer: Customer
   projects: ClientProject[]
@@ -67,6 +89,7 @@ export type ClientDashboardData = {
   messages: ClientMessage[]
   meetings: ClientMeeting[]
   agents: ClientAgent[]
+  serviceProviders: ServiceProvider[]
 }
 
 const filePath = path.join(process.cwd(), 'data', 'client-dashboard.json')
@@ -78,22 +101,29 @@ const defaultDashboard: ClientDashboardData = {
     email: 'cliente@sualuma.online',
     plan: 'Cliente',
     avatar: 'S',
+    hasProviderAccess: true,
+    serviceDashboardUrl: 'https://meuservico.sualuma.online',
   },
   projects: [],
   deliveries: [],
   messages: [],
   meetings: [],
   agents: [],
+  serviceProviders: [],
 }
 
 function normalizeDashboard(data: Partial<ClientDashboardData>): ClientDashboardData {
   return {
-    customer: data.customer || defaultDashboard.customer,
+    customer: {
+      ...defaultDashboard.customer,
+      ...(data.customer || {}),
+    },
     projects: Array.isArray(data.projects) ? data.projects : [],
     deliveries: Array.isArray(data.deliveries) ? data.deliveries : [],
     messages: Array.isArray(data.messages) ? data.messages : [],
     meetings: Array.isArray(data.meetings) ? data.meetings : [],
     agents: Array.isArray(data.agents) ? data.agents : [],
+    serviceProviders: Array.isArray(data.serviceProviders) ? data.serviceProviders : [],
   }
 }
 

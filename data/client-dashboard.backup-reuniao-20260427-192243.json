@@ -152,108 +152,19 @@
   ],
   "meetings": [
     {
-      "id": "reuniao-1777320607826-qph1h1",
-      "projectId": "",
-      "providerId": "prestador-site",
-      "title": "Solicitação de reunião com Prestador de Site",
-      "description": "Teste final com link manual.",
-      "scheduledAt": "2026-05-09T18:00:00.000Z",
-      "status": "confirmada",
-      "link": "https://teste.com",
-      "providerName": "Prestador de Site",
-      "providerEmail": "emaildoprestador@email.com",
-      "clientName": "Cliente Sualuma",
-      "clientEmail": "cliente@sualuma.online",
-      "notes": "Teste final com link manual.",
-      "createdAt": "2026-04-27T20:10:07.826Z",
-      "confirmedAt": "2026-04-27T20:11:05.918Z",
-      "meetLink": "https://teste.com",
-      "providerMessage": "",
-      "calendarLink": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Solicita%C3%A7%C3%A3o%20de%20reuni%C3%A3o%20com%20Prestador%20de%20Site&dates=20260509T180000Z/20260509T190000Z&details=Reuni%C3%A3o%20confirmada%20pela%20Sualuma%20Online.%0A%0ACliente%3A%20Cliente%20Sualuma%0APrestador%3A%20Prestador%20de%20Site%0A%0ALink%20da%20reuni%C3%A3o%3A%0Ahttps%3A%2F%2Fteste.com%0A%0AObserva%C3%A7%C3%B5es%3A%0ATeste%20final%20com%20link%20manual.%0A%0AMensagem%20do%20prestador%3A%0A&location=https%3A%2F%2Fteste.com"
-    },
-    {
-      "id": "reuniao-1777320234308-ntzkxx",
-      "projectId": "",
-      "providerId": "",
-      "title": "Solicitação de reunião com Prestador de Site",
-      "description": "urgente teste",
-      "scheduledAt": "2026-05-09T18:00:00.000Z",
-      "status": "confirmada",
-      "link": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Solicita%C3%A7%C3%A3o%20de%20reuni%C3%A3o%20com%20Prestador%20de%20Site&dates=20260509T180000Z/20260509T190000Z&details=Reuni%C3%A3o%20confirmada%20pela%20Sualuma%20Online.%0A%0ACliente%3A%20Cliente%20Sualuma%0APrestador%3A%20Prestador%20de%20Site%0A%0AObserva%C3%A7%C3%B5es%3A%20urgente%20teste",
-      "providerName": "Prestador de Site",
-      "providerEmail": "emaildoprestador@email.com",
-      "clientName": "Cliente Sualuma",
-      "clientEmail": "cliente@sualuma.online",
-      "notes": "urgente teste",
-      "createdAt": "2026-04-27T20:03:54.308Z",
-      "confirmedAt": "2026-04-27T20:04:45.533Z"
-    },
-    {
-      "id": "reuniao-1777319938179-135cmb",
-      "projectId": "",
-      "providerId": "",
-      "title": "Solicitação de reunião com Prestador de Site",
-      "description": "Cliente solicitou reunião pelo dashboard.",
-      "scheduledAt": "2026-05-02T18:00:00.000Z",
-      "status": "confirmada",
-      "link": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Solicita%C3%A7%C3%A3o%20de%20reuni%C3%A3o%20com%20Prestador%20de%20Site&dates=20260502T180000Z/20260502T190000Z&details=Reuni%C3%A3o%20confirmada%20pela%20Sualuma%20Online.%0A%0ACliente%3A%20Cliente%20Sualuma%0APrestador%3A%20Prestador%20de%20Site%0A%0AObserva%C3%A7%C3%B5es%3A%20",
-      "providerName": "Prestador de Site",
-      "providerEmail": "emaildoprestador@email.com",
-      "clientName": "Cliente Sualuma",
-      "clientEmail": "cliente@sualuma.online",
-      "notes": "",
-      "createdAt": "2026-04-27T19:58:58.179Z",
-      "confirmedAt": "2026-04-27T20:00:20.131Z"
-    },
-    {
-      "id": "reuniao-1777319569698-bymrp4",
-      "projectId": "",
-      "providerId": "",
-      "title": "Solicitação de reunião com Prestador Teste",
-      "description": "Quero alinhar o andamento do projeto.",
-      "scheduledAt": "2026-04-30T18:00:00.000Z",
-      "status": "confirmada",
-      "link": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Solicita%C3%A7%C3%A3o%20de%20reuni%C3%A3o%20com%20Prestador%20Teste&dates=20260430T180000Z/20260430T190000Z&details=Reuni%C3%A3o%20confirmada%20pela%20Sualuma%20Online.%0A%0ACliente%3A%20Cliente%20Teste%0APrestador%3A%20Prestador%20Teste%0A%0AObserva%C3%A7%C3%B5es%3A%20Quero%20alinhar%20o%20andamento%20do%20projeto.",
-      "providerName": "Prestador Teste",
-      "providerEmail": "SEU_EMAIL_DE_PRESTADOR_REAL",
-      "clientName": "Cliente Teste",
-      "clientEmail": "SEU_EMAIL_DE_CLIENTE_REAL",
-      "notes": "Quero alinhar o andamento do projeto.",
-      "createdAt": "2026-04-27T19:52:49.698Z",
-      "confirmedAt": "2026-04-27T19:53:59.798Z"
-    },
-    {
-      "id": "reuniao-1777317875489-oz6z94",
-      "projectId": "",
-      "providerId": "prestador-site",
-      "title": "Solicitação de reunião com Prestador de Site",
-      "description": "Quero alinhar o andamento do projeto.",
-      "scheduledAt": "2026-04-30T18:00:00.000Z",
-      "status": "confirmada",
-      "link": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Solicita%C3%A7%C3%A3o%20de%20reuni%C3%A3o%20com%20Prestador%20de%20Site&dates=20260430T180000Z/20260430T190000Z&details=Reuni%C3%A3o%20confirmada%20pela%20Sualuma%20Online.%0A%0ACliente%3A%20Cliente%20Sualuma%0APrestador%3A%20Prestador%20de%20Site%0A%0AObserva%C3%A7%C3%B5es%3A%20Quero%20alinhar%20o%20andamento%20do%20projeto.",
-      "providerName": "Prestador de Site",
-      "providerEmail": "emaildoprestador@email.com",
-      "clientName": "Cliente Sualuma",
-      "clientEmail": "cliente@sualuma.online",
-      "notes": "Quero alinhar o andamento do projeto.",
-      "createdAt": "2026-04-27T19:24:35.489Z",
-      "confirmedAt": "2026-04-27T19:25:37.782Z"
-    },
-    {
       "id": "reuniao-1777317553496-puiz18",
       "projectId": "",
       "title": "Solicitação de reunião com Prestador Teste",
       "description": "Quero alinhar o andamento do projeto.",
       "scheduledAt": "2026-04-30T18:00:00.000Z",
-      "status": "confirmada",
-      "link": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Solicita%C3%A7%C3%A3o%20de%20reuni%C3%A3o%20com%20Prestador%20Teste&dates=20260430T180000Z/20260430T190000Z&details=Reuni%C3%A3o%20confirmada%20pela%20Sualuma%20Online.%0A%0ACliente%3A%20Cliente%20Teste%0APrestador%3A%20Prestador%20Teste%0A%0AObserva%C3%A7%C3%B5es%3A%20Quero%20alinhar%20o%20andamento%20do%20projeto.",
+      "status": "aguardando_confirmacao_prestador",
+      "link": "",
       "providerName": "Prestador Teste",
       "providerEmail": "SEU_EMAIL_DE_PRESTADOR_AQUI",
       "clientName": "Cliente Teste",
       "clientEmail": "SEU_EMAIL_DE_CLIENTE_AQUI",
       "notes": "Quero alinhar o andamento do projeto.",
-      "createdAt": "2026-04-27T19:19:13.496Z",
-      "confirmedAt": "2026-04-27T19:49:26.246Z"
+      "createdAt": "2026-04-27T19:19:13.496Z"
     },
     {
       "id": "reuniao-demo-1",
@@ -287,24 +198,6 @@
       "description": "Ajuda a organizar briefing, páginas, textos e estrutura do site.",
       "status": "disponivel",
       "category": "sites"
-    }
-  ],
-  "serviceProviders": [
-    {
-      "id": "prestador-site",
-      "name": "Prestador de Site",
-      "email": "emaildoprestador@email.com",
-      "role": "Construção de site e landing pages",
-      "service": "Site institucional / landing page",
-      "calendarType": "manual"
-    },
-    {
-      "id": "prestador-automacao",
-      "name": "Especialista em Automação",
-      "email": "emaildoprestador@email.com",
-      "role": "Fluxos, atendimento e integrações",
-      "service": "Automação e atendimento",
-      "calendarType": "manual"
     }
   ]
 }
