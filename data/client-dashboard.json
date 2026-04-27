@@ -1,0 +1,108 @@
+{
+  "customer": {
+    "id": "cliente-demo",
+    "name": "Cliente Sualuma",
+    "email": "cliente@sualuma.online",
+    "plan": "Cliente",
+    "avatar": "S"
+  },
+  "projects": [
+    {
+      "id": "proj-1777314248147-u5oss0",
+      "name": "Projeto Teste Cliente",
+      "description": "Projeto criado pelo backend do dashboard do cliente.",
+      "status": "em_andamento",
+      "progress": 10,
+      "nextStep": "Enviar briefing inicial.",
+      "createdAt": "2026-04-27T18:24:08.147Z",
+      "updatedAt": "2026-04-27T18:24:08.147Z"
+    },
+    {
+      "id": "proj-site-demo",
+      "name": "Site institucional",
+      "description": "Criação do site principal com página inicial, página de serviços e formulário de contato.",
+      "status": "em_andamento",
+      "progress": 65,
+      "nextStep": "Cliente revisar a primeira versão da home.",
+      "createdAt": "2026-04-27T12:00:00.000Z",
+      "updatedAt": "2026-04-27T12:00:00.000Z"
+    },
+    {
+      "id": "proj-automacao-demo",
+      "name": "Automação de atendimento",
+      "description": "Estrutura inicial para organizar mensagens, captação de leads e respostas automáticas.",
+      "status": "em_andamento",
+      "progress": 35,
+      "nextStep": "Definir perguntas frequentes do atendimento.",
+      "createdAt": "2026-04-27T12:00:00.000Z",
+      "updatedAt": "2026-04-27T12:00:00.000Z"
+    }
+  ],
+  "deliveries": [
+    {
+      "id": "entrega-home-demo",
+      "projectId": "proj-site-demo",
+      "title": "Primeira versão da página inicial",
+      "description": "Layout inicial da home enviado para revisão do cliente.",
+      "status": "pendente_revisao",
+      "dueDate": "2026-04-30",
+      "url": "https://sualuma.online",
+      "createdAt": "2026-04-27T12:00:00.000Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "msg-demo-1",
+      "projectId": "proj-site-demo",
+      "from": "Sualuma Online",
+      "to": "Cliente Sualuma",
+      "text": "Oi! Sua primeira entrega já está disponível para revisão.",
+      "read": false,
+      "createdAt": "2026-04-27T12:00:00.000Z"
+    },
+    {
+      "id": "msg-demo-2",
+      "projectId": "proj-automacao-demo",
+      "from": "Sualuma Online",
+      "to": "Cliente Sualuma",
+      "text": "Precisamos das principais dúvidas dos seus clientes para montar a automação.",
+      "read": false,
+      "createdAt": "2026-04-27T12:05:00.000Z"
+    }
+  ],
+  "meetings": [
+    {
+      "id": "reuniao-demo-1",
+      "projectId": "proj-site-demo",
+      "title": "Reunião de alinhamento do site",
+      "description": "Revisar primeira entrega e ajustar próximos passos.",
+      "scheduledAt": "2026-04-30T18:00:00.000Z",
+      "status": "agendada",
+      "link": "https://meet.google.com/",
+      "createdAt": "2026-04-27T12:00:00.000Z"
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent-social-media",
+      "name": "Agente Social Media",
+      "description": "Ajuda a criar ideias de posts, legendas e calendário de conteúdo.",
+      "status": "disponivel",
+      "category": "marketing"
+    },
+    {
+      "id": "agent-atendimento",
+      "name": "Agente de Atendimento",
+      "description": "Ajuda a responder dúvidas frequentes e organizar conversas com clientes.",
+      "status": "disponivel",
+      "category": "atendimento"
+    },
+    {
+      "id": "agent-sites",
+      "name": "Agente de Sites",
+      "description": "Ajuda a organizar briefing, páginas, textos e estrutura do site.",
+      "status": "disponivel",
+      "category": "sites"
+    }
+  ]
+}
