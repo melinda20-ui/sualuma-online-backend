@@ -2,7 +2,7 @@ import './globals.css'
 import AuthWelcomeEmail from "@/components/AuthWelcomeEmail";
 import ChoosePlanPopup from "@/components/ChoosePlanPopup";
 import AuthCookieBridge from "@/components/AuthCookieBridge";
-import LoginMobileLayoutFix from "@/components/LoginMobileLayoutFix";
+import LoginMobileSafeFix from "@/components/LoginMobileSafeFix";
 
 export const metadata = {
   title: 'Luma OS',
@@ -17,7 +17,8 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body>
-        <LoginMobileLayoutFix />
+        <LoginMobileSafeFix />
+        
         <AuthCookieBridge />{children}          <AuthWelcomeEmail />
                   <ChoosePlanPopup />
         </body>
