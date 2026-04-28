@@ -1571,129 +1571,6 @@
   window.addEventListener("load", boot);
 })();
 </script>
-
-<style id="trabalhosja-profile-atalhos-style">
-  .tj-profile-shortcuts-title{
-    margin:18px 0 10px !important;
-    color:#fff !important;
-    font-size:18px !important;
-    font-weight:1000 !important;
-  }
-
-  .tj-profile-shortcuts{
-    display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    gap:12px !important;
-    margin:12px 0 18px !important;
-  }
-
-  .tj-profile-shortcut{
-    min-height:58px !important;
-    border-radius:18px !important;
-    border:1px solid rgba(255,255,255,.12) !important;
-    background:rgba(255,255,255,.055) !important;
-    color:#fff !important;
-    text-decoration:none !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    text-align:center !important;
-    font-weight:1000 !important;
-    padding:12px !important;
-    transition:.18s ease !important;
-  }
-
-  .tj-profile-shortcut:hover{
-    transform:translateY(-2px) !important;
-    border-color:rgba(24,242,255,.35) !important;
-    background:linear-gradient(135deg,rgba(141,92,255,.28),rgba(24,242,255,.16)) !important;
-  }
-
-  .tj-profile-shortcut.primary{
-    background:linear-gradient(135deg,#8d5cff,#18f2ff) !important;
-    border-color:transparent !important;
-    box-shadow:0 14px 34px rgba(24,242,255,.14) !important;
-  }
-
-  @media(max-width:860px){
-    .tj-profile-shortcuts{
-      grid-template-columns:1fr !important;
-    }
-
-    .tj-profile-shortcut{
-      min-height:56px !important;
-      font-size:16px !important;
-    }
-  }
-</style>
-
-<script id="trabalhosja-profile-atalhos-script">
-(function(){
-  if(window.__tjProfileAtalhosLoaded) return;
-  window.__tjProfileAtalhosLoaded = true;
-
-  const shortcuts = [
-    {
-      label: "💼 Marketplace de propostas",
-      url: "https://meuservico.sualuma.online/?v=atalhos1#prestador-servicos",
-      primary: true
-    },
-    {
-      label: "🤖 Chat IA",
-      url: "https://chat.sualuma.online",
-      primary: true
-    },
-    {
-      label: "🏠 Dashboard do cliente",
-      url: "https://dashboardcliente.sualuma.online"
-    },
-    {
-      label: "🛠️ Dashboard de serviço",
-      url: "https://meuservico.sualuma.online/?v=atalhos1#prestador"
-    }
-  ];
-
-  function insertShortcuts(){
-    const modal = document.getElementById("tjProfileModal");
-    if(!modal) return;
-
-    const box = modal.querySelector(".tj-profile-box");
-    const actions = modal.querySelector(".tj-profile-actions");
-
-    if(!box || !actions) return;
-    if(document.getElementById("tjProfileExtraShortcuts")) return;
-
-    const title = document.createElement("h3");
-    title.className = "tj-profile-shortcuts-title";
-    title.textContent = "Atalhos rápidos";
-
-    const wrap = document.createElement("div");
-    wrap.id = "tjProfileExtraShortcuts";
-    wrap.className = "tj-profile-shortcuts";
-
-    wrap.innerHTML = shortcuts.map(item => `
-      <a class="tj-profile-shortcut ${item.primary ? "primary" : ""}"
-         href="${item.url}">
-        ${item.label}
-      </a>
-    `).join("");
-
-    actions.insertAdjacentElement("afterend", wrap);
-    wrap.insertAdjacentElement("beforebegin", title);
-  }
-
-  document.addEventListener("DOMContentLoaded", insertShortcuts);
-  window.addEventListener("load", insertShortcuts);
-
-  const originalOpenCheck = setInterval(function(){
-    insertShortcuts();
-  }, 700);
-
-  setTimeout(function(){
-    clearInterval(originalOpenCheck);
-  }, 8000);
-})();
-</script>
 <style id="trabalhosja-portfolio-profile-bridge-style">
   .tj-provider-portfolio-list{
     display:grid;
@@ -2011,6 +1888,181 @@
 
   window.addEventListener("load", function(){
     setTimeout(bootAvatar, 700);
+  });
+})();
+</script>
+<style id="trabalhosja-profile-final-clean-style">
+  #tjProfileModal .tj-profile-actions {
+    display: none !important;
+  }
+
+  #tjProfileModal .tj-profile-shortcuts-title {
+    margin: 20px 0 12px !important;
+    font-size: 18px !important;
+    font-weight: 1000 !important;
+  }
+
+  #tjProfileModal .tj-profile-shortcuts {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 18px !important;
+  }
+
+  #tjProfileModal .tj-profile-shortcut {
+    width: 100% !important;
+    min-height: 56px !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    font-weight: 1000 !important;
+    border: 1px solid rgba(255,255,255,.12) !important;
+    background: rgba(255,255,255,.055) !important;
+    color: #fff !important;
+  }
+
+  #tjProfileModal .tj-profile-shortcut.primary {
+    background: linear-gradient(135deg,#8d5cff,#18f2ff) !important;
+  }
+
+  @media (max-width: 860px){
+    #tjProfileModal .tj-profile-shortcuts {
+      grid-template-columns: 1fr !important;
+    }
+
+    #tjProfileModal .tj-profile-shortcut {
+      min-height: 64px !important;
+      font-size: 18px !important;
+    }
+  }
+</style>
+
+<script id="trabalhosja-profile-final-clean-script">
+(function(){
+  if(window.__tjProfileFinalClean) return;
+  window.__tjProfileFinalClean = true;
+
+  const links = [
+    ["🖼️ Abrir meu portfólio", "https://meuservico.sualuma.online/?v=portfolio-backend#prestador-portfolio", "primary"],
+    ["💼 Marketplace de propostas", "https://meuservico.sualuma.online/?v=portfolio-backend#prestador-servicos", "primary"],
+    ["🤖 Chat IA", "https://chat.sualuma.online", "primary"],
+    ["🏠 Dashboard do cliente", "https://dashboardcliente.sualuma.online", ""],
+    ["🛠️ Dashboard de serviço", "https://meuservico.sualuma.online/?v=portfolio-backend#prestador", ""],
+    ["🌐 Voltar para o feed", "https://trabalhosja.sualuma.online", ""]
+  ];
+
+  async function fetchPortfolioProfile(){
+    try{
+      const r = await fetch("/api/prestador/portfolio-sync", {
+        credentials: "include",
+        cache: "no-store"
+      });
+      if(!r.ok) return null;
+      return await r.json();
+    }catch{
+      return null;
+    }
+  }
+
+  function initialsFromName(name, email){
+    const base = String(name || email || "U").trim();
+    return base
+      .split(/\s+/)
+      .slice(0,2)
+      .map(x => x[0])
+      .join("")
+      .toUpperCase() || "U";
+  }
+
+  function setProfileButton(profile){
+    const btn = document.getElementById("tjProfileBtn");
+    if(!btn || !profile) return;
+
+    const photo = profile.photoUrl || profile.avatarUrl || profile.fotoUrl || profile.imageUrl || "";
+    const initials = initialsFromName(profile.name, profile.email);
+
+    if(photo && !photo.startsWith("data:image")){
+      btn.classList.add("tj-has-profile-photo");
+      btn.innerHTML = `<img src="${photo}" alt="Perfil" loading="lazy">`;
+    } else {
+      btn.classList.remove("tj-has-profile-photo");
+      btn.textContent = initials;
+    }
+  }
+
+  function cleanModal(profileData){
+    const modal = document.getElementById("tjProfileModal");
+    if(!modal) return;
+
+    const profile = profileData?.profile || {};
+    const portfolio = profileData?.portfolio || [];
+
+    const actions = modal.querySelector(".tj-profile-actions");
+    if(actions) actions.style.display = "none";
+
+    let shortcuts = modal.querySelector(".tj-profile-shortcuts") || document.getElementById("tjProfileExtraShortcuts");
+    if(!shortcuts){
+      shortcuts = document.createElement("div");
+      shortcuts.className = "tj-profile-shortcuts";
+      const title = document.createElement("h3");
+      title.className = "tj-profile-shortcuts-title";
+      title.textContent = "Atalhos rápidos";
+      const anchor = modal.querySelector(".tj-profile-body") || modal.querySelector(".modal-body") || modal;
+      anchor.appendChild(title);
+      anchor.appendChild(shortcuts);
+    }
+
+    shortcuts.innerHTML = links.map(([label, href, type]) => {
+      return `<a class="tj-profile-shortcut ${type}" href="${href}">${label}</a>`;
+    }).join("");
+
+    const title = modal.querySelector("h2, .tj-profile-title");
+    if(title && profile.name) title.textContent = profile.name;
+
+    const subtitle = modal.querySelector(".tj-profile-subtitle, .profile-subtitle");
+    if(subtitle) {
+      subtitle.textContent = portfolio.length
+        ? `${portfolio.length} trabalho(s) no portfólio`
+        : "Portfólio e posts publicados.";
+    }
+
+    modal.querySelectorAll(".tj-profile-shortcuts").forEach((el, index) => {
+      if(index > 0) el.remove();
+    });
+  }
+
+  async function refresh(){
+    const data = await fetchPortfolioProfile();
+    if(data?.ok){
+      setProfileButton(data.profile);
+      cleanModal(data);
+    } else {
+      cleanModal(null);
+    }
+  }
+
+  const oldOpen = window.TJProfile && window.TJProfile.open;
+  if(window.TJProfile && typeof oldOpen === "function"){
+    window.TJProfile.open = async function(){
+      const result = await oldOpen.apply(this, arguments);
+      setTimeout(refresh, 120);
+      setTimeout(refresh, 600);
+      return result;
+    };
+  }
+
+  document.addEventListener("click", function(e){
+    if(e.target.closest("#tjProfileBtn, #tjSidebarProfileBtn, .tj-profile-open")){
+      setTimeout(refresh, 120);
+      setTimeout(refresh, 600);
+    }
+  });
+
+  window.addEventListener("load", function(){
+    setTimeout(refresh, 700);
+    setTimeout(refresh, 2200);
   });
 })();
 </script>

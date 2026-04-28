@@ -153,6 +153,268 @@
       .sidepanel{position:relative;top:0}
     }
   </style>
+<style id="sualuma-service-mobile-cleanup-v2">
+  @media (max-width: 860px) {
+    html,
+    body {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+      scroll-behavior: smooth !important;
+    }
+
+    body {
+      background: #040615 !important;
+    }
+
+    body * {
+      box-sizing: border-box !important;
+    }
+
+    body::before,
+    body::after {
+      pointer-events: none !important;
+    }
+
+    main,
+    section,
+    .section,
+    .dashboard,
+    .dashboard-shell,
+    .provider-dashboard,
+    .provider-shell,
+    .provider-layout,
+    .app-shell,
+    .shell,
+    .container,
+    .content,
+    .main,
+    .page,
+    [class*="dashboard"],
+    [class*="Dashboard"] {
+      max-width: 100% !important;
+    }
+
+    aside,
+    .sidebar,
+    .side,
+    .menu,
+    [class*="sidebar"],
+    [class*="Sidebar"] {
+      position: relative !important;
+      inset: auto !important;
+      width: calc(100% - 24px) !important;
+      max-width: calc(100% - 24px) !important;
+      height: auto !important;
+      max-height: none !important;
+      min-height: auto !important;
+      margin: 12px auto 14px !important;
+      padding: 14px !important;
+      border-radius: 26px !important;
+      overflow: visible !important;
+      background: rgba(5, 8, 25, 0.92) !important;
+      border: 1px solid rgba(255,255,255,.10) !important;
+      box-shadow: 0 18px 50px rgba(0,0,0,.28) !important;
+    }
+
+    aside nav,
+    .sidebar nav,
+    .side nav,
+    [class*="sidebar"] nav,
+    [class*="Sidebar"] nav {
+      display: flex !important;
+      gap: 10px !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      padding: 4px 2px 8px !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    aside nav::-webkit-scrollbar,
+    .sidebar nav::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    aside a,
+    aside button,
+    .sidebar a,
+    .sidebar button,
+    .side a,
+    .side button,
+    [class*="sidebar"] a,
+    [class*="sidebar"] button,
+    [class*="Sidebar"] a,
+    [class*="Sidebar"] button {
+      flex: 0 0 auto !important;
+      min-width: max-content !important;
+      width: auto !important;
+      min-height: 50px !important;
+      padding: 12px 15px !important;
+      border-radius: 18px !important;
+      font-size: 14px !important;
+      line-height: 1.2 !important;
+      white-space: nowrap !important;
+    }
+
+    main,
+    .main,
+    .content,
+    .page-content,
+    .dashboard-content,
+    [class*="content"],
+    [class*="Content"] {
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 12px !important;
+      overflow-x: hidden !important;
+    }
+
+    .hero,
+    .page-hero,
+    .dashboard-header,
+    .provider-header,
+    .topbar,
+    .header,
+    [class*="hero"],
+    [class*="Hero"],
+    [class*="header"],
+    [class*="Header"] {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 14px !important;
+      width: 100% !important;
+      min-height: auto !important;
+      padding: 20px !important;
+      border-radius: 26px !important;
+      overflow: hidden !important;
+    }
+
+    .sualuma-floating-switch,
+    .floating-switch,
+    .auth-pill,
+    .login-pill,
+    .user-pill,
+    [class*="floating"],
+    [class*="Floating"] {
+      position: static !important;
+      inset: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: flex-start !important;
+      align-items: center !important;
+      gap: 10px !important;
+      margin: 0 !important;
+      transform: none !important;
+      z-index: 1 !important;
+    }
+
+    .sualuma-floating-switch a,
+    .sualuma-floating-switch button,
+    .floating-switch a,
+    .floating-switch button,
+    .auth-pill a,
+    .auth-pill button,
+    .login-pill a,
+    .login-pill button {
+      flex: 1 1 auto !important;
+      min-width: 130px !important;
+      text-align: center !important;
+      justify-content: center !important;
+    }
+
+    h1 {
+      font-size: clamp(34px, 10vw, 52px) !important;
+      line-height: 1.02 !important;
+      letter-spacing: -1.8px !important;
+    }
+
+    h2 {
+      font-size: clamp(26px, 7vw, 38px) !important;
+      line-height: 1.08 !important;
+    }
+
+    p {
+      line-height: 1.55 !important;
+    }
+
+    .grid,
+    .cards,
+    .stats,
+    .content-grid,
+    .dashboard-grid,
+    .provider-grid,
+    [class*="grid"],
+    [class*="Grid"] {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      gap: 14px !important;
+      width: 100% !important;
+    }
+
+    .card,
+    .panel,
+    .box,
+    .glass,
+    .stat,
+    .item,
+    article,
+    [class*="card"],
+    [class*="Card"],
+    [class*="panel"],
+    [class*="Panel"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    input,
+    textarea,
+    select,
+    button,
+    .btn,
+    a.btn {
+      max-width: 100% !important;
+      font-size: 16px !important;
+    }
+
+    textarea {
+      min-height: 130px !important;
+    }
+
+    img,
+    video,
+    iframe {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    .portfolio-hero,
+    .portfolio-preview,
+    .profile-card,
+    .work-preview,
+    .preview-card {
+      min-height: auto !important;
+    }
+
+    .portfolio-hero img,
+    .profile-card img,
+    .avatar img {
+      object-fit: cover !important;
+    }
+
+    * {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .12s !important;
+    }
+  }
+</style>
+
 </head>
 <body>
   <header class="top">
@@ -6184,6 +6446,157 @@
         clearInterval(wait);
       }
     },500);
+  });
+})();
+</script>
+
+<script id="sualuma-portfolio-backend-bridge-final">
+(function(){
+  if(window.__sualumaPortfolioBackendBridgeFinal) return;
+  window.__sualumaPortfolioBackendBridgeFinal = true;
+
+  const STORAGE_KEY = "sualuma_provider_portfolio_v14";
+  const SYNC_KEY = "sualuma_provider_portfolio_last_sync_v1";
+  const API_URL = "/api/prestador/portfolio-sync";
+
+  function readLocal(){
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function writeLocal(data){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {}
+  }
+
+  function getPortfolio(data){
+    if(!data) return [];
+    if(Array.isArray(data.portfolio)) return data.portfolio;
+    if(Array.isArray(data.projects)) return data.projects;
+    if(Array.isArray(data.works)) return data.works;
+    if(Array.isArray(data.items)) return data.items;
+    return [];
+  }
+
+  function getProfile(data){
+    if(!data) return {};
+    return data.profile || data.providerProfile || data.provider || {};
+  }
+
+  function localLooksRich(data){
+    const list = getPortfolio(data);
+    const profile = getProfile(data);
+    return Boolean(
+      list.length ||
+      profile.photoUrl ||
+      profile.avatarUrl ||
+      profile.fotoUrl ||
+      profile.imageUrl ||
+      profile.name ||
+      profile.bio
+    );
+  }
+
+  function normalizeForLocal(remote){
+    const current = readLocal() || {};
+    return {
+      ...current,
+      profile: {
+        ...(current.profile || current.providerProfile || {}),
+        ...(remote.profile || {}),
+      },
+      providerProfile: {
+        ...(current.providerProfile || current.profile || {}),
+        ...(remote.profile || {}),
+      },
+      portfolio: remote.portfolio || [],
+      projects: remote.portfolio || [],
+      updatedAt: remote.updatedAt || new Date().toISOString(),
+    };
+  }
+
+  async function getRemote(){
+    const r = await fetch(API_URL, { credentials: "include", cache: "no-store" });
+    if(!r.ok) return null;
+    return await r.json();
+  }
+
+  async function postLocal(data){
+    const r = await fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        source: "meuservico-localstorage-migration",
+        state: data,
+      }),
+    });
+
+    if(!r.ok) return null;
+
+    const json = await r.json();
+    try {
+      localStorage.setItem(SYNC_KEY, String(Date.now()));
+    } catch {}
+
+    return json;
+  }
+
+  async function syncPortfolio(){
+    try {
+      const local = readLocal();
+      const remote = await getRemote();
+
+      const localCount = getPortfolio(local).length;
+      const remoteCount = remote?.portfolio?.length || 0;
+
+      if(localLooksRich(local) && localCount >= remoteCount){
+        const saved = await postLocal(local);
+        if(saved?.ok){
+          console.log("[Sualuma] Portfólio local migrado para backend:", saved.total);
+          return;
+        }
+      }
+
+      if(remote?.ok && remoteCount > localCount){
+        writeLocal(normalizeForLocal(remote));
+        console.log("[Sualuma] Portfólio carregado do backend:", remoteCount);
+        if(location.hash.includes("portfolio") || location.hash.includes("portifolio")){
+          setTimeout(() => location.reload(), 300);
+        }
+      }
+    } catch(err) {
+      console.warn("[Sualuma] Sync portfolio falhou:", err);
+    }
+  }
+
+  const originalSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value){
+    originalSetItem(key, value);
+    if(key === STORAGE_KEY){
+      clearTimeout(window.__sualumaPortfolioSyncTimer);
+      window.__sualumaPortfolioSyncTimer = setTimeout(syncPortfolio, 800);
+    }
+  };
+
+  window.SualumaPortfolioSync = {
+    sync: syncPortfolio,
+    postLocal,
+    getRemote,
+    readLocal,
+  };
+
+  window.addEventListener("load", function(){
+    setTimeout(syncPortfolio, 900);
+    setTimeout(syncPortfolio, 3500);
+  });
+
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) syncPortfolio();
   });
 })();
 </script>
