@@ -1,2069 +1,2923 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <title>TrabalhosJa | Comunidade Sualuma</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     *{box-sizing:border-box}
-    body{
+
+    :root{
+      --bg:#050714;
+      --card:rgba(255,255,255,.055);
+      --card2:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.12);
+      --text:#ffffff;
+      --muted:#cfd5ff;
+      --muted2:#9da7d9;
+      --cyan:#18f2ff;
+      --purple:#8d5cff;
+      --green:#40f59b;
+    }
+
+    html,body{
       margin:0;
-      font-family:Inter,Arial,sans-serif;
+      min-height:100%;
       background:
-        radial-gradient(circle at 15% 0%, rgba(141,92,255,.18), transparent 24%),
-        radial-gradient(circle at 95% 5%, rgba(24,242,255,.08), transparent 22%),
-        #020205;
-      color:#fff;
+        radial-gradient(circle at 0 0,rgba(24,242,255,.13),transparent 36%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.18),transparent 34%),
+        var(--bg);
+      color:var(--text);
+      font-family:Inter,Arial,sans-serif;
+      overflow-x:hidden;
+      -webkit-text-size-adjust:100%;
     }
+
     body.light{
-      background:#f4f6fb;
-      color:#08101f;
+      --bg:#f5f7ff;
+      --card:rgba(255,255,255,.82);
+      --card2:rgba(255,255,255,.96);
+      --stroke:rgba(18,28,64,.12);
+      --text:#101426;
+      --muted:#37405f;
+      --muted2:#596381;
+      background:#f5f7ff;
     }
+
     a{color:inherit;text-decoration:none}
-    .shell{max-width:1580px;margin:0 auto;display:grid;grid-template-columns:280px minmax(0,1fr) 330px;gap:24px;padding:24px}
-    .card{border:1px solid rgba(255,255,255,.09);border-radius:30px;background:linear-gradient(180deg,#090a14,#0d1020);box-shadow:0 22px 70px rgba(0,0,0,.42)}
-    body.light .card{background:#fff;border-color:rgba(20,30,70,.10);box-shadow:0 18px 50px rgba(15,23,42,.10)}
-    .left,.right{position:sticky;top:24px;height:calc(100vh - 48px);overflow:auto;padding:20px}
-    .main{display:grid;gap:24px;align-content:start}
-    .brand{display:flex;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.09);margin-bottom:14px}
-    body.light .brand{border-color:rgba(20,30,70,.10)}
-    .brand img{width:44px;height:44px;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.06)}
-    .brand strong{display:block;font-size:18px}
-    .brand small,.muted{color:#aeb8e8;font-weight:800}
-    body.light .brand small, body.light .muted{color:#51617e}
-    .btn{border:0;border-radius:18px;padding:12px 15px;color:#fff;font-weight:1000;cursor:pointer;background:linear-gradient(135deg,#8d5cff,#18f2ff);display:inline-flex;align-items:center;justify-content:center;gap:8px}
-    .btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
-    body.light .btn.secondary{background:#f5f7fb;color:#08101f;border-color:rgba(20,30,70,.10)}
-    .btn.full{width:100%}
-    .theme{width:100%;margin-bottom:12px;border:1px solid rgba(255,255,255,.10);border-radius:18px;padding:13px 14px;background:rgba(255,255,255,.045);color:inherit;font-weight:1000;cursor:pointer}
-    body.light .theme{background:#f5f7fb;border-color:rgba(20,30,70,.10)}
-    .menu{display:grid;gap:10px;margin-top:18px}
-    .menu button,.menu a{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);color:#d8defd;border-radius:18px;padding:13px 14px;text-align:left;font-weight:850;cursor:pointer}
-    body.light .menu button, body.light .menu a{background:#f8faff;color:#23304b;border-color:rgba(20,30,70,.10)}
-    .menu button.active{color:#fff;border-color:rgba(24,242,255,.28);background:linear-gradient(135deg,rgba(141,92,255,.34),rgba(24,242,255,.11))}
-    .hero{padding:30px;position:relative;overflow:hidden}
-    .kicker,.badge{display:inline-flex;padding:8px 13px;border-radius:999px;color:#18f2ff;font-size:12px;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(24,242,255,.16);background:rgba(24,242,255,.075)}
-    .hero h1{margin:14px 0 8px;font-size:44px;line-height:1.02;letter-spacing:-.03em;max-width:900px}
-    .hero p,.post p,.ad p{color:#aeb8e8;line-height:1.75}
-    body.light .hero p, body.light .post p, body.light .ad p{color:#51617e}
-    .tools{display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:16px 18px}
-    .search{flex:1;min-width:260px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(255,255,255,.045);color:inherit;padding:14px 16px;outline:0;font-weight:800}
-    body.light .search{background:#f5f7fb;border-color:rgba(20,30,70,.10)}
-    .composer{padding:22px;display:grid;gap:12px}
-    .input,.textarea,.select{width:100%;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px;background:rgba(255,255,255,.06);color:inherit;outline:0;font-family:inherit}
-    body.light .input,body.light .textarea,body.light .select{background:#f5f7fb;border-color:rgba(20,30,70,.10)}
-    .textarea{min-height:96px;resize:vertical}
-    #feed{display:grid;gap:24px}
-    .post{padding:24px;display:grid;gap:14px}
-    .post-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap}
-    .author{display:flex;align-items:center;gap:12px}
-    .avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8d5cff,#18f2ff);font-weight:1000;color:#fff}
-    .author strong,.name-link{cursor:pointer}
-    .author strong:hover,.name-link:hover{color:#18f2ff;text-decoration:underline}
-    .post h3{margin:0;font-size:26px;line-height:1.15}
-    .cover{min-height:240px;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,rgba(141,92,255,.18),rgba(24,242,255,.08));display:grid;place-items:center;border:1px solid rgba(255,255,255,.10)}
-    .cover img{width:100%;height:100%;max-height:340px;object-fit:cover;display:block}
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
-    .meta-line{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;font-weight:800;color:#aeb8e8}
-    .pill{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04)}
-    body.light .pill{border-color:rgba(20,30,70,.10);background:#f8faff;color:#51617e}
-    .comments{display:none;padding:16px;border-radius:20px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03);gap:12px}
-    .comments.open{display:grid}
-    body.light .comments{border-color:rgba(20,30,70,.10);background:#f8faff}
-    .comment{padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04)}
-    body.light .comment{border-color:rgba(20,30,70,.10);background:#fff}
-    .ad{padding:17px;border-radius:22px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);margin-bottom:12px}
-    body.light .ad{background:#f8faff;border-color:rgba(20,30,70,.10)}
-    .person{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);border-radius:20px;padding:13px;cursor:pointer;margin-bottom:10px}
-    body.light .person{background:#f8faff;border-color:rgba(20,30,70,.10)}
-    .dot{width:10px;height:10px;border-radius:50%;background:#43ff9b;box-shadow:0 0 16px rgba(67,255,155,.72)}
-    .modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:18px}
-    .modal.show{display:flex}
-    .modal-box{width:min(620px,96vw);border-radius:28px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#090a14,#0d1020);box-shadow:0 30px 90px rgba(0,0,0,.45);padding:22px}
-    body.light .modal-box{background:#fff;color:#08101f}
-    .toast{position:fixed;right:22px;bottom:22px;z-index:10000;border-radius:18px;padding:14px 16px;font-weight:1000;color:#fff;border:1px solid rgba(24,242,255,.22);background:linear-gradient(135deg,rgba(14,22,56,.98),rgba(18,34,66,.98));opacity:0;transform:translateY(14px);transition:.25s}
-    .toast.show{opacity:1;transform:translateY(0)}
-    @media(max-width:1180px){.shell{grid-template-columns:260px minmax(0,1fr)}.right{grid-column:1/-1;position:relative;height:auto}}
-    @media(max-width:850px){.shell{grid-template-columns:1fr;padding:14px;gap:16px}.left,.right{position:relative;height:auto}.hero h1{font-size:32px}}
-  </style>
-</head>
-<body>
-  <main class="shell">
-    <aside class="left card">
-      <div class="brand">
-        <img src="/logodosite.png" onerror="this.style.display='none'" alt="Sualuma" />
-        <div><strong>TrabalhosJa</strong><small>Comunidade Sualuma</small></div>
-      </div>
-      <button class="theme" id="themeBtn">☀️ Usar modo branco</button>
-      <button class="btn full" onclick="TJ.focusComposer()">+ Criar post</button>
-      <nav class="menu">
-        <button class="active" onclick="TJ.filter('Todos', this)">🏠 Geral</button>
-        <button onclick="TJ.filter('Trabalhos', this)">💼 Trabalhos</button>
-        <button onclick="TJ.filter('Portfólios', this)">🎨 Portfólios</button>
-        <button onclick="TJ.filter('Oportunidades', this)">🚀 Oportunidades</button>
-        <button onclick="TJ.filter('Dúvidas', this)">❓ Dúvidas</button>
-        <button onclick="TJ.filter('Conquistas', this)">🏆 Conquistas</button>
-        <a href="https://meuservico.sualuma.online/?v=18#prestador-chat">💬 Ir para chats</a>
-        <a href="https://meuservico.sualuma.online/?v=18#prestador-portfolio">🖼️ Meu portfólio</a>
-      </nav>
-    </aside>
+    button,input,textarea,select{font:inherit}
 
-    <section class="main">
-      <header class="hero card">
-        <span class="kicker">Feed público</span>
-        <h1>Comunidade para trocar trabalhos, ideias e oportunidades.</h1>
-        <p>Todo mundo pode ver o feed. Para postar, comentar, compartilhar e solicitar contato, é preciso entrar na plataforma.</p>
-      </header>
-
-      <section class="tools card">
-        <input class="search" id="searchInput" placeholder="Pesquisar pessoas, trabalhos, posts ou palavras-chave..." oninput="TJ.render()" />
-        <span class="pill" id="authStatus">Verificando login...</span>
-      </section>
-
-      <section class="composer card" id="composer">
-        <strong>Criar publicação</strong>
-        <input class="input" id="postTitle" placeholder="Título do post" />
-        <select class="select" id="postCategory">
-          <option>Trabalhos</option>
-          <option>Portfólios</option>
-          <option>Oportunidades</option>
-          <option>Dúvidas</option>
-          <option>Conquistas</option>
-          <option>Geral</option>
-        </select>
-        <input class="input" id="postImage" placeholder="Imagem do post ou capa do trabalho, opcional" />
-        <input class="input" id="postLink" placeholder="Link do trabalho/site, opcional" />
-        <input class="input" id="postVideo" placeholder="Link do vídeo YouTube, opcional" />
-        <textarea class="textarea" id="postText" placeholder="Escreva sua publicação..."></textarea>
-        <div class="actions">
-          <button class="btn" onclick="TJ.createPost()">Publicar</button>
-          <button class="btn secondary" onclick="TJ.clearComposer()">Limpar</button>
-          <a class="btn secondary" href="https://sualuma.online/sign-in">Entrar na plataforma</a>
-        </div>
-      </section>
-
-      <section id="feed"></section>
-    </section>
-
-    <aside class="right card">
-      <h3>Anúncios Sualuma</h3>
-      <div class="ad"><strong>Plano Pro de Serviços</strong><p>Prioridade para receber propostas e aparecer melhor para empresas.</p></div>
-      <div class="ad"><strong>Agentes de IA</strong><p>Use agentes para propostas, atendimento, entrega e organização.</p></div>
-      <div class="ad"><strong>Marketplace de automações</strong><p>Compre fluxos prontos para acelerar seu trabalho.</p></div>
-      <h3 style="margin-top:24px">Pessoas online</h3>
-      <div id="onlineList"></div>
-    </aside>
-  </main>
-
-  <div class="modal" id="contactModal">
-    <div class="modal-box">
-      <div class="post-top">
-        <div class="author">
-          <div class="avatar" id="modalAvatar">P</div>
-          <div><strong id="modalName">Prestador</strong><br><small class="muted" id="modalRole">Especialista</small></div>
-        </div>
-        <button class="btn secondary" onclick="TJ.closeModal()">Fechar</button>
-      </div>
-      <p class="muted">Envie uma mensagem rápida e solicite adicionar contato. Se a pessoa aceitar, a conversa completa aparece no dashboard com a tag amigo.</p>
-      <textarea class="textarea" id="quickMessage"></textarea>
-      <div class="actions" style="margin-top:12px">
-        <button class="btn" onclick="TJ.requestContact()">Solicitar contato</button>
-        <a class="btn secondary" href="https://meuservico.sualuma.online/?v=18#prestador-chat">Ver conversa completa</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="profileModal">
-    <div class="modal-box">
-      <div class="post-top">
-        <div class="author">
-          <div class="avatar" id="profileAvatar">P</div>
-          <div><strong id="profileName">Perfil</strong><br><small class="muted" id="profileRole">Prestador</small></div>
-        </div>
-        <button class="btn secondary" onclick="TJ.closeProfile()">Fechar</button>
-      </div>
-      <p class="muted" id="profileBio">Perfil público da comunidade.</p>
-      <div class="actions">
-        <a class="btn" href="https://meuservico.sualuma.online/?v=18#prestador-portfolio" target="_blank">Abrir portfólio</a>
-        <a class="btn secondary" href="https://meuservico.sualuma.online/?v=18#prestador-chat">Ir para chat</a>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const SUPABASE_URL = 'https://vadljxyykrhyeuarzyat.supabase.co';
-    const SUPABASE_ANON = 'sb_publishable_1O8rZojnDMZeYkBOtFF6jA_8m64Y-Yo';
-
-    const sb = window.supabase && SUPABASE_URL && SUPABASE_ANON
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
-      : null;
-
-    let posts = [];
-    let currentCategory = 'Todos';
-    let selectedPerson = null;
-    let session = null;
-
-    const people = [
-      { id:'ana-sites', name:'Ana Sites', role:'Web designer', initials:'AS' },
-      { id:'rafa-automacao', name:'Rafa Automação', role:'n8n e IA', initials:'RA' },
-      { id:'bia-social', name:'Bia Social', role:'Social media', initials:'BS' },
-      { id:'leo-dev', name:'Leo Dev', role:'Front-end', initials:'LD' },
-      { id:'mari-copy', name:'Mari Copy', role:'Copywriter', initials:'MC' }
-    ];
-
-    function esc(v) {
-      return String(v ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+    .wrap{
+      width:min(1180px,100%);
+      margin:0 auto;
+      padding:16px;
+      padding-bottom:90px;
     }
 
-    function initials(name) {
-      return String(name || 'P').trim().split(/\s+/).slice(0,2).map(p=>p[0]?.toUpperCase()||'').join('') || 'P';
+    .top{
+      position:sticky;
+      top:0;
+      z-index:80;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:12px 0 16px;
+      background:linear-gradient(180deg,var(--bg) 78%,rgba(5,7,20,0));
+      backdrop-filter:blur(16px);
     }
 
-    function toast(message) {
-      let box = document.getElementById('toast');
-      if(!box) {
-        box = document.createElement('div');
-        box.id = 'toast';
-        box.className = 'toast';
-        document.body.appendChild(box);
-      }
-      box.textContent = message;
-      box.classList.add('show');
-      setTimeout(()=>box.classList.remove('show'),2600);
+    body.light .top{
+      background:linear-gradient(180deg,#f5f7ff 78%,rgba(245,247,255,0));
     }
 
-    async function getToken() {
-      if(!sb) return '';
-      const { data } = await sb.auth.getSession();
-      session = data.session || null;
-      return session?.access_token || '';
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
     }
 
-    async function requireToken() {
-      const token = await getToken();
-      if(!token) {
-        toast('Faça login na plataforma para executar essa ação.');
-        return '';
-      }
-      return token;
+    .logo{
+      width:58px;
+      height:58px;
+      border-radius:20px;
+      background:linear-gradient(135deg,var(--purple),var(--cyan));
+      display:grid;
+      place-items:center;
+      font-weight:1000;
+      box-shadow:0 18px 42px rgba(24,242,255,.16);
+      flex:0 0 auto;
     }
 
-    async function api(path, options={}) {
-      const headers = options.headers || {};
-      if(options.auth) {
-        const token = await requireToken();
-        if(!token) throw new Error('login_required');
-        headers.Authorization = 'Bearer ' + token;
-      }
-      if(options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
-
-      const res = await fetch(path, { ...options, headers });
-      const json = await res.json().catch(()=>({ ok:false, error:'Resposta inválida.' }));
-      if(!res.ok || json.ok === false) throw new Error(json.error || 'Erro na API.');
-      return json;
+    .brandText{
+      min-width:0;
     }
 
-    function renderOnline() {
-      document.getElementById('onlineList').innerHTML = people.map(p => `
-        <div class="person" onclick="TJ.openPerson('${p.id}')">
-          <div class="author">
-            <div class="avatar">${p.initials}</div>
-            <div><strong>${p.name}</strong><br><small class="muted">${p.role}</small></div>
-          </div>
-          <span style="width:10px;height:10px;border-radius:50%;background:#43ff9b;box-shadow:0 0 16px rgba(67,255,155,.72)"></span>
-        </div>
-      `).join('');
+    .brand h1{
+      font-size:26px;
+      line-height:1;
+      margin:0;
+      white-space:nowrap;
     }
 
-    function commentedBy(post) {
-      return post.commentedBy?.length ? 'Comentado por ' + post.commentedBy.join(', ') : 'Ainda sem comentários';
+    .brand p{
+      margin:5px 0 0;
+      color:var(--muted);
+      font-weight:850;
+      font-size:15px;
     }
 
-    function sharedBy(post) {
-      return post.sharedBy?.length ? 'Compartilhado por ' + post.sharedBy.join(', ') : 'Ainda sem compartilhamentos';
+    .topActions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
     }
 
-    function renderComments(post) {
-      const list = post.comments || [];
-      if(!list.length) return '<div class="muted">Ainda não há comentários.</div>';
-      return list.map(c => `
-        <div class="comment">
-          <strong class="name-link" onclick="TJ.openProfile('${esc(c.author_name)}')">${esc(c.author_name)}</strong>
-          <div>${esc(c.body)}</div>
-          <small class="muted">${new Date(c.created_at).toLocaleString('pt-BR')}</small>
-        </div>
-      `).join('');
+    .btn{
+      min-height:46px;
+      padding:11px 15px;
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background:var(--card2);
+      color:var(--text);
+      font-weight:1000;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-align:center;
+      transition:.18s ease;
     }
 
-    window.TJ = {
-      async init() {
-        document.getElementById('themeBtn').onclick = () => {
-          document.body.classList.toggle('light');
-          localStorage.setItem('tj_theme', document.body.classList.contains('light') ? 'light' : 'dark');
-          document.getElementById('themeBtn').textContent = document.body.classList.contains('light') ? '🌙 Usar modo preto' : '☀️ Usar modo branco';
-        };
-
-        if(localStorage.getItem('tj_theme') === 'light') {
-          document.body.classList.add('light');
-          document.getElementById('themeBtn').textContent = '🌙 Usar modo preto';
-        }
-
-        renderOnline();
-        await this.checkAuth();
-        await this.loadPosts();
-      },
-
-      async checkAuth() {
-        await getToken();
-        const el = document.getElementById('authStatus');
-        if(session) el.textContent = 'Logado: ' + (session.user?.email || 'usuário');
-        else el.textContent = 'Feed público · faça login para interagir';
-      },
-
-      async loadPosts() {
-        try {
-          const data = await api('/api/comunidade/posts');
-          posts = data.posts || [];
-        } catch(e) {
-          toast(e.message || 'Erro ao carregar feed.');
-          posts = [];
-        }
-        this.render();
-      },
-
-      render() {
-        const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
-        const filtered = posts.filter(post => {
-          const byCategory = currentCategory === 'Todos' || post.category === currentCategory;
-          const text = [post.title, post.body, post.category, post.author_name].join(' ').toLowerCase();
-          return byCategory && (!q || text.includes(q));
-        });
-
-        document.getElementById('feed').innerHTML = filtered.length ? filtered.map(post => `
-          <article class="post card">
-            <div class="post-top">
-              <div class="author">
-                <div class="avatar">${esc(initials(post.author_name))}</div>
-                <div>
-                  <strong class="name-link" onclick="TJ.openProfile('${esc(post.author_name)}')">${esc(post.author_name)}</strong><br>
-                  <small class="muted">${new Date(post.created_at).toLocaleString('pt-BR')}</small>
-                </div>
-              </div>
-              <span class="badge">${esc(post.category || 'Geral')}</span>
-            </div>
-
-            <h3>${esc(post.title)}</h3>
-            <p>${esc(post.body)}</p>
-
-            ${post.image_url ? `<div class="cover"><img src="${esc(post.image_url)}" alt="${esc(post.title)}"></div>` : ''}
-
-            <div class="meta-line">
-              <span class="pill">${esc(commentedBy(post))}</span>
-              <span class="pill">${esc(sharedBy(post))}</span>
-              <span class="pill">${post.commentsCount || 0} comentário(s) • ${post.sharesCount || 0} compartilhamento(s)</span>
-            </div>
-
-            <div class="actions">
-              ${post.link_url ? `<a class="btn secondary" href="${esc(post.link_url)}" target="_blank">Abrir link</a>` : ''}
-              <button class="btn secondary" onclick="TJ.toggleComments('${post.id}')">💬 Comentar</button>
-              <button class="btn secondary" onclick="TJ.sharePost('${post.id}')">🔁 Compartilhar</button>
-              <a class="btn secondary" href="https://meuservico.sualuma.online/?v=18#prestador-chat">Ir para chat</a>
-            </div>
-
-            <div class="comments" id="comments-${post.id}">
-              <div>${renderComments(post)}</div>
-              <textarea class="textarea" id="commentText-${post.id}" placeholder="Escreva seu comentário..."></textarea>
-              <div class="actions">
-                <button class="btn" onclick="TJ.createComment('${post.id}')">Publicar comentário</button>
-              </div>
-            </div>
-          </article>
-        `).join('') : '<article class="post card"><h3>Nenhum post encontrado</h3><p>Teste outra busca ou categoria.</p></article>';
-      },
-
-      filter(category, el) {
-        currentCategory = category;
-        document.querySelectorAll('.menu button').forEach(btn=>btn.classList.remove('active'));
-        if(el) el.classList.add('active');
-        this.render();
-      },
-
-      focusComposer() {
-        document.getElementById('composer')?.scrollIntoView({ behavior:'smooth', block:'start' });
-        document.getElementById('postTitle')?.focus();
-      },
-
-      clearComposer() {
-        ['postTitle','postImage','postLink','postVideo','postText'].forEach(id => {
-          const el = document.getElementById(id);
-          if(el) el.value = '';
-        });
-        document.getElementById('postCategory').value = 'Trabalhos';
-      },
-
-      async createPost() {
-        try {
-          await api('/api/comunidade/posts', {
-            method:'POST',
-            auth:true,
-            body:JSON.stringify({
-              title:document.getElementById('postTitle').value,
-              category:document.getElementById('postCategory').value,
-              body:document.getElementById('postText').value,
-              imageUrl:document.getElementById('postImage').value,
-              linkUrl:document.getElementById('postLink').value,
-              videoUrl:document.getElementById('postVideo').value,
-              source:'manual'
-            })
-          });
-          this.clearComposer();
-          toast('Post publicado.');
-          await this.loadPosts();
-        } catch(e) {
-          if(e.message !== 'login_required') toast(e.message);
-        }
-      },
-
-      toggleComments(postId) {
-        document.getElementById('comments-' + postId)?.classList.toggle('open');
-      },
-
-      async createComment(postId) {
-        try {
-          const input = document.getElementById('commentText-' + postId);
-          await api('/api/comunidade/comments', {
-            method:'POST',
-            auth:true,
-            body:JSON.stringify({ postId, body:input.value })
-          });
-          input.value = '';
-          toast('Comentário publicado.');
-          await this.loadPosts();
-          setTimeout(()=>document.getElementById('comments-' + postId)?.classList.add('open'), 100);
-        } catch(e) {
-          if(e.message !== 'login_required') toast(e.message);
-        }
-      },
-
-      async sharePost(postId) {
-        try {
-          await api('/api/comunidade/shares', {
-            method:'POST',
-            auth:true,
-            body:JSON.stringify({ postId })
-          });
-          toast('Compartilhamento registrado.');
-          await this.loadPosts();
-        } catch(e) {
-          if(e.message !== 'login_required') toast(e.message);
-        }
-      },
-
-      openPerson(id) {
-        selectedPerson = people.find(p=>p.id === id);
-        if(!selectedPerson) return;
-        document.getElementById('modalAvatar').textContent = selectedPerson.initials;
-        document.getElementById('modalName').textContent = selectedPerson.name;
-        document.getElementById('modalRole').textContent = selectedPerson.role;
-        document.getElementById('quickMessage').value = `Oi, ${selectedPerson.name}! Vi você online na comunidade e queria conectar.`;
-        document.getElementById('contactModal').classList.add('show');
-      },
-
-      closeModal() {
-        document.getElementById('contactModal').classList.remove('show');
-      },
-
-      async requestContact() {
-        try {
-          await api('/api/comunidade/contact-requests', {
-            method:'POST',
-            auth:true,
-            body:JSON.stringify({
-              targetProfileId:selectedPerson.id,
-              targetName:selectedPerson.name,
-              message:document.getElementById('quickMessage').value
-            })
-          });
-          this.closeModal();
-          toast('Solicitação enviada.');
-        } catch(e) {
-          if(e.message !== 'login_required') toast(e.message);
-        }
-      },
-
-      openProfile(name) {
-        document.getElementById('profileAvatar').textContent = initials(name);
-        document.getElementById('profileName').textContent = name;
-        document.getElementById('profileRole').textContent = 'Perfil da comunidade';
-        document.getElementById('profileBio').textContent = 'Portfólio público de ' + name + '. Em breve esse perfil será puxado do cadastro real do prestador.';
-        document.getElementById('profileModal').classList.add('show');
-      },
-
-      closeProfile() {
-        document.getElementById('profileModal').classList.remove('show');
-      }
-    };
-
-    TJ.init();
-  </script>
-<style id="trabalhosja-mobile-improve-style">
-  @media (max-width: 860px) {
-    html, body {
-      overflow-x: hidden !important;
+    .btn:hover{
+      transform:translateY(-1px);
+      border-color:rgba(24,242,255,.35);
     }
 
-    body {
-      font-size: 16px !important;
-      -webkit-text-size-adjust: 100% !important;
+    .btn.primary{
+      background:linear-gradient(135deg,var(--purple),var(--cyan));
+      border-color:rgba(255,255,255,.12);
+      color:#fff;
+      box-shadow:0 16px 36px rgba(24,242,255,.16);
     }
 
-    aside,
-    .community-sidebar,
-    .sidebar,
-    [class*="sidebar"] {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: min(86vw, 340px) !important;
-      height: 100vh !important;
-      z-index: 9999 !important;
-      transform: translateX(-105%) !important;
-      transition: transform .28s ease !important;
-      overflow-y: auto !important;
-      box-shadow: 0 18px 50px rgba(0,0,0,.45) !important;
-      border-right: 1px solid rgba(255,255,255,.08) !important;
+    .btn.small{
+      min-height:38px;
+      border-radius:14px;
+      padding:9px 12px;
+      font-size:14px;
     }
 
-    body.tj-mobile-menu-open aside,
-    body.tj-mobile-menu-open .community-sidebar,
-    body.tj-mobile-menu-open .sidebar,
-    body.tj-mobile-menu-open [class*="sidebar"] {
-      transform: translateX(0) !important;
+    .grid{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 330px;
+      gap:18px;
+      align-items:start;
     }
 
-    #tjMobileOverlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.45);
-      backdrop-filter: blur(2px);
-      z-index: 9998;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .22s ease;
+    .hero,.card,.composer,.post,.sideCard{
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(circle at 0 0,rgba(24,242,255,.10),transparent 36%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.16),transparent 40%),
+        var(--card);
+      border-radius:30px;
+      box-shadow:0 20px 60px rgba(0,0,0,.22);
     }
 
-    body.tj-mobile-menu-open #tjMobileOverlay {
-      opacity: 1;
-      pointer-events: auto;
+    .hero{
+      padding:26px;
+      margin:0 0 18px;
     }
 
-    #tjMobileTopbar {
-      position: sticky;
-      top: 0;
-      z-index: 9997;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 14px 10px;
-      background: rgba(5,8,20,.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
+    .hero h2{
+      font-size:clamp(38px,7vw,74px);
+      line-height:.96;
+      letter-spacing:-.04em;
+      margin:8px 0 14px;
     }
 
-    #tjMobileBrand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
+    .hero p,.card p,.composer p,.sideCard p,.post p{
+      color:var(--muted);
+      line-height:1.55;
+      font-size:16px;
     }
 
-    #tjMobileBrandLogo {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, rgba(140,92,255,.25), rgba(24,242,255,.18));
-      border: 1px solid rgba(255,255,255,.10);
-      font-size: 20px;
-      flex: 0 0 42px;
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(24,242,255,.25);
+      background:rgba(24,242,255,.10);
+      color:#aaf9ff;
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.02em;
     }
 
-    #tjMobileBrandText {
-      min-width: 0;
-    }
-
-    #tjMobileBrandText strong {
-      display: block;
-      font-size: 18px;
-      line-height: 1.1;
-      color: #fff;
-    }
-
-    #tjMobileBrandText span {
-      display: block;
-      font-size: 12px;
-      opacity: .82;
-      color: #cfd5ff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    #tjMobileMenuBtn {
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      color: #fff;
-      min-width: 46px;
-      min-height: 46px;
-      border-radius: 14px;
-      font-size: 20px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-    }
-
-    main,
-    [role="main"],
-    .community-main,
-    .main-content,
-    [class*="main"] {
-      width: 100% !important;
-      max-width: 100% !important;
-      margin: 0 !important;
-      padding: 14px !important;
-    }
-
-    .tj-mobile-full,
-    .tj-mobile-full > * {
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-
-    .tj-mobile-card {
-      border-radius: 24px !important;
-      padding: 18px !important;
-      margin-bottom: 16px !important;
-    }
-
-    .tj-mobile-card h1,
-    .tj-mobile-card h2,
-    .tj-mobile-card h3 {
-      line-height: 1.12 !important;
-      margin-bottom: 10px !important;
-    }
-
-    .tj-mobile-card h1 {
-      font-size: 32px !important;
-    }
-
-    .tj-mobile-card h2 {
-      font-size: 22px !important;
-    }
-
-    .tj-mobile-card p {
-      font-size: 15px !important;
-      line-height: 1.55 !important;
-    }
-
-    input,
-    select,
-    textarea,
-    button {
-      font-size: 16px !important;
-    }
-
-    input,
-    select,
-    textarea {
-      min-height: 54px !important;
-      border-radius: 18px !important;
-      padding: 14px 16px !important;
-    }
-
-    textarea {
-      min-height: 150px !important;
-    }
-
-    .tj-mobile-search-wrap {
-      margin: 10px 14px 16px !important;
-    }
-
-    .tj-mobile-search-wrap input,
-    .tj-mobile-search-wrap .search-input {
-      width: 100% !important;
-    }
-
-    .tj-mobile-pills {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
-
-    .tj-mobile-pills::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tj-mobile-pill,
-    .tj-mobile-pills > * {
-      white-space: nowrap;
-      flex: 0 0 auto;
-    }
-
-    .tj-mobile-collapse-toggle {
-      width: 100%;
-      min-height: 52px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: linear-gradient(135deg,#8d5cff,#22d3ee);
-      color: #fff;
-      font-weight: 900;
-      margin-bottom: 12px;
-      cursor: pointer;
-    }
-
-    .tj-mobile-collapsible {
-      display: none;
-    }
-
-    .tj-mobile-collapsible.tj-open {
-      display: block;
-    }
-
-    .tj-online-row {
-      display: flex !important;
-      gap: 12px !important;
-      overflow-x: auto !important;
-      padding-bottom: 6px !important;
-      scroll-snap-type: x proximity;
-    }
-
-    .tj-online-row > * {
-      min-width: 220px !important;
-      flex: 0 0 220px !important;
-      scroll-snap-align: start;
-    }
-
-    .tj-feed-list {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 16px !important;
-    }
-
-    .tj-feed-list > * {
-      margin: 0 !important;
-    }
-
-    .tj-mobile-bottom-space {
-      height: 26px;
-    }
-  }
-</style>
-
-<script id="trabalhosja-mobile-improve-script">
-(function () {
-  if (window.__tjMobileImproveLoaded) return;
-  window.__tjMobileImproveLoaded = true;
-
-  function isMobile() {
-    return window.innerWidth <= 860;
-  }
-
-  function ensureViewport() {
-    if (!document.querySelector('meta[name="viewport"]')) {
-      const meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1, viewport-fit=cover';
-      document.head.appendChild(meta);
-    }
-  }
-
-  function findByHeading(text) {
-    const headings = [...document.querySelectorAll('h1,h2,h3,h4,strong')];
-    return headings.find(el => (el.textContent || '').trim().toLowerCase().includes(text.toLowerCase()));
-  }
-
-  function closestCard(el) {
-    if (!el) return null;
-    return el.closest('section, article, div');
-  }
-
-  function createTopbar() {
-    if (!isMobile()) return;
-    if (document.getElementById('tjMobileTopbar')) return;
-
-    const topbar = document.createElement('div');
-    topbar.id = 'tjMobileTopbar';
-    topbar.innerHTML = `
-      <div id="tjMobileBrand">
-        <div id="tjMobileBrandLogo">💼</div>
-        <div id="tjMobileBrandText">
-          <strong>TrabalhosJa</strong>
-          <span>Comunidade Sualuma</span>
-        </div>
-      </div>
-      <button id="tjMobileMenuBtn" aria-label="Abrir menu">☰</button>
-    `;
-    document.body.prepend(topbar);
-
-    const overlay = document.createElement('div');
-    overlay.id = 'tjMobileOverlay';
-    document.body.appendChild(overlay);
-
-    const toggle = () => document.body.classList.toggle('tj-mobile-menu-open');
-    const close = () => document.body.classList.remove('tj-mobile-menu-open');
-
-    topbar.querySelector('#tjMobileMenuBtn').addEventListener('click', toggle);
-    overlay.addEventListener('click', close);
-
-    document.addEventListener('keydown', function(ev){
-      if (ev.key === 'Escape') close();
-    });
-  }
-
-  function enhanceSearch() {
-    if (!isMobile()) return;
-    const search = [...document.querySelectorAll('input,textarea')]
-      .find(el => /pesquisar pessoas|pesquisar|buscar/i.test(el.placeholder || ''));
-    if (!search) return;
-    if (search.closest('.tj-mobile-search-wrap')) return;
-
-    const wrap = document.createElement('div');
-    wrap.className = 'tj-mobile-search-wrap';
-    search.parentNode.insertBefore(wrap, search);
-    wrap.appendChild(search);
-  }
-
-  function enhanceSections() {
-    if (!isMobile()) return;
-
-    document.querySelectorAll('main section, main article, main > div, [role="main"] section, [role="main"] article, [role="main"] > div')
-      .forEach(el => {
-        if ((el.innerText || '').trim().length > 0) {
-          el.classList.add('tj-mobile-card');
-        }
-      });
-
-    const feedHeading = findByHeading('Feed público');
-    const onlineHeading = findByHeading('Pessoas online');
-    const createHeading = findByHeading('Criar publicação');
-
-    const feedCard = closestCard(feedHeading);
-    const onlineCard = closestCard(onlineHeading);
-    const createCard = closestCard(createHeading);
-
-    if (feedCard) feedCard.classList.add('tj-mobile-full');
-    if (onlineCard) onlineCard.classList.add('tj-mobile-full');
-    if (createCard) createCard.classList.add('tj-mobile-full');
-
-    if (onlineCard && !onlineCard.dataset.onlineEnhanced) {
-      onlineCard.dataset.onlineEnhanced = '1';
-      const items = [...onlineCard.querySelectorAll(':scope > div, :scope .card, :scope article, :scope li')];
-      if (items.length >= 2) {
-        const row = document.createElement('div');
-        row.className = 'tj-online-row';
-        items.forEach(item => row.appendChild(item));
-        const target = onlineHeading.parentElement || onlineCard;
-        target.appendChild(row);
-      }
-    }
-
-    if (createCard && !createCard.dataset.createEnhanced) {
-      createCard.dataset.createEnhanced = '1';
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'tj-mobile-collapse-toggle';
-      toggle.textContent = '✍️ Criar publicação';
-
-      const content = document.createElement('div');
-      content.className = 'tj-mobile-collapsible';
-      content.id = 'tjCreateCollapsible';
-
-      const children = [...createCard.children];
-      children.forEach(child => {
-        if (child !== createHeading) content.appendChild(child);
-      });
-
-      createCard.innerHTML = '';
-      if (createHeading) createCard.appendChild(createHeading);
-      createCard.appendChild(toggle);
-      createCard.appendChild(content);
-
-      toggle.addEventListener('click', () => {
-        content.classList.toggle('tj-open');
-        toggle.textContent = content.classList.contains('tj-open')
-          ? '✖ Fechar publicação'
-          : '✍️ Criar publicação';
-      });
-    }
-  }
-
-  function improveFeedSpacing() {
-    if (!isMobile()) return;
-    const headings = [...document.querySelectorAll('h1,h2,h3,h4')];
-    headings.forEach(h => {
-      const text = (h.textContent || '').trim().toLowerCase();
-      if (text.includes('nenhum post encontrado') || text.includes('feed')) {
-        const card = closestCard(h);
-        if (card) card.classList.add('tj-mobile-card');
-      }
-    });
-
-    const possibleLists = [...document.querySelectorAll('main, [role="main"]')]
-      .flatMap(root => [...root.querySelectorAll(':scope > div, section, article')]);
-
-    possibleLists.forEach(list => {
-      const txt = (list.innerText || '').toLowerCase();
-      if (txt.includes('comentado por') || txt.includes('compartilhado por') || txt.includes('curtir') || txt.includes('comentar')) {
-        list.classList.add('tj-feed-list');
-      }
-    });
-  }
-
-  function boot() {
-    ensureViewport();
-    createTopbar();
-    enhanceSearch();
-    enhanceSections();
-    improveFeedSpacing();
-
-    if (!document.querySelector('.tj-mobile-bottom-space')) {
-      const spacer = document.createElement('div');
-      spacer.className = 'tj-mobile-bottom-space';
-      document.body.appendChild(spacer);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', boot);
-  window.addEventListener('load', boot);
-  window.addEventListener('resize', function(){
-    if (isMobile()) boot();
-    else document.body.classList.remove('tj-mobile-menu-open');
-  });
-
-  setTimeout(boot, 300);
-  setTimeout(boot, 1200);
-})();
-</script>
-
-<style id="trabalhosja-anuncios-links-style">
-  .tj-ad-clickable{
-    cursor:pointer !important;
-    position:relative !important;
-    overflow:hidden !important;
-    transition:transform .18s ease, border-color .18s ease, filter .18s ease !important;
-  }
-
-  .tj-ad-clickable:hover{
-    transform:translateY(-2px) !important;
-    border-color:rgba(24,242,255,.32) !important;
-    filter:brightness(1.08) !important;
-  }
-
-  .tj-ad-action{
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:8px !important;
-    margin-top:14px !important;
-    min-height:42px !important;
-    padding:10px 14px !important;
-    border-radius:999px !important;
-    background:linear-gradient(135deg,#8d5cff,#18f2ff) !important;
-    color:#fff !important;
-    font-weight:1000 !important;
-    font-size:14px !important;
-    text-decoration:none !important;
-    box-shadow:0 12px 28px rgba(24,242,255,.16) !important;
-  }
-
-  .tj-ad-small-note{
-    display:block;
-    margin-top:8px;
-    color:rgba(207,213,255,.72);
-    font-size:12px;
-    font-weight:800;
-  }
-
-  @media(max-width:860px){
-    .tj-ad-action{
-      width:100% !important;
-      min-height:50px !important;
-      font-size:16px !important;
-      margin-top:16px !important;
-    }
-  }
-</style>
-
-<script id="trabalhosja-anuncios-links-script">
-(function(){
-  if(window.__trabalhosJaAnunciosLinks) return;
-  window.__trabalhosJaAnunciosLinks = true;
-
-  const LINKS = [
-    {
-      match: "Plano Pro de Serviços",
-      url: "https://sualuma.online/plans",
-      label: "Ver Plano Pro",
-      note: "Prioridade para prestadores"
-    },
-    {
-      match: "Agentes de IA",
-      url: "https://dev.sualuma.online",
-      label: "Ver agentes",
-      note: "Abrir vitrine de agentes"
-    },
-    {
-      match: "Marketplace de automações",
-      url: "https://automacoes.sualuma.online",
-      label: "Ver automações",
-      note: "Comprar fluxos prontos"
-    }
-  ];
-
-  function findCardByText(text){
-    const candidates = [...document.querySelectorAll("div, article, section")];
-
-    return candidates
-      .filter(el => {
-        const ownText = (el.innerText || "").trim();
-        return ownText.includes(text) && ownText.length < 420;
-      })
-      .sort((a,b) => (a.innerText || "").length - (b.innerText || "").length)[0];
-  }
-
-  function enhanceAds(){
-    LINKS.forEach(item => {
-      const card = findCardByText(item.match);
-      if(!card || card.dataset.tjAdLinked === "1") return;
-
-      card.dataset.tjAdLinked = "1";
-      card.classList.add("tj-ad-clickable");
-
-      const btn = document.createElement("a");
-      btn.className = "tj-ad-action";
-      btn.href = item.url;
-      btn.target = "_blank";
-      btn.rel = "noopener";
-      btn.innerHTML = item.label + " →";
-
-      const note = document.createElement("span");
-      note.className = "tj-ad-small-note";
-      note.textContent = item.note;
-
-      card.appendChild(btn);
-      card.appendChild(note);
-
-      card.addEventListener("click", function(e){
-        if(e.target.closest("a,button,input,select,textarea")) return;
-        window.open(item.url, "_blank", "noopener");
-      });
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", enhanceAds);
-  window.addEventListener("load", enhanceAds);
-  setTimeout(enhanceAds, 400);
-  setTimeout(enhanceAds, 1200);
-})();
-</script>
-
-<style id="trabalhosja-profile-button-style">
-  #tjProfileBtn,
-  #tjSidebarProfileBtn{
-    border:1px solid rgba(255,255,255,.12);
-    background:linear-gradient(135deg,rgba(141,92,255,.24),rgba(24,242,255,.14));
-    color:#fff;
-    font-weight:1000;
-    cursor:pointer;
-    box-shadow:0 12px 28px rgba(24,242,255,.10);
-  }
-
-  #tjProfileBtn{
-    min-width:46px;
-    min-height:46px;
-    border-radius:14px;
-    display:grid;
-    place-items:center;
-    font-size:18px;
-  }
-
-  #tjSidebarProfileBtn{
-    width:100%;
-    min-height:52px;
-    border-radius:18px;
-    margin-top:12px;
-    padding:13px 15px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:9px;
-  }
-
-  #tjProfileModal{
-    position:fixed;
-    inset:0;
-    z-index:10050;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:18px;
-    background:rgba(0,0,0,.72);
-    backdrop-filter:blur(6px);
-  }
-
-  #tjProfileModal.show{
-    display:flex;
-  }
-
-  .tj-profile-box{
-    width:min(760px,96vw);
-    max-height:88vh;
-    overflow:auto;
-    border-radius:30px;
-    border:1px solid rgba(255,255,255,.14);
-    background:
-      radial-gradient(circle at 90% 0%, rgba(24,242,255,.13), transparent 28%),
-      radial-gradient(circle at 0% 0%, rgba(141,92,255,.22), transparent 28%),
-      #090a14;
-    color:#fff;
-    box-shadow:0 30px 90px rgba(0,0,0,.5);
-    padding:22px;
-  }
-
-  .tj-profile-head{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:16px;
-    margin-bottom:18px;
-  }
-
-  .tj-profile-user{
-    display:flex;
-    align-items:center;
-    gap:14px;
-  }
-
-  .tj-profile-avatar{
-    width:58px;
-    height:58px;
-    border-radius:22px;
-    display:grid;
-    place-items:center;
-    font-weight:1000;
-    background:linear-gradient(135deg,#8d5cff,#18f2ff);
-    color:#fff;
-    font-size:20px;
-    flex:0 0 58px;
-  }
-
-  .tj-profile-head h2{
-    margin:0;
-    font-size:28px;
-    line-height:1.1;
-  }
-
-  .tj-profile-head p{
-    margin:6px 0 0;
-    color:#cfd5ff;
-  }
-
-  .tj-profile-close{
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.07);
-    color:#fff;
-    border-radius:16px;
-    padding:11px 14px;
-    font-weight:1000;
-    cursor:pointer;
-  }
-
-  .tj-profile-actions{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-    margin:18px 0;
-  }
-
-  .tj-profile-action{
-    min-height:54px;
-    border-radius:18px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.06);
-    color:#fff;
-    text-decoration:none;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    font-weight:1000;
-    padding:12px;
-  }
-
-  .tj-profile-action.primary{
-    background:linear-gradient(135deg,#8d5cff,#18f2ff);
-    border-color:transparent;
-  }
-
-  .tj-profile-stats{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:12px;
-    margin:16px 0 20px;
-  }
-
-  .tj-profile-stat{
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.045);
-    border-radius:18px;
-    padding:14px;
-  }
-
-  .tj-profile-stat strong{
-    display:block;
-    font-size:24px;
-  }
-
-  .tj-profile-stat span{
-    color:#cfd5ff;
-    font-size:13px;
-    font-weight:800;
-  }
-
-  .tj-profile-posts{
-    display:grid;
-    gap:12px;
-  }
-
-  .tj-profile-post{
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.045);
-    border-radius:20px;
-    padding:15px;
-  }
-
-  .tj-profile-post strong{
-    display:block;
-    font-size:17px;
-    margin-bottom:6px;
-  }
-
-  .tj-profile-post p{
-    color:#cfd5ff;
-    margin:0 0 10px;
-    line-height:1.55;
-  }
-
-  .tj-profile-post small{
-    color:rgba(207,213,255,.72);
-    font-weight:800;
-  }
-
-  @media(max-width:860px){
-    #tjMobileTopbar{
-      gap:8px !important;
-    }
-
-    #tjProfileBtn{
-      order:2;
-    }
-
-    #tjMobileMenuBtn{
-      order:3;
-    }
-
-    .tj-profile-box{
+    .search{
       width:100%;
-      max-height:86vh;
-      border-radius:26px;
+      min-height:54px;
+      border-radius:20px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.07);
+      color:var(--text);
+      padding:0 16px;
+      outline:none;
+      margin-top:14px;
+      font-weight:800;
+    }
+
+    .search::placeholder{color:var(--muted2)}
+
+    .composer{
+      padding:20px;
+      margin-bottom:18px;
+    }
+
+    .composer h2{
+      margin:0 0 8px;
+      font-size:24px;
+    }
+
+    .feedTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin:4px 0 14px;
+    }
+
+    .feedTitle h2{
+      margin:0;
+      font-size:26px;
+    }
+
+    .post{
+      padding:18px;
+      margin-bottom:16px;
+      overflow:hidden;
+    }
+
+    .postHead{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .avatar{
+      width:48px;
+      height:48px;
+      border-radius:17px;
+      background:linear-gradient(135deg,var(--purple),var(--cyan));
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:1000;
+      flex:0 0 auto;
+      overflow:hidden;
+    }
+
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .postMeta{
+      min-width:0;
+      flex:1;
+    }
+
+    .postAuthor{
+      font-weight:1000;
+      color:var(--text);
+      cursor:pointer;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+    }
+
+    .postAuthor:hover{
+      color:#aaf9ff;
+    }
+
+    .postTime{
+      color:var(--muted2);
+      font-size:13px;
+      font-weight:800;
+      margin-top:3px;
+    }
+
+    .post h3{
+      font-size:clamp(24px,5vw,34px);
+      line-height:1.08;
+      letter-spacing:-.02em;
+      margin:8px 0 10px;
+    }
+
+    .postContent{
+      font-size:17px;
+      line-height:1.55;
+      color:var(--muted);
+      white-space:pre-wrap;
+    }
+
+    .preview{
+      margin-top:14px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.045);
+      border-radius:22px;
+      overflow:hidden;
+    }
+
+    .preview img{
+      width:100%;
+      max-height:320px;
+      object-fit:cover;
+      display:block;
+    }
+
+    .previewBody{
+      padding:14px;
+    }
+
+    .previewBody strong{
+      display:block;
+      margin-bottom:4px;
+      color:var(--text);
+    }
+
+    .actionBar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      border-top:1px solid var(--stroke);
+      margin-top:14px;
+      padding-top:12px;
+    }
+
+    .actionBar button{
+      flex:1;
+      min-height:40px;
+      border:0;
+      border-radius:14px;
+      background:rgba(255,255,255,.065);
+      color:var(--muted);
+      font-weight:1000;
+      cursor:pointer;
+    }
+
+    .actionBar button:hover{
+      background:rgba(24,242,255,.12);
+      color:var(--text);
+    }
+
+    .commentBox{
+      margin-top:12px;
+      display:none;
+      gap:10px;
+    }
+
+    .commentBox.open{
+      display:grid;
+    }
+
+    .commentBox textarea{
+      width:100%;
+      min-height:86px;
+      resize:vertical;
+      border-radius:18px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.07);
+      color:var(--text);
+      padding:12px;
+      outline:none;
+    }
+
+    .commentList{
+      display:grid;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .commentItem{
+      background:rgba(255,255,255,.055);
+      border:1px solid var(--stroke);
+      border-radius:16px;
+      padding:10px 12px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .side{
+      display:grid;
+      gap:16px;
+      position:sticky;
+      top:96px;
+    }
+
+    .sideCard{
       padding:18px;
     }
 
-    .tj-profile-actions,
-    .tj-profile-stats{
-      grid-template-columns:1fr;
-    }
-
-    .tj-profile-head h2{
+    .sideCard h2{
+      margin:0 0 14px;
       font-size:24px;
     }
-  }
-</style>
 
-<script id="trabalhosja-profile-button-script">
-(function(){
-  if(window.__trabalhosJaProfileButton) return;
-  window.__trabalhosJaProfileButton = true;
-
-  const SUPABASE_URL = "https://vadljxyykrhyeuarzyat.supabase.co";
-  const SUPABASE_ANON = "sb_publishable_1O8rZojnDMZeYkBOtFF6jA_8m64Y-Yo";
-  const PORTFOLIO_URL = "https://meuservico.sualuma.online/?v=perfil1#prestador-portfolio";
-  const DASHBOARD_URL = "https://meuservico.sualuma.online/?v=perfil1#prestador";
-  const LOGIN_URL = "https://sualuma.online/sign-in";
-
-  let sb = null;
-  let currentSession = null;
-
-  function initials(name){
-    return String(name || "U")
-      .trim()
-      .split(/\s+/)
-      .slice(0,2)
-      .map(p => p[0]?.toUpperCase() || "")
-      .join("") || "U";
-  }
-
-  function escapeHtml(value){
-    return String(value || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  function getName(user){
-    const meta = user?.user_metadata || {};
-    return meta.full_name || meta.name || meta.nome || user?.email?.split("@")?.[0] || "Usuário";
-  }
-
-  function toast(msg){
-    let box = document.getElementById("tjProfileToast");
-    if(!box){
-      box = document.createElement("div");
-      box.id = "tjProfileToast";
-      box.style.cssText = "position:fixed;right:18px;bottom:18px;z-index:11000;background:#10162a;color:white;border:1px solid rgba(24,242,255,.22);border-radius:16px;padding:13px 15px;font-weight:1000;box-shadow:0 16px 40px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);transition:.22s";
-      document.body.appendChild(box);
+    .ad{
+      display:block;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.055);
+      border-radius:22px;
+      padding:16px;
+      margin-bottom:12px;
+      transition:.18s ease;
     }
-    box.textContent = msg;
-    box.style.opacity = "1";
-    box.style.transform = "translateY(0)";
-    setTimeout(() => {
-      box.style.opacity = "0";
-      box.style.transform = "translateY(10px)";
-    }, 2600);
+
+    .ad:hover{
+      transform:translateY(-2px);
+      border-color:rgba(24,242,255,.35);
+    }
+
+    .ad h3{
+      margin:0 0 8px;
+      font-size:20px;
+    }
+
+    .person{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.055);
+      border-radius:20px;
+      margin-bottom:10px;
+      cursor:pointer;
+    }
+
+    .person strong{
+      display:block;
+      color:var(--text);
+    }
+
+    .person p{
+      margin:2px 0 0;
+      font-size:13px;
+    }
+
+    .online{
+      margin-left:auto;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:var(--green);
+      box-shadow:0 0 22px var(--green);
+    }
+
+    .profileModal{
+      position:fixed;
+      inset:0;
+      z-index:999;
+      display:none;
+      background:rgba(0,0,0,.68);
+      backdrop-filter:blur(12px);
+      padding:18px;
+      overflow:auto;
+    }
+
+    .profileModal.open{
+      display:grid;
+      place-items:center;
+    }
+
+    .profileBox{
+      width:min(540px,100%);
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(circle at 0 0,rgba(24,242,255,.13),transparent 36%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.20),transparent 40%),
+        #080a18;
+      border-radius:30px;
+      padding:22px;
+      display:grid;
+      gap:14px;
+    }
+
+    .profileHead{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+    }
+
+    .profileHead h2{
+      font-size:34px;
+      line-height:1;
+      margin:0 0 6px;
+    }
+
+    .profileLinks{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:24px;
+      transform:translateX(-50%) translateY(20px);
+      opacity:0;
+      pointer-events:none;
+      z-index:1200;
+      background:#101221;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:20px;
+      padding:14px 18px;
+      font-weight:900;
+      box-shadow:0 20px 80px rgba(0,0,0,.45);
+      transition:.2s ease;
+      width:min(420px,calc(100vw - 32px));
+      text-align:center;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    @media(max-width:860px){
+      .wrap{
+        padding:14px;
+        padding-bottom:96px;
+      }
+
+      .top{
+        align-items:flex-start;
+        gap:10px;
+        padding-bottom:12px;
+      }
+
+      .logo{
+        width:52px;
+        height:52px;
+        border-radius:18px;
+      }
+
+      .brand{
+        align-items:flex-start;
+        flex:1;
+      }
+
+      .brand h1{
+        font-size:24px;
+        white-space:normal;
+      }
+
+      .brand p{
+        font-size:15px;
+      }
+
+      .topActions{
+        flex-direction:column;
+        gap:8px;
+        width:118px;
+      }
+
+      .topActions .btn{
+        width:100%;
+        min-height:46px;
+        border-radius:18px;
+        padding:10px;
+      }
+
+      .hero,.composer,.post,.sideCard{
+        border-radius:26px;
+        padding:18px;
+      }
+
+      .hero{
+        margin-top:4px;
+      }
+
+      .hero h2{
+        font-size:38px;
+      }
+
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .side{
+        position:static;
+      }
+
+      .feedTitle{
+        align-items:flex-start;
+      }
+
+      .actionBar{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+      }
+
+      .actionBar button{
+        font-size:13px;
+        padding:8px 6px;
+      }
+
+      .postHead{
+        align-items:center;
+      }
+
+      .post h3{
+        font-size:28px;
+      }
+
+      .profileModal{
+        padding:12px;
+        align-items:start;
+      }
+
+      .profileBox{
+        margin-top:54px;
+        border-radius:28px;
+        padding:20px;
+      }
+
+      .profileHead h2{
+        font-size:30px;
+      }
+    }
+  
+    .linkPreviewAuto{
+      margin-top:14px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.055);
+      border-radius:22px;
+      overflow:hidden;
+      display:none;
+    }
+
+    .linkPreviewAuto.show{
+      display:grid;
+      grid-template-columns:150px minmax(0,1fr);
+    }
+
+    .linkPreviewAuto img{
+      width:100%;
+      height:100%;
+      min-height:126px;
+      object-fit:cover;
+      display:block;
+      background:rgba(255,255,255,.06);
+    }
+
+    .linkPreviewAutoBody{
+      padding:14px;
+      min-width:0;
+    }
+
+    .linkPreviewAutoBody strong{
+      display:block;
+      color:var(--text);
+      font-size:16px;
+      line-height:1.2;
+      margin-bottom:6px;
+    }
+
+    .linkPreviewAutoBody p{
+      margin:0 0 8px;
+      font-size:14px;
+      color:var(--muted);
+    }
+
+    .linkPreviewAutoBody span{
+      display:block;
+      color:var(--muted2);
+      font-size:12px;
+      font-weight:900;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .manageBar{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .manageBar button{
+      min-height:38px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.07);
+      color:var(--text);
+      font-weight:900;
+      padding:8px 11px;
+      cursor:pointer;
+    }
+
+    .manageBar button.danger{
+      background:rgba(255,60,120,.12);
+      border-color:rgba(255,60,120,.24);
+    }
+
+    .editModal{
+      position:fixed;
+      inset:0;
+      z-index:1300;
+      background:rgba(0,0,0,.72);
+      backdrop-filter:blur(12px);
+      display:none;
+      padding:16px;
+      overflow:auto;
+    }
+
+    .editModal.open{
+      display:grid;
+      place-items:center;
+    }
+
+    .editBox{
+      width:min(620px,100%);
+      border:1px solid var(--stroke);
+      background:
+        radial-gradient(circle at 0 0,rgba(24,242,255,.13),transparent 36%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.20),transparent 40%),
+        #080a18;
+      border-radius:28px;
+      padding:20px;
+    }
+
+    .editBox h2{
+      margin:0 0 14px;
+      font-size:30px;
+    }
+
+    .editBox input,
+    .editBox textarea{
+      width:100%;
+      border:1px solid rgba(255,255,255,.13);
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-radius:18px;
+      padding:14px;
+      margin:7px 0;
+      outline:none;
+    }
+
+    .editBox textarea{
+      min-height:120px;
+      resize:vertical;
+    }
+
+    .editActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    @media(max-width:860px){
+      .linkPreviewAuto.show{
+        grid-template-columns:1fr;
+      }
+
+      .linkPreviewAuto img{
+        height:190px;
+      }
+
+      .manageBar{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+      }
+
+      .manageBar button{
+        width:100%;
+      }
+
+      .editModal{
+        align-items:start;
+      }
+
+      .editBox{
+        margin-top:46px;
+        border-radius:26px;
+      }
+    }
+
+  
+    /* post-menu-dots-v1-start */
+    .postRight{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-left:auto;
+      flex:0 0 auto;
+    }
+
+    .dotsBtn{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.075);
+      color:var(--text);
+      font-weight:1000;
+      font-size:20px;
+      line-height:1;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+    }
+
+    .dotsBtn:hover{
+      background:rgba(24,242,255,.12);
+      border-color:rgba(24,242,255,.28);
+    }
+
+    .postActionsModal{
+      position:fixed;
+      inset:0;
+      z-index:1400;
+      display:none;
+      background:rgba(0,0,0,.66);
+      backdrop-filter:blur(12px);
+      padding:18px;
+      overflow:auto;
+    }
+
+    .postActionsModal.open{
+      display:grid;
+      place-items:center;
+    }
+
+    .postActionsBox{
+      width:min(420px,100%);
+      border:1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(circle at 0 0,rgba(24,242,255,.13),transparent 36%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.22),transparent 40%),
+        #080a18;
+      border-radius:28px;
+      padding:18px;
+      box-shadow:0 28px 90px rgba(0,0,0,.5);
+      display:grid;
+      gap:10px;
+    }
+
+    .postActionsBox h2{
+      margin:0 0 6px;
+      font-size:24px;
+      color:#fff;
+    }
+
+    .postActionsBox p{
+      margin:0 0 8px;
+      color:#cfd5ff;
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .postActionsBox button{
+      width:100%;
+      min-height:52px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.075);
+      color:#fff;
+      font-weight:1000;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .postActionsBox button.primary{
+      background:linear-gradient(135deg,#8d5cff,#18f2ff);
+    }
+
+    .postActionsBox button.warning{
+      background:rgba(255,190,70,.10);
+      border-color:rgba(255,190,70,.22);
+    }
+
+    .postActionsBox button.danger{
+      background:rgba(255,60,120,.13);
+      border-color:rgba(255,60,120,.28);
+    }
+
+    .manageBar{
+      display:none !important;
+    }
+
+    @media(max-width:860px){
+      .postRight{
+        gap:6px;
+      }
+
+      .dotsBtn{
+        width:38px;
+        height:38px;
+        border-radius:13px;
+      }
+
+      .postActionsModal{
+        align-items:end;
+        padding:12px;
+      }
+
+      .postActionsBox{
+        border-radius:26px 26px 22px 22px;
+        padding:18px;
+        margin-bottom:18px;
+      }
+    }
+    /* post-menu-dots-v1-end */
+
+  
+    /* fixed-categories-v1-start */
+    .categoryFilter{
+      margin-top:14px;
+      border:1px solid var(--stroke);
+      border-radius:22px;
+      background:rgba(255,255,255,.055);
+      overflow:hidden;
+    }
+
+    .categoryFilter summary{
+      list-style:none;
+      cursor:pointer;
+      min-height:52px;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      color:var(--text);
+      font-weight:1000;
+    }
+
+    .categoryFilter summary::-webkit-details-marker{
+      display:none;
+    }
+
+    .categoryFilter summary::after{
+      content:"⌄";
+      opacity:.8;
+      font-size:20px;
+    }
+
+    .categoryFilter[open] summary::after{
+      content:"⌃";
+    }
+
+    .categoryPills{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      padding:0 14px 14px;
+    }
+
+    .categoryPill{
+      min-height:38px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.065);
+      color:var(--muted);
+      padding:8px 12px;
+      font-weight:950;
+      cursor:pointer;
+    }
+
+    .categoryPill.active{
+      color:#fff;
+      border-color:rgba(24,242,255,.40);
+      background:linear-gradient(135deg,rgba(141,92,255,.75),rgba(24,242,255,.75));
+      box-shadow:0 12px 26px rgba(24,242,255,.12);
+    }
+
+    .fixedCategorySelect{
+      width:100%;
+      border:1px solid rgba(255,255,255,.13);
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-radius:18px;
+      padding:14px;
+      margin:7px 0;
+      outline:none;
+      font-weight:850;
+    }
+
+    .fixedCategorySelect option{
+      color:#111;
+    }
+
+    @media(max-width:860px){
+      .categoryPills{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+      }
+
+      .categoryPill{
+        width:100%;
+      }
+    }
+    /* fixed-categories-v1-end */
+
+  
+    /* edit-category-select-final-start */
+    .fixedCategorySelect{
+      width:100% !important;
+      min-height:56px !important;
+      border:1px solid rgba(255,255,255,.13) !important;
+      background:rgba(255,255,255,.08) !important;
+      color:#fff !important;
+      border-radius:18px !important;
+      padding:0 14px !important;
+      margin:7px 0 !important;
+      outline:none !important;
+      font-weight:850 !important;
+      appearance:auto !important;
+      -webkit-appearance:auto !important;
+    }
+
+    .fixedCategorySelect option{
+      color:#111 !important;
+      background:#fff !important;
+    }
+    /* edit-category-select-final-end */
+
+  
+    /* link-screenshot-preview-v1-start */
+    .linkPreviewAuto{
+      margin-top:14px !important;
+      border:1px solid var(--stroke) !important;
+      background:rgba(255,255,255,.055) !important;
+      border-radius:22px !important;
+      overflow:hidden !important;
+      display:none;
+      text-decoration:none !important;
+      color:inherit !important;
+    }
+
+    .linkPreviewAuto.show{
+      display:grid !important;
+      grid-template-columns:220px minmax(0,1fr) !important;
+    }
+
+    .linkPreviewAutoImageWrap{
+      width:100%;
+      height:100%;
+      min-height:150px;
+      background:
+        radial-gradient(circle at 20% 10%,rgba(24,242,255,.16),transparent 35%),
+        radial-gradient(circle at 90% 0%,rgba(141,92,255,.18),transparent 38%),
+        rgba(255,255,255,.05);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .linkPreviewAutoImageWrap::after{
+      content:"Prévia do site";
+      position:absolute;
+      left:10px;
+      bottom:10px;
+      padding:6px 9px;
+      border-radius:999px;
+      background:rgba(0,0,0,.55);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      backdrop-filter:blur(8px);
+    }
+
+    .linkPreviewAuto img{
+      width:100% !important;
+      height:100% !important;
+      min-height:150px !important;
+      object-fit:cover !important;
+      display:block !important;
+      background:rgba(255,255,255,.06) !important;
+    }
+
+    .linkPreviewAutoBody{
+      padding:16px !important;
+      min-width:0 !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:center !important;
+    }
+
+    .linkPreviewAutoBody strong{
+      display:block !important;
+      color:var(--text) !important;
+      font-size:18px !important;
+      line-height:1.2 !important;
+      margin-bottom:7px !important;
+    }
+
+    .linkPreviewAutoBody p{
+      margin:0 0 9px !important;
+      font-size:14px !important;
+      color:var(--muted) !important;
+      line-height:1.35 !important;
+    }
+
+    .linkPreviewAutoBody span{
+      display:block !important;
+      color:#aaf9ff !important;
+      font-size:12px !important;
+      font-weight:1000 !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      white-space:nowrap !important;
+    }
+
+    @media(max-width:860px){
+      .linkPreviewAuto.show{
+        grid-template-columns:1fr !important;
+      }
+
+      .linkPreviewAutoImageWrap{
+        min-height:190px !important;
+      }
+
+      .linkPreviewAuto img{
+        min-height:190px !important;
+        height:190px !important;
+      }
+    }
+    /* link-screenshot-preview-v1-end */
+
+  
+    /* search-popup-v2-start */
+    .searchSmartWrap{
+      width:100%;
+      display:grid;
+      gap:12px;
+      margin-top:12px;
+      position:relative;
+      z-index:20;
+    }
+
+    .searchRow{
+      position:relative;
+      width:100%;
+    }
+
+    .searchRow .search{
+      width:100% !important;
+      margin:0 !important;
+      padding-right:72px !important;
+    }
+
+    .searchIconBtn{
+      position:absolute;
+      top:50%;
+      right:12px;
+      transform:translateY(-50%);
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:linear-gradient(135deg,#8d5cff,#18f2ff);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(24,242,255,.12);
+      font-size:20px;
+      font-weight:1000;
+    }
+
+    .searchPopupInline{
+      position:relative;
+      width:100%;
+      border:1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(circle at 0 0,rgba(24,242,255,.10),transparent 35%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.16),transparent 40%),
+        rgba(8,10,24,.96);
+      backdrop-filter:blur(18px);
+      border-radius:24px;
+      padding:16px;
+      display:none;
+      box-shadow:0 24px 50px rgba(0,0,0,.28);
+    }
+
+    .searchPopupInline.open{
+      display:block;
+    }
+
+    .searchPopupHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .searchPopupTitle{
+      color:#fff;
+      font-size:18px;
+      font-weight:1000;
+    }
+
+    .searchPopupClose{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      border-radius:14px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-weight:900;
+      font-size:14px;
+    }
+
+    .searchGroup{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .searchGroupTitle{
+      color:#aaf9ff;
+      font-size:12px;
+      font-weight:1000;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin:2px 0;
+    }
+
+    .searchResultItem{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:#fff;
+      border-radius:18px;
+      padding:12px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-align:left;
+      cursor:pointer;
+    }
+
+    .searchResultItem:hover{
+      background:rgba(24,242,255,.08);
+      border-color:rgba(24,242,255,.22);
+    }
+
+    .searchResultAvatar{
+      width:46px;
+      height:46px;
+      border-radius:16px;
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,#8d5cff,#18f2ff);
+      color:#fff;
+      font-weight:1000;
+      overflow:hidden;
+    }
+
+    .searchResultAvatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .searchResultMain{
+      min-width:0;
+      flex:1;
+    }
+
+    .searchResultMain strong{
+      display:block;
+      font-size:15px;
+      line-height:1.2;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .searchResultMain span{
+      display:block;
+      color:#cfd5ff;
+      font-size:13px;
+      margin-top:3px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .searchResultBadge{
+      border:1px solid rgba(24,242,255,.24);
+      color:#aaf9ff;
+      background:rgba(24,242,255,.08);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:1000;
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    .searchEmpty{
+      padding:14px;
+      color:#cfd5ff;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+    }
+
+    @media(max-width:860px){
+      .searchPopupInline{
+        padding:14px;
+        border-radius:22px;
+      }
+
+      .searchPopupTitle{
+        font-size:17px;
+      }
+
+      .searchPopupClose{
+        padding:9px 12px;
+        font-size:13px;
+      }
+
+      .searchIconBtn{
+        width:46px;
+        height:46px;
+        right:10px;
+        border-radius:15px;
+      }
+    }
+    /* search-popup-v2-end */
+
+
+    /* blog-carousel-fixed-v2-start */
+    .blogCarouselFixed{
+      width:100% !important;
+      max-width:100% !important;
+      min-width:0 !important;
+      flex:0 0 100% !important;
+      grid-column:1 / -1 !important;
+      display:block !important;
+      clear:both !important;
+      box-sizing:border-box !important;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(circle at 0 0,rgba(24,242,255,.12),transparent 34%),
+        radial-gradient(circle at 100% 0,rgba(141,92,255,.18),transparent 40%),
+        rgba(8,10,24,.82);
+      border-radius:28px;
+      padding:20px;
+      margin:24px 0 !important;
+      overflow:hidden;
+    }
+
+    .blogCarouselFixedHeader{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:14px;
+    }
+
+    .blogCarouselFixedHeader h2{
+      margin:0;
+      color:#fff;
+      font-size:28px;
+      line-height:1.05;
+      font-weight:1000;
+    }
+
+    .blogCarouselFixedHeader p{
+      margin:7px 0 0;
+      color:#cfd5ff;
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .blogCarouselFixedHeader a{
+      color:#fff;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.14);
+      background:linear-gradient(135deg,#8d5cff,#18f2ff);
+      border-radius:16px;
+      padding:12px 16px;
+      font-weight:1000;
+      white-space:nowrap;
+      text-align:center;
+    }
+
+    .blogCarouselFixedTrack{
+      display:flex !important;
+      gap:14px;
+      width:100%;
+      max-width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      padding:4px 2px 10px;
+      -webkit-overflow-scrolling:touch;
+    }
+
+    .blogCarouselFixedTrack::-webkit-scrollbar{
+      height:7px;
+    }
+
+    .blogCarouselFixedTrack::-webkit-scrollbar-thumb{
+      background:rgba(24,242,255,.35);
+      border-radius:999px;
+    }
+
+    .blogFixedCard{
+      min-width:280px;
+      max-width:280px;
+      flex:0 0 280px;
+      scroll-snap-align:start;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.055);
+      border-radius:22px;
+      overflow:hidden;
+      text-decoration:none;
+      color:#fff;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .blogFixedImage{
+      width:100%;
+      height:150px;
+      background:
+        radial-gradient(circle at 20% 10%,rgba(24,242,255,.22),transparent 35%),
+        radial-gradient(circle at 90% 0,rgba(141,92,255,.24),transparent 42%),
+        rgba(255,255,255,.05);
+      overflow:hidden;
+    }
+
+    .blogFixedImage img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .blogFixedFallbackImage{
+      width:100%;
+      height:100%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:18px;
+      color:#fff;
+      font-weight:1000;
+      font-size:18px;
+      line-height:1.15;
+      background:linear-gradient(135deg,rgba(141,92,255,.72),rgba(24,242,255,.55));
+    }
+
+    .blogFixedBody{
+      padding:14px;
+      display:grid;
+      gap:8px;
+    }
+
+    .blogFixedBadge{
+      width:max-content;
+      max-width:100%;
+      color:#aaf9ff;
+      border:1px solid rgba(24,242,255,.26);
+      background:rgba(24,242,255,.08);
+      border-radius:999px;
+      padding:6px 9px;
+      font-size:11px;
+      font-weight:1000;
+    }
+
+    .blogFixedCard h3{
+      margin:0;
+      font-size:17px;
+      line-height:1.2;
+      color:#fff;
+    }
+
+    .blogFixedCard p{
+      margin:0;
+      color:#cfd5ff;
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .blogFixedRead{
+      color:#aaf9ff;
+      font-size:13px;
+      font-weight:1000;
+      margin-top:4px;
+    }
+
+    .blogCarouselFixedEmpty{
+      width:100%;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      border-radius:18px;
+      padding:14px;
+      color:#cfd5ff;
+    }
+
+    @media(max-width:860px){
+      .blogCarouselFixed{
+        width:100% !important;
+        max-width:100% !important;
+        min-width:100% !important;
+        flex:0 0 100% !important;
+        grid-column:1 / -1 !important;
+        border-radius:24px;
+        padding:16px;
+        margin:18px 0 !important;
+      }
+
+      .blogCarouselFixedHeader{
+        display:grid;
+        grid-template-columns:1fr;
+        align-items:stretch;
+      }
+
+      .blogCarouselFixedHeader h2{
+        font-size:24px;
+      }
+
+      .blogCarouselFixedHeader a{
+        width:100%;
+      }
+
+      .blogFixedCard{
+        min-width:82vw;
+        max-width:82vw;
+        flex:0 0 82vw;
+      }
+
+      .blogFixedImage{
+        height:145px;
+      }
+    }
+    /* blog-carousel-fixed-v2-end */
+
+</style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a class="brand" href="/">
+        <div class="logo">TJ</div>
+        <div class="brandText">
+          <h1>TrabalhosJa</h1>
+          <p>Comunidade Sualuma</p>
+        </div>
+      </a>
+
+      <div class="topActions">
+        <button class="btn" onclick="openProfile()">Perfil</button>
+        <a class="btn primary" href="https://meuservico.sualuma.online/portfolio/">Portfólio</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <span class="tag">Feed público</span>
+      <h2>Trabalhos, ideias e oportunidades em um só lugar</h2>
+      <p>Veja publicações da comunidade, encontre prestadores, acompanhe portfólios e publique seus trabalhos pelo Dashboard de Serviço.</p>
+      <input id="search" class="search" placeholder="Pesquisar pessoas, trabalhos, posts ou palavras-chave">
+
+      <details id="categoryFilter" class="categoryFilter">
+        <summary>Categorias</summary>
+        <div id="categoryPills" class="categoryPills"></div>
+      </details>
+
+    </section>
+
+    <main class="grid">
+      <section>
+        <div class="composer">
+          <h2>Criar publicação</h2>
+          <p>Entre na plataforma para publicar manualmente. Trabalhos do portfólio aparecem aqui quando você clicar em <strong>Publicar na comunidade</strong>.</p>
+          <a class="btn primary" href="https://sualuma.online/sign-in">Entrar na plataforma</a>
+        </div>
+
+        <div class="feedTitle">
+
+<h2>Feed da comunidade</h2>
+          <button class="btn small" onclick="loadFeed(search.value)">Atualizar</button>
+        </div>
+
+        <section id="feed">
+          <div class="post">
+            <h3>Carregando feed...</h3>
+            <p>Buscando publicações.</p>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side">
+        <section class="sideCard">
+
+<h2>Anúncios Sualuma</h2>
+
+          <a class="ad" href="https://sualuma.online/plans">
+            <h3>Plano Pro de Serviços</h3>
+            <p>Prioridade para receber propostas, aparecer melhor para empresas e crescer dentro da plataforma.</p>
+          </a>
+
+          <a class="ad" href="https://chat.sualuma.online" target="_blank" rel="noopener">
+            <h3>Agentes de IA</h3>
+            <p>Abra o chat de IA para criar propostas, responder clientes e organizar entregas.</p>
+          </a>
+
+          <a class="ad" href="https://sualuma.online/automations">
+            <h3>Marketplace de automações</h3>
+            <p>Veja fluxos, agentes e automações prontas para acelerar seu trabalho.</p>
+          </a>
+        </section>
+
+        <section class="sideCard">
+          <h2>Pessoas online</h2>
+
+          <div class="person" onclick="quickMessage('Ana Sites')">
+            <div class="avatar">AS</div>
+            <div><strong>Ana Sites</strong><p>Web designer</p></div>
+            <span class="online"></span>
+          </div>
+
+          <div class="person" onclick="quickMessage('Rafa Automação')">
+            <div class="avatar">RA</div>
+            <div><strong>Rafa Automação</strong><p>n8n e IA</p></div>
+            <span class="online"></span>
+          </div>
+
+          <div class="person" onclick="quickMessage('Bia Social')">
+            <div class="avatar">BS</div>
+            <div><strong>Bia Social</strong><p>Social media</p></div>
+            <span class="online"></span>
+          </div>
+        </section>
+
+        <section class="sideCard">
+          <h2>Acesso rápido</h2>
+          <a class="btn primary" style="width:100%;margin-bottom:10px" href="https://meuservico.sualuma.online/#prestador-servicos">Ver propostas</a>
+          <a class="btn" style="width:100%;margin-bottom:10px" href="https://meuservico.sualuma.online/portfolio/">Meu portfólio</a>
+          <button class="btn" style="width:100%" onclick="toggleTheme()">Alternar tema</button>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div id="profileModal" class="profileModal" onclick="closeProfile(event)">
+    <div class="profileBox" onclick="event.stopPropagation()">
+      <div class="profileHead">
+        <div id="profileAvatar" class="avatar">LR</div>
+        <div>
+          <h2>Meu perfil</h2>
+          <p id="profileText">Portfólio, posts e atalhos rápidos.</p>
+        </div>
+      </div>
+
+      <div class="profileLinks">
+        <a class="btn primary" href="https://meuservico.sualuma.online/portfolio/">🖼️ Abrir meu portfólio</a>
+        <a class="btn primary" href="https://meuservico.sualuma.online/#prestador-servicos">💼 Marketplace de propostas</a>
+        <a class="btn primary" href="https://chat.sualuma.online" target="_blank" rel="noopener">🤖 Chat IA</a>
+        <a class="btn" href="https://dashboardcliente.sualuma.online">🏠 Dashboard do cliente</a>
+        <a class="btn" href="https://meuservico.sualuma.online/#prestador">🛠️ Dashboard de serviço</a>
+        <button class="btn" onclick="document.getElementById('profileModal').classList.remove('open')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <div id="postActionsModal" class="postActionsModal" onclick="closePostActions(event)">
+    <div class="postActionsBox" onclick="event.stopPropagation()">
+      <h2>Gerenciar post</h2>
+      <p>Escolha o que deseja fazer com esta publicação.</p>
+
+      <button class="primary" onclick="postMenuEdit()">✏️ Editar</button>
+      <button class="warning" onclick="postMenuArchive()">🗂️ Arquivar</button>
+      <button class="danger" onclick="postMenuDelete()">🗑️ Excluir / apagar</button>
+      <button onclick="document.getElementById('postActionsModal').classList.remove('open')">Cancelar</button>
+    </div>
+  </div>
+
+<div id="editPostModal" class="editModal" onclick="closeEditPost(event)">
+    <div class="editBox" onclick="event.stopPropagation()">
+      <h2>Editar publicação</h2>
+
+      <input id="editPostTitle" placeholder="Título do post">
+      <select id="editPostCategory" class="fixedCategorySelect" aria-label="Categoria do post">
+        <option value="Geral">Geral</option>
+        <option value="Trabalhos">Trabalhos</option>
+        <option value="Portfólios">Portfólios</option>
+        <option value="Oportunidades">Oportunidades</option>
+        <option value="Vendas">Vendas</option>
+        <option value="Notícias">Notícias</option>
+        <option value="Tecnologia">Tecnologia</option>
+        <option value="Entretenimento">Entretenimento</option>
+        <option value="Dúvidas">Dúvidas</option>
+        <option value="Conquistas">Conquistas</option>
+        <option value="Outros">Outros</option>
+      </select>
+      <input id="editPostLink" placeholder="Link principal">
+      <input id="editPostImage" placeholder="Imagem/capa">
+      <input id="editPostVideo" placeholder="Vídeo YouTube">
+      <textarea id="editPostContent" placeholder="Texto da publicação"></textarea>
+
+      <div class="editActions">
+        <button class="btn" onclick="document.getElementById('editPostModal').classList.remove('open')">Cancelar</button>
+        <button class="btn primary" onclick="saveEditedPost()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+const feed = document.getElementById("feed");
+const search = document.getElementById("search");
+let currentPosts = [];
+let editingPostId = "";
+let selectedPostActionId = "";
+
+function openPostActions(id){
+  selectedPostActionId = id;
+  document.getElementById("postActionsModal").classList.add("open");
+}
+
+function closePostActions(e){
+  if(e.target.id === "postActionsModal"){
+    document.getElementById("postActionsModal").classList.remove("open");
+  }
+}
+
+function postMenuEdit(){
+  const id = selectedPostActionId;
+  document.getElementById("postActionsModal").classList.remove("open");
+  openEditPost(id);
+}
+
+function postMenuArchive(){
+  const id = selectedPostActionId;
+  document.getElementById("postActionsModal").classList.remove("open");
+  archivePost(id);
+}
+
+function postMenuDelete(){
+  const id = selectedPostActionId;
+  document.getElementById("postActionsModal").classList.remove("open");
+  deletePost(id);
+}
+
+function esc(v){
+  return String(v || "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[m]));
+}
+
+function initials(name){
+  const parts = String(name || "Usuário").trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] || "U") + (parts[1]?.[0] || "")).toUpperCase();
+}
+
+function timeLabel(date){
+  if(!date) return "agora";
+  const d = new Date(date);
+  if(Number.isNaN(d.getTime())) return "agora";
+  return d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+}
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+function openProfile(){
+  document.getElementById("profileModal").classList.add("open");
+  loadProfile();
+}
+
+function closeProfile(e){
+  if(e.target.id === "profileModal"){
+    document.getElementById("profileModal").classList.remove("open");
+  }
+}
+
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("tj_theme", document.body.classList.contains("light") ? "light" : "dark");
+}
+
+function quickMessage(name){
+  toast("Solicitação de contato enviada para " + name + ".");
+}
+
+function commentToggle(id){
+  const box = document.getElementById("commentBox-" + id);
+  if(box) box.classList.toggle("open");
+}
+
+function addLocalComment(id){
+  const input = document.getElementById("commentText-" + id);
+  const list = document.getElementById("comments-" + id);
+  const value = (input?.value || "").trim();
+
+  if(!value){
+    toast("Escreva um comentário primeiro.");
+    return;
   }
 
-  function loadSupabase(callback){
-    if(window.supabase){
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      callback();
+  const item = document.createElement("div");
+  item.className = "commentItem";
+  item.innerHTML = "<strong>Você:</strong> " + esc(value);
+  list.prepend(item);
+  input.value = "";
+  toast("Comentário adicionado na tela.");
+}
+
+async function sharePost(post){
+  const url = post.linkUrl || post.url || location.href;
+
+  try{
+    await navigator.clipboard.writeText(url);
+    toast("Link copiado para compartilhar.");
+  }catch{
+    toast("Post marcado para compartilhamento.");
+  }
+}
+
+function firstUrlFromText(text){
+  const match = String(text || "").match(/https?:\/\/[^\s<>"']+/i);
+  return match ? match[0] : "";
+}
+
+function getPreviewUrl(post){
+  return post.linkUrl || post.url || post.videoUrl || post.youtubeUrl || firstUrlFromText((post.content || "") + " " + (post.body || ""));
+}
+
+async function hydrateLinkPreviews(){
+  const cards = Array.from(document.querySelectorAll("[data-preview-url]"));
+
+  for(const card of cards){
+    const url = card.getAttribute("data-preview-url");
+    if(!url) continue;
+
+    try{
+      const res = await fetch("/api/comunidade/link-preview?url=" + encodeURIComponent(url), {
+        cache:"force-cache"
+      });
+
+      const json = await res.json();
+
+      if(!json.ok) continue;
+
+      card.classList.add("show");
+
+      card.innerHTML = `
+        ${json.image ? `<img src="${esc(json.image)}" alt="">` : ""}
+        <div class="linkPreviewAutoBody">
+          <strong>${esc(json.title || url)}</strong>
+          ${json.description ? `<p>${esc(json.description)}</p>` : ""}
+          <span>${esc(json.siteName || url)}</span>
+        </div>
+      `;
+    }catch(e){
+      card.classList.add("show");
+      card.innerHTML = `
+        <div class="linkPreviewAutoBody">
+          <strong>${esc(url)}</strong>
+          <span>Prévia indisponível</span>
+        </div>
+      `;
+    }
+  }
+}
+
+async function loadProfile(){
+  try{
+    const res = await fetch("https://meuservico.sualuma.online/api/prestador/portfolio-sync?t=" + Date.now(), {
+      credentials:"include",
+      cache:"no-store"
+    });
+
+    const text = await res.text();
+    const json = JSON.parse(text);
+
+    const profile = json.providerProfile || {};
+    const name = profile.name || "Meu perfil";
+    const photo = profile.photoUrl || "";
+
+    document.getElementById("profileText").textContent = name + " · Portfólio e posts publicados.";
+
+    const avatar = document.getElementById("profileAvatar");
+
+    if(photo){
+      avatar.innerHTML = `<img src="${esc(photo)}" alt="">`;
+    }else{
+      avatar.textContent = initials(name);
+    }
+  }catch{}
+}
+
+function renderPosts(posts){
+  currentPosts = posts;
+
+  if(!posts.length){
+    feed.innerHTML = `
+      <article class="post">
+        <span class="tag">Feed vazio</span>
+        <h3>Nenhum post encontrado</h3>
+        <p>Publique um trabalho pelo portfólio para ele aparecer aqui.</p>
+        <a class="btn primary" href="https://meuservico.sualuma.online/portfolio/">Abrir portfólio</a>
+      </article>
+    `;
+    return;
+  }
+
+  feed.innerHTML = posts.map(post => {
+    const id = esc(post.id || Math.random().toString(16).slice(2));
+    const author = post.authorName || "Prestador Sualuma";
+    const category = post.category || "Geral";
+    const title = post.title || "Publicação";
+    const content = post.content || post.body || "";
+    const image = post.imageUrl || post.coverImage || "";
+    const link = post.linkUrl || post.url || "";
+    const video = post.videoUrl || post.youtubeUrl || "";
+    const authorPhoto = post.authorPhotoUrl || "";
+    const previewUrl = getPreviewUrl(post);
+
+    return `
+      <article class="post" data-post-id="${id}">
+        <div class="postHead">
+          <div class="avatar">
+            ${authorPhoto ? `<img src="${esc(authorPhoto)}" alt="">` : esc(initials(author))}
+          </div>
+
+          <div class="postMeta">
+            <button class="postAuthor" style="background:none;border:0;padding:0" onclick="openProfile()">
+              ${esc(author)}
+            </button>
+            <div class="postTime">${esc(category)} · ${esc(timeLabel(post.createdAt))}</div>
+          </div>
+
+          <div class="postRight"><span class="tag">${esc(category)}</span><button class="dotsBtn" onclick="openPostActions('${id}')" aria-label="Gerenciar post">⋯</button></div>
+        </div>
+
+        <h3>${esc(title)}</h3>
+
+        ${content ? `<div class="postContent">${esc(content)}</div>` : ""}
+
+        ${image ? `
+          <div class="preview">
+            <img src="${esc(image)}" alt="">
+          </div>
+        ` : ""}
+
+        ${previewUrl ? `<a class="linkPreviewAuto" data-preview-url="${esc(previewUrl)}" href="${esc(previewUrl)}" target="_blank" rel="noopener"></a>` : ""}
+
+        <div class="actionBar">
+          <button onclick="toast('Você curtiu este post.')">Curtir</button>
+          <button onclick="commentToggle('${id}')">Comentar</button>
+          <button onclick='sharePost(${JSON.stringify(post).replace(/'/g,"&#039;")})'>Compartilhar</button>
+        </div>
+
+        <div id="commentBox-${id}" class="commentBox">
+          <textarea id="commentText-${id}" placeholder="Escreva um comentário..."></textarea>
+          <button class="btn primary" onclick="addLocalComment('${id}')">Enviar comentário</button>
+          <div id="comments-${id}" class="commentList"></div>
+        </div>
+
+        ${(link || video) ? `
+          <div class="postActions" style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+            ${link ? `<a class="btn small" href="${esc(link)}" target="_blank" rel="noopener">Abrir trabalho</a>` : ""}
+            ${video ? `<a class="btn small" href="${esc(video)}" target="_blank" rel="noopener">Ver vídeo</a>` : ""}
+          </div>
+        ` : ""}
+      </article>
+    `;
+  }).join("");
+
+  hydrateLinkPreviews();
+}
+
+async function apiPost(body){
+  const res = await fetch("/api/comunidade/posts", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    credentials:"include",
+    cache:"no-store",
+    body:JSON.stringify(body)
+  });
+
+  const text = await res.text();
+
+  let json;
+  try{
+    json = JSON.parse(text);
+  }catch{
+    throw new Error("API respondeu HTML. Status: " + res.status);
+  }
+
+  if(!res.ok || !json.ok){
+    throw new Error(json.error || "Erro na API.");
+  }
+
+  return json;
+}
+
+function openEditPost(id){
+  const post = currentPosts.find(p => String(p.id) === String(id));
+  if(!post){
+    toast("Post não encontrado.");
+    return;
+  }
+
+  editingPostId = id;
+
+  document.getElementById("editPostTitle").value = post.title || "";
+  document.getElementById("editPostCategory").value = post.category || "";
+  document.getElementById("editPostLink").value = post.linkUrl || post.url || "";
+  document.getElementById("editPostImage").value = post.imageUrl || "";
+  document.getElementById("editPostVideo").value = post.videoUrl || post.youtubeUrl || "";
+  document.getElementById("editPostContent").value = post.content || post.body || "";
+
+  document.getElementById("editPostModal").classList.add("open");
+}
+
+function closeEditPost(e){
+  if(e.target.id === "editPostModal"){
+    document.getElementById("editPostModal").classList.remove("open");
+  }
+}
+
+async function saveEditedPost(){
+  if(!editingPostId) return;
+
+  try{
+    toast("Salvando post...");
+
+    await apiPost({
+      action:"update",
+      id:editingPostId,
+      title:document.getElementById("editPostTitle").value,
+      category:document.getElementById("editPostCategory").value,
+      linkUrl:document.getElementById("editPostLink").value,
+      imageUrl:document.getElementById("editPostImage").value,
+      videoUrl:document.getElementById("editPostVideo").value,
+      content:document.getElementById("editPostContent").value
+    });
+
+    document.getElementById("editPostModal").classList.remove("open");
+    toast("Post atualizado.");
+    loadFeed(search.value);
+  }catch(err){
+    toast(err.message || "Erro ao salvar.");
+  }
+}
+
+async function archivePost(id){
+  if(!confirm("Arquivar este post? Ele vai sair do feed público.")) return;
+
+  try{
+    await apiPost({ action:"archive", id });
+    toast("Post arquivado.");
+    loadFeed(search.value);
+  }catch(err){
+    toast(err.message || "Erro ao arquivar.");
+  }
+}
+
+async function deletePost(id){
+  if(!confirm("Excluir este post definitivamente?")) return;
+
+  try{
+    await apiPost({ action:"delete", id });
+    toast("Post excluído.");
+    loadFeed(search.value);
+  }catch(err){
+    toast(err.message || "Erro ao excluir.");
+  }
+}
+
+async function loadFeed(q=""){
+  feed.innerHTML = `
+    <article class="post">
+      <h3>Carregando feed...</h3>
+      <p>Buscando publicações.</p>
+    </article>
+  `;
+
+  try{
+    const res = await fetch("/api/comunidade/posts?q=" + encodeURIComponent(q) + "&t=" + Date.now(), {
+      credentials:"include",
+      cache:"no-store"
+    });
+
+    const text = await res.text();
+
+    let json;
+    try{
+      json = JSON.parse(text);
+    }catch{
+      feed.innerHTML = `
+        <article class="post">
+          <span class="tag">Erro</span>
+          <h3>API respondeu HTML</h3>
+          <p>Status: ${res.status}. O Nginx/Next ainda precisa ser revisado.</p>
+        </article>
+      `;
       return;
     }
 
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-    s.onload = function(){
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      callback();
-    };
-    document.head.appendChild(s);
-  }
-
-  async function getSession(){
-    if(!sb) return null;
-    const { data } = await sb.auth.getSession();
-    currentSession = data.session || null;
-    return currentSession;
-  }
-
-  function ensureModal(){
-    if(document.getElementById("tjProfileModal")) return;
-
-    const modal = document.createElement("div");
-    modal.id = "tjProfileModal";
-    modal.innerHTML = `
-      <div class="tj-profile-box">
-        <div class="tj-profile-head">
-          <div class="tj-profile-user">
-            <div class="tj-profile-avatar" id="tjProfileAvatar">U</div>
-            <div>
-              <h2 id="tjProfileTitle">Meu perfil</h2>
-              <p id="tjProfileSubtitle">Portfólio e posts publicados.</p>
-            </div>
-          </div>
-          <button class="tj-profile-close" onclick="window.TJProfile.close()">Fechar</button>
-        </div>
-
-        <div class="tj-profile-actions">
-          <a class="tj-profile-action primary" href="${PORTFOLIO_URL}">🖼️ Abrir meu portfólio</a>
-          <a class="tj-profile-action" href="${DASHBOARD_URL}">📊 Dashboard de serviço</a>
-          <a class="tj-profile-action" href="https://trabalhosja.sualuma.online?v=perfil-feed">🌐 Voltar para o feed</a>
-          <a class="tj-profile-action" href="${LOGIN_URL}" id="tjProfileLoginLink">🔐 Entrar na plataforma</a>
-        </div>
-
-        <div class="tj-profile-stats">
-          <div class="tj-profile-stat"><strong id="tjProfilePostsCount">0</strong><span>posts publicados</span></div>
-          <div class="tj-profile-stat"><strong id="tjProfileCommentsCount">0</strong><span>comentários recebidos</span></div>
-          <div class="tj-profile-stat"><strong id="tjProfileSharesCount">0</strong><span>compartilhamentos</span></div>
-        </div>
-
-        <h3>Meus posts</h3>
-        <div class="tj-profile-posts" id="tjProfilePosts">
-          <div class="tj-profile-post">
-            <strong>Carregando...</strong>
-            <p>Buscando seus posts publicados.</p>
-          </div>
-        </div>
-      </div>
+    renderPosts(json.posts || json.data || []);
+  }catch(err){
+    feed.innerHTML = `
+      <article class="post">
+        <span class="tag">Erro</span>
+        <h3>Não consegui carregar o feed</h3>
+        <p>${esc(err.message)}</p>
+      </article>
     `;
+  }
+}
 
-    modal.addEventListener("click", function(e){
-      if(e.target === modal) window.TJProfile.close();
+let timer;
+search.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => loadFeed(search.value), 280);
+});
+
+if(localStorage.getItem("tj_theme") === "light"){
+  document.body.classList.add("light");
+}
+
+loadFeed();
+</script>
+
+<script id="fixed-categories-v1-script">
+(function(){
+  const CATEGORIES = [
+    "Geral",
+    "Trabalhos",
+    "Portfólios",
+    "Oportunidades",
+    "Vendas",
+    "Notícias",
+    "Tecnologia",
+    "Entretenimento",
+    "Dúvidas",
+    "Conquistas",
+    "Outros"
+  ];
+
+  let selectedCommunityCategory = localStorage.getItem("tj_selected_category") || "Geral";
+
+  function normalize(v){
+    return String(v || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function renderCategoryPills(){
+    const area = document.getElementById("categoryPills");
+    if(!area) return;
+
+    area.innerHTML = CATEGORIES.map(cat => `
+      <button
+        class="categoryPill ${normalize(cat) === normalize(selectedCommunityCategory) ? "active" : ""}"
+        type="button"
+        data-cat="${cat}"
+      >${cat}</button>
+    `).join("");
+
+    area.querySelectorAll("[data-cat]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedCommunityCategory = btn.getAttribute("data-cat") || "Geral";
+        localStorage.setItem("tj_selected_category", selectedCommunityCategory);
+        renderCategoryPills();
+
+        if(typeof loadFeed === "function"){
+          loadFeed(search?.value || "");
+        }
+      });
     });
-
-    document.body.appendChild(modal);
   }
 
-  function ensureButtons(){
-    const topbar = document.getElementById("tjMobileTopbar");
-    const menuBtn = document.getElementById("tjMobileMenuBtn");
+  function replaceEditCategoryInput(){
+    const old = document.getElementById("editPostCategory");
+    if(!old || old.tagName === "SELECT") return;
 
-    if(topbar && menuBtn && !document.getElementById("tjProfileBtn")){
-      const btn = document.createElement("button");
-      btn.id = "tjProfileBtn";
-      btn.type = "button";
-      btn.innerHTML = "👤";
-      btn.setAttribute("aria-label", "Abrir perfil");
-      btn.onclick = () => window.TJProfile.open();
-      menuBtn.insertAdjacentElement("beforebegin", btn);
-    }
+    const select = document.createElement("select");
+    select.id = "editPostCategory";
+    select.className = "fixedCategorySelect";
 
-    const sidebar =
-      document.querySelector(".left.card") ||
-      document.querySelector("aside") ||
-      document.querySelector(".sidebar");
+    select.innerHTML = CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join("");
 
-    if(sidebar && !document.getElementById("tjSidebarProfileBtn")){
-      const btn = document.createElement("button");
-      btn.id = "tjSidebarProfileBtn";
-      btn.type = "button";
-      btn.innerHTML = "👤 Meu perfil";
-      btn.onclick = () => window.TJProfile.open();
-
-      const createBtn = [...sidebar.querySelectorAll("button,a")]
-        .find(el => /criar post/i.test(el.textContent || ""));
-
-      if(createBtn){
-        createBtn.insertAdjacentElement("afterend", btn);
-      }else{
-        sidebar.appendChild(btn);
-      }
-    }
+    old.replaceWith(select);
   }
 
-  async function fetchPosts(){
-    const res = await fetch("/api/comunidade/posts", { cache:"no-store" });
-    const data = await res.json().catch(() => ({ ok:false, posts:[] }));
-    return data.posts || [];
-  }
+  const originalLoadFeed = typeof loadFeed === "function" ? loadFeed : null;
 
-  window.TJProfile = {
-    async open(){
-      ensureModal();
-      const modal = document.getElementById("tjProfileModal");
-      modal.classList.add("show");
-
-      const session = await getSession();
-
-      const title = document.getElementById("tjProfileTitle");
-      const subtitle = document.getElementById("tjProfileSubtitle");
-      const avatar = document.getElementById("tjProfileAvatar");
-      const loginLink = document.getElementById("tjProfileLoginLink");
-      const postsBox = document.getElementById("tjProfilePosts");
-
-      if(!session){
-        title.textContent = "Meu perfil";
-        subtitle.textContent = "Faça login para ver seus posts e editar seu portfólio.";
-        avatar.textContent = "U";
-        loginLink.style.display = "flex";
-
-        document.getElementById("tjProfilePostsCount").textContent = "0";
-        document.getElementById("tjProfileCommentsCount").textContent = "0";
-        document.getElementById("tjProfileSharesCount").textContent = "0";
-
-        postsBox.innerHTML = `
-          <div class="tj-profile-post">
-            <strong>Você ainda não está logada.</strong>
-            <p>Entre na plataforma para ver seus posts, editar seu portfólio e publicar trabalhos na comunidade.</p>
-            <a class="tj-profile-action primary" href="${LOGIN_URL}">Entrar agora</a>
-          </div>
-        `;
-        return;
-      }
-
-      loginLink.style.display = "none";
-
-      const user = session.user;
-      const name = getName(user);
-
-      title.textContent = name;
-      subtitle.textContent = user.email || "Perfil da comunidade";
-      avatar.textContent = initials(name);
-
-      postsBox.innerHTML = `
-        <div class="tj-profile-post">
-          <strong>Carregando seus posts...</strong>
-          <p>Aguarde um instante.</p>
-        </div>
+  if(originalLoadFeed){
+    loadFeed = async function(q=""){
+      feed.innerHTML = `
+        <article class="post">
+          <h3>Carregando feed...</h3>
+          <p>Buscando publicações.</p>
+        </article>
       `;
 
       try{
-        const posts = await fetchPosts();
-        const mine = posts.filter(post => post.author_user_id === user.id);
+        const categoryQuery = normalize(selectedCommunityCategory) === "geral"
+          ? ""
+          : "&category=" + encodeURIComponent(selectedCommunityCategory);
 
-        const comments = mine.reduce((sum, post) => sum + Number(post.commentsCount || 0), 0);
-        const shares = mine.reduce((sum, post) => sum + Number(post.sharesCount || 0), 0);
+        const res = await fetch("/api/comunidade/posts?q=" + encodeURIComponent(q) + categoryQuery + "&t=" + Date.now(), {
+          credentials:"include",
+          cache:"no-store"
+        });
 
-        document.getElementById("tjProfilePostsCount").textContent = mine.length;
-        document.getElementById("tjProfileCommentsCount").textContent = comments;
-        document.getElementById("tjProfileSharesCount").textContent = shares;
+        const text = await res.text();
 
-        postsBox.innerHTML = mine.length ? mine.map(post => `
-          <div class="tj-profile-post">
-            <strong>${escapeHtml(post.title)}</strong>
-            <p>${escapeHtml(post.body).slice(0, 220)}${String(post.body || "").length > 220 ? "..." : ""}</p>
-            <small>${escapeHtml(post.category || "Geral")} · ${new Date(post.created_at).toLocaleString("pt-BR")}</small>
-            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-              ${post.link_url ? `<a class="tj-profile-action" style="min-height:42px;padding:8px 12px" href="${escapeHtml(post.link_url)}" target="_blank">Abrir link</a>` : ""}
-              <a class="tj-profile-action" style="min-height:42px;padding:8px 12px" href="https://trabalhosja.sualuma.online?v=perfil-posts">Ver no feed</a>
-            </div>
-          </div>
-        `).join("") : `
-          <div class="tj-profile-post">
-            <strong>Nenhum post publicado ainda.</strong>
-            <p>Quando você publicar na comunidade ou adicionar trabalhos no portfólio, eles vão aparecer aqui.</p>
-            <a class="tj-profile-action primary" href="${PORTFOLIO_URL}">Adicionar trabalho ao portfólio</a>
-          </div>
-        `;
+        let json;
+        try{
+          json = JSON.parse(text);
+        }catch{
+          feed.innerHTML = `
+            <article class="post">
+              <span class="tag">Erro</span>
+              <h3>API respondeu HTML</h3>
+              <p>Status: ${res.status}. O Nginx/Next ainda precisa ser revisado.</p>
+            </article>
+          `;
+          return;
+        }
+
+        renderPosts(json.posts || json.data || []);
       }catch(err){
-        postsBox.innerHTML = `
-          <div class="tj-profile-post">
-            <strong>Não consegui carregar seus posts.</strong>
-            <p>Tente atualizar a página ou abrir novamente.</p>
-          </div>
+        feed.innerHTML = `
+          <article class="post">
+            <span class="tag">Erro</span>
+            <h3>Não consegui carregar o feed</h3>
+            <p>${err.message || "Erro desconhecido."}</p>
+          </article>
         `;
       }
-    },
+    };
+  }
 
-    close(){
-      document.getElementById("tjProfileModal")?.classList.remove("show");
+  renderCategoryPills();
+  replaceEditCategoryInput();
+
+  const observer = new MutationObserver(() => replaceEditCategoryInput());
+  observer.observe(document.body, { childList:true, subtree:true });
+
+  setTimeout(() => {
+    if(typeof loadFeed === "function") loadFeed(search?.value || "");
+  }, 300);
+})();
+</script>
+
+
+<script id="edit-category-select-final-script">
+(function(){
+  const CATEGORIES = [
+    "Geral",
+    "Trabalhos",
+    "Portfólios",
+    "Oportunidades",
+    "Vendas",
+    "Notícias",
+    "Tecnologia",
+    "Entretenimento",
+    "Dúvidas",
+    "Conquistas",
+    "Outros"
+  ];
+
+  function normalize(v){
+    return String(v || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function validCategory(v){
+    const found = CATEGORIES.find(c => normalize(c) === normalize(v));
+    return found || "Outros";
+  }
+
+  function forceSelect(){
+    const current = document.getElementById("editPostCategory");
+
+    if(!current) return;
+
+    if(current.tagName === "SELECT"){
+      if(!current.options.length){
+        current.innerHTML = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join("");
+      }
+      current.classList.add("fixedCategorySelect");
+      current.value = validCategory(current.value || "Trabalhos");
+      return;
+    }
+
+    const select = document.createElement("select");
+    select.id = "editPostCategory";
+    select.className = "fixedCategorySelect";
+    select.setAttribute("aria-label", "Categoria do post");
+    select.innerHTML = CATEGORIES.map(c => `<option value="${c}">${c}</option>`).join("");
+    select.value = validCategory(current.value || "Trabalhos");
+    current.replaceWith(select);
+  }
+
+  const oldOpenEditPost = window.openEditPost;
+
+  if(typeof oldOpenEditPost === "function"){
+    window.openEditPost = function(id){
+      oldOpenEditPost(id);
+      setTimeout(() => {
+        forceSelect();
+
+        const post = Array.isArray(window.currentPosts)
+          ? window.currentPosts.find(p => String(p.id) === String(id))
+          : null;
+
+        const select = document.getElementById("editPostCategory");
+        if(select && post){
+          select.value = validCategory(post.category || "Trabalhos");
+        }
+      }, 80);
+    };
+  }
+
+  document.addEventListener("click", () => setTimeout(forceSelect, 120));
+  document.addEventListener("DOMContentLoaded", forceSelect);
+  setTimeout(forceSelect, 300);
+})();
+</script>
+
+
+<script id="link-screenshot-preview-v1-script">
+(function(){
+  function esc2(v){
+    return String(v || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m]));
+  }
+
+  function screenshotUrl(url){
+    try{
+      const clean = new URL(url).toString();
+      return "https://s.wordpress.com/mshots/v1/" + encodeURIComponent(clean) + "?w=900";
+    }catch{
+      return "";
+    }
+  }
+
+  function siteName(url){
+    try{
+      return new URL(url).hostname.replace(/^www\./, "");
+    }catch{
+      return url;
+    }
+  }
+
+  async function hydrateOne(card){
+    const url = card.getAttribute("data-preview-url");
+    if(!url || card.getAttribute("data-preview-loaded") === "1") return;
+
+    card.setAttribute("data-preview-loaded", "1");
+
+    let title = url;
+    let description = "";
+    let image = "";
+    let name = siteName(url);
+
+    try{
+      const res = await fetch("/api/comunidade/link-preview?url=" + encodeURIComponent(url), {
+        cache:"no-store"
+      });
+
+      const json = await res.json();
+
+      if(json && json.ok){
+        title = json.title || title;
+        description = json.description || "";
+        image = json.image || "";
+        name = json.siteName || name;
+      }
+    }catch{}
+
+    // Se não tiver imagem oficial do site, gera captura visual do link
+    if(!image){
+      image = screenshotUrl(url);
+    }
+
+    card.classList.add("show");
+    card.innerHTML = `
+      <div class="linkPreviewAutoImageWrap">
+        ${image ? `<img src="${esc2(image)}" alt="Prévia de ${esc2(name)}" loading="lazy">` : ""}
+      </div>
+
+      <div class="linkPreviewAutoBody">
+        <strong>${esc2(title || name)}</strong>
+        ${description ? `<p>${esc2(description)}</p>` : `<p>Visualização automática do link publicado.</p>`}
+        <span>${esc2(name)}</span>
+      </div>
+    `;
+  }
+
+  window.hydrateLinkPreviews = async function(){
+    const cards = Array.from(document.querySelectorAll("[data-preview-url]"));
+    for(const card of cards){
+      hydrateOne(card);
     }
   };
 
-  function boot(){
-    ensureModal();
-    ensureButtons();
-  }
-
-  loadSupabase(function(){
-    boot();
-    setTimeout(boot, 400);
-    setTimeout(boot, 1200);
+  const observer = new MutationObserver(() => {
+    clearTimeout(window.__previewHydrateTimer);
+    window.__previewHydrateTimer = setTimeout(() => {
+      if(typeof window.hydrateLinkPreviews === "function"){
+        window.hydrateLinkPreviews();
+      }
+    }, 250);
   });
 
-  document.addEventListener("DOMContentLoaded", boot);
-  window.addEventListener("load", boot);
+  observer.observe(document.body, { childList:true, subtree:true });
+
+  setTimeout(() => {
+    if(typeof window.hydrateLinkPreviews === "function"){
+      window.hydrateLinkPreviews();
+    }
+  }, 500);
 })();
 </script>
-<style id="trabalhosja-portfolio-profile-bridge-style">
-  .tj-provider-portfolio-list{
-    display:grid;
-    gap:12px;
-    margin:12px 0 20px;
-  }
 
-  .tj-provider-portfolio-card{
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.05);
-    border-radius:20px;
-    padding:15px;
-  }
 
-  .tj-provider-portfolio-card strong{
-    display:block;
-    color:#fff;
-    font-size:17px;
-    margin-bottom:6px;
-  }
 
-  .tj-provider-portfolio-card p{
-    margin:0 0 10px;
-    color:#cfd5ff;
-    line-height:1.55;
-  }
 
-  .tj-provider-portfolio-card a{
-    color:#25f4ff;
-    font-weight:1000;
-    text-decoration:none;
-  }
-
-  .tj-profile-avatar.tj-has-profile-photo,
-  #tjProfileBtn.tj-has-profile-photo{
-    padding:0 !important;
-    overflow:hidden !important;
-    background:rgba(255,255,255,.06) !important;
-  }
-
-  .tj-profile-avatar.tj-has-profile-photo img{
-    width:58px !important;
-    height:58px !important;
-    border-radius:22px !important;
-    object-fit:cover !important;
-    display:block !important;
-  }
-
-  #tjProfileBtn.tj-has-profile-photo img{
-    width:46px !important;
-    height:46px !important;
-    border-radius:14px !important;
-    object-fit:cover !important;
-    display:block !important;
-  }
-</style>
-
-<script id="trabalhosja-portfolio-profile-bridge-script">
+<script id="search-popup-v2-script">
 (function(){
-  if(window.__tjPortfolioProfileBridge) return;
-  window.__tjPortfolioProfileBridge = true;
+  const DEFAULT_PEOPLE = [
+    { name:"Ana Sites", role:"Web designer", tag:"Pessoa" },
+    { name:"Prestador Sualuma", role:"Sites, automações e presença digital", tag:"Perfil" }
+  ];
 
-  const LOGIN_URL = "https://sualuma.online/sign-in";
-  const PORTFOLIO_URL = "https://meuservico.sualuma.online/?v=perfil-portfolio-bridge#prestador-portfolio";
-  const SERVICE_DASHBOARD_URL = "https://meuservico.sualuma.online/?v=perfil-portfolio-bridge#prestador";
-  const CLIENT_DASHBOARD_URL = "https://dashboardcliente.sualuma.online";
-
-  function escapeHtml(value){
-    return String(value || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  function esc(v){
+    return String(v || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m]));
   }
 
-  function initials(name, email){
-    const base = String(name || email || "U").trim();
-    return base
-      .replace(/@.*/, "")
-      .split(/\s+|\.|-/)
-      .filter(Boolean)
-      .slice(0,2)
-      .map(p => p[0]?.toUpperCase() || "")
-      .join("") || "U";
+  function normalize(v){
+    return String(v || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
   }
 
-  function isImageUrl(value){
-    return typeof value === "string" && (
-      value.startsWith("http://") ||
-      value.startsWith("https://") ||
-      value.startsWith("/") ||
-      value.startsWith("data:image/")
-    );
+  function initials(name){
+    const parts = String(name || "U").trim().split(/\s+/).filter(Boolean);
+    return ((parts[0]?.[0] || "U") + (parts[1]?.[0] || "")).toUpperCase();
   }
 
-  function applyAvatar(profile, user){
-    const name = profile?.name || user?.name || "Usuário";
-    const email = user?.email || profile?.email || "";
-    const photoUrl = profile?.photoUrl || profile?.avatarUrl || profile?.fotoUrl || "";
-    const label = initials(name, email);
+  function getPeopleFromPage(){
+    const people = [...DEFAULT_PEOPLE];
+    document.querySelectorAll(".onlinePerson,.personCard,[data-person-name]").forEach(el => {
+      const name =
+        el.getAttribute("data-person-name") ||
+        el.querySelector("strong,h3,h4")?.textContent ||
+        "";
+      const role =
+        el.getAttribute("data-person-role") ||
+        el.querySelector("span,p")?.textContent ||
+        "";
 
-    const btn = document.getElementById("tjProfileBtn");
-    if(btn){
-      if(isImageUrl(photoUrl)){
-        btn.classList.add("tj-has-profile-photo");
-        btn.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.closest('button').classList.remove('tj-has-profile-photo');this.closest('button').textContent='${label}'">`;
-      }else{
-        btn.classList.remove("tj-has-profile-photo");
-        btn.textContent = label;
+      if(name && !people.some(p => normalize(p.name) === normalize(name))){
+        people.push({ name, role, tag:"Pessoa" });
       }
-    }
-
-    const avatar = document.getElementById("tjProfileAvatar");
-    if(avatar){
-      if(isImageUrl(photoUrl)){
-        avatar.classList.add("tj-has-profile-photo");
-        avatar.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.classList.remove('tj-has-profile-photo');this.parentElement.textContent='${label}'">`;
-      }else{
-        avatar.classList.remove("tj-has-profile-photo");
-        avatar.textContent = label;
-      }
-    }
+    });
+    return people;
   }
 
-  async function getPerfil(){
+  async function fetchPosts(q){
     try{
-      const res = await fetch("/api/comunidade/perfil", {
+      const res = await fetch("/api/comunidade/posts?q=" + encodeURIComponent(q || "") + "&t=" + Date.now(), {
+        credentials:"include",
+        cache:"no-store"
+      });
+      const text = await res.text();
+      const json = JSON.parse(text);
+      return json.posts || json.data || [];
+    }catch(e){
+      return Array.isArray(window.currentPosts) ? window.currentPosts : [];
+    }
+  }
+
+  function personItem(person){
+    const safeName = String(person.name || "").replace(/'/g, "\\'");
+    return `
+      <button class="searchResultItem" type="button" onclick="quickMessage && quickMessage('${safeName}')">
+        <div class="searchResultAvatar">${esc(initials(person.name))}</div>
+        <div class="searchResultMain">
+          <strong>${esc(person.name)}</strong>
+          <span>${esc(person.role || "Pessoa da comunidade")}</span>
+        </div>
+        <div class="searchResultBadge">${esc(person.tag || "Pessoa")}</div>
+      </button>
+    `;
+  }
+
+  function postItem(post){
+    const title = post.title || "Publicação";
+    const author = post.authorName || "Prestador Sualuma";
+    const category = post.category || "Geral";
+    const id = post.id || "";
+    return `
+      <button class="searchResultItem" type="button" data-open-post="${esc(id)}">
+        <div class="searchResultAvatar">${esc(initials(author))}</div>
+        <div class="searchResultMain">
+          <strong>${esc(title)}</strong>
+          <span>${esc(author)} · ${esc(category)}</span>
+        </div>
+        <div class="searchResultBadge">Post</div>
+      </button>
+    `;
+  }
+
+  function bindPostOpen(container, q){
+    container.querySelectorAll("[data-open-post]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-open-post");
+        closePopup();
+
+        if(typeof loadFeed === "function"){
+          loadFeed(q);
+        }
+
+        setTimeout(() => {
+          try{
+            const postEl = document.querySelector('[data-post-id="' + CSS.escape(id) + '"]');
+            if(postEl){
+              postEl.scrollIntoView({ behavior:"smooth", block:"center" });
+              postEl.style.outline = "2px solid rgba(24,242,255,.55)";
+              postEl.style.outlineOffset = "4px";
+              setTimeout(() => {
+                postEl.style.outline = "";
+                postEl.style.outlineOffset = "";
+              }, 1800);
+            }
+          }catch(e){}
+        }, 700);
+      });
+    });
+  }
+
+  function closePopup(){
+    const popup = document.getElementById("searchPopupInline");
+    if(popup) popup.classList.remove("open");
+  }
+
+  async function renderPopup(q, forceOpen){
+    const popup = document.getElementById("searchPopupInline");
+    const content = document.getElementById("searchPopupInlineContent");
+    if(!popup || !content) return;
+
+    const query = normalize(q);
+
+    if(!query){
+      content.innerHTML = `
+        <div class="searchEmpty">
+          Digite para encontrar pessoas, posts e trabalhos.
+        </div>
+      `;
+      if(forceOpen) popup.classList.add("open");
+      return;
+    }
+
+    if(forceOpen) popup.classList.add("open");
+
+    content.innerHTML = `<div class="searchEmpty">Buscando resultados...</div>`;
+
+    const people = getPeopleFromPage()
+      .filter(p => normalize([p.name, p.role, p.tag].join(" ")).includes(query))
+      .slice(0,5);
+
+    const posts = (await fetchPosts(q))
+      .filter(post => normalize([
+        post.title || "",
+        post.authorName || "",
+        post.category || "",
+        post.description || ""
+      ].join(" ")).includes(query))
+      .slice(0,6);
+
+    let out = "";
+
+    if(people.length){
+      out += `
+        <div class="searchGroup">
+          <div class="searchGroupTitle">Pessoas</div>
+          ${people.map(personItem).join("")}
+        </div>
+      `;
+    }
+
+    if(posts.length){
+      out += `
+        <div class="searchGroup">
+          <div class="searchGroupTitle">Posts e trabalhos</div>
+          ${posts.map(postItem).join("")}
+        </div>
+      `;
+    }
+
+    if(!people.length && !posts.length){
+      out = `
+        <div class="searchEmpty">
+          Nenhum resultado encontrado para “${esc(q)}”.
+        </div>
+      `;
+    }
+
+    content.innerHTML = out;
+    bindPostOpen(content, q);
+  }
+
+  function setupSearchUI(){
+    const input = document.getElementById("search");
+    if(!input) return;
+    if(document.getElementById("searchPopupInline")) return;
+
+    const oldParent = input.parentElement;
+
+    const wrap = document.createElement("div");
+    wrap.className = "searchSmartWrap";
+
+    const row = document.createElement("div");
+    row.className = "searchRow";
+
+    oldParent.insertBefore(wrap, input);
+    wrap.appendChild(row);
+    row.appendChild(input);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "searchIconBtn";
+    btn.id = "searchIconBtn";
+    btn.setAttribute("aria-label", "Buscar");
+    btn.innerHTML = "🔍";
+    row.appendChild(btn);
+
+    const popup = document.createElement("div");
+    popup.className = "searchPopupInline";
+    popup.id = "searchPopupInline";
+    popup.innerHTML = `
+      <div class="searchPopupHeader">
+        <div class="searchPopupTitle">Resultados rápidos</div>
+        <button type="button" class="searchPopupClose" id="searchPopupClose">Fechar</button>
+      </div>
+      <div id="searchPopupInlineContent">
+        <div class="searchEmpty">Digite para encontrar pessoas, posts e trabalhos.</div>
+      </div>
+    `;
+
+    wrap.appendChild(popup);
+
+    btn.addEventListener("click", () => {
+      const q = input.value.trim();
+      if(typeof loadFeed === "function") loadFeed(q);
+      renderPopup(q, true);
+    });
+
+    input.addEventListener("focus", () => {
+      if(input.value.trim()){
+        renderPopup(input.value.trim(), true);
+      }
+    });
+
+    input.addEventListener("input", () => {
+      clearTimeout(window.__smartSearchTimer2);
+      window.__smartSearchTimer2 = setTimeout(() => {
+        const q = input.value.trim();
+        if(q){
+          renderPopup(q, true);
+        }else{
+          closePopup();
+        }
+      }, 220);
+    });
+
+    document.getElementById("searchPopupClose").addEventListener("click", closePopup);
+  }
+
+  setupSearchUI();
+
+  const observer = new MutationObserver(() => setupSearchUI());
+  observer.observe(document.body, { childList:true, subtree:true });
+})();
+</script>
+
+
+
+
+<script id="blog-carousel-fixed-v2-script">
+(function(){
+  function esc(v){
+    return String(v || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m]));
+  }
+
+  function makeSection(id, title, subtitle, btn){
+    const section = document.createElement("section");
+    section.id = id;
+    section.className = "blogCarouselFixed";
+    section.innerHTML = `
+      <div class="blogCarouselFixedHeader">
+        <div>
+          <h2>${esc(title)}</h2>
+          <p>${esc(subtitle)}</p>
+        </div>
+        <a href="https://blog.sualuma.online" target="_blank" rel="noopener">${esc(btn)}</a>
+      </div>
+      <div id="${id}Track" class="blogCarouselFixedTrack">
+        <div class="blogCarouselFixedEmpty">Carregando artigos...</div>
+      </div>
+    `;
+    return section;
+  }
+
+  function findHeading(text){
+    return Array.from(document.querySelectorAll("h1,h2,h3"))
+      .find(el => String(el.textContent || "").toLowerCase().includes(text.toLowerCase()));
+  }
+
+  function closestBlock(el){
+    if(!el) return null;
+    return el.closest("section, article, .card, .feedSection, .feedWrap, main > div") || el.parentElement;
+  }
+
+  function placeCarousels(){
+    if(document.getElementById("blogCarouselTopFixed")) return;
+
+    const top = makeSection(
+      "blogCarouselTopFixed",
+      "Últimos artigos do blog",
+      "Conteúdos recentes para aprender, se inspirar e continuar navegando.",
+      "Ver blog"
+    );
+
+    const bottom = makeSection(
+      "blogCarouselBottomFixed",
+      "Continue lendo",
+      "Mais artigos da Sualuma para quem quer crescer com serviços, IA e automações.",
+      "Abrir blog"
+    );
+
+    const main = document.querySelector("main") || document.body;
+    const feedHeading = findHeading("Feed da comunidade");
+    const feedBlock = closestBlock(feedHeading);
+
+    if(feedBlock && feedBlock.parentElement){
+      feedBlock.parentElement.insertBefore(top, feedBlock);
+    }else{
+      main.appendChild(top);
+    }
+
+    const adsHeading = findHeading("Anúncios Sualuma");
+    const adsBlock = closestBlock(adsHeading);
+
+    if(adsBlock && adsBlock.parentElement){
+      adsBlock.parentElement.insertBefore(bottom, adsBlock);
+    }else{
+      main.appendChild(bottom);
+    }
+  }
+
+  function formatDate(value){
+    try{
+      return new Date(value).toLocaleDateString("pt-BR", { day:"2-digit", month:"short" });
+    }catch{
+      return "Blog";
+    }
+  }
+
+  function fallbackImage(title){
+    return `
+      <div class="blogFixedFallbackImage">
+        ${esc(title || "Sualuma Blog")}
+      </div>
+    `;
+  }
+
+  function card(post){
+    const title = post.title || "Artigo Sualuma";
+    const excerpt = post.excerpt || "Clique para ler o artigo completo no blog.";
+    const link = post.link || "https://blog.sualuma.online";
+    const date = formatDate(post.date);
+
+    return `
+      <a class="blogFixedCard" href="${esc(link)}" target="_blank" rel="noopener">
+        <div class="blogFixedImage">
+          ${
+            post.image
+              ? `<img src="${esc(post.image)}" alt="${esc(title)}" loading="lazy">`
+              : fallbackImage(title)
+          }
+        </div>
+        <div class="blogFixedBody">
+          <span class="blogFixedBadge">${esc(date)}</span>
+          <h3>${esc(title)}</h3>
+          <p>${esc(excerpt)}</p>
+          <span class="blogFixedRead">Ler artigo →</span>
+        </div>
+      </a>
+    `;
+  }
+
+  async function loadBlog(){
+    const tracks = [
+      document.getElementById("blogCarouselTopFixedTrack"),
+      document.getElementById("blogCarouselBottomFixedTrack")
+    ].filter(Boolean);
+
+    if(!tracks.length) return;
+
+    try{
+      const res = await fetch("/api/blog/latest?t=" + Date.now(), {
         cache:"no-store",
         credentials:"include"
       });
 
-      const json = await res.json().catch(() => null);
-      if(!res.ok || !json?.ok) return null;
-      return json;
-    }catch{
-      return null;
-    }
-  }
+      const json = await res.json();
+      const posts = json.posts || [];
 
-  function ensureModal(){
-    if(document.getElementById("tjProfileModal")) return;
+      if(!posts.length){
+        throw new Error("Sem posts");
+      }
 
-    const modal = document.createElement("div");
-    modal.id = "tjProfileModal";
-    modal.innerHTML = `
-      <div class="tj-profile-box">
-        <div class="tj-profile-head">
-          <div class="tj-profile-user">
-            <div class="tj-profile-avatar" id="tjProfileAvatar">U</div>
-            <div>
-              <h2 id="tjProfileTitle">Meu perfil</h2>
-              <p id="tjProfileSubtitle">Portfólio e posts publicados.</p>
-            </div>
-          </div>
-          <button class="tj-profile-close" onclick="window.TJProfile.close()">Fechar</button>
-        </div>
-
-        <div class="tj-profile-actions">
-          <a class="tj-profile-action primary" href="${PORTFOLIO_URL}">🖼️ Abrir meu portfólio</a>
-          <a class="tj-profile-action" href="${SERVICE_DASHBOARD_URL}">📊 Dashboard de serviço</a>
-          <a class="tj-profile-action" href="https://trabalhosja.sualuma.online">🌐 Voltar para o feed</a>
-          <a class="tj-profile-action" href="${LOGIN_URL}" id="tjProfileLoginLink">🔐 Entrar na plataforma</a>
-        </div>
-
-        <h3 class="tj-profile-shortcuts-title">Atalhos rápidos</h3>
-        <div id="tjProfileExtraShortcuts" class="tj-profile-shortcuts">
-          <a class="tj-profile-shortcut primary" href="https://meuservico.sualuma.online/?v=perfil-portfolio-bridge#prestador-servicos">💼 Marketplace de propostas</a>
-          <a class="tj-profile-shortcut primary" href="https://chat.sualuma.online">🤖 Chat IA</a>
-          <a class="tj-profile-shortcut" href="${CLIENT_DASHBOARD_URL}">🏠 Dashboard do cliente</a>
-          <a class="tj-profile-shortcut" href="${SERVICE_DASHBOARD_URL}">🛠️ Dashboard de serviço</a>
-        </div>
-
-        <div class="tj-profile-stats">
-          <div class="tj-profile-stat"><strong id="tjProfilePostsCount">0</strong><span>posts publicados</span></div>
-          <div class="tj-profile-stat"><strong id="tjProfilePortfolioCount">0</strong><span>trabalhos no portfólio</span></div>
-          <div class="tj-profile-stat"><strong id="tjProfileSharesCount">0</strong><span>compartilhamentos</span></div>
-        </div>
-
-        <div id="tjProfileBody"></div>
-      </div>
-    `;
-
-    modal.addEventListener("click", function(e){
-      if(e.target === modal) window.TJProfile.close();
-    });
-
-    document.body.appendChild(modal);
-  }
-
-  function renderLoggedOut(){
-    document.getElementById("tjProfileTitle").textContent = "Meu perfil";
-    document.getElementById("tjProfileSubtitle").textContent = "Faça login para ver seu portfólio e seus posts.";
-    document.getElementById("tjProfileLoginLink").style.display = "flex";
-
-    applyAvatar({}, {});
-
-    document.getElementById("tjProfilePostsCount").textContent = "0";
-    document.getElementById("tjProfilePortfolioCount").textContent = "0";
-    document.getElementById("tjProfileSharesCount").textContent = "0";
-
-    document.getElementById("tjProfileBody").innerHTML = `
-      <h3>Meu portfólio</h3>
-      <div class="tj-profile-post">
-        <strong>Você ainda não está logada.</strong>
-        <p>Entre na plataforma para a comunidade puxar o mesmo portfólio do Dashboard de serviço.</p>
-        <a class="tj-profile-action primary" href="${LOGIN_URL}">Entrar agora</a>
-      </div>
-    `;
-  }
-
-  function renderPerfil(data){
-    const user = data.user || {};
-    const profile = data.providerProfile || {};
-    const portfolio = Array.isArray(data.portfolio) ? data.portfolio : [];
-    const posts = Array.isArray(data.posts) ? data.posts : [];
-
-    const name = profile.name || user.name || "Meu perfil";
-    const title = profile.title || profile.bio || user.email || "Prestador da comunidade Sualuma";
-
-    document.getElementById("tjProfileTitle").textContent = name;
-    document.getElementById("tjProfileSubtitle").textContent = title;
-    document.getElementById("tjProfileLoginLink").style.display = "none";
-
-    applyAvatar(profile, user);
-
-    document.getElementById("tjProfilePostsCount").textContent = posts.length;
-    document.getElementById("tjProfilePortfolioCount").textContent = portfolio.length;
-    document.getElementById("tjProfileSharesCount").textContent = data.stats?.shares || "0";
-
-    const portfolioHtml = portfolio.length ? portfolio.map(item => {
-      const title = item.title || item.name || item.projectTitle || "Trabalho sem título";
-      const category = item.category || item.type || "Portfólio";
-      const description = item.description || item.content || item.bio || "";
-      const url = item.url || item.link || item.linkUrl || item.siteUrl || item.videoUrl || "";
-
-      return `
-        <div class="tj-provider-portfolio-card">
-          <strong>${escapeHtml(title)}</strong>
-          <p>${escapeHtml(category)}${description ? " · " + escapeHtml(description) : ""}</p>
-          ${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">Abrir trabalho →</a>` : ""}
-        </div>
-      `;
-    }).join("") : `
-      <div class="tj-profile-post">
-        <strong>Nenhum trabalho no portfólio ainda.</strong>
-        <p>Adicione seus trabalhos no Dashboard de serviço para aparecer aqui automaticamente.</p>
-        <a class="tj-profile-action primary" href="${PORTFOLIO_URL}">Adicionar trabalho</a>
-      </div>
-    `;
-
-    const postsHtml = posts.length ? posts.map(post => `
-      <div class="tj-profile-post">
-        <strong>${escapeHtml(post.title || "Post sem título")}</strong>
-        <p>${escapeHtml(post.body || post.content || post.description || "").slice(0, 220)}</p>
-        <small>${escapeHtml(post.category || "Geral")} ${post.created_at ? "· " + new Date(post.created_at).toLocaleString("pt-BR") : ""}</small>
-      </div>
-    `).join("") : `
-      <div class="tj-profile-post">
-        <strong>Nenhum post publicado ainda.</strong>
-        <p>Quando você publicar na comunidade, seus posts aparecem aqui.</p>
-      </div>
-    `;
-
-    document.getElementById("tjProfileBody").innerHTML = `
-      <h3>Meu portfólio do Dashboard de serviço</h3>
-      <div class="tj-provider-portfolio-list">
-        ${portfolioHtml}
-      </div>
-
-      <h3>Meus posts na comunidade</h3>
-      <div class="tj-profile-posts">
-        ${postsHtml}
-      </div>
-    `;
-  }
-
-  async function openProfile(){
-    ensureModal();
-
-    document.getElementById("tjProfileModal").classList.add("show");
-    document.getElementById("tjProfileBody").innerHTML = `
-      <div class="tj-profile-post">
-        <strong>Carregando...</strong>
-        <p>Buscando seu portfólio real do Dashboard de serviço.</p>
-      </div>
-    `;
-
-    const data = await getPerfil();
-
-    if(!data){
-      renderLoggedOut();
-      return;
-    }
-
-    renderPerfil(data);
-  }
-
-  window.TJProfile = {
-    open: openProfile,
-    close(){
-      document.getElementById("tjProfileModal")?.classList.remove("show");
-    }
-  };
-
-  async function bootAvatar(){
-    ensureModal();
-    const data = await getPerfil();
-    if(data) applyAvatar(data.providerProfile || {}, data.user || {});
-  }
-
-  document.addEventListener("DOMContentLoaded", function(){
-    setTimeout(bootAvatar, 700);
-  });
-
-  window.addEventListener("load", function(){
-    setTimeout(bootAvatar, 700);
-  });
-})();
-</script>
-<style id="trabalhosja-profile-final-clean-style">
-  #tjProfileModal .tj-profile-actions {
-    display: none !important;
-  }
-
-  #tjProfileModal .tj-profile-shortcuts-title {
-    margin: 20px 0 12px !important;
-    font-size: 18px !important;
-    font-weight: 1000 !important;
-  }
-
-  #tjProfileModal .tj-profile-shortcuts {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    margin-bottom: 18px !important;
-  }
-
-  #tjProfileModal .tj-profile-shortcut {
-    width: 100% !important;
-    min-height: 56px !important;
-    border-radius: 20px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    font-weight: 1000 !important;
-    border: 1px solid rgba(255,255,255,.12) !important;
-    background: rgba(255,255,255,.055) !important;
-    color: #fff !important;
-  }
-
-  #tjProfileModal .tj-profile-shortcut.primary {
-    background: linear-gradient(135deg,#8d5cff,#18f2ff) !important;
-  }
-
-  @media (max-width: 860px){
-    #tjProfileModal .tj-profile-shortcuts {
-      grid-template-columns: 1fr !important;
-    }
-
-    #tjProfileModal .tj-profile-shortcut {
-      min-height: 64px !important;
-      font-size: 18px !important;
-    }
-  }
-</style>
-
-<script id="trabalhosja-profile-final-clean-script">
-(function(){
-  if(window.__tjProfileFinalClean) return;
-  window.__tjProfileFinalClean = true;
-
-  const links = [
-    ["🖼️ Abrir meu portfólio", "https://meuservico.sualuma.online/?v=portfolio-backend#prestador-portfolio", "primary"],
-    ["💼 Marketplace de propostas", "https://meuservico.sualuma.online/?v=portfolio-backend#prestador-servicos", "primary"],
-    ["🤖 Chat IA", "https://chat.sualuma.online", "primary"],
-    ["🏠 Dashboard do cliente", "https://dashboardcliente.sualuma.online", ""],
-    ["🛠️ Dashboard de serviço", "https://meuservico.sualuma.online/?v=portfolio-backend#prestador", ""],
-    ["🌐 Voltar para o feed", "https://trabalhosja.sualuma.online", ""]
-  ];
-
-  async function fetchPortfolioProfile(){
-    try{
-      const r = await fetch("/api/prestador/portfolio-sync", {
-        credentials: "include",
-        cache: "no-store"
+      tracks.forEach((track, index) => {
+        const list = index === 0 ? posts.slice(0,6) : posts.slice(0,8);
+        track.innerHTML = list.map(card).join("");
       });
-      if(!r.ok) return null;
-      return await r.json();
     }catch{
-      return null;
+      tracks.forEach(track => {
+        track.innerHTML = `
+          <a class="blogFixedCard" href="https://blog.sualuma.online" target="_blank" rel="noopener">
+            <div class="blogFixedImage">
+              ${fallbackImage("Sualuma Blog")}
+            </div>
+            <div class="blogFixedBody">
+              <span class="blogFixedBadge">Blog</span>
+              <h3>Leia os artigos da Sualuma</h3>
+              <p>Conteúdos sobre IA, serviços digitais, automações, freelas e empreendedorismo.</p>
+              <span class="blogFixedRead">Abrir blog →</span>
+            </div>
+          </a>
+        `;
+      });
     }
   }
 
-  function initialsFromName(name, email){
-    const base = String(name || email || "U").trim();
-    return base
-      .split(/\s+/)
-      .slice(0,2)
-      .map(x => x[0])
-      .join("")
-      .toUpperCase() || "U";
+  function init(){
+    placeCarousels();
+    setTimeout(loadBlog, 200);
   }
 
-  function setProfileButton(profile){
-    const btn = document.getElementById("tjProfileBtn");
-    if(!btn || !profile) return;
-
-    const photo = profile.photoUrl || profile.avatarUrl || profile.fotoUrl || profile.imageUrl || "";
-    const initials = initialsFromName(profile.name, profile.email);
-
-    if(photo && !photo.startsWith("data:image")){
-      btn.classList.add("tj-has-profile-photo");
-      btn.innerHTML = `<img src="${photo}" alt="Perfil" loading="lazy">`;
-    } else {
-      btn.classList.remove("tj-has-profile-photo");
-      btn.textContent = initials;
-    }
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  }else{
+    init();
   }
-
-  function cleanModal(profileData){
-    const modal = document.getElementById("tjProfileModal");
-    if(!modal) return;
-
-    const profile = profileData?.profile || {};
-    const portfolio = profileData?.portfolio || [];
-
-    const actions = modal.querySelector(".tj-profile-actions");
-    if(actions) actions.style.display = "none";
-
-    let shortcuts = modal.querySelector(".tj-profile-shortcuts") || document.getElementById("tjProfileExtraShortcuts");
-    if(!shortcuts){
-      shortcuts = document.createElement("div");
-      shortcuts.className = "tj-profile-shortcuts";
-      const title = document.createElement("h3");
-      title.className = "tj-profile-shortcuts-title";
-      title.textContent = "Atalhos rápidos";
-      const anchor = modal.querySelector(".tj-profile-body") || modal.querySelector(".modal-body") || modal;
-      anchor.appendChild(title);
-      anchor.appendChild(shortcuts);
-    }
-
-    shortcuts.innerHTML = links.map(([label, href, type]) => {
-      return `<a class="tj-profile-shortcut ${type}" href="${href}">${label}</a>`;
-    }).join("");
-
-    const title = modal.querySelector("h2, .tj-profile-title");
-    if(title && profile.name) title.textContent = profile.name;
-
-    const subtitle = modal.querySelector(".tj-profile-subtitle, .profile-subtitle");
-    if(subtitle) {
-      subtitle.textContent = portfolio.length
-        ? `${portfolio.length} trabalho(s) no portfólio`
-        : "Portfólio e posts publicados.";
-    }
-
-    modal.querySelectorAll(".tj-profile-shortcuts").forEach((el, index) => {
-      if(index > 0) el.remove();
-    });
-  }
-
-  async function refresh(){
-    const data = await fetchPortfolioProfile();
-    if(data?.ok){
-      setProfileButton(data.profile);
-      cleanModal(data);
-    } else {
-      cleanModal(null);
-    }
-  }
-
-  const oldOpen = window.TJProfile && window.TJProfile.open;
-  if(window.TJProfile && typeof oldOpen === "function"){
-    window.TJProfile.open = async function(){
-      const result = await oldOpen.apply(this, arguments);
-      setTimeout(refresh, 120);
-      setTimeout(refresh, 600);
-      return result;
-    };
-  }
-
-  document.addEventListener("click", function(e){
-    if(e.target.closest("#tjProfileBtn, #tjSidebarProfileBtn, .tj-profile-open")){
-      setTimeout(refresh, 120);
-      setTimeout(refresh, 600);
-    }
-  });
-
-  window.addEventListener("load", function(){
-    setTimeout(refresh, 700);
-    setTimeout(refresh, 2200);
-  });
 })();
 </script>
 
