@@ -3,63 +3,40 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-function cleanRedirect(value: FormDataEntryValue | null, fallback: string) {
-  const raw = String(value || "").trim();
-
-  if (!raw) return fallback;
-
-  if (raw.startsWith("http://") || raw.startsWith("https://")) {
-    return raw;
-  }
-
-  if (raw.startsWith("/")) {
-    return raw;
-  }
-
-  return fallback;
-}
+const CLIENT_DASHBOARD_URL = "https://dashboardcliente.sualuma.online";
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
 
-  const fullName = String(formData.get("full_name") || "").trim();
-  const email = String(formData.get("email") || "").trim();
+  const fullName = String(formData.get("full_name") || "");
+  const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
-  const role = String(formData.get("role") || "client").trim() === "provider" ? "provider" : "client";
-  const redirectTo = cleanRedirect(formData.get("redirect_to"), role === "provider" ? "/provider-services" : "/member-user");
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://sualuma.online";
-
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
         full_name: fullName,
-        role,
       },
-      emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(redirectTo)}`,
+      emailRedirectTo: `https://sualuma.online/auth/callback?next=${encodeURIComponent(
+        CLIENT_DASHBOARD_URL
+      )}`,
     },
   });
 
   if (error) {
-    redirect(`/sign-up?error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(redirectTo)}&role=${role}`);
+    redirect(`/sign-up?error=${encodeURIComponent(error.message)}`);
   }
 
-  if (data.session) {
-    redirect(redirectTo);
-  }
-
-  redirect(`/sign-up?success=check-email&next=${encodeURIComponent(redirectTo)}&role=${role}`);
+  redirect("/sign-up?success=check-email");
 }
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient();
 
-  const email = String(formData.get("email") || "").trim();
+  const email = String(formData.get("email") || "");
   const password = String(formData.get("password") || "");
-  const role = String(formData.get("role") || "client").trim() === "provider" ? "provider" : "client";
-  const redirectTo = cleanRedirect(formData.get("redirect_to"), role === "provider" ? "/provider-services" : "/member-user");
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -67,10 +44,10 @@ export async function signIn(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/sign-in?error=${encodeURIComponent(error.message)}&next=${encodeURIComponent(redirectTo)}&role=${role}`);
+    redirect(`/sign-in?error=${encodeURIComponent(error.message)}`);
   }
 
-  redirect(redirectTo);
+  redirect(CLIENT_DASHBOARD_URL);
 }
 
 export async function signOut() {

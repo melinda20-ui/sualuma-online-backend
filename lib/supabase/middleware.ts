@@ -1,6 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function sharedCookieOptions(options: any = {}) {
+  const domain = process.env.SUALUMA_COOKIE_DOMAIN || ".sualuma.online";
+
+  return {
+    ...options,
+    path: "/",
+    sameSite: "lax" as const,
+    domain,
+  };
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -24,7 +35,11 @@ export async function updateSession(request: NextRequest) {
           });
 
           cookiesToSet.forEach(({ name, value, options }) => {
-            supabaseResponse.cookies.set(name, value, options);
+            supabaseResponse.cookies.set(
+              name,
+              value,
+              sharedCookieOptions(options)
+            );
           });
         },
       },
