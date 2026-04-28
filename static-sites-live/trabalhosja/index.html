@@ -1694,11 +1694,52 @@
   }, 8000);
 })();
 </script>
-<style id="trabalhosja-profile-session-fix-style">
+<style id="trabalhosja-portfolio-profile-bridge-style">
+  .tj-provider-portfolio-list{
+    display:grid;
+    gap:12px;
+    margin:12px 0 20px;
+  }
+
+  .tj-provider-portfolio-card{
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.05);
+    border-radius:20px;
+    padding:15px;
+  }
+
+  .tj-provider-portfolio-card strong{
+    display:block;
+    color:#fff;
+    font-size:17px;
+    margin-bottom:6px;
+  }
+
+  .tj-provider-portfolio-card p{
+    margin:0 0 10px;
+    color:#cfd5ff;
+    line-height:1.55;
+  }
+
+  .tj-provider-portfolio-card a{
+    color:#25f4ff;
+    font-weight:1000;
+    text-decoration:none;
+  }
+
+  .tj-profile-avatar.tj-has-profile-photo,
   #tjProfileBtn.tj-has-profile-photo{
     padding:0 !important;
     overflow:hidden !important;
     background:rgba(255,255,255,.06) !important;
+  }
+
+  .tj-profile-avatar.tj-has-profile-photo img{
+    width:58px !important;
+    height:58px !important;
+    border-radius:22px !important;
+    object-fit:cover !important;
+    display:block !important;
   }
 
   #tjProfileBtn.tj-has-profile-photo img{
@@ -1708,30 +1749,17 @@
     object-fit:cover !important;
     display:block !important;
   }
-
-  #tjProfileAvatar.tj-has-profile-photo{
-    overflow:hidden !important;
-    padding:0 !important;
-    background:rgba(255,255,255,.06) !important;
-  }
-
-  #tjProfileAvatar.tj-has-profile-photo img{
-    width:58px !important;
-    height:58px !important;
-    border-radius:22px !important;
-    object-fit:cover !important;
-    display:block !important;
-  }
 </style>
 
-<script id="trabalhosja-profile-session-fix-script">
+<script id="trabalhosja-portfolio-profile-bridge-script">
 (function(){
-  if(window.__tjProfileSessionFixLoaded) return;
-  window.__tjProfileSessionFixLoaded = true;
+  if(window.__tjPortfolioProfileBridge) return;
+  window.__tjPortfolioProfileBridge = true;
 
   const LOGIN_URL = "https://sualuma.online/sign-in";
-  const PORTFOLIO_URL = "https://meuservico.sualuma.online/?v=perfil-login-fix#prestador-portfolio";
-  const SERVICE_DASHBOARD_URL = "https://meuservico.sualuma.online/?v=perfil-login-fix#prestador";
+  const PORTFOLIO_URL = "https://meuservico.sualuma.online/?v=perfil-portfolio-bridge#prestador-portfolio";
+  const SERVICE_DASHBOARD_URL = "https://meuservico.sualuma.online/?v=perfil-portfolio-bridge#prestador";
+  const CLIENT_DASHBOARD_URL = "https://dashboardcliente.sualuma.online";
 
   function escapeHtml(value){
     return String(value || "")
@@ -1762,78 +1790,17 @@
     );
   }
 
-  function getProviderPhoto(providerData){
-    const d = providerData?.data || providerData || {};
-    const p = d.providerProfile || d.profile || d.portfolioProfile || {};
-
-    return [
-      p.photoUrl,
-      p.fotoUrl,
-      p.profilePhotoUrl,
-      p.profile_photo_url,
-      p.avatarUrl,
-      p.avatar_url,
-      p.imageUrl,
-      p.picture,
-      d.photoUrl,
-      d.avatarUrl,
-    ].find(isImageUrl) || "";
-  }
-
-  async function getMe(){
-    try{
-      const res = await fetch("/api/platform/me", {
-        cache: "no-store",
-        credentials: "include"
-      });
-
-      const json = await res.json().catch(() => null);
-      if(!res.ok || !json?.ok) return null;
-
-      return json.user;
-    }catch{
-      return null;
-    }
-  }
-
-  async function getProviderDashboard(){
-    try{
-      const res = await fetch("/api/prestador/dashboard", {
-        cache: "no-store",
-        credentials: "include"
-      });
-
-      const json = await res.json().catch(() => null);
-      if(!res.ok || !json?.ok) return null;
-
-      return json;
-    }catch{
-      return null;
-    }
-  }
-
-  async function getPosts(){
-    try{
-      const res = await fetch("/api/comunidade/posts", {
-        cache: "no-store",
-        credentials: "include"
-      });
-
-      const json = await res.json().catch(() => null);
-      return json?.posts || [];
-    }catch{
-      return [];
-    }
-  }
-
-  function applyAvatar({ name, email, photoUrl }){
+  function applyAvatar(profile, user){
+    const name = profile?.name || user?.name || "Usuário";
+    const email = user?.email || profile?.email || "";
+    const photoUrl = profile?.photoUrl || profile?.avatarUrl || profile?.fotoUrl || "";
     const label = initials(name, email);
 
     const btn = document.getElementById("tjProfileBtn");
     if(btn){
-      if(photoUrl){
+      if(isImageUrl(photoUrl)){
         btn.classList.add("tj-has-profile-photo");
-        btn.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(name || email || "Perfil")}" loading="lazy" onerror="this.closest('button').classList.remove('tj-has-profile-photo');this.closest('button').textContent='${label}'">`;
+        btn.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.closest('button').classList.remove('tj-has-profile-photo');this.closest('button').textContent='${label}'">`;
       }else{
         btn.classList.remove("tj-has-profile-photo");
         btn.textContent = label;
@@ -1842,13 +1809,28 @@
 
     const avatar = document.getElementById("tjProfileAvatar");
     if(avatar){
-      if(photoUrl){
+      if(isImageUrl(photoUrl)){
         avatar.classList.add("tj-has-profile-photo");
-        avatar.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(name || email || "Perfil")}" loading="lazy" onerror="this.parentElement.classList.remove('tj-has-profile-photo');this.parentElement.textContent='${label}'">`;
+        avatar.innerHTML = `<img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(name)}" loading="lazy" onerror="this.parentElement.classList.remove('tj-has-profile-photo');this.parentElement.textContent='${label}'">`;
       }else{
         avatar.classList.remove("tj-has-profile-photo");
         avatar.textContent = label;
       }
+    }
+  }
+
+  async function getPerfil(){
+    try{
+      const res = await fetch("/api/comunidade/perfil", {
+        cache:"no-store",
+        credentials:"include"
+      });
+
+      const json = await res.json().catch(() => null);
+      if(!res.ok || !json?.ok) return null;
+      return json;
+    }catch{
+      return null;
     }
   }
 
@@ -1879,20 +1861,19 @@
 
         <h3 class="tj-profile-shortcuts-title">Atalhos rápidos</h3>
         <div id="tjProfileExtraShortcuts" class="tj-profile-shortcuts">
-          <a class="tj-profile-shortcut primary" href="https://meuservico.sualuma.online/?v=perfil-login-fix#prestador-servicos">💼 Marketplace de propostas</a>
+          <a class="tj-profile-shortcut primary" href="https://meuservico.sualuma.online/?v=perfil-portfolio-bridge#prestador-servicos">💼 Marketplace de propostas</a>
           <a class="tj-profile-shortcut primary" href="https://chat.sualuma.online">🤖 Chat IA</a>
-          <a class="tj-profile-shortcut" href="https://dashboardcliente.sualuma.online">🏠 Dashboard do cliente</a>
-          <a class="tj-profile-shortcut" href="https://meuservico.sualuma.online/?v=perfil-login-fix#prestador">🛠️ Dashboard de serviço</a>
+          <a class="tj-profile-shortcut" href="${CLIENT_DASHBOARD_URL}">🏠 Dashboard do cliente</a>
+          <a class="tj-profile-shortcut" href="${SERVICE_DASHBOARD_URL}">🛠️ Dashboard de serviço</a>
         </div>
 
         <div class="tj-profile-stats">
           <div class="tj-profile-stat"><strong id="tjProfilePostsCount">0</strong><span>posts publicados</span></div>
-          <div class="tj-profile-stat"><strong id="tjProfileCommentsCount">0</strong><span>comentários recebidos</span></div>
+          <div class="tj-profile-stat"><strong id="tjProfilePortfolioCount">0</strong><span>trabalhos no portfólio</span></div>
           <div class="tj-profile-stat"><strong id="tjProfileSharesCount">0</strong><span>compartilhamentos</span></div>
         </div>
 
-        <h3>Meus posts</h3>
-        <div class="tj-profile-posts" id="tjProfilePosts"></div>
+        <div id="tjProfileBody"></div>
       </div>
     `;
 
@@ -1903,92 +1884,112 @@
     document.body.appendChild(modal);
   }
 
-  async function openProfile(){
-    ensureModal();
+  function renderLoggedOut(){
+    document.getElementById("tjProfileTitle").textContent = "Meu perfil";
+    document.getElementById("tjProfileSubtitle").textContent = "Faça login para ver seu portfólio e seus posts.";
+    document.getElementById("tjProfileLoginLink").style.display = "flex";
 
-    const modal = document.getElementById("tjProfileModal");
-    const title = document.getElementById("tjProfileTitle");
-    const subtitle = document.getElementById("tjProfileSubtitle");
-    const loginLink = document.getElementById("tjProfileLoginLink");
-    const postsBox = document.getElementById("tjProfilePosts");
+    applyAvatar({}, {});
 
-    modal.classList.add("show");
+    document.getElementById("tjProfilePostsCount").textContent = "0";
+    document.getElementById("tjProfilePortfolioCount").textContent = "0";
+    document.getElementById("tjProfileSharesCount").textContent = "0";
 
-    postsBox.innerHTML = `
+    document.getElementById("tjProfileBody").innerHTML = `
+      <h3>Meu portfólio</h3>
       <div class="tj-profile-post">
-        <strong>Carregando...</strong>
-        <p>Buscando sua sessão, portfólio e posts.</p>
+        <strong>Você ainda não está logada.</strong>
+        <p>Entre na plataforma para a comunidade puxar o mesmo portfólio do Dashboard de serviço.</p>
+        <a class="tj-profile-action primary" href="${LOGIN_URL}">Entrar agora</a>
+      </div>
+    `;
+  }
+
+  function renderPerfil(data){
+    const user = data.user || {};
+    const profile = data.providerProfile || {};
+    const portfolio = Array.isArray(data.portfolio) ? data.portfolio : [];
+    const posts = Array.isArray(data.posts) ? data.posts : [];
+
+    const name = profile.name || user.name || "Meu perfil";
+    const title = profile.title || profile.bio || user.email || "Prestador da comunidade Sualuma";
+
+    document.getElementById("tjProfileTitle").textContent = name;
+    document.getElementById("tjProfileSubtitle").textContent = title;
+    document.getElementById("tjProfileLoginLink").style.display = "none";
+
+    applyAvatar(profile, user);
+
+    document.getElementById("tjProfilePostsCount").textContent = posts.length;
+    document.getElementById("tjProfilePortfolioCount").textContent = portfolio.length;
+    document.getElementById("tjProfileSharesCount").textContent = data.stats?.shares || "0";
+
+    const portfolioHtml = portfolio.length ? portfolio.map(item => {
+      const title = item.title || item.name || item.projectTitle || "Trabalho sem título";
+      const category = item.category || item.type || "Portfólio";
+      const description = item.description || item.content || item.bio || "";
+      const url = item.url || item.link || item.linkUrl || item.siteUrl || item.videoUrl || "";
+
+      return `
+        <div class="tj-provider-portfolio-card">
+          <strong>${escapeHtml(title)}</strong>
+          <p>${escapeHtml(category)}${description ? " · " + escapeHtml(description) : ""}</p>
+          ${url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">Abrir trabalho →</a>` : ""}
+        </div>
+      `;
+    }).join("") : `
+      <div class="tj-profile-post">
+        <strong>Nenhum trabalho no portfólio ainda.</strong>
+        <p>Adicione seus trabalhos no Dashboard de serviço para aparecer aqui automaticamente.</p>
+        <a class="tj-profile-action primary" href="${PORTFOLIO_URL}">Adicionar trabalho</a>
       </div>
     `;
 
-    const user = await getMe();
-
-    if(!user){
-      title.textContent = "Meu perfil";
-      subtitle.textContent = "Faça login para ver seus posts e editar seu portfólio.";
-      loginLink.style.display = "flex";
-
-      applyAvatar({ name:"Usuário", email:"", photoUrl:"" });
-
-      document.getElementById("tjProfilePostsCount").textContent = "0";
-      document.getElementById("tjProfileCommentsCount").textContent = "0";
-      document.getElementById("tjProfileSharesCount").textContent = "0";
-
-      postsBox.innerHTML = `
-        <div class="tj-profile-post">
-          <strong>Você ainda não está logada.</strong>
-          <p>Entre novamente para ativar a sessão compartilhada entre Sualuma, Dashboard e Comunidade.</p>
-          <a class="tj-profile-action primary" href="${LOGIN_URL}">Entrar agora</a>
-        </div>
-      `;
-      return;
-    }
-
-    loginLink.style.display = "none";
-
-    const provider = await getProviderDashboard();
-
-    const name = provider?.data?.providerProfile?.name || user.name || user.email;
-    const email = user.email || "";
-    const photoUrl = getProviderPhoto(provider) || user.avatarUrl || "";
-
-    title.textContent = name || "Meu perfil";
-    subtitle.textContent = email || "Perfil da comunidade";
-
-    applyAvatar({ name, email, photoUrl });
-
-    const posts = await getPosts();
-
-    const mine = posts.filter(post => {
-      return (
-        post.author_user_id === user.id ||
-        post.user_id === user.id ||
-        post.authorId === user.id ||
-        post.author_email === user.email ||
-        post.email === user.email
-      );
-    });
-
-    const comments = mine.reduce((sum, post) => sum + Number(post.commentsCount || post.comments_count || 0), 0);
-    const shares = mine.reduce((sum, post) => sum + Number(post.sharesCount || post.shares_count || 0), 0);
-
-    document.getElementById("tjProfilePostsCount").textContent = mine.length;
-    document.getElementById("tjProfileCommentsCount").textContent = comments;
-    document.getElementById("tjProfileSharesCount").textContent = shares;
-
-    postsBox.innerHTML = mine.length ? mine.map(post => `
+    const postsHtml = posts.length ? posts.map(post => `
       <div class="tj-profile-post">
         <strong>${escapeHtml(post.title || "Post sem título")}</strong>
-        <p>${escapeHtml(post.body || post.content || "").slice(0,220)}</p>
-        <small>${escapeHtml(post.category || "Geral")} · ${post.created_at ? new Date(post.created_at).toLocaleString("pt-BR") : ""}</small>
+        <p>${escapeHtml(post.body || post.content || post.description || "").slice(0, 220)}</p>
+        <small>${escapeHtml(post.category || "Geral")} ${post.created_at ? "· " + new Date(post.created_at).toLocaleString("pt-BR") : ""}</small>
       </div>
     `).join("") : `
       <div class="tj-profile-post">
         <strong>Nenhum post publicado ainda.</strong>
-        <p>Quando você publicar na comunidade ou adicionar trabalhos no portfólio, eles aparecem aqui.</p>
-        <a class="tj-profile-action primary" href="${PORTFOLIO_URL}">Adicionar trabalho ao portfólio</a>
+        <p>Quando você publicar na comunidade, seus posts aparecem aqui.</p>
       </div>
     `;
+
+    document.getElementById("tjProfileBody").innerHTML = `
+      <h3>Meu portfólio do Dashboard de serviço</h3>
+      <div class="tj-provider-portfolio-list">
+        ${portfolioHtml}
+      </div>
+
+      <h3>Meus posts na comunidade</h3>
+      <div class="tj-profile-posts">
+        ${postsHtml}
+      </div>
+    `;
+  }
+
+  async function openProfile(){
+    ensureModal();
+
+    document.getElementById("tjProfileModal").classList.add("show");
+    document.getElementById("tjProfileBody").innerHTML = `
+      <div class="tj-profile-post">
+        <strong>Carregando...</strong>
+        <p>Buscando seu portfólio real do Dashboard de serviço.</p>
+      </div>
+    `;
+
+    const data = await getPerfil();
+
+    if(!data){
+      renderLoggedOut();
+      return;
+    }
+
+    renderPerfil(data);
   }
 
   window.TJProfile = {
@@ -2000,29 +2001,16 @@
 
   async function bootAvatar(){
     ensureModal();
-
-    const user = await getMe();
-
-    if(!user){
-      applyAvatar({ name:"Usuário", email:"", photoUrl:"" });
-      return;
-    }
-
-    const provider = await getProviderDashboard();
-
-    applyAvatar({
-      name: provider?.data?.providerProfile?.name || user.name || user.email,
-      email: user.email || "",
-      photoUrl: getProviderPhoto(provider) || user.avatarUrl || ""
-    });
+    const data = await getPerfil();
+    if(data) applyAvatar(data.providerProfile || {}, data.user || {});
   }
 
   document.addEventListener("DOMContentLoaded", function(){
-    setTimeout(bootAvatar, 500);
+    setTimeout(bootAvatar, 700);
   });
 
   window.addEventListener("load", function(){
-    setTimeout(bootAvatar, 500);
+    setTimeout(bootAvatar, 700);
   });
 })();
 </script>
