@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-27T20:54:55.446Z",
+  "updatedAt": "2026-04-28T01:03:39.444Z",
   "providerProfile": {
     "name": "Prestador Sualuma",
     "title": "Especialista em sites, automações e entregas digitais",
@@ -21,7 +21,7 @@
       "id": "recebimento",
       "title": "Dados de recebimento",
       "description": "Chave Pix, banco ou conta para saque.",
-      "done": false
+      "done": true
     },
     {
       "id": "portfolio",
@@ -53,13 +53,27 @@
     "referralEarnings": 900
   },
   "payout": {
-    "status": "pending",
-    "pixKey": "",
-    "bankName": "",
-    "holderName": "",
-    "document": "",
-    "updatedAt": ""
+    "status": "withdrawal_requested",
+    "pixKey": "15593688613",
+    "bankName": "teste",
+    "holderName": "Ludmila Ramos Cavalcante",
+    "document": "15593688613",
+    "updatedAt": "2026-04-28T01:03:39.444Z"
   },
+  "payoutRequests": [
+    {
+      "id": "saque-1777338219444-kco52z",
+      "amount": 2100,
+      "status": "solicitado",
+      "createdAt": "2026-04-28T01:03:39.444Z"
+    },
+    {
+      "id": "saque-1777338214774-jm4ucc",
+      "amount": 2100,
+      "status": "solicitado",
+      "createdAt": "2026-04-28T01:03:34.774Z"
+    }
+  ],
   "proposals": [
     {
       "id": "prop-demo-1",
@@ -105,15 +119,6 @@
       "category": "Sites",
       "url": "https://sualuma.online",
       "description": "Modelo de apresentação profissional para empresas digitais.",
-      "createdAt": "2026-04-27T20:54:55.446Z"
-    }
-  ],
-  "community": [
-    {
-      "id": "post-demo-1",
-      "author": "Equipe Sualuma",
-      "title": "Bem-vindo à comunidade dos prestadores",
-      "content": "Use esse espaço para trocar ideias, pedir ajuda, compartilhar dificuldades e evoluir junto com outros prestadores.",
       "createdAt": "2026-04-27T20:54:55.446Z"
     }
   ],
@@ -176,5 +181,91 @@
       "status": "em_configuracao"
     }
   ],
-  "notifications": []
+  "notifications": [],
+  "community": [
+    {
+      "id": "post-demo-1",
+      "author": "Equipe Sualuma",
+      "title": "Bem-vindo à comunidade dos prestadores",
+      "content": "Use esse espaço para trocar ideias, pedir ajuda, compartilhar dificuldades e evoluir junto com outros prestadores.",
+      "createdAt": "2026-04-27T20:54:55.446Z"
+    }
+  ],
+  "platformFeeRate": 0.05,
+  "financialLedger": [
+    {
+      "id": "fin-site-demo-1",
+      "type": "service_income",
+      "title": "Site institucional principal",
+      "clientName": "Cliente Sualuma",
+      "grossAmount": 2500,
+      "platformFeeRate": 0.05,
+      "platformFeeAmount": 125,
+      "netAmount": 2375,
+      "status": "liberado",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    },
+    {
+      "id": "fin-page-demo-1",
+      "type": "service_income",
+      "title": "Página de vendas",
+      "clientName": "Cliente Sualuma",
+      "grossAmount": 1500,
+      "platformFeeRate": 0.05,
+      "platformFeeAmount": 75,
+      "netAmount": 1425,
+      "status": "aguardando revisão",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    },
+    {
+      "id": "fin-auto-demo-1",
+      "type": "service_income",
+      "title": "Automação inicial",
+      "clientName": "Loja Parceira",
+      "grossAmount": 3400,
+      "platformFeeRate": 0.05,
+      "platformFeeAmount": 170,
+      "netAmount": 3230,
+      "status": "liberado",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    }
+  ],
+  "billingItems": [
+    {
+      "id": "bill-platform-fee-info",
+      "type": "platform_fee",
+      "title": "Taxa da plataforma",
+      "description": "5% sobre cada serviço prestado dentro da Sualuma.",
+      "amount": 370,
+      "status": "calculado",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    },
+    {
+      "id": "bill-ai-plan-demo",
+      "type": "ai_plan",
+      "title": "Plano de IA",
+      "description": "Nenhum plano de IA contratado no momento.",
+      "amount": 0,
+      "status": "não contratado",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    },
+    {
+      "id": "bill-marketplace-demo",
+      "type": "marketplace_product",
+      "title": "Produtos de automação/agentes",
+      "description": "Nenhum produto comprado no marketplace até agora.",
+      "amount": 0,
+      "status": "sem compra",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    },
+    {
+      "id": "bill-service-pro-demo",
+      "type": "service_pro_plan",
+      "title": "Plano Pro de Serviços",
+      "description": "Prioridade nas propostas ainda não ativada.",
+      "amount": 0,
+      "status": "não contratado",
+      "date": "2026-04-28T00:56:06.092686+00:00"
+    }
+  ]
 }

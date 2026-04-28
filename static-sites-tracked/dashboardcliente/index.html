@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard do Cliente | Sualuma Online</title>
+  <style>
+    :root{
+      --bg:#070817;
+      --card:rgba(18,22,58,.76);
+      --card2:rgba(31,38,95,.70);
+      --stroke:rgba(139,164,255,.20);
+      --text:#f7f8ff;
+      --muted:#b8c4ff;
+      --cyan:#18f2ff;
+      --violet:#865dff;
+      --pink:#ff4fd8;
+      --green:#44f5b2;
+      --warning:#ffd166;
+      --danger:#ff6b91;
+      --shadow:0 26px 80px rgba(0,0,0,.42);
+      --radius:26px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--text);
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 8% 8%,rgba(24,242,255,.28),transparent 28%),
+        radial-gradient(circle at 78% 15%,rgba(134,93,255,.32),transparent 30%),
+        radial-gradient(circle at 50% 100%,rgba(255,79,216,.12),transparent 35%),
+        linear-gradient(135deg,#070817,#0b0f2c 55%,#050510);
+      overflow-x:hidden;
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.22;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size:46px 46px;
+      mask-image:linear-gradient(to bottom,black,transparent 78%);
+    }
+    a{color:inherit;text-decoration:none}
+    button,input,textarea{font:inherit}
+    .shell{display:grid;grid-template-columns:282px 1fr;min-height:100vh}
+    .sidebar{
+      position:sticky;top:0;height:100vh;padding:22px 18px;
+      border-right:1px solid var(--stroke);
+      background:rgba(8,10,28,.72);
+      backdrop-filter:blur(22px);
+      overflow:auto;
+    }
+    .brand{display:flex;gap:13px;align-items:center;margin-bottom:28px}
+    .brand-logo{
+      width:48px;height:48px;border-radius:16px;object-fit:contain;
+      background:linear-gradient(135deg,var(--violet),var(--cyan));
+      box-shadow:0 0 32px rgba(24,242,255,.26);
+      padding:5px;
+    }
+    .brand h1{font-size:17px;margin:0}
+    .brand p{font-size:12px;color:var(--muted);margin:3px 0 0}
+    .nav-title{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:#7f8ee8;margin:24px 10px 10px}
+    .nav{display:grid;gap:8px}
+    .nav a{
+      display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:17px;
+      color:#dbe2ff;border:1px solid transparent;
+      transition:.2s ease;
+      font-weight:750;
+      font-size:14px;
+    }
+    .nav a span{width:30px;height:30px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.08)}
+    .nav a.active,.nav a:hover{
+      background:linear-gradient(135deg,rgba(134,93,255,.38),rgba(24,242,255,.14));
+      border-color:rgba(143,166,255,.28);
+      box-shadow:0 14px 40px rgba(0,0,0,.18);
+    }
+    .main{padding:26px;min-width:0}
+    .topbar{
+      display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:22px;
+      padding:18px 20px;border:1px solid var(--stroke);border-radius:24px;
+      background:rgba(255,255,255,.045);backdrop-filter:blur(18px);
+    }
+    .topbar h2{margin:0;font-size:16px}
+    .topbar p{margin:4px 0 0;color:var(--muted);font-size:13px}
+    .pill{
+      display:inline-flex;gap:8px;align-items:center;border-radius:999px;
+      padding:10px 13px;border:1px solid rgba(255,255,255,.14);
+      color:#eaf1ff;background:rgba(255,255,255,.06);font-weight:800;font-size:12px;
+    }
+    .btn{
+      cursor:pointer;border:0;border-radius:16px;padding:13px 18px;font-weight:900;color:white;
+      background:linear-gradient(135deg,var(--violet),var(--cyan));
+      box-shadow:0 14px 42px rgba(24,242,255,.20);
+      transition:.2s ease;
+    }
+    .btn:hover{transform:translateY(-2px)}
+    .btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);box-shadow:none}
+    .hero{
+      position:relative;overflow:hidden;border-radius:34px;padding:34px;
+      border:1px solid var(--stroke);
+      background:
+        linear-gradient(135deg,rgba(20,24,64,.86),rgba(15,20,55,.48)),
+        radial-gradient(circle at 80% 10%,rgba(24,242,255,.30),transparent 28%),
+        radial-gradient(circle at 15% 80%,rgba(134,93,255,.30),transparent 30%);
+      box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+    .hero:after{
+      content:"";position:absolute;right:-90px;top:-90px;width:260px;height:260px;border-radius:999px;
+      background:linear-gradient(135deg,rgba(24,242,255,.25),rgba(134,93,255,.30));filter:blur(12px);
+    }
+    .hero small{color:var(--cyan);font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .hero h1{font-size:clamp(34px,5vw,72px);line-height:.96;margin:13px 0 18px;max-width:900px}
+    .hero strong{background:linear-gradient(135deg,#fff,var(--cyan),var(--violet));-webkit-background-clip:text;color:transparent}
+    .hero p{max-width:780px;color:#d9e1ff;font-size:18px;line-height:1.65;margin:0}
+    .grid{display:grid;gap:18px}
+    .grid.cols-2{grid-template-columns:1.25fr .9fr}
+    .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+    .card{
+      position:relative;overflow:hidden;
+      border:1px solid var(--stroke);border-radius:var(--radius);
+      background:linear-gradient(135deg,var(--card),rgba(17,22,60,.50));
+      box-shadow:0 16px 50px rgba(0,0,0,.20);
+      padding:22px;
+    }
+    .card h3{margin:0 0 8px;font-size:22px}
+    .card p{margin:0;color:#cbd5ff;line-height:1.6}
+    .metric{
+      min-height:126px;display:flex;flex-direction:column;justify-content:space-between;
+      background:linear-gradient(135deg,rgba(134,93,255,.24),rgba(24,242,255,.10));
+    }
+    .metric b{font-size:36px;line-height:1}
+    .metric span{color:var(--muted);font-weight:750}
+    .list{display:grid;gap:12px;margin-top:14px}
+    .item{
+      display:flex;gap:14px;align-items:flex-start;justify-content:space-between;
+      padding:16px;border:1px solid rgba(255,255,255,.10);border-radius:18px;
+      background:rgba(255,255,255,.045);
+    }
+    .item h4{margin:0 0 5px;font-size:15px}
+    .item p{font-size:13px}
+    .badge{
+      flex:none;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900;
+      background:rgba(24,242,255,.13);color:#9ff8ff;border:1px solid rgba(24,242,255,.22);
+    }
+    .badge.warn{background:rgba(255,209,102,.12);color:#ffe39e;border-color:rgba(255,209,102,.22)}
+    .badge.ok{background:rgba(68,245,178,.12);color:#a8ffd9;border-color:rgba(68,245,178,.22)}
+    .bar{height:10px;border-radius:99px;background:rgba(255,255,255,.10);overflow:hidden;margin-top:12px}
+    .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--violet),var(--cyan));width:70%}
+    .floating{
+      position:fixed;right:22px;bottom:22px;z-index:5;
+      border:1px solid rgba(255,255,255,.16);background:rgba(9,12,35,.88);
+      backdrop-filter:blur(18px);border-radius:24px;padding:14px;box-shadow:var(--shadow);
+      width:min(360px,calc(100vw - 44px));
+      display:none;
+    }
+    .floating.open{display:block}
+    .bell{
+      position:fixed;right:24px;bottom:24px;z-index:6;width:58px;height:58px;border-radius:22px;
+      display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);
+      background:linear-gradient(135deg,var(--violet),var(--cyan));box-shadow:0 18px 45px rgba(24,242,255,.26);
+      cursor:pointer;font-size:23px;
+    }
+    .notif-dot{position:absolute;right:9px;top:8px;width:14px;height:14px;background:#ff3b81;border-radius:99px;border:2px solid white}
+    .mobile-toggle{display:none}
+    @media(max-width:980px){
+      .shell{grid-template-columns:1fr}
+      .sidebar{position:fixed;z-index:10;left:-310px;width:285px;transition:.25s ease}
+      .sidebar.open{left:0}
+      .main{padding:18px}
+      .mobile-toggle{display:inline-flex}
+      .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}
+      .hero{padding:24px}
+      .topbar{align-items:flex-start;flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="/logodosite.png" onerror="this.style.display='none';document.getElementById('fallbackLogo').style.display='grid'" class="brand-logo" alt="Sualuma" />
+        <div id="fallbackLogo" class="brand-logo" style="display:none;place-items:center;font-weight:900">S</div>
+        <div>
+          <h1>Sualuma Online</h1>
+          <p>Dashboard do cliente</p>
+        </div>
+      </div>
+
+      <div class="nav-title">Painel</div>
+      <nav class="nav" id="nav">
+        <a href="#visao" data-view="visao"><span>🏠</span>Visão geral</a>
+        <a href="#projetos" data-view="projetos"><span>📁</span>Meus projetos</a>
+        <a href="#mensagens" data-view="mensagens"><span>💬</span>Mensagens</a>
+        <a href="#entregas" data-view="entregas"><span>📦</span>Entregas</a>
+        <a href="#reunioes" data-view="reunioes"><span>🗓️</span>Reuniões</a>
+        <a href="#servicos" data-view="servicos"><span>🛒</span>Marketplace</a>
+        <a href="#agentes" data-view="agentes"><span>🤖</span>Vitrine de agentes</a>
+        <a href="#chat" data-view="chat"><span>✨</span>Chat IA</a>
+      </nav>
+
+      <div class="nav-title">Ações rápidas</div>
+      <div class="nav">
+        <a href="https://meuservico.sualuma.online" target="_blank"><span>🚀</span>Ver prestadores</a>
+        <a href="https://sualuma.online" target="_blank"><span>🌐</span>Site principal</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <button class="btn secondary mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰ Menu</button>
+          <h2 id="pageTitle">Dashboard do Cliente</h2>
+          <p id="pageSub">Acompanhe projetos, entregas, mensagens e próximos passos.</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span class="pill">🟢 Painel ativo</span>
+          <span class="pill" id="updatedAt">Atualizando...</span>
+        </div>
+      </div>
+
+      <section id="app"></section>
+    </main>
+  </div>
+
+  <button class="bell" onclick="toggleNotifications()">🔔<i class="notif-dot" id="notifDot"></i></button>
+  <div class="floating" id="notifPanel">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px">
+      <strong>Central de notificações</strong>
+      <button class="btn secondary" style="padding:8px 10px" onclick="toggleNotifications()">Fechar</button>
+    </div>
+    <div id="notifList" class="list"></div>
+  </div>
+
+  <script>
+    const state = {
+      view: location.hash.replace('#','') || 'visao',
+      notifications: [],
+      loaded: false
+    }
+
+    const fallbackProjects = [
+      { title:'Site institucional principal', status:'Em andamento', progress:72, text:'Estrutura inicial aprovada. Equipe trabalhando na parte visual e organização das seções.' },
+      { title:'Página de vendas', status:'Aguardando revisão', progress:88, text:'Primeira versão enviada. Falta revisar detalhes finais e aprovar ajustes.' },
+      { title:'Integração da área de membros', status:'Concluído', progress:100, text:'Área interna inicial estruturada para comunicação, entregas e acompanhamento.' }
+    ]
+
+    function money(value){
+      return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value||0))
+    }
+
+    async function getJson(url){
+      try{
+        const r = await fetch(url,{cache:'no-store'})
+        if(!r.ok) throw new Error('erro')
+        return await r.json()
+      }catch(e){
+        return null
+      }
+    }
+
+    async function loadData(){
+      const notif = await getJson('/api/cliente/notificacoes?audience=client')
+      state.notifications = notif?.notifications || []
+      document.getElementById('updatedAt').textContent = 'Atualizado agora'
+      document.getElementById('notifDot').style.display = state.notifications.length ? 'block' : 'none'
+      state.loaded = true
+      render()
+      renderNotifications()
+    }
+
+    function setActive(){
+      document.querySelectorAll('[data-view]').forEach(a=>{
+        a.classList.toggle('active', a.dataset.view === state.view)
+      })
+    }
+
+    function setTitle(title, sub){
+      document.getElementById('pageTitle').textContent = title
+      document.getElementById('pageSub').textContent = sub
+    }
+
+    function card(title, text, icon, link){
+      return `
+        <article class="card">
+          <div style="font-size:30px;margin-bottom:12px">${icon}</div>
+          <h3>${title}</h3>
+          <p>${text}</p>
+          ${link ? `<div style="margin-top:18px"><a class="btn secondary" href="${link}">Abrir →</a></div>` : ''}
+        </article>
+      `
+    }
+
+    function projectsList(){
+      return `
+        <div class="list">
+          ${fallbackProjects.map(p=>`
+            <div class="item">
+              <div style="width:100%">
+                <h4>${p.title}</h4>
+                <p>${p.text}</p>
+                <div class="bar"><i style="width:${p.progress}%"></i></div>
+              </div>
+              <span class="badge ${p.progress>=100?'ok':p.progress>80?'warn':''}">${p.status}</span>
+            </div>
+          `).join('')}
+        </div>
+      `
+    }
+
+    function visao(){
+      setTitle('Bem-vinda à sua área do cliente','Acompanhe seus projetos, entregas, reuniões, agentes e mensagens em um só lugar.')
+
+      return `
+        <div class="hero">
+          <small>Centro de comando do cliente</small>
+          <h1>Clareza total sobre <strong>projetos, entregas e próximos passos</strong></h1>
+          <p>Seu painel foi reorganizado para parecer uma central profissional: tudo que precisa de aprovação, envio de material, conversa com equipe e acompanhamento fica visível em poucos cliques.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px">
+            <a class="btn" href="#projetos">Ver meus projetos</a>
+            <a class="btn secondary" href="#servicos">Contratar serviço</a>
+          </div>
+        </div>
+
+        <div class="grid cols-3" style="margin-bottom:18px">
+          <div class="card metric"><span>Projetos em andamento</span><b>2</b></div>
+          <div class="card metric"><span>Entrega pendente de revisão</span><b>1</b></div>
+          <div class="card metric"><span>Mensagens aguardando resposta</span><b>3</b></div>
+        </div>
+
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Seus projetos</h3>
+            <p>Painel rápido para acompanhar progresso e próximos passos.</p>
+            ${projectsList()}
+          </div>
+
+          <div class="card">
+            <h3>Acessos rápidos</h3>
+            <p>Entre nas áreas mais importantes com um clique.</p>
+            <div class="list">
+              <a class="item" href="#agentes"><div><h4>Vitrine de agentes</h4><p>Veja agentes disponíveis para automatizar partes do seu projeto.</p></div><span class="badge">Abrir</span></a>
+              <a class="item" href="#chat"><div><h4>Chat IA</h4><p>Converse com a IA da plataforma sobre seu projeto.</p></div><span class="badge">Abrir</span></a>
+              <a class="item" href="#reunioes"><div><h4>Reunião do projeto</h4><p>Confira horários, convites e próximos alinhamentos.</p></div><span class="badge">Abrir</span></a>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    function projetos(){
+      setTitle('Meus projetos','Visualize status, progresso, arquivos e próximos passos de cada entrega.')
+
+      return `
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Projetos ativos</h3>
+            <p>Agora cada projeto aparece como um cartão de acompanhamento.</p>
+            ${projectsList()}
+          </div>
+
+          <div class="card">
+            <h3>Próximos passos</h3>
+            <div class="list">
+              <div class="item"><div><h4>Enviar materiais do projeto</h4><p>Logos, referências, textos, fotos, links e observações.</p></div><span class="badge warn">Pendente</span></div>
+              <div class="item"><div><h4>Revisar primeira entrega</h4><p>Aprovar ou pedir ajustes na página de vendas.</p></div><span class="badge warn">Revisão</span></div>
+              <div class="item"><div><h4>Confirmar reunião</h4><p>Escolha a melhor data proposta pela equipe.</p></div><span class="badge ok">Disponível</span></div>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    function mensagens(){
+      setTitle('Mensagens','Central de conversa entre cliente, equipe e prestadores.')
+
+      return `
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Conversas recentes</h3>
+            <div class="list">
+              <div class="item"><div><h4>Equipe Sualuma</h4><p>Recebemos seus materiais. A próxima etapa é revisar a copy.</p></div><span class="badge">Hoje</span></div>
+              <div class="item"><div><h4>Prestador de Site</h4><p>Enviei uma proposta de nova data para a reunião.</p></div><span class="badge warn">Responder</span></div>
+              <div class="item"><div><h4>Suporte</h4><p>Seu painel foi atualizado com a nova central de notificações.</p></div><span class="badge ok">Lido</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Nova mensagem</h3>
+            <p>Em breve essa área será conectada ao envio real de mensagens. Por enquanto, use o WhatsApp ou a central de notificações.</p>
+            <div style="margin-top:18px">
+              <a class="btn" href="https://sualuma.online" target="_blank">Ir para o site principal</a>
+            </div>
+          </div>
+        </div>
+      `
+    }
+
+    function entregas(){
+      setTitle('Entregas','Acompanhe aprovações, materiais enviados e arquivos finais.')
+
+      return `
+        <div class="grid cols-3">
+          ${card('Arquivos recebidos','Materiais, referências e documentos enviados pela equipe.','📂')}
+          ${card('Aguardando revisão','Entregas que precisam da sua aprovação ou comentário.','📝')}
+          ${card('Finalizados','Histórico de entregas concluídas para baixar ou consultar.','✅')}
+        </div>
+      `
+    }
+
+    function reunioes(){
+      setTitle('Reuniões','Convites, datas propostas, confirmações e links de encontro.')
+
+      return `
+        <div class="card">
+          <h3>Notificações de reunião</h3>
+          <p>As reuniões confirmadas e propostas de nova data aparecem aqui.</p>
+          <div class="list">
+            ${(state.notifications.length ? state.notifications : []).map(n=>`
+              <div class="item">
+                <div>
+                  <h4>${n.title || 'Notificação'}</h4>
+                  <p>${n.message || ''}</p>
+                </div>
+                ${n.actionUrl ? `<a class="badge" href="${n.actionUrl}" target="_blank">${n.actionLabel || 'Abrir'}</a>` : `<span class="badge">Info</span>`}
+              </div>
+            `).join('') || '<div class="item"><div><h4>Nenhuma reunião nova</h4><p>Quando uma reunião for marcada, ela aparecerá aqui.</p></div><span class="badge ok">Livre</span></div>'}
+          </div>
+        </div>
+      `
+    }
+
+    function servicos(){
+      setTitle('Marketplace de serviços','Encontre prestadores, envie proposta e acompanhe tudo pelo dashboard.')
+
+      return `
+        <div class="hero">
+          <small>Marketplace Sualuma</small>
+          <h1>Contrate prestadores com <strong>mais clareza e segurança</strong></h1>
+          <p>Essa área será o caminho para empresas encontrarem profissionais, enviarem propostas e acompanharem tudo sem bagunça.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px">
+            <a class="btn" href="https://meuservico.sualuma.online#marketplace" target="_blank">Ver prestadores</a>
+            <a class="btn secondary" href="https://meuservico.sualuma.online#empresa" target="_blank">Entrar como empresa</a>
+          </div>
+        </div>
+
+        <div class="grid cols-3">
+          ${card('Sites e páginas','Prestadores para criar sites, landing pages e páginas de venda.','💻')}
+          ${card('Automação e IA','Agentes e automações para atendimento, conteúdo, vendas e processos.','🤖')}
+          ${card('Social media','Prestadores para estratégia, copy, calendário e edição de conteúdo.','📱')}
+        </div>
+      `
+    }
+
+    function agentes(){
+      setTitle('Vitrine de agentes','Agentes de IA para acelerar atendimento, conteúdo, organização e entrega.')
+
+      return `
+        <div class="grid cols-3">
+          ${card('Agente de Briefing','Coleta informações do cliente e transforma em tarefa organizada.','🧠')}
+          ${card('Agente de Conteúdo','Gera ideias, posts, scripts e textos de campanha.','✍️')}
+          ${card('Agente de Entrega','Organiza etapas, aprovações, arquivos e histórico.','📦')}
+        </div>
+      `
+    }
+
+    function chat(){
+      setTitle('Chat IA','Área preparada para conversar com a IA da plataforma.')
+
+      return `
+        <div class="card">
+          <h3>Chat IA da Sualuma</h3>
+          <p>Em breve o cérebro de IA vai ficar conectado aqui para ler contexto do projeto, gerar tarefas, orientar próximos passos e chamar agentes.</p>
+          <div class="list">
+            <div class="item"><div><h4>O que posso pedir?</h4><p>Resumo do projeto, próximos passos, ideias de melhoria, textos e organização das entregas.</p></div><span class="badge">IA</span></div>
+            <div class="item"><div><h4>Status</h4><p>Interface pronta para conectar ao cérebro de IA.</p></div><span class="badge warn">Em configuração</span></div>
+          </div>
+        </div>
+      `
+    }
+
+    function renderNotifications(){
+      const box = document.getElementById('notifList')
+      box.innerHTML = state.notifications.length ? state.notifications.map(n=>`
+        <div class="item">
+          <div>
+            <h4>${n.title || 'Notificação'}</h4>
+            <p>${n.message || ''}</p>
+          </div>
+          ${n.actionUrl ? `<a class="badge" href="${n.actionUrl}" target="_blank">${n.actionLabel || 'Abrir'}</a>` : '<span class="badge">Novo</span>'}
+        </div>
+      `).join('') : '<div class="item"><div><h4>Sem notificações</h4><p>Nenhuma novidade por enquanto.</p></div></div>'
+    }
+
+    function toggleNotifications(){
+      document.getElementById('notifPanel').classList.toggle('open')
+      renderNotifications()
+    }
+
+    function render(){
+      state.view = location.hash.replace('#','') || 'visao'
+      setActive()
+
+      const pages = {visao,projetos,mensagens,entregas,reunioes,servicos,agentes,chat}
+      document.getElementById('app').innerHTML = (pages[state.view] || visao)()
+      document.getElementById('sidebar').classList.remove('open')
+    }
+
+    window.addEventListener('hashchange', render)
+    render()
+    loadData()
+  </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script id="sualuma-supabase-auth-guard">
+(function(){
+  if (window.__sualumaSupabaseAuthGuardV2) return;
+  window.__sualumaSupabaseAuthGuardV2 = true;
+
+  const SUPABASE_URL = 'https://vadljxyykrhyeuarzyat.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_1O8rZojnDMZeYkBOtFF6jA_8m64Y-Yo';
+  const API_ROOT = location.hostname.includes('meuservico')
+    ? 'https://meuservico.sualuma.online'
+    : 'https://dashboardcliente.sualuma.online';
+
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.sualumaSupabase = supabaseClient;
+
+  const originalFetch = window.fetch.bind(window);
+
+  function setCookie(name, value, maxAge) {
+    document.cookie = name + '=' + encodeURIComponent(value || '') + '; Domain=.sualuma.online; Path=/; Max-Age=' + maxAge + '; Secure; SameSite=Lax';
+  }
+
+  function getCookie(name) {
+    return document.cookie.split('; ').find(row => row.startsWith(name + '='))?.split('=')[1] || '';
+  }
+
+  function clearCookie(name) {
+    document.cookie = name + '=; Domain=.sualuma.online; Path=/; Max-Age=0; Secure; SameSite=Lax';
+  }
+
+  async function syncCookiesFromSession() {
+    const { data } = await supabaseClient.auth.getSession();
+    const session = data?.session;
+
+    if (session?.access_token) {
+      setCookie('sualuma_access_token', session.access_token, 60 * 60 * 24 * 7);
+      setCookie('sualuma_refresh_token', session.refresh_token || '', 60 * 60 * 24 * 30);
+    }
+
+    return session || null;
+  }
+
+  async function restoreSessionFromCookies() {
+    const current = await supabaseClient.auth.getSession();
+    if (current?.data?.session) return current.data.session;
+
+    const accessToken = decodeURIComponent(getCookie('sualuma_access_token'));
+    const refreshToken = decodeURIComponent(getCookie('sualuma_refresh_token'));
+
+    if (accessToken && refreshToken) {
+      const { data } = await supabaseClient.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken
+      });
+
+      return data?.session || null;
+    }
+
+    return null;
+  }
+
+  window.fetch = async function(input, init) {
+    init = init || {};
+
+    let url = '';
+    try {
+      url = typeof input === 'string' ? input : input.url;
+    } catch(e) {}
+
+    const shouldAttachToken =
+      url.includes('/api/') ||
+      url.startsWith('https://dashboardcliente.sualuma.online/api/') ||
+      url.startsWith('https://meuservico.sualuma.online/api/');
+
+    if (shouldAttachToken) {
+      await restoreSessionFromCookies();
+      const { data } = await supabaseClient.auth.getSession();
+      const token = data?.session?.access_token || decodeURIComponent(getCookie('sualuma_access_token'));
+
+      if (token) {
+        const headers = new Headers(init.headers || {});
+        headers.set('Authorization', 'Bearer ' + token);
+        init.headers = headers;
+      }
+    }
+
+    return originalFetch(input, init);
+  };
+
+  function roleFromPage() {
+    if (location.hostname.includes('meuservico') && (
+      location.hash.includes('prestador') ||
+      location.hash.includes('github') ||
+      location.hash.includes('whatsapp') ||
+      location.hash.includes('comunidade') ||
+      location.hash.includes('indicacoes')
+    )) return 'provider';
+
+    return 'client';
+  }
+
+  function requiresAuth() {
+    if (location.hostname.includes('dashboardcliente')) return true;
+
+    if (location.hostname.includes('meuservico') && (
+      location.hash.includes('prestador') ||
+      location.hash.includes('github') ||
+      location.hash.includes('whatsapp') ||
+      location.hash.includes('comunidade') ||
+      location.hash.includes('indicacoes')
+    )) return true;
+
+    return false;
+  }
+
+  function ensureStyle() {
+    if (document.getElementById('sualuma-auth-style')) return;
+
+    const style = document.createElement('style');
+    style.id = 'sualuma-auth-style';
+    style.textContent = `
+      .sualuma-auth-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 999999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 22px;
+        background:
+          radial-gradient(circle at 15% 15%, rgba(24,242,255,.24), transparent 30%),
+          radial-gradient(circle at 85% 10%, rgba(141,92,255,.34), transparent 32%),
+          rgba(3,5,18,.94);
+        backdrop-filter: blur(18px);
+        color: #fff;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      .sualuma-auth-box {
+        width: min(460px, 100%);
+        border: 1px solid rgba(150,170,255,.24);
+        border-radius: 30px;
+        padding: 26px;
+        background: linear-gradient(135deg, rgba(17,22,61,.96), rgba(7,10,31,.96));
+        box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      }
+
+      .sualuma-auth-box h2 {
+        font-size: 30px;
+        line-height: 1;
+        margin: 0 0 10px;
+      }
+
+      .sualuma-auth-box p {
+        margin: 0 0 18px;
+        color: #cbd5ff;
+        line-height: 1.5;
+      }
+
+      .sualuma-auth-box label {
+        display: block;
+        font-size: 12px;
+        color: #aebdff;
+        font-weight: 800;
+        margin: 12px 0 6px;
+      }
+
+      .sualuma-auth-box input,
+      .sualuma-auth-box select {
+        width: 100%;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 16px;
+        padding: 13px 14px;
+        outline: 0;
+        color: white;
+        background: rgba(255,255,255,.07);
+      }
+
+      .sualuma-auth-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .sualuma-auth-btn {
+        border: 0;
+        cursor: pointer;
+        border-radius: 16px;
+        padding: 13px 14px;
+        color: #fff;
+        font-weight: 950;
+        background: linear-gradient(135deg, #8d5cff, #18f2ff);
+      }
+
+      .sualuma-auth-btn.secondary {
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.14);
+      }
+
+      .sualuma-auth-message {
+        min-height: 22px;
+        margin-top: 12px;
+        color: #9ff8ff;
+        font-weight: 750;
+        font-size: 13px;
+      }
+
+      .sualuma-auth-userbar {
+        position: fixed;
+        right: 18px;
+        top: 92px;
+        z-index: 99999;
+        display: none;
+        gap: 8px;
+        align-items: center;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 999px;
+        padding: 8px 10px;
+        background: rgba(8,10,28,.74);
+        backdrop-filter: blur(16px);
+        color: white;
+        font-family: Inter, system-ui, sans-serif;
+        font-size: 12px;
+      }
+
+      .sualuma-auth-userbar button {
+        border: 0;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 7px 9px;
+        color: white;
+        font-weight: 800;
+        background: rgba(255,255,255,.10);
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function ensureOverlay() {
+    ensureStyle();
+
+    if (document.getElementById('sualumaAuthOverlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'sualumaAuthOverlay';
+    overlay.className = 'sualuma-auth-overlay';
+    overlay.innerHTML = `
+      <div class="sualuma-auth-box">
+        <h2>Entrar na Sualuma</h2>
+        <p>Use seu e-mail e senha. A mesma conta vale para cliente e prestador.</p>
+
+        <label>Nome</label>
+        <input id="sualumaAuthName" placeholder="Seu nome" autocomplete="name" />
+
+        <label>E-mail</label>
+        <input id="sualumaAuthEmail" type="email" placeholder="voce@email.com" autocomplete="email" />
+
+        <label>Senha</label>
+        <input id="sualumaAuthPassword" type="password" placeholder="Sua senha" autocomplete="current-password" />
+
+        <label>Tipo de acesso</label>
+        <select id="sualumaAuthRole">
+          <option value="client">Cliente / Empresa</option>
+          <option value="provider">Prestador de serviço</option>
+        </select>
+
+        <div class="sualuma-auth-actions">
+          <button class="sualuma-auth-btn" id="sualumaLoginBtn">Entrar</button>
+          <button class="sualuma-auth-btn secondary" id="sualumaSignupBtn">Criar conta</button>
+        </div>
+
+        <div class="sualuma-auth-message" id="sualumaAuthMessage"></div>
+      </div>
+    `;
+
+    const userbar = document.createElement('div');
+    userbar.id = 'sualumaAuthUserbar';
+    userbar.className = 'sualuma-auth-userbar';
+    userbar.innerHTML = `
+      <span id="sualumaAuthUserEmail"></span>
+      <button id="sualumaLogoutBtn">Sair</button>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(userbar);
+
+    document.getElementById('sualumaAuthRole').value = roleFromPage();
+    document.getElementById('sualumaLoginBtn').onclick = login;
+    document.getElementById('sualumaSignupBtn').onclick = signup;
+    document.getElementById('sualumaLogoutBtn').onclick = logout;
+  }
+
+  function message(text) {
+    const el = document.getElementById('sualumaAuthMessage');
+    if (el) el.textContent = text || '';
+  }
+
+  function formValues() {
+    return {
+      name: document.getElementById('sualumaAuthName')?.value?.trim() || '',
+      email: document.getElementById('sualumaAuthEmail')?.value?.trim() || '',
+      password: document.getElementById('sualumaAuthPassword')?.value || '',
+      role: document.getElementById('sualumaAuthRole')?.value || roleFromPage()
+    };
+  }
+
+  async function boot(role) {
+    await restoreSessionFromCookies();
+    const { data } = await supabaseClient.auth.getSession();
+    const token = data?.session?.access_token || decodeURIComponent(getCookie('sualuma_access_token'));
+
+    if (!token) return null;
+
+    const response = await originalFetch(API_ROOT + '/api/platform/me', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ role })
+    });
+
+    return response.json();
+  }
+
+  async function login() {
+    const values = formValues();
+
+    if (!values.email || !values.password) {
+      message('Preencha e-mail e senha.');
+      return;
+    }
+
+    message('Entrando...');
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: values.email,
+      password: values.password
+    });
+
+    if (error) {
+      message(error.message || 'Erro ao entrar.');
+      return;
+    }
+
+    await syncCookiesFromSession();
+    await boot(values.role);
+
+    message('Login feito com sucesso.');
+    location.reload();
+  }
+
+  async function signup() {
+    const values = formValues();
+
+    if (!values.email || !values.password) {
+      message('Preencha e-mail e senha.');
+      return;
+    }
+
+    message('Criando conta...');
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: {
+        emailRedirectTo: 'https://sualuma.online/auth/callback?next=' + encodeURIComponent(location.href),
+        data: {
+          full_name: values.name,
+          role: values.role
+        }
+      }
+    });
+
+    if (error) {
+      message(error.message || 'Erro ao criar conta.');
+      return;
+    }
+
+    if (!data.session) {
+      message('Conta criada. Confirme seu e-mail, se o Supabase pedir, e depois faça login.');
+      return;
+    }
+
+    await syncCookiesFromSession();
+    await boot(values.role);
+
+    message('Conta criada com sucesso.');
+    location.reload();
+  }
+
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    clearCookie('sualuma_access_token');
+    clearCookie('sualuma_refresh_token');
+    location.reload();
+  }
+
+  async function refreshAuthState() {
+    ensureOverlay();
+
+    await restoreSessionFromCookies();
+    const { data } = await supabaseClient.auth.getSession();
+    const session = data?.session;
+
+    const overlay = document.getElementById('sualumaAuthOverlay');
+    const userbar = document.getElementById('sualumaAuthUserbar');
+    const email = document.getElementById('sualumaAuthUserEmail');
+
+    if (!session) {
+      overlay.style.display = requiresAuth() ? 'flex' : 'none';
+      userbar.style.display = 'none';
+      return;
+    }
+
+    await syncCookiesFromSession();
+
+    overlay.style.display = 'none';
+    userbar.style.display = 'flex';
+    email.textContent = session.user?.email || 'logado';
+
+    await boot(roleFromPage());
+
+    try {
+      if (typeof window.loadProvider === 'function') window.loadProvider();
+      if (typeof window.loadData === 'function') window.loadData();
+    } catch(e) {}
+  }
+
+  window.addEventListener('hashchange', function() {
+    const roleSelect = document.getElementById('sualumaAuthRole');
+    if (roleSelect) roleSelect.value = roleFromPage();
+    refreshAuthState();
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshAuthState);
+  } else {
+    refreshAuthState();
+  }
+})();
+</script>
+
+<style id="sualuma-client-switch-service-style">
+  .sualuma-client-service-switch {
+    position: fixed;
+    right: 18px;
+    top: 18px;
+    z-index: 99998;
+    border-radius: 999px;
+    padding: 11px 14px;
+    text-decoration: none;
+    color: white;
+    font-size: 12px;
+    font-weight: 950;
+    border: 1px solid rgba(255,255,255,.14);
+    background: linear-gradient(135deg, #8d5cff, #18f2ff);
+    box-shadow: 0 14px 38px rgba(24,242,255,.18);
+  }
+
+  @media(max-width: 760px) {
+    .sualuma-client-service-switch {
+      top: auto;
+      right: 16px;
+      left: 16px;
+      bottom: 16px;
+      text-align: center;
+    }
+  }
+</style>
+
+<a id="sualumaClientServiceSwitch" class="sualuma-client-service-switch" href="https://meuservico.sualuma.online#prestador">
+  Dashboard de serviço
+</a>
+
+<style id="sualuma-safe-auth-bubble-cleaner-v8-style">
+  .sualuma-auth-bubble-v8-hide {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+</style>
+
+<script id="sualuma-safe-auth-bubble-cleaner-v8-script">
+(function () {
+  if (window.__sualumaSafeAuthBubbleCleanerV8) return;
+  window.__sualumaSafeAuthBubbleCleanerV8 = true;
+
+  function isSualumaDashboard() {
+    return location.hostname.includes('meuservico.sualuma.online') ||
+           location.hostname.includes('dashboardcliente.sualuma.online');
+  }
+
+  function cleanOldClasses() {
+    document.querySelectorAll('.sualuma-hidden-legacy-auth, .sualuma-old-auth-bubble-hidden').forEach(function (el) {
+      el.classList.remove('sualuma-hidden-legacy-auth');
+      el.classList.remove('sualuma-old-auth-bubble-hidden');
+      el.style.display = '';
+      el.style.opacity = '';
+      el.style.visibility = '';
+      el.style.pointerEvents = '';
+    });
+  }
+
+  function textOf(el) {
+    return String(el.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function hideFloatingAuthBubble() {
+    if (!isSualumaDashboard()) return;
+
+    cleanOldClasses();
+
+    var all = Array.from(document.querySelectorAll('body *'));
+
+    all.forEach(function (el) {
+      if (!el || !el.getBoundingClientRect) return;
+
+      if (el.closest('#sualumaProviderDashboardV7')) return;
+      if (el.closest('#sualumaClientServiceSwitch')) return;
+
+      var txt = textOf(el);
+
+      if (!txt.includes('@')) return;
+      if (!/sair/i.test(txt)) return;
+
+      var rect = el.getBoundingClientRect();
+      var style = window.getComputedStyle(el);
+
+      var smallEnough =
+        rect.width >= 90 &&
+        rect.width <= 520 &&
+        rect.height >= 24 &&
+        rect.height <= 170;
+
+      var looksFloating =
+        style.position === 'fixed' ||
+        style.position === 'absolute' ||
+        rect.top < 180 ||
+        rect.right > window.innerWidth - 520;
+
+      if (smallEnough && looksFloating) {
+        el.classList.add('sualuma-auth-bubble-v8-hide');
+      }
+    });
+  }
+
+  window.addEventListener('load', hideFloatingAuthBubble);
+  window.addEventListener('hashchange', hideFloatingAuthBubble);
+  document.addEventListener('DOMContentLoaded', hideFloatingAuthBubble);
+
+  setTimeout(hideFloatingAuthBubble, 300);
+  setTimeout(hideFloatingAuthBubble, 1000);
+  setTimeout(hideFloatingAuthBubble, 2000);
+  setInterval(hideFloatingAuthBubble, 1500);
+})();
+</script>
+
+</body>
+</html>
