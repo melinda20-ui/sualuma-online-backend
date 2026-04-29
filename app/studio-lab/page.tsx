@@ -1933,6 +1933,131 @@ function LiveCnpjView({ fallbackRows }: { fallbackRows: LiveCnpjNotification[] }
 }
 
 
+
+type LiveSubdomain = {
+  name: string;
+  status?: string;
+  tone?: Tone;
+  links?: string[];
+};
+
+function LiveSubdomainsView({ fallbackRows }: { fallbackRows: LiveSubdomain[] }) {
+  const [rows, setRows] = useState<LiveSubdomain[]>(fallbackRows);
+  const [source, setSource] = useState("visual");
+  const [selected, setSelected] = useState<LiveSubdomain | null>(fallbackRows?.[0] || null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSubdomains() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveRows = payload?.data?.subdomainRows;
+
+        if (!cancelled && Array.isArray(liveRows) && liveRows.length > 0) {
+          setRows(liveRows);
+          setSelected(liveRows[0]);
+          setSource(payload?.source || "api");
+        }
+      } catch (error) {
+        console.error("[Studio Lab] Falha ao carregar Subdomínios do banco:", error);
+      }
+    }
+
+    loadSubdomains();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const onlineRows = rows.filter((item) => item.status === "Online" || item.status === "Ativo");
+  const attentionRows = rows.filter((item) => item.tone === "yellow" || item.tone === "red");
+  const totalLinks = rows.reduce((acc, item) => acc + (item.links?.length || 0), 0);
+
+  return (
+    <>
+      <section className="metric-grid">
+        <MetricCard title="Subdomínios" value={String(rows.length)} detail="Áreas principais do ecossistema" tone="pink" />
+        <MetricCard title="Online/ativos" value={String(onlineRows.length)} detail="Subdomínios funcionando" tone="green" />
+        <MetricCard title="Links mapeados" value={String(totalLinks)} detail="Rotas cadastradas no sitemap interno" tone="blue" />
+        <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados carregados da API do Studio" tone="yellow" />
+      </section>
+
+      <section className="lower-grid">
+        <div className="panel">
+          <PanelTitle eyebrow="Raiz do Site" title="Subdomínios monitorados" action={source === "postgres" ? "Banco conectado" : "Visual"} />
+
+          <div className="subdomain-grid">
+            {rows.map((item) => (
+              <button
+                key={item.name}
+                className={`subdomain-card ${selected?.name === item.name ? "active" : ""}`}
+                onClick={() => setSelected(item)}
+                type="button"
+              >
+                <ToneDot tone={item.tone || "blue"} />
+                <strong>{item.name}</strong>
+                <span>{item.status || "monitorar"}</span>
+                <small>{item.links?.length || 0} links</small>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel">
+          <PanelTitle eyebrow="Sitemap" title={selected?.name || "Selecione um subdomínio"} />
+
+          {(selected?.links || []).map((link) => (
+            <DataRow
+              key={`${selected?.name}-${link}`}
+              title={link}
+              detail={`Rota cadastrada dentro de ${selected?.name}`}
+              value="monitorar"
+              tone={selected?.tone || "blue"}
+            />
+          ))}
+
+          {(!selected?.links || selected.links.length === 0) && (
+            <DataRow
+              title="Nenhum link cadastrado"
+              detail="Quando adicionarmos links no banco, eles aparecem aqui."
+              value="vazio"
+              tone="yellow"
+            />
+          )}
+        </div>
+      </section>
+
+      <section className="panel full">
+        <PanelTitle eyebrow="Monitoramento" title="Alertas e próximos passos dos subdomínios" action="Agente Sitemap futuro" />
+
+        <div className="store-table">
+          {rows.map((item) => (
+            <div key={item.name} className="store-row">
+              <ToneDot tone={item.tone || "blue"} />
+              <div>
+                <strong>{item.name}</strong>
+                <p>
+                  Status: {item.status || "monitorar"} • Links cadastrados: {item.links?.length || 0}
+                </p>
+              </div>
+              <button>{item.status || "status"}</button>
+              <button>Ver sitemap</button>
+              <button>Checar depois</button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
@@ -2406,38 +2531,7 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "sitemap" && (
-          <>
-            <section className="panel full">
-              <PanelTitle eyebrow="Subdomínios" title="Mapa do ecossistema Sualuma" action="Verificar todos" />
-
-              <div className="subdomain-grid">
-                {subdomainRows.map((item) => (
-                  <button
-                    key={item.name}
-                    className={`subdomain-card ${selectedSubdomain.name === item.name ? "selected" : ""} ${item.tone}`}
-                    onClick={() => setSelectedSubdomain(item)}
-                  >
-                    <ToneDot tone={item.tone} />
-                    <strong>{item.name}</strong>
-                    <span>{item.status}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="sitemap-detail">
-                <PanelTitle eyebrow="Sitemap do subdomínio" title={selectedSubdomain.name} />
-                <div className="sitemap-list">
-                  {selectedSubdomain.links.map((link) => (
-                    <div key={link} className="sitemap-line">
-                      <ToneDot tone={selectedSubdomain.tone} />
-                      <strong>{link}</strong>
-                      <span>monitorar</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-          </>
+          <LiveSubdomainsView fallbackRows={subdomainRows} />
         )}
 
         {activeView === "mia" && (
