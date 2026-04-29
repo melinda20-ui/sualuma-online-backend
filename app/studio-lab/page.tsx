@@ -3016,7 +3016,12 @@ export default function StudioLabPage() {
           <>
             <section className="finance-hero">
               <div className="finance-main-card">
-                <PanelTitle eyebrow="Financeiro estratégico" title="Painel de dinheiro, custos e reinvestimento" action="Conectar banco" />
+                <PanelTitle eyebrow="Financeiro estratégico" title="Painel de dinheiro, custos e reinvestimento" action="Banco conectado" />
+                
+                <div className="finance-live-badge">
+                  <span>Banco conectado ao Postgres</span>
+                  <strong>Dados demonstrativos até conectar Stripe</strong>
+                </div>
 
                 <div className="finance-big-number">
                   <small>Saldo operacional estimado</small>
@@ -3574,6 +3579,32 @@ export default function StudioLabPage() {
           backdrop-filter: blur(24px);
           border-radius: 28px;
           padding: 22px;
+        }
+
+        .finance-live-badge {
+          display: inline-flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 14px;
+          padding: 10px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(250,204,21,.25);
+          background: rgba(250,204,21,.08);
+          color: rgba(255,255,255,.72);
+          font-size: 12px;
+        }
+
+        .finance-live-badge span {
+          color: #22c55e;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: .08em;
+        }
+
+        .finance-live-badge strong {
+          color: #facc15;
+          font-weight: 900;
         }
 
         .finance-big-number {
