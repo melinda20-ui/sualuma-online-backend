@@ -9,6 +9,9 @@ type StudioView =
   | "relatorios"
   | "blog"
   | "email"
+  | "tarefas"
+  | "suporte"
+  | "cnpj"
   | "sitemap"
   | "mia"
   | "agentes"
@@ -42,7 +45,10 @@ const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = 
   { id: "relatorios", label: "Relatórios", icon: "📊" },
   { id: "blog", label: "Relatórios Blog", icon: "📝", badge: "Novo" },
   { id: "email", label: "Relatórios E-mail", icon: "📨", badge: "Novo" },
-  { id: "sitemap", label: "Raiz do Site", icon: "🧬", badge: "12" },
+  { id: "tarefas", label: "Tarefas do Sistema", icon: "✅", badge: "24" },
+  { id: "suporte", label: "Suporte", icon: "🛟", badge: "5" },
+  { id: "sitemap", label: "Subdomínios", icon: "🧬", badge: "12" },
+  { id: "cnpj", label: "CNPJ", icon: "🧾", badge: "Novo" },
   { id: "mia", label: "Painel da Mia", icon: "🧠" },
   { id: "agentes", label: "Agentes", icon: "🤖", badge: "9" },
   { id: "servicos", label: "Serviços", icon: "🧰" },
@@ -1004,6 +1010,91 @@ const financeCostBars = [
   { label: "Infra", value: "18%", tone: "blue" as Tone },
 ];
 
+
+const systemTaskRows = [
+  { title: "Corrigir páginas de entrada", detail: "Home, blog, planos e páginas de captura precisam estar sem erro para receber leads.", value: "em risco", tone: "red" as Tone, tag: "Sistema" },
+  { title: "Ativar rastreio por subdomínio", detail: "Monitorar tráfego e origem dos leads por área do ecossistema.", value: "em andamento", tone: "yellow" as Tone, tag: "Marketing" },
+  { title: "Finalizar UX da árvore", detail: "Mapear jornadas principais e transformar em fluxos conectados ao banco.", value: "ativo", tone: "pink" as Tone, tag: "UX" },
+  { title: "Criar Agente Sitemap", detail: "Detectar páginas quebradas automaticamente e alimentar notificações.", value: "em andamento", tone: "green" as Tone, tag: "Agentes" },
+  { title: "Melhorar onboarding", detail: "Diminuir abandono depois do cadastro e guiar usuário até a primeira ação.", value: "em risco", tone: "red" as Tone, tag: "Usuários" },
+  { title: "Conectar financeiro ao banco", detail: "Trocar dados mockados por dados reais do Supabase e Stripe depois.", value: "ativo", tone: "blue" as Tone, tag: "Financeiro" },
+];
+
+const supportRows = [
+  { title: "Usuário travou no login", detail: "Falha provável: confirmação de e-mail ou sessão expirada.", value: "urgente", tone: "red" as Tone },
+  { title: "Pagamento pendente", detail: "Usuário tentou contratar plano, mas não completou checkout.", value: "verificar", tone: "yellow" as Tone },
+  { title: "Erro ao abrir área de serviços", detail: "Possível falha de permissão ou plano sem acesso liberado.", value: "suporte", tone: "pink" as Tone },
+  { title: "Dúvida sobre proposta", detail: "Empresa quer contratar, mas não sabe qual fluxo seguir.", value: "oportunidade", tone: "green" as Tone },
+];
+
+const serviceDeepRows = [
+  { title: "Catálogo de serviços", detail: "Listagem de serviços ativos, pausados, em análise e sem categoria.", value: "42 ativos", tone: "green" as Tone },
+  { title: "Empresas sem contratação", detail: "Entraram, visualizaram, mas não fecharam nenhum prestador.", value: "13 empresas", tone: "yellow" as Tone },
+  { title: "Gargalo de briefing", detail: "Muitas empresas param antes de explicar o que precisam.", value: "alto impacto", tone: "red" as Tone },
+  { title: "Prestadores parados", detail: "Profissionais cadastrados que ainda não receberam oportunidade.", value: "8 perfis", tone: "blue" as Tone },
+  { title: "Serviços mais procurados", detail: "Sites, automação, social media e suporte com IA.", value: "top 4", tone: "pink" as Tone },
+];
+
+const userControlRows = [
+  { title: "Ana Paula", detail: "Premium • última sessão há 4 min • usando área de serviços normalmente.", value: "ativo", tone: "green" as Tone },
+  { title: "Carlos Lima", detail: "Free • parou na tela de login • possível e-mail não confirmado.", value: "erro login", tone: "red" as Tone },
+  { title: "Marina Alves", detail: "Prime • checkout iniciado, pagamento pendente, acesso ainda não liberado.", value: "pendente", tone: "yellow" as Tone },
+  { title: "João Pedro", detail: "Pro • sessão ativa • pediu suporte em proposta de serviço.", value: "suporte", tone: "blue" as Tone },
+];
+
+const userActionRows = [
+  { title: "Liberar acesso", detail: "Ativar acesso manual para um usuário sem entrar no Supabase.", value: "ação futura", tone: "green" as Tone },
+  { title: "Cancelar acesso", detail: "Bloquear plano, área ou recurso específico de um usuário.", value: "ação futura", tone: "red" as Tone },
+  { title: "Ver jornada", detail: "Abrir histórico de páginas, erros, cliques e último ponto onde parou.", value: "prioridade", tone: "pink" as Tone },
+  { title: "Reenviar e-mail", detail: "Reenviar confirmação, boas-vindas ou link de acesso.", value: "útil", tone: "blue" as Tone },
+];
+
+const subdomainRows = [
+  {
+    name: "sualuma.online",
+    status: "Online",
+    tone: "green" as Tone,
+    links: ["/", "/planos", "/login", "/cadastro", "/site-service", "/site-demo-request"],
+  },
+  {
+    name: "blog.sualuma.online",
+    status: "Online",
+    tone: "green" as Tone,
+    links: ["/", "/posts", "/categorias/ia", "/categorias/automacao", "/sitemap.xml"],
+  },
+  {
+    name: "studio.sualuma.online",
+    status: "Ativo",
+    tone: "pink" as Tone,
+    links: ["/studio-lab", "/studio", "/studio/ux-tree", "/admin", "/admin/leads"],
+  },
+  {
+    name: "trabalhosja.sualuma.online",
+    status: "Atenção",
+    tone: "yellow" as Tone,
+    links: ["/", "/comunidade", "/perfil", "/posts", "/api/comunidade/posts"],
+  },
+  {
+    name: "sospublicidade.sualuma.online",
+    status: "Verificar",
+    tone: "red" as Tone,
+    links: ["/", "/obrigada", "/campanha", "/api/leads"],
+  },
+];
+
+const cnpjNotificationRows = [
+  { title: "Declaração mensal", detail: "Verificar se há pendência ou obrigação recorrente do mês.", value: "atenção", tone: "yellow" as Tone },
+  { title: "Comprovantes e notas", detail: "Organizar documentos enviados e pendentes para não perder histórico.", value: "organizar", tone: "blue" as Tone },
+  { title: "Situação cadastral", detail: "Monitorar se o CNPJ segue regular e sem alerta crítico.", value: "ok", tone: "green" as Tone },
+];
+
+const cnpjDeepRows = [
+  { title: "Situação do CNPJ", detail: "Acompanhar se está ativo, regular, pendente ou com alguma restrição.", value: "regular", tone: "green" as Tone },
+  { title: "Obrigações do mês", detail: "Guias, declarações, notas, comprovantes e prazos importantes.", value: "3 itens", tone: "yellow" as Tone },
+  { title: "Documentos salvos", detail: "Notas fiscais, comprovantes, certificados e documentos do negócio.", value: "28 docs", tone: "blue" as Tone },
+  { title: "Alertas importantes", detail: "Pendências que podem prejudicar emissão, venda ou regularidade.", value: "1 alerta", tone: "red" as Tone },
+];
+
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
 }
@@ -1076,6 +1167,7 @@ function DataRow({
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
+  const [selectedSubdomain, setSelectedSubdomain] = useState(subdomainRows[0]);
 
   const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || tabs[0], [activeView]);
 
@@ -1148,10 +1240,10 @@ export default function StudioLabPage() {
 
                   {[
                     ["UX", "🌳", "Árvore", "left-1"],
-                    ["Relatórios", "📊", "Indicadores", "left-2"],
-                    ["Sitemap", "🧬", "12 links", "left-3"],
+                    ["Tarefas", "✅", "24 itens", "left-2"],
+                    ["Subdomínios", "🧬", "5 áreas", "left-3"],
                     ["Usuários", "👥", "3 alertas", "right-1"],
-                    ["Agentes", "🤖", "9 ativos", "right-2"],
+                    ["Suporte", "🛟", "5 tickets", "right-2"],
                     ["Financeiro", "💎", "+18%", "right-3"],
                   ].map(([title, icon, status, pos]) => (
                     <button key={title} className={`orbit-node ${pos}`}>
@@ -1172,18 +1264,34 @@ export default function StudioLabPage() {
                       <span>Saudável</span>
                     </div>
                   </div>
-                  <p className="muted">O sistema está bem, mas onboarding e páginas quebradas precisam revisão.</p>
+                  <p className="muted">O sistema está bem, mas onboarding, suporte e páginas quebradas precisam revisão.</p>
                 </div>
 
                 <div className="panel compact">
                   <PanelTitle eyebrow="Sugestão da Mia" title="Próxima melhoria" />
                   <DataRow
-                    title="Criar Agente Sitemap"
-                    detail="Detectar páginas quebradas e alimentar notificações automaticamente."
+                    title="Criar central de suporte"
+                    detail="Ver erro, acesso, sessão e histórico do usuário sem abrir Supabase."
                     value="alto impacto"
                     tone="green"
                   />
                 </div>
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="CNPJ" title="Notificações rápidas da empresa" action="Ver CNPJ" />
+                {cnpjNotificationRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Tarefas do Sistema" title="O que precisa atenção agora" />
+                {systemTaskRows.slice(0, 4).map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
               </div>
             </section>
           </>
@@ -1302,23 +1410,122 @@ export default function StudioLabPage() {
           </>
         )}
 
-        {activeView === "sitemap" && (
-          <section className="panel full">
-            <PanelTitle eyebrow="Raiz do site" title="Sitemap vivo por domínio e subdomínio" action="Verificar agora" />
-            <div className="sitemap-grid">
-              {sitemapItems.map((item) => (
-                <div key={`${item.area}-${item.path}`} className={`site-card ${item.tone}`}>
-                  <div>
-                    <ToneDot tone={item.tone} />
-                    <strong>{item.area}</strong>
+        {activeView === "tarefas" && (
+          <>
+            <section className="metric-grid">
+              <MetricCard title="Em risco" value="6" detail="Itens que travam leads, venda ou acesso" tone="red" />
+              <MetricCard title="Em andamento" value="9" detail="Tarefas sendo construídas agora" tone="yellow" />
+              <MetricCard title="Ativas" value="7" detail="Áreas funcionando e monitoradas" tone="green" />
+              <MetricCard title="Backlog" value="12" detail="Ideias e melhorias futuras" tone="blue" />
+            </section>
+
+            <section className="panel full">
+              <PanelTitle eyebrow="Tarefas do Sistema" title="Tudo catalogado por status e prioridade" action="Nova tarefa" />
+              <div className="task-board">
+                {["em risco", "em andamento", "ativo"].map((status) => (
+                  <div key={status} className="task-column">
+                    <h3>{status}</h3>
+                    {systemTaskRows.filter((item) => item.value === status).map((item) => (
+                      <div key={item.title} className={`task-card ${item.tone}`}>
+                        <strong>{item.title}</strong>
+                        <p>{item.detail}</p>
+                        <span>{item.tag}</span>
+                      </div>
+                    ))}
                   </div>
-                  <h3>{item.path}</h3>
-                  <p>{item.status}</p>
-                  <em>{item.response}</em>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "suporte" && (
+          <>
+            <section className="metric-grid">
+              <MetricCard title="Tickets abertos" value="5" detail="Pedidos que precisam resposta" tone="red" />
+              <MetricCard title="Tempo médio" value="8.2s" detail="Tempo de análise da Mia" tone="blue" />
+              <MetricCard title="Resolvidos" value="18" detail="Últimos 7 dias" tone="green" />
+              <MetricCard title="Oportunidades" value="4" detail="Suporte que pode virar venda" tone="pink" />
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Central de Suporte" title="Chamados e travas dos usuários" action="Novo ticket" />
+                {supportRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="O que resolver" title="Diagnóstico rápido" />
+                <DataRow title="Login e acesso" detail="Principal motivo de suporte nos primeiros usuários." value="prioridade" tone="red" />
+                <DataRow title="Pagamento e plano" detail="Usuário precisa enxergar status e liberação." value="importante" tone="yellow" />
+                <DataRow title="Área de serviços" detail="Dúvidas podem virar contratação se a resposta for boa." value="vendas" tone="green" />
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "cnpj" && (
+          <>
+            <section className="metric-grid">
+              <MetricCard title="Situação" value="Regular" detail="Resumo demonstrativo do CNPJ" tone="green" />
+              <MetricCard title="Pendências" value="1" detail="Item para verificar no mês" tone="yellow" />
+              <MetricCard title="Documentos" value="28" detail="Notas e comprovantes salvos" tone="blue" />
+              <MetricCard title="Alertas" value="3" detail="Notificações importantes" tone="pink" />
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Relatório CNPJ" title="O que preciso saber sobre minha empresa" action="Atualizar" />
+                {cnpjDeepRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Notificações" title="Acompanhamento do mês" />
+                {cnpjNotificationRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "sitemap" && (
+          <>
+            <section className="panel full">
+              <PanelTitle eyebrow="Subdomínios" title="Mapa do ecossistema Sualuma" action="Verificar todos" />
+
+              <div className="subdomain-grid">
+                {subdomainRows.map((item) => (
+                  <button
+                    key={item.name}
+                    className={`subdomain-card ${selectedSubdomain.name === item.name ? "selected" : ""} ${item.tone}`}
+                    onClick={() => setSelectedSubdomain(item)}
+                  >
+                    <ToneDot tone={item.tone} />
+                    <strong>{item.name}</strong>
+                    <span>{item.status}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="sitemap-detail">
+                <PanelTitle eyebrow="Sitemap do subdomínio" title={selectedSubdomain.name} />
+                <div className="sitemap-list">
+                  {selectedSubdomain.links.map((link) => (
+                    <div key={link} className="sitemap-line">
+                      <ToneDot tone={selectedSubdomain.tone} />
+                      <strong>{link}</strong>
+                      <span>monitorar</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
+              </div>
+            </section>
+          </>
         )}
 
         {activeView === "mia" && (
@@ -1377,11 +1584,30 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "servicos" && (
-          <section className="metric-grid">
-            {serviceSignals.map((item) => (
-              <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
-            ))}
-          </section>
+          <>
+            <section className="metric-grid">
+              {serviceSignals.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Painel de Serviços" title="Controle da área de serviços" action="Novo serviço" />
+                {serviceDeepRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Diagnóstico" title="Onde empresas e prestadores travam" />
+                <DataRow title="Empresa entra, mas não contrata" detail="Precisa melhorar explicação, confiança e exemplos de entrega." value="prioridade" tone="red" />
+                <DataRow title="Prestador cadastra, mas não ativa perfil" detail="Criar checklist guiado para completar portfólio e serviço." value="em andamento" tone="yellow" />
+                <DataRow title="Serviços sem categoria" detail="Catalogar melhor para busca, marketplace e recomendação da Mia." value="organizar" tone="blue" />
+                <DataRow title="Oportunidade" detail="Criar agente que monta briefing e sugere prestador ideal." value="alto ROI" tone="green" />
+              </div>
+            </section>
+          </>
         )}
 
         {activeView === "comunidade" && (
@@ -1411,25 +1637,49 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "usuarios" && (
-          <section className="panel full">
-            <PanelTitle eyebrow="Suporte e acesso" title="Monitoramento de usuários" action="Buscar usuário" />
-            <div className="user-search">🔎 Pesquisar por nome, e-mail, ID, plano ou erro recente...</div>
-            <div className="user-table">
-              {users.map((user) => (
-                <div key={user.email} className="user-row">
-                  <ToneDot tone={user.tone} />
-                  <div>
-                    <strong>{user.name}</strong>
-                    <p>{user.email}</p>
+          <>
+            <section className="metric-grid">
+              <MetricCard title="Usuários ativos" value="1.248" detail="Usuários com sessão ou acesso recente" tone="green" />
+              <MetricCard title="Com erro recente" value="11" detail="Login, pagamento, acesso ou upload" tone="red" />
+              <MetricCard title="Aguardando acesso" value="7" detail="Precisam liberação ou confirmação" tone="yellow" />
+              <MetricCard title="Pedidos de suporte" value="5" detail="Chamados ligados a contas" tone="pink" />
+            </section>
+
+            <section className="panel full">
+              <PanelTitle eyebrow="Controle de acesso" title="Monitoramento de usuários" action="Buscar usuário" />
+              <div className="user-search">🔎 Pesquisar por nome, e-mail, ID, plano, erro ou última página acessada...</div>
+
+              <div className="user-table enhanced">
+                {userControlRows.map((user) => (
+                  <div key={user.title} className="user-row">
+                    <ToneDot tone={user.tone} />
+                    <div>
+                      <strong>{user.title}</strong>
+                      <p>{user.detail}</p>
+                    </div>
+                    <span>{user.value}</span>
+                    <button>Abrir histórico</button>
                   </div>
-                  <span>{user.plan}</span>
-                  <span>{user.last}</span>
-                  <em>{user.issue}</em>
-                  <button>Abrir</button>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Ações futuras" title="O que controlar sem abrir Supabase" />
+                {userActionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Diagnóstico de jornada" title="O que quero enxergar por usuário" />
+                <DataRow title="Onde parou" detail="Última página, último clique e etapa da jornada." value="essencial" tone="pink" />
+                <DataRow title="Por que travou" detail="Erro técnico, limite de acesso, falta de permissão ou dúvida." value="suporte" tone="yellow" />
+                <DataRow title="Como resolver" detail="Botões de ação rápida: liberar, reenviar, resetar, abrir ticket." value="futuro" tone="green" />
+              </div>
+            </section>
+          </>
         )}
 
         {activeView === "saude" && (
@@ -2138,6 +2388,124 @@ export default function StudioLabPage() {
 
         .full { min-height: 650px; }
 
+        .subdomain-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          margin-bottom: 18px;
+        }
+
+        .subdomain-card {
+          min-height: 130px;
+          border-radius: 22px;
+          padding: 18px;
+          color: #fff;
+          text-align: left;
+          cursor: pointer;
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.24);
+        }
+
+        .subdomain-card.selected {
+          outline: 2px solid rgba(255,79,189,.55);
+          box-shadow: 0 0 40px rgba(255,79,189,.22);
+        }
+
+        .subdomain-card strong {
+          display: block;
+          margin: 14px 0 6px;
+          font-size: 18px;
+        }
+
+        .subdomain-card span {
+          color: rgba(255,255,255,.62);
+        }
+
+        .sitemap-detail {
+          margin-top: 18px;
+          padding: 18px;
+          border-radius: 24px;
+          background: rgba(255,255,255,.035);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .sitemap-list {
+          display: grid;
+          gap: 10px;
+        }
+
+        .sitemap-line {
+          display: grid;
+          grid-template-columns: 18px 1fr auto;
+          align-items: center;
+          gap: 12px;
+          padding: 13px;
+          border-radius: 16px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .sitemap-line span {
+          color: #ff9be6;
+          font-size: 12px;
+        }
+
+        .task-board {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+
+        .task-column {
+          min-height: 430px;
+          padding: 14px;
+          border-radius: 22px;
+          background: rgba(255,255,255,.035);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .task-column h3 {
+          margin: 0 0 14px;
+          text-transform: uppercase;
+          letter-spacing: .08em;
+          color: #ff9be6;
+          font-size: 13px;
+        }
+
+        .task-card {
+          padding: 14px;
+          border-radius: 18px;
+          margin-bottom: 10px;
+          border: 1px solid rgba(255,255,255,.10);
+          background: rgba(255,255,255,.045);
+        }
+
+        .task-card strong {
+          display: block;
+          color: #fff;
+        }
+
+        .task-card p {
+          margin: 6px 0 10px;
+          color: rgba(255,255,255,.58);
+          font-size: 13px;
+          line-height: 1.45;
+        }
+
+        .task-card span {
+          display: inline-flex;
+          padding: 6px 9px;
+          border-radius: 999px;
+          color: #fff;
+          background: rgba(255,255,255,.07);
+          font-size: 11px;
+        }
+
+        .user-table.enhanced .user-row {
+          grid-template-columns: 20px 1fr auto auto;
+        }
+
         .sitemap-grid,
         .agent-grid {
           display: grid;
@@ -2316,7 +2684,9 @@ export default function StudioLabPage() {
 
           .metric-grid,
           .sitemap-grid,
-          .agent-grid {
+          .agent-grid,
+          .subdomain-grid,
+          .task-board {
             grid-template-columns: repeat(2, 1fr);
           }
 
@@ -2350,7 +2720,9 @@ export default function StudioLabPage() {
           .metric-grid,
           .sitemap-grid,
           .agent-grid,
-          .idea-list {
+          .idea-list,
+          .subdomain-grid,
+          .task-board {
             grid-template-columns: 1fr;
           }
 
