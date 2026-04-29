@@ -9,6 +9,7 @@ type StudioView =
   | "relatorios"
   | "blog"
   | "email"
+  | "google"
   | "tarefas"
   | "loja"
   | "suporte"
@@ -46,6 +47,7 @@ const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = 
   { id: "relatorios", label: "Relatórios", icon: "📊" },
   { id: "blog", label: "Relatórios Blog", icon: "📝", badge: "Novo" },
   { id: "email", label: "Relatórios E-mail", icon: "📨", badge: "Novo" },
+  { id: "google", label: "Google", icon: "🔎", badge: "Novo" },
   { id: "tarefas", label: "Tarefas do Sistema", icon: "✅", badge: "24" },
   { id: "loja", label: "Admin Loja", icon: "🛍️", badge: "Hub" },
   { id: "suporte", label: "Suporte", icon: "🛟", badge: "5" },
@@ -1183,6 +1185,69 @@ const communityMiaRows = [
   { title: "Monetização", detail: "Tópicos mais pesquisados devem alimentar produtos da loja.", value: "loja", tone: "blue" as Tone },
 ];
 
+
+const googlePresenceCards = [
+  { title: "Receita anúncios", value: "R$ 342,80", detail: "Estimativa demonstrativa do blog", tone: "green" as Tone },
+  { title: "Cliques orgânicos", value: "3.842", detail: "Visitas vindas do Google", tone: "pink" as Tone },
+  { title: "Posição média", value: "18,6", detail: "Ranking médio das palavras-chave", tone: "yellow" as Tone },
+  { title: "Backlinks", value: "27", detail: "Sites mencionando ou linkando a Sualuma", tone: "blue" as Tone },
+];
+
+const googleAdsRows = [
+  { title: "Ganhos com anúncios", detail: "Valor estimado gerado por banners e blocos de anúncio no blog.", value: "R$ 342,80", tone: "green" as Tone },
+  { title: "Impressões de anúncios", detail: "Quantidade de vezes que os anúncios apareceram para visitantes.", value: "42.180", tone: "blue" as Tone },
+  { title: "CTR dos anúncios", detail: "Percentual de pessoas que clicaram nos anúncios exibidos.", value: "1,8%", tone: "yellow" as Tone },
+  { title: "RPM estimado", detail: "Receita estimada a cada mil visualizações monetizadas.", value: "R$ 8,12", tone: "pink" as Tone },
+];
+
+const googleSearchRows = [
+  { title: "Páginas indexadas", detail: "URLs que o Google já reconhece e pode exibir nos resultados.", value: "86 URLs", tone: "green" as Tone },
+  { title: "Páginas com problema", detail: "URLs que precisam revisar erro, canonical, sitemap ou conteúdo fino.", value: "9 URLs", tone: "red" as Tone },
+  { title: "Melhor palavra-chave", detail: "Termo que mais trouxe tráfego orgânico para o ecossistema.", value: "automação com IA", tone: "pink" as Tone },
+  { title: "Oportunidade rápida", detail: "Criar clusters de conteúdo sobre IA, clientes, sites e automações.", value: "alto impacto", tone: "blue" as Tone },
+];
+
+const googleKeywordRows = [
+  { title: "automação com IA", detail: "Boa intenção comercial para vender agentes e automações.", value: "posição 11", tone: "pink" as Tone },
+  { title: "como conseguir clientes online", detail: "Pode ligar blog, comunidade e serviços.", value: "posição 18", tone: "green" as Tone },
+  { title: "site profissional para empresa", detail: "Leva para construção de sites e página de demonstração.", value: "posição 24", tone: "blue" as Tone },
+  { title: "ferramentas para empreendedor", detail: "Pode puxar tráfego para Minha Empresa e Studio.", value: "posição 31", tone: "yellow" as Tone },
+];
+
+const googleBacklinkRows = [
+  { title: "blog parceiro citou Sualuma", detail: "Menção positiva em artigo sobre ferramentas de IA para negócios.", value: "backlink bom", tone: "green" as Tone },
+  { title: "post social sem link", detail: "Alguém mencionou a marca, mas não colocou link para o site.", value: "pedir link", tone: "yellow" as Tone },
+  { title: "diretório de ferramentas", detail: "Possível oportunidade para cadastrar agentes e templates.", value: "oportunidade", tone: "blue" as Tone },
+  { title: "menção sem contexto", detail: "Verificar se a citação está correta e se não prejudica a marca.", value: "analisar", tone: "red" as Tone },
+];
+
+const googleMiaRows = [
+  { title: "Criar cluster SEO", detail: "Organizar posts por temas: IA, automação, sites, clientes e CNPJ.", value: "prioridade", tone: "pink" as Tone },
+  { title: "Melhorar links internos", detail: "Todo post forte deve mandar para loja, serviços, planos ou comunidade.", value: "vendas", tone: "green" as Tone },
+  { title: "Buscar backlinks", detail: "Transformar menções sociais e parcerias em links para o domínio.", value: "autoridade", tone: "blue" as Tone },
+  { title: "Monetização de anúncios", detail: "Testar posição dos anúncios sem prejudicar leitura nem conversão.", value: "otimizar", tone: "yellow" as Tone },
+];
+
+const googleTrendBars = [
+  { label: "IA e automação", value: "42%", tone: "pink" as Tone },
+  { label: "Sites e vendas", value: "28%", tone: "green" as Tone },
+  { label: "CNPJ e empresa", value: "18%", tone: "blue" as Tone },
+  { label: "Templates/skills", value: "12%", tone: "yellow" as Tone },
+];
+
+const socialMentionRows = [
+  { title: "Instagram", detail: "Menções sobre automação, IA e criação de sites.", value: "18 menções", tone: "pink" as Tone },
+  { title: "TikTok", detail: "Conteúdos curtos falando de IA para negócios e renda.", value: "7 menções", tone: "blue" as Tone },
+  { title: "YouTube", detail: "Possível oportunidade de vídeos e comentários citando a marca.", value: "4 menções", tone: "red" as Tone },
+  { title: "Comunidade", detail: "Tópicos internos que podem virar posts, e-mails e produtos.", value: "32 sinais", tone: "green" as Tone },
+];
+
+const socialSentimentRows = [
+  { title: "Sentimento positivo", detail: "Pessoas associando Sualuma a automação, IA e crescimento.", value: "72%", tone: "green" as Tone },
+  { title: "Dúvidas frequentes", detail: "Usuários perguntam preço, como funciona e para quem serve.", value: "18%", tone: "yellow" as Tone },
+  { title: "Críticas ou confusão", detail: "Algumas pessoas ainda não entendem se é serviço, curso ou plataforma.", value: "10%", tone: "red" as Tone },
+];
+
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
 }
@@ -1493,6 +1558,96 @@ export default function StudioLabPage() {
                 <DataRow title="Limpar lista" detail="Remover e-mails inválidos para melhorar entregabilidade" value="72 contatos" tone="red" />
                 <DataRow title="Criar sequência de nutrição" detail="Leads que entraram e ainda não compraram" value="prioridade" tone="pink" />
                 <DataRow title="Testar assunto novo" detail="Melhorar abertura dos próximos disparos" value="A/B test" tone="blue" />
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "google" && (
+          <>
+            <section className="metric-grid">
+              {googlePresenceCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="google-hero">
+              <div className="panel">
+                <PanelTitle eyebrow="Google Ads / AdSense" title="Monetização dos anúncios do blog" action="Conectar conta" />
+                {googleAdsRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Search Console" title="Presença orgânica no Google" action="Auditar SEO" />
+                {googleSearchRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Ranking" title="Palavras-chave para ganhar espaço" />
+                {googleKeywordRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Interesse do Google" title="Temas que mais puxam tráfego" />
+                <div className="google-bars">
+                  {googleTrendBars.map((item) => (
+                    <div key={item.label} className={`google-bar ${item.tone}`}>
+                      <div>
+                        <strong>{item.label}</strong>
+                        <span>{item.value}</span>
+                      </div>
+                      <b style={{ width: item.value }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Backlinks" title="Quem está falando ou linkando a Sualuma" />
+                {googleBacklinkRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Mia para Google" title="Como conquistar mais espaço" />
+                {googleMiaRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="google-social-panel">
+              <div className="panel">
+                <PanelTitle eyebrow="Presença social" title="O que estão falando da Sualuma nas redes" action="Criar alerta" />
+                {socialMentionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Sentimento da marca" title="Resumo do que o público está sentindo" />
+                <div className="social-sentiment">
+                  <div className="sentiment-circle">
+                    <strong>72%</strong>
+                    <span>positivo</span>
+                  </div>
+                  <div>
+                    {socialSentimentRows.map((item) => (
+                      <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
           </>
@@ -2602,6 +2757,77 @@ export default function StudioLabPage() {
 
         .full { min-height: 650px; }
 
+        .google-hero,
+        .google-social-panel {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 18px;
+          margin-top: 18px;
+        }
+
+        .google-bars {
+          display: grid;
+          gap: 16px;
+        }
+
+        .google-bar {
+          display: grid;
+          gap: 8px;
+        }
+
+        .google-bar div {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: center;
+        }
+
+        .google-bar strong {
+          color: #fff;
+        }
+
+        .google-bar span {
+          color: rgba(255,255,255,.62);
+          font-size: 13px;
+        }
+
+        .google-bar b {
+          display: block;
+          height: 14px;
+          border-radius: 999px;
+          background: currentColor;
+          box-shadow: 0 0 22px currentColor;
+        }
+
+        .social-sentiment {
+          display: grid;
+          grid-template-columns: 170px 1fr;
+          gap: 18px;
+          align-items: start;
+        }
+
+        .sentiment-circle {
+          width: 155px;
+          height: 155px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          background: conic-gradient(#22c55e 0 72%, rgba(255,255,255,.08) 72% 100%);
+          box-shadow: 0 0 42px rgba(34,197,94,.24);
+        }
+
+        .sentiment-circle strong {
+          display: block;
+          font-size: 34px;
+          margin-top: 25px;
+        }
+
+        .sentiment-circle span {
+          margin-top: -36px;
+          color: rgba(255,255,255,.62);
+          font-size: 12px;
+        }
+
         .store-table {
           display: grid;
           gap: 12px;
@@ -2981,6 +3207,8 @@ export default function StudioLabPage() {
           .hero-grid,
           .finance-hero,
           .community-hero,
+          .google-hero,
+          .google-social-panel,
           .lower-grid,
           .brain-layout {
             grid-template-columns: 1fr;
@@ -3045,7 +3273,8 @@ export default function StudioLabPage() {
           .moderation-row {
             grid-template-columns: 20px 1fr;
           }
-          .community-retention-chart {
+          .community-retention-chart,
+          .social-sentiment {
             grid-template-columns: 1fr;
           }
           .finance-mini-grid { grid-template-columns: 1fr; }
