@@ -259,7 +259,7 @@ export default function StudioPage() {
           </div>
 
           <div className="tree-stage">
-            <svg className="branch-svg" viewBox="0 0 1000 620" preserveAspectRatio="none">
+            <svg className="branch-svg" viewBox="0 0 1000 630" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="branchGradient" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#ff4fbd" />
@@ -267,7 +267,7 @@ export default function StudioPage() {
                   <stop offset="100%" stopColor="#38bdf8" />
                 </linearGradient>
                 <filter id="glow">
-                  <feGaussianBlur stdDeviation="5" result="coloredBlur" />
+                  <feGaussianBlur stdDeviation="4" result="coloredBlur" />
                   <feMerge>
                     <feMergeNode in="coloredBlur" />
                     <feMergeNode in="SourceGraphic" />
@@ -275,17 +275,33 @@ export default function StudioPage() {
                 </filter>
               </defs>
 
-              <path d="M500 520 C470 395 420 320 260 180" />
-              <path d="M500 500 C420 400 350 330 210 290" />
-              <path d="M500 505 C405 430 325 405 190 410" />
-              <path d="M500 535 C390 515 330 500 260 500" />
-              <path d="M500 510 C520 380 525 260 515 130" />
-              <path d="M500 500 C580 360 650 210 790 170" />
-              <path d="M500 515 C610 420 670 345 780 320" />
-              <path d="M500 525 C620 465 700 425 800 430" />
-              <path d="M500 540 C605 555 690 535 800 515" />
-              <path d="M500 540 C560 575 620 585 670 565" />
-              <path d="M500 520 C610 500 710 590 835 590" />
+              {/* Galhos conectados diretamente nas caixinhas */}
+              <path className="branch branch-entrada" d="M500 320 C420 215 285 95 150 44" />
+              <path className="branch branch-home" d="M500 245 C500 160 492 82 480 25" />
+              <path className="branch branch-cadastro" d="M500 355 C385 290 245 190 100 158" />
+              <path className="branch branch-onboarding" d="M500 405 C380 365 230 292 80 265" />
+              <path className="branch branch-suporte" d="M500 465 C370 455 245 390 100 378" />
+              <path className="branch branch-email" d="M500 520 C430 525 355 485 290 460" />
+              <path className="branch branch-compra" d="M500 300 C600 190 675 85 760 57" />
+              <path className="branch branch-indicacao" d="M500 365 C585 305 645 220 720 195" />
+              <path className="branch branch-prestador" d="M500 425 C595 405 655 320 730 302" />
+              <path className="branch branch-empresa" d="M500 485 C615 485 680 425 740 410" />
+              <path className="branch branch-contratacao" d="M500 540 C520 515 540 495 560 479" />
+              <path className="branch branch-retencao" d="M500 545 C610 560 705 535 770 517" />
+
+              {/* pontinhos de conexão nos cards */}
+              <circle cx="150" cy="44" r="7" />
+              <circle cx="480" cy="25" r="7" />
+              <circle cx="100" cy="158" r="7" />
+              <circle cx="80" cy="265" r="7" />
+              <circle cx="100" cy="378" r="7" />
+              <circle cx="290" cy="460" r="7" />
+              <circle cx="760" cy="57" r="7" />
+              <circle cx="720" cy="195" r="7" />
+              <circle cx="730" cy="302" r="7" />
+              <circle cx="740" cy="410" r="7" />
+              <circle cx="560" cy="479" r="7" />
+              <circle cx="770" cy="517" r="7" />
             </svg>
 
             <div className="magic-tree">
@@ -876,17 +892,26 @@ export default function StudioPage() {
           height: 100%;
           overflow: visible;
           pointer-events: none;
+          z-index: 1;
         }
 
         .branch-svg path {
           fill: none;
           stroke: url(#branchGradient);
-          stroke-width: 9;
+          stroke-width: 6;
           stroke-linecap: round;
           filter: url(#glow);
-          opacity: .82;
+          opacity: .86;
           stroke-dasharray: 1180;
           animation: branchPulse 5s ease-in-out infinite;
+        }
+
+        .branch-svg circle {
+          fill: #ff9be6;
+          stroke: rgba(255, 255, 255, .92);
+          stroke-width: 2;
+          filter: drop-shadow(0 0 12px #ff4fbd);
+          opacity: .96;
         }
 
         @keyframes branchPulse {
@@ -896,6 +921,7 @@ export default function StudioPage() {
 
         .magic-tree {
           position: absolute;
+          z-index: 2;
           left: 50%;
           bottom: 0;
           transform: translateX(-50%);
@@ -1012,6 +1038,7 @@ export default function StudioPage() {
 
         .journey-node {
           position: absolute;
+          z-index: 4;
           width: 175px;
           min-height: 88px;
           transform: translate(-50%, -50%);
@@ -1132,6 +1159,7 @@ export default function StudioPage() {
 
         .flow-popup {
           position: absolute;
+          z-index: 8;
           right: 10px;
           top: 125px;
           width: 330px;
