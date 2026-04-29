@@ -253,13 +253,175 @@ async function readStudioFinanceData(): Promise<any> {
   }
 }
 
+
+function getStripeFallbackData(): any {
+  return {
+    summary: {
+      revenue: "R$ 0,00",
+      successfulPayments: "0",
+      activeSubscriptions: "0",
+      failedPayments: "0",
+      healthScore: 0,
+      statusLabel: "Stripe ainda não conectado",
+      statusDetail: "Base Stripe criada no banco. Falta configurar a chave Stripe e sincronizar pagamentos reais.",
+    },
+    stripeDashboardCards: [
+      { title: "Receita Stripe", value: "R$ 0,00", detail: "Nenhum pagamento real sincronizado ainda.", tone: "yellow" },
+      { title: "Pagamentos aprovados", value: "0", detail: "Aguardando conexão com Stripe.", tone: "blue" },
+      { title: "Assinaturas ativas", value: "0", detail: "Ainda sem usuários pagantes conectados.", tone: "pink" },
+      { title: "Falhas de pagamento", value: "0", detail: "Sem eventos Stripe importados.", tone: "green" },
+    ],
+    stripePaymentRows: [],
+    stripeSubscriptionRows: [],
+    stripeActionRows: [],
+    stripeAlertRows: [],
+    stripeRevenueBars: [],
+  };
+}
+
+function stripeText(row: any, keys: string[], fallbackValue = "") {
+  for (const key of keys) {
+    const value = row?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
+      return String(value);
+    }
+  }
+  return fallbackValue;
+}
+
+function stripeNumberText(row: any, keys: string[], fallbackValue = "0") {
+  for (const key of keys) {
+    const value = row?.[key];
+    if (value !== undefined && value !== null && value !== "") {
+      return String(value);
+    }
+  }
+  return fallbackValue;
+}
+
+function stripeMoney(row: any, textKeys: string[], centKeys: string[], fallbackValue = "R$ 0,00") {
+  for (const key of textKeys) {
+    const value = row?.[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
+      return String(value);
+    }
+  }
+
+  for (const key of centKeys) {
+    const value = Number(row?.[key]);
+    if (Number.isFinite(value)) {
+      return (value / 100).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      });
+    }
+  }
+
+  return fallbackValue;
+}
+
+async function readStudioStripeData(): Promise<any> {
+  const connectionString =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.SUPABASE_DB_URL;
+
+  if (!connectionString) {
+    return getStripeFallbackData();
+  }
+
+  const pg = await import("pg");
+  const pool = new pg.Pool({ connectionString });
+
+  try {
+    const [
+      summaryResult,
+      cardsResult,
+      paymentRowsResult,
+      subscriptionRowsResult,
+      actionRowsResult,
+      alertRowsResult,
+      revenueBarsResult,
+    ] = await Promise.all([
+      pool.query("select * from studio_stripe_summary limit 1"),
+      pool.query("select * from studio_stripe_cards order by priority asc, title asc"),
+      pool.query("select * from studio_stripe_payment_rows order by priority asc, title asc"),
+      pool.query("select * from studio_stripe_subscription_rows order by priority asc, title asc"),
+      pool.query("select * from studio_stripe_action_rows order by priority asc, title asc"),
+      pool.query("select * from studio_stripe_alert_rows order by priority asc, title asc"),
+      pool.query("select * from studio_stripe_revenue_bars order by priority asc, label asc"),
+    ]);
+
+    const fallbackStripe = getStripeFallbackData();
+    const summary = summaryResult.rows?.[0] || {};
+
+    const mapDataRow = (row: any) => ({
+      title: stripeText(row, ["title", "name"], "Stripe"),
+      detail: stripeText(row, ["detail", "description"], ""),
+      value: stripeText(row, ["value", "status", "amount"], "pendente"),
+      tone: safeTone(row?.tone, "yellow"),
+      priority: row?.priority ?? 99,
+    });
+
+    const mapBar = (row: any) => ({
+      label: stripeText(row, ["label", "title", "name"], "Stripe"),
+      value: stripeText(row, ["value", "percent", "percentage"], "0%"),
+      tone: safeTone(row?.tone, "blue"),
+      priority: row?.priority ?? 99,
+    });
+
+    const cards = cardsResult.rows.map(mapDataRow);
+    const paymentRows = paymentRowsResult.rows.map(mapDataRow);
+    const subscriptionRows = subscriptionRowsResult.rows.map(mapDataRow);
+    const actionRows = actionRowsResult.rows.map(mapDataRow);
+    const alertRows = alertRowsResult.rows.map(mapDataRow);
+    const revenueBars = revenueBarsResult.rows.map(mapBar);
+
+    return {
+      summary: {
+        revenue: stripeMoney(
+          summary,
+          ["revenue", "monthly_revenue", "revenue_value", "total_revenue", "stripe_revenue"],
+          ["revenue_cents", "monthly_revenue_cents", "total_revenue_cents"],
+          "R$ 0,00"
+        ),
+        successfulPayments: stripeNumberText(summary, ["successful_payments", "paid_payments", "payments_success", "approved_payments"], "0"),
+        activeSubscriptions: stripeNumberText(summary, ["active_subscriptions", "subscriptions_active", "active_customers"], "0"),
+        failedPayments: stripeNumberText(summary, ["failed_payments", "payment_failures", "failed_count"], "0"),
+        healthScore: Number(summary?.health_score ?? summary?.healthScore ?? 0),
+        statusLabel: stripeText(summary, ["status_label", "status", "title"], "Stripe ainda não conectado"),
+        statusDetail: stripeText(summary, ["status_detail", "detail", "description", "mia_summary"], "Base Stripe criada no banco. Falta conectar a chave Stripe real."),
+      },
+      stripeDashboardCards: cards.length ? cards : fallbackStripe.stripeDashboardCards,
+      stripePaymentRows: paymentRows.length ? paymentRows : fallbackStripe.stripePaymentRows,
+      stripeSubscriptionRows: subscriptionRows.length ? subscriptionRows : fallbackStripe.stripeSubscriptionRows,
+      stripeActionRows: actionRows.length ? actionRows : fallbackStripe.stripeActionRows,
+      stripeAlertRows: alertRows.length ? alertRows : fallbackStripe.stripeAlertRows,
+      stripeRevenueBars: revenueBars.length ? revenueBars : fallbackStripe.stripeRevenueBars,
+    };
+  } catch (error) {
+    console.error("Erro ao carregar Stripe do Studio:", error);
+    return getStripeFallbackData();
+  } finally {
+    await pool.end().catch(() => {});
+  }
+}
+
 export async function GET() {
   let financeData: any = getFinanceFallbackData();
+  let stripeData: any = getStripeFallbackData();
 
   try {
     financeData = await readStudioFinanceData();
   } catch (financeError) {
     console.error("Erro ao preparar financeData:", financeError);
+  }
+
+  try {
+    stripeData = await readStudioStripeData();
+  } catch (stripeError) {
+    console.error("Erro ao preparar stripeData:", stripeError);
   }
 
   try {
@@ -271,7 +433,7 @@ export async function GET() {
           ok: false,
           source: "fallback",
           error: "DATABASE_URL/POSTGRES_URL/SUPABASE_DB_URL não encontrado no runtime.",
-          data: fallback,
+          data: { ...fallback, financeData, stripeData },
         },
         { headers: { "Cache-Control": "no-store" } }
       );
@@ -357,7 +519,7 @@ export async function GET() {
         ok: false,
         source: "fallback",
         error: error instanceof Error ? error.message : String(error),
-        data: fallback,
+        data: { ...fallback, financeData, stripeData },
       },
       { status: 200, headers: { "Cache-Control": "no-store" } }
     );
