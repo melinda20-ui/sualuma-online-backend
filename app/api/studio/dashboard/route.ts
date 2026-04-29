@@ -127,7 +127,141 @@ async function query(sql: string) {
   return result.rows;
 }
 
+
+
+function formatFinanceMoney(value: unknown) {
+  const numberValue = Number(value || 0);
+
+  return numberValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function getFinanceFallbackData(): any {
+  return {
+    summary: {
+      operatingBalance: "R$ 36.320,00",
+      revenue: "R$ 48.750,00",
+      costs: "R$ 12.430,00",
+      reinvestment: "R$ 8.600,00",
+      profitLabel: "Lucro líquido após custos principais do mês",
+      revenueGrowth: "+18,6%",
+      costsGrowth: "controlado",
+      reinvestmentGrowth: "+12%",
+      healthScore: 82,
+      miaSummary:
+        "O financeiro está saudável, mas precisa separar origem da receita, custos fixos, custos variáveis e ROI dos agentes antes de escalar.",
+    },
+    financeDashboardCards: [
+      { title: "Receita total", value: "R$ 48.750", detail: "Entradas estimadas do mês atual", tone: "green" },
+      { title: "Custos principais", value: "R$ 12.430", detail: "Infraestrutura, ferramentas e operação", tone: "yellow" },
+      { title: "Saldo operacional", value: "R$ 36.320", detail: "Valor livre depois dos custos principais", tone: "pink" },
+      { title: "Reinvestimento", value: "R$ 8.600", detail: "Valor reservado para crescimento e aquisição", tone: "blue" },
+    ],
+    financeRevenueRows: [],
+    financeBars: [],
+    financeCostRows: [],
+    financeCostBars: [],
+    financeProjectionRows: [],
+    financeMiaRows: [],
+  };
+}
+
+async function readStudioFinanceData(): Promise<any> {
+  const connectionString =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.POSTGRES_PRISMA_URL;
+
+  if (!connectionString) {
+    return getFinanceFallbackData();
+  }
+
+  const pg = await import("pg");
+  const pool = new pg.Pool({ connectionString });
+
+  try {
+    const [
+      summaryResult,
+      cardsResult,
+      revenueRowsResult,
+      barsResult,
+      costRowsResult,
+      projectionRowsResult,
+      miaRowsResult,
+    ] = await Promise.all([
+      pool.query("select * from public.studio_finance_summary where id = 'main' limit 1"),
+      pool.query("select title, value, detail, tone, priority from public.studio_finance_cards order by priority asc, updated_at desc"),
+      pool.query("select title, value, detail, tone, priority from public.studio_finance_revenue_rows order by priority asc, updated_at desc"),
+      pool.query("select group_key, label, value, percent, tone, priority from public.studio_finance_bars order by priority asc, updated_at desc"),
+      pool.query("select title, value, detail, tone, priority from public.studio_finance_cost_rows order by priority asc, updated_at desc"),
+      pool.query("select title, value, detail, tone, priority from public.studio_finance_projection_rows order by priority asc, updated_at desc"),
+      pool.query("select title, value, detail, tone, priority from public.studio_finance_mia_rows order by priority asc, updated_at desc"),
+    ]);
+
+    const summaryRow = summaryResult.rows[0] || {};
+
+    const mapDataRow = (row: any) => ({
+      title: row.title,
+      value: row.value,
+      detail: row.detail,
+      tone: row.tone || "blue",
+      priority: row.priority || 100,
+    });
+
+    const mapBar = (row: any) => ({
+      label: row.label,
+      value: row.value,
+      percent: Number(row.percent || 0),
+      tone: row.tone || "blue",
+      priority: row.priority || 100,
+    });
+
+    const allBars = barsResult.rows || [];
+
+    return {
+      summary: {
+        operatingBalance: formatFinanceMoney(summaryRow.operating_balance),
+        revenue: formatFinanceMoney(summaryRow.revenue),
+        costs: formatFinanceMoney(summaryRow.costs),
+        reinvestment: formatFinanceMoney(summaryRow.reinvestment),
+        profitLabel:
+          summaryRow.profit_label ||
+          "Lucro líquido após custos principais do mês",
+        revenueGrowth: summaryRow.revenue_growth || "+18,6%",
+        costsGrowth: summaryRow.costs_growth || "controlado",
+        reinvestmentGrowth: summaryRow.reinvestment_growth || "+12%",
+        healthScore: Number(summaryRow.health_score || 82),
+        miaSummary:
+          summaryRow.mia_summary ||
+          "O financeiro está saudável, mas precisa separar origem da receita, custos fixos, custos variáveis e ROI dos agentes antes de escalar.",
+      },
+      financeDashboardCards: cardsResult.rows.map(mapDataRow),
+      financeRevenueRows: revenueRowsResult.rows.map(mapDataRow),
+      financeBars: allBars.filter((row: any) => row.group_key === "revenue").map(mapBar),
+      financeCostRows: costRowsResult.rows.map(mapDataRow),
+      financeCostBars: allBars.filter((row: any) => row.group_key === "cost").map(mapBar),
+      financeProjectionRows: projectionRowsResult.rows.map(mapDataRow),
+      financeMiaRows: miaRowsResult.rows.map(mapDataRow),
+    };
+  } catch (error) {
+    console.error("Erro ao carregar financeiro do Studio:", error);
+    return getFinanceFallbackData();
+  } finally {
+    await pool.end().catch(() => {});
+  }
+}
+
 export async function GET() {
+  let financeData: any = getFinanceFallbackData();
+
+  try {
+    financeData = await readStudioFinanceData();
+  } catch (financeError) {
+    console.error("Erro ao preparar financeData:", financeError);
+  }
+
   try {
     const activePool = getPool();
 
@@ -210,6 +344,7 @@ export async function GET() {
           communityModerationRows: normalizeRows(reportRows, fallback.communityModerationRows),
           cnpjNotificationRows: normalizeRows(cnpjRows, fallback.cnpjNotificationRows),
           subdomainRows,
+        financeData,
         },
       },
       { headers: { "Cache-Control": "no-store" } }
