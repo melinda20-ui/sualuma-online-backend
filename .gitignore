@@ -21,3 +21,6 @@ yarn-error.log*
 .DS_Store
 
 data/login-rate-limit-alerts.json
+
+# tarefas locais do executor Mia
+data/brain-executor-tasks.json
