@@ -24,7 +24,8 @@ type StudioView =
   | "ideias"
   | "usuarios"
   | "saude"
-  | "financeiro";
+  | "financeiro"
+  | "stripe";
 
 type Tone = "pink" | "blue" | "green" | "yellow" | "red" | "purple";
 
@@ -65,6 +66,7 @@ const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = 
   { id: "usuarios", label: "Usuários", icon: "👥" },
   { id: "saude", label: "Saúde Geral", icon: "📡" },
   { id: "financeiro", label: "Financeiro", icon: "💎" },
+  { id: "stripe", label: "Stripe", icon: "💳", badge: "Pagamentos" },
 ];
 
 const empireHealth = [
@@ -1332,6 +1334,49 @@ const hotOpportunityRows = [
   { title: "Conteúdo de autoridade", detail: "Mostrar como o Studio controla uma startup de uma pessoa só.", value: "marca", tone: "yellow" as Tone },
 ];
 
+
+const stripeDashboardCards = [
+  { title: "Receita Stripe", value: "R$ 32.480", detail: "Pagamentos processados no mês", tone: "green" as Tone },
+  { title: "MRR estimado", value: "R$ 18.900", detail: "Receita recorrente mensal", tone: "pink" as Tone },
+  { title: "Pagamentos falhados", value: "7", detail: "Cartões recusados ou cobrança não concluída", tone: "red" as Tone },
+  { title: "Assinaturas ativas", value: "126", detail: "Clientes com plano ativo", tone: "blue" as Tone },
+];
+
+const stripePaymentRows = [
+  { title: "Pagamento aprovado", detail: "Plano Premium • cliente: Ana Paula • cartão final 4242", value: "R$ 197", tone: "green" as Tone },
+  { title: "Pagamento pendente", detail: "Plano Pro • cliente: Marina Alves • aguardando confirmação", value: "R$ 497", tone: "yellow" as Tone },
+  { title: "Pagamento falhou", detail: "Plano Prime • cliente: Carlos Lima • cartão recusado", value: "falhou", tone: "red" as Tone },
+  { title: "Checkout iniciado", detail: "Usuário abriu checkout, mas ainda não finalizou a compra", value: "recuperar", tone: "pink" as Tone },
+];
+
+const stripeSubscriptionRows = [
+  { title: "Premium", detail: "Plano mais vendido, boa retenção e menor suporte.", value: "72 clientes", tone: "pink" as Tone },
+  { title: "Prime", detail: "Plano intermediário, precisa melhorar ativação pós-compra.", value: "34 clientes", tone: "blue" as Tone },
+  { title: "Pro", detail: "Plano com maior ticket, ideal para empresas e prestadores.", value: "20 clientes", tone: "green" as Tone },
+  { title: "Cancelamentos", detail: "Usuários que cancelaram ou não renovaram no mês.", value: "5 churn", tone: "red" as Tone },
+];
+
+const stripeActionRows = [
+  { title: "Reenviar link de checkout", detail: "Mandar novo link para cliente que iniciou compra e não concluiu.", value: "ação futura", tone: "pink" as Tone },
+  { title: "Cancelar assinatura", detail: "Cancelar plano do usuário direto pelo Studio, sem abrir Stripe.", value: "ação futura", tone: "red" as Tone },
+  { title: "Ver fatura", detail: "Abrir histórico de cobranças, recibos e status de pagamento.", value: "essencial", tone: "blue" as Tone },
+  { title: "Aplicar cupom", detail: "Liberar desconto ou condição especial para cliente específico.", value: "vendas", tone: "green" as Tone },
+];
+
+const stripeAlertRows = [
+  { title: "7 pagamentos falharam", detail: "Criar automação para recuperar cartão recusado e checkout abandonado.", value: "urgente", tone: "red" as Tone },
+  { title: "Plano Pro converte pouco", detail: "Melhorar página de comparação e benefícios do plano maior.", value: "otimizar", tone: "yellow" as Tone },
+  { title: "Premium está performando bem", detail: "Pode virar plano principal da comunicação de vendas.", value: "escalar", tone: "green" as Tone },
+  { title: "Mia sugere recuperação", detail: "Enviar e-mail/WhatsApp para quem iniciou checkout e não pagou.", value: "alto ROI", tone: "pink" as Tone },
+];
+
+const stripeRevenueBars = [
+  { label: "Premium", value: "48%", tone: "pink" as Tone },
+  { label: "Prime", value: "27%", tone: "blue" as Tone },
+  { label: "Pro", value: "20%", tone: "green" as Tone },
+  { label: "Extras", value: "5%", tone: "yellow" as Tone },
+];
+
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
 }
@@ -2247,6 +2292,111 @@ export default function StudioLabPage() {
           </section>
         )}
 
+        {activeView === "stripe" && (
+          <>
+            <section className="stripe-hero">
+              <div className="stripe-main-card">
+                <PanelTitle eyebrow="Stripe / Pagamentos" title="Central de assinaturas, cobranças e checkout" action="Conectar Stripe" />
+
+                <div className="stripe-big-number">
+                  <small>Receita processada no mês</small>
+                  <strong>R$ 32.480,00</strong>
+                  <span>Dados demonstrativos até conectar a API do Stripe com segurança no backend.</span>
+                </div>
+
+                <div className="stripe-mini-grid">
+                  <div>
+                    <small>MRR</small>
+                    <strong>R$ 18.900</strong>
+                    <em>recorrente</em>
+                  </div>
+                  <div>
+                    <small>Falhas</small>
+                    <strong>7</strong>
+                    <em className="negative">recuperar</em>
+                  </div>
+                  <div>
+                    <small>Ativas</small>
+                    <strong>126</strong>
+                    <em>assinaturas</em>
+                  </div>
+                </div>
+              </div>
+
+              <div className="stripe-side-card">
+                <PanelTitle eyebrow="Mia Pagamentos" title="Leitura rápida" />
+                <p>
+                  A operação de pagamentos está saudável, mas precisa recuperar checkouts abandonados
+                  e pagamentos falhados para aumentar receita sem comprar mais tráfego.
+                </p>
+                <div className="stripe-score">
+                  <strong>86%</strong>
+                  <span>saúde Stripe</span>
+                </div>
+              </div>
+            </section>
+
+            <section className="metric-grid stripe-metrics">
+              {stripeDashboardCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Pagamentos" title="Últimos eventos importantes" action="Ver eventos" />
+                {stripePaymentRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Assinaturas" title="Planos e recorrência" />
+                {stripeSubscriptionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Distribuição de receita" title="Receita por plano/produto" />
+                <div className="stripe-bars">
+                  {stripeRevenueBars.map((item) => (
+                    <div key={item.label} className={`stripe-bar ${item.tone}`}>
+                      <div>
+                        <strong>{item.label}</strong>
+                        <span>{item.value}</span>
+                      </div>
+                      <b style={{ width: item.value }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Ações rápidas" title="Controle sem abrir o Stripe" />
+                {stripeActionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="panel full">
+              <PanelTitle eyebrow="Alertas da Mia" title="O que fazer para recuperar e aumentar receita" />
+              <div className="stripe-alert-grid">
+                {stripeAlertRows.map((item) => (
+                  <div key={item.title} className={`stripe-alert-card ${item.tone}`}>
+                    <strong>{item.title}</strong>
+                    <p>{item.detail}</p>
+                    <span>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
         {activeView === "financeiro" && (
           <>
             <section className="finance-hero">
@@ -2938,6 +3088,183 @@ export default function StudioLabPage() {
 
         .full { min-height: 650px; }
 
+        .stripe-hero {
+          display: grid;
+          grid-template-columns: 1.7fr .9fr;
+          gap: 18px;
+          margin-top: 18px;
+        }
+
+        .stripe-main-card,
+        .stripe-side-card {
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.28);
+          backdrop-filter: blur(24px);
+          border-radius: 28px;
+          padding: 22px;
+        }
+
+        .stripe-big-number {
+          margin-top: 18px;
+          padding: 22px;
+          border-radius: 24px;
+          background:
+            radial-gradient(circle at 18% 0%, rgba(56,189,248,.22), transparent 34%),
+            rgba(255,255,255,.04);
+          border: 1px solid rgba(56,189,248,.18);
+        }
+
+        .stripe-big-number small,
+        .stripe-mini-grid small {
+          display: block;
+          color: rgba(255,255,255,.58);
+        }
+
+        .stripe-big-number strong {
+          display: block;
+          margin: 8px 0;
+          font-size: clamp(34px, 4vw, 58px);
+          letter-spacing: -.06em;
+          color: #93c5fd;
+          text-shadow: 0 0 32px rgba(56,189,248,.28);
+        }
+
+        .stripe-big-number span,
+        .stripe-side-card p {
+          color: rgba(255,255,255,.62);
+          line-height: 1.55;
+        }
+
+        .stripe-mini-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-top: 14px;
+        }
+
+        .stripe-mini-grid div {
+          padding: 14px;
+          border-radius: 18px;
+          background: rgba(255,255,255,.045);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .stripe-mini-grid strong {
+          display: block;
+          margin: 5px 0;
+          font-size: 22px;
+        }
+
+        .stripe-mini-grid em {
+          font-style: normal;
+          color: #22c55e;
+          font-size: 12px;
+        }
+
+        .stripe-mini-grid em.negative {
+          color: #facc15;
+        }
+
+        .stripe-score {
+          width: 170px;
+          height: 170px;
+          margin: 22px auto 0;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          background: conic-gradient(#38bdf8 0 86%, rgba(255,255,255,.08) 86% 100%);
+          box-shadow: 0 0 48px rgba(56,189,248,.30);
+        }
+
+        .stripe-score strong {
+          display: block;
+          font-size: 36px;
+          margin-top: 24px;
+        }
+
+        .stripe-score span {
+          margin-top: -34px;
+          color: rgba(255,255,255,.58);
+          font-size: 12px;
+        }
+
+        .stripe-metrics {
+          margin-top: 18px;
+        }
+
+        .stripe-bars {
+          display: grid;
+          gap: 16px;
+        }
+
+        .stripe-bar {
+          display: grid;
+          gap: 8px;
+        }
+
+        .stripe-bar div {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .stripe-bar strong {
+          color: #fff;
+        }
+
+        .stripe-bar span {
+          color: rgba(255,255,255,.62);
+          font-size: 13px;
+        }
+
+        .stripe-bar b {
+          display: block;
+          height: 14px;
+          border-radius: 999px;
+          background: currentColor;
+          box-shadow: 0 0 22px currentColor;
+        }
+
+        .stripe-alert-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .stripe-alert-card {
+          min-height: 170px;
+          border-radius: 22px;
+          padding: 18px;
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.24);
+        }
+
+        .stripe-alert-card strong {
+          display: block;
+          color: #fff;
+          font-size: 17px;
+          margin-bottom: 8px;
+        }
+
+        .stripe-alert-card p {
+          color: rgba(255,255,255,.62);
+          line-height: 1.5;
+          margin: 0 0 14px;
+          font-size: 13px;
+        }
+
+        .stripe-alert-card span {
+          display: inline-flex;
+          padding: 7px 10px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.07);
+          color: #ff9be6;
+          font-size: 12px;
+        }
+
         .trend-hero,
         .organic-hero {
           display: grid;
@@ -3432,6 +3759,7 @@ export default function StudioLabPage() {
 
         @media (max-width: 1280px) {
           .hero-grid,
+          .stripe-hero,
           .finance-hero,
           .community-hero,
           .google-hero,
@@ -3448,7 +3776,8 @@ export default function StudioLabPage() {
           .agent-grid,
           .subdomain-grid,
           .task-board,
-          .opportunity-grid {
+          .opportunity-grid,
+          .stripe-alert-grid {
             grid-template-columns: repeat(2, 1fr);
           }
 
@@ -3485,7 +3814,8 @@ export default function StudioLabPage() {
           .idea-list,
           .subdomain-grid,
           .task-board,
-          .opportunity-grid {
+          .opportunity-grid,
+          .stripe-alert-grid {
             grid-template-columns: 1fr;
           }
 
