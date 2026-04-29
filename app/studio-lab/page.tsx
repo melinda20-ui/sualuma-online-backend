@@ -10,6 +10,8 @@ type StudioView =
   | "blog"
   | "email"
   | "google"
+  | "noticias"
+  | "organico"
   | "tarefas"
   | "loja"
   | "suporte"
@@ -47,7 +49,9 @@ const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = 
   { id: "relatorios", label: "Relatórios", icon: "📊" },
   { id: "blog", label: "Relatórios Blog", icon: "📝", badge: "Novo" },
   { id: "email", label: "Relatórios E-mail", icon: "📨", badge: "Novo" },
-  { id: "google", label: "Google", icon: "🔎", badge: "Novo" },
+  { id: "google", label: "Google", icon: "🔎" },
+  { id: "noticias", label: "Notícias & Trends", icon: "🔥", badge: "24h" },
+  { id: "organico", label: "Marketing Orgânico", icon: "🚀", badge: "Radar" },
   { id: "tarefas", label: "Tarefas do Sistema", icon: "✅", badge: "24" },
   { id: "loja", label: "Admin Loja", icon: "🛍️", badge: "Hub" },
   { id: "suporte", label: "Suporte", icon: "🛟", badge: "5" },
@@ -1248,6 +1252,86 @@ const socialSentimentRows = [
   { title: "Críticas ou confusão", detail: "Algumas pessoas ainda não entendem se é serviço, curso ou plataforma.", value: "10%", tone: "red" as Tone },
 ];
 
+
+const trendNewsCards = [
+  { title: "Trends sociais", value: "18", detail: "Assuntos crescendo nas redes sociais", tone: "pink" as Tone },
+  { title: "Pesquisas Google 24h", value: "42", detail: "Buscas quentes ligadas ao nicho", tone: "green" as Tone },
+  { title: "Notícias tech", value: "12", detail: "Atualizações relevantes para IA e SaaS", tone: "blue" as Tone },
+  { title: "Empreendedorismo", value: "9", detail: "Sinais fortes para conteúdo e vendas", tone: "yellow" as Tone },
+];
+
+const socialTrendRows = [
+  { title: "IA para vender mais", detail: "Tema crescendo em vídeos curtos, posts educativos e debates de negócios.", value: "alta", tone: "pink" as Tone },
+  { title: "Automação no WhatsApp", detail: "Pessoas procurando formas de automatizar atendimento e follow-up.", value: "subindo", tone: "green" as Tone },
+  { title: "Como conseguir clientes", detail: "Dor recorrente de autônomos, prestadores e pequenos negócios.", value: "forte", tone: "blue" as Tone },
+  { title: "Ferramentas para empreender", detail: "Conteúdos comparando plataformas, IA, CRM e gestão.", value: "oportunidade", tone: "yellow" as Tone },
+];
+
+const googleHotSearchRows = [
+  { title: "como usar IA no meu negócio", detail: "Busca com intenção educativa e comercial.", value: "post + vídeo", tone: "pink" as Tone },
+  { title: "automação para pequenos negócios", detail: "Boa para landing page, blog e oferta de agente.", value: "captar leads", tone: "green" as Tone },
+  { title: "site profissional barato", detail: "Termo sensível a preço, mas pode converter com proposta certa.", value: "vendas", tone: "yellow" as Tone },
+  { title: "ferramentas para microempreendedor", detail: "Conecta com CNPJ, Minha Empresa, comunidade e serviços.", value: "estratégico", tone: "blue" as Tone },
+];
+
+const techNewsRows = [
+  { title: "IA generativa entrando em pequenas empresas", detail: "Sinal para conteúdo sobre automação prática e economia de tempo.", value: "tech", tone: "pink" as Tone },
+  { title: "Ferramentas no-code e low-code crescendo", detail: "Excelente gancho para vender automações e sistemas internos.", value: "produto", tone: "green" as Tone },
+  { title: "Busca por agentes de IA aumentando", detail: "Criar conteúdos comparando agente, automação e chatbot.", value: "SEO", tone: "blue" as Tone },
+  { title: "Privacidade e dados em plataformas digitais", detail: "Gancho para falar de segurança, acesso e controle do usuário.", value: "confiança", tone: "yellow" as Tone },
+];
+
+const entrepreneurNewsRows = [
+  { title: "Empreendedores buscando reduzir custo operacional", detail: "Falar sobre IA como funcionária digital e painel de controle.", value: "conteúdo", tone: "green" as Tone },
+  { title: "Crescimento de negócios solo com automação", detail: "A sua história e o Studio viram narrativa forte de marca.", value: "branding", tone: "pink" as Tone },
+  { title: "Prestadores tentando vender serviço online", detail: "Conectar comunidade, serviços, marketplace e templates.", value: "oferta", tone: "blue" as Tone },
+  { title: "Pequenas empresas sem clareza de funil", detail: "Criar isca: checklist de funil com IA.", value: "lead magnet", tone: "yellow" as Tone },
+];
+
+const organicMarketingCards = [
+  { title: "Ideias orgânicas", value: "36", detail: "Testes possíveis sem tráfego pago", tone: "pink" as Tone },
+  { title: "Fóruns monitorados", value: "14", detail: "Locais onde o nicho conversa", tone: "blue" as Tone },
+  { title: "Oportunidades hoje", value: "8", detail: "Ganchos para postar nas próximas 24h", tone: "green" as Tone },
+  { title: "Conteúdos urgentes", value: "5", detail: "Criar antes que a trend esfrie", tone: "yellow" as Tone },
+];
+
+const organicIdeaRows = [
+  { title: "Post carrossel: 7 formas de usar IA para conseguir clientes", detail: "Conteúdo educativo com CTA para blog, comunidade e loja.", value: "Instagram", tone: "pink" as Tone },
+  { title: "Short: eu construindo uma startup sozinha com IA", detail: "Conteúdo de bastidor para gerar autoridade e identificação.", value: "Reels/TikTok", tone: "green" as Tone },
+  { title: "Artigo SEO: automação para pequenos negócios", detail: "Atrair busca qualificada e linkar para agentes/automações.", value: "Blog", tone: "blue" as Tone },
+  { title: "Thread: o que automatizar primeiro em uma empresa pequena", detail: "Boa para comunidades, LinkedIn e fóruns.", value: "Social", tone: "yellow" as Tone },
+  { title: "Checklist gratuito: raio-x do negócio digital", detail: "Isca para capturar leads e alimentar e-mail marketing.", value: "Lead", tone: "pink" as Tone },
+];
+
+const forumRadarRows = [
+  { title: "Reddit / empreendedores", detail: "Discussões sobre IA, captação, automação e pequenos negócios.", value: "monitorar", tone: "pink" as Tone },
+  { title: "Quora / dúvidas de negócio", detail: "Perguntas viram posts, vídeos e respostas com autoridade.", value: "conteúdo", tone: "blue" as Tone },
+  { title: "Comunidades Facebook", detail: "Autônomos perguntando sobre clientes, site, CNPJ e vendas.", value: "leads", tone: "green" as Tone },
+  { title: "LinkedIn", detail: "Debates sobre produtividade, IA e transformação de negócios.", value: "autoridade", tone: "yellow" as Tone },
+  { title: "Product Hunt / Indie Hackers", detail: "Sinais sobre SaaS, agentes, automações e produtos digitais.", value: "inspiração", tone: "pink" as Tone },
+];
+
+const forumAlertRows = [
+  { title: "Fórum 01 falou sobre automação para WhatsApp", detail: "Comentaram dificuldade de responder leads rápido.", value: "criar post", tone: "green" as Tone },
+  { title: "Fórum 03 discutiu preço de site profissional", detail: "Gancho para conteúdo comparando site barato vs site que vende.", value: "vendas", tone: "pink" as Tone },
+  { title: "Fórum 07 perguntou sobre ferramentas para MEI", detail: "Conecta com CNPJ, Minha Empresa e painel do empreendedor.", value: "oportunidade", tone: "blue" as Tone },
+  { title: "Fórum 12 citou medo de IA substituir pessoas", detail: "Criar conteúdo: IA como equipe, não como ameaça.", value: "educativo", tone: "yellow" as Tone },
+];
+
+const miaOrganicRows = [
+  { title: "Criar agente Radar de Trends", detail: "Buscar trends sociais, buscas do Google, notícias e fóruns todo dia.", value: "prioridade", tone: "pink" as Tone },
+  { title: "Transformar trend em conteúdo", detail: "Cada trend deve gerar post, short, e-mail e oferta relacionada.", value: "sistema", tone: "green" as Tone },
+  { title: "Criar biblioteca de fóruns", detail: "Separar fóruns por tema: IA, negócios, CNPJ, serviços, automação.", value: "organizar", tone: "blue" as Tone },
+  { title: "Criar alerta de oportunidade", detail: "Quando um tema crescer, a Mia sugere conteúdo e produto para vender.", value: "crescimento", tone: "yellow" as Tone },
+];
+
+const hotOpportunityRows = [
+  { title: "Gancho do dia", detail: "Empreendedores estão procurando IA prática, não teoria. Mostrar exemplos reais.", value: "postar hoje", tone: "pink" as Tone },
+  { title: "Produto para empurrar", detail: "Agente de propostas comerciais combina com as buscas atuais.", value: "loja", tone: "green" as Tone },
+  { title: "Conteúdo para blog", detail: "Como automatizar atendimento sem parecer robô.", value: "SEO", tone: "blue" as Tone },
+  { title: "Conteúdo de autoridade", detail: "Mostrar como o Studio controla uma startup de uma pessoa só.", value: "marca", tone: "yellow" as Tone },
+];
+
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
 }
@@ -1648,6 +1732,103 @@ export default function StudioLabPage() {
                     ))}
                   </div>
                 </div>
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "noticias" && (
+          <>
+            <section className="metric-grid">
+              {trendNewsCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="trend-hero">
+              <div className="panel">
+                <PanelTitle eyebrow="Trends sociais" title="O que está bombando nas redes" action="Atualizar radar" />
+                {socialTrendRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Google 24h" title="Pesquisas quentes do nicho" action="Ver buscas" />
+                {googleHotSearchRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Tecnologia" title="Notícias quentes de IA, SaaS e automação" />
+                {techNewsRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Empresários e empreendedores" title="Sinais do mercado" />
+                {entrepreneurNewsRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="panel full">
+              <PanelTitle eyebrow="Oportunidades de hoje" title="Como transformar notícia em conteúdo, lead e venda" />
+              <div className="opportunity-grid">
+                {hotOpportunityRows.map((item) => (
+                  <div key={item.title} className={`opportunity-card ${item.tone}`}>
+                    <strong>{item.title}</strong>
+                    <p>{item.detail}</p>
+                    <span>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "organico" && (
+          <>
+            <section className="metric-grid">
+              {organicMarketingCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="organic-hero">
+              <div className="panel">
+                <PanelTitle eyebrow="Ruby de Marketing Orgânico" title="Testes para trazer clientes sem pagar tráfego" action="Criar experimento" />
+                {organicIdeaRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Sugestões da Mia" title="Sistema de crescimento orgânico" />
+                {miaOrganicRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Fóruns do nicho" title="Onde estão falando sobre nossos temas" action="Adicionar fórum" />
+                {forumRadarRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Alertas dos fóruns" title="O que apareceu agora para virar conteúdo" />
+                {forumAlertRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
               </div>
             </section>
           </>
@@ -2757,6 +2938,52 @@ export default function StudioLabPage() {
 
         .full { min-height: 650px; }
 
+        .trend-hero,
+        .organic-hero {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 18px;
+          margin-top: 18px;
+        }
+
+        .opportunity-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .opportunity-card {
+          min-height: 180px;
+          border-radius: 22px;
+          padding: 18px;
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.24);
+        }
+
+        .opportunity-card strong {
+          display: block;
+          color: #fff;
+          font-size: 17px;
+          margin-bottom: 8px;
+        }
+
+        .opportunity-card p {
+          color: rgba(255,255,255,.62);
+          line-height: 1.5;
+          margin: 0 0 14px;
+          font-size: 13px;
+        }
+
+        .opportunity-card span {
+          display: inline-flex;
+          padding: 7px 10px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.07);
+          color: #ff9be6;
+          font-size: 12px;
+        }
+
         .google-hero,
         .google-social-panel {
           display: grid;
@@ -3209,6 +3436,8 @@ export default function StudioLabPage() {
           .community-hero,
           .google-hero,
           .google-social-panel,
+          .trend-hero,
+          .organic-hero,
           .lower-grid,
           .brain-layout {
             grid-template-columns: 1fr;
@@ -3218,7 +3447,8 @@ export default function StudioLabPage() {
           .sitemap-grid,
           .agent-grid,
           .subdomain-grid,
-          .task-board {
+          .task-board,
+          .opportunity-grid {
             grid-template-columns: repeat(2, 1fr);
           }
 
@@ -3254,7 +3484,8 @@ export default function StudioLabPage() {
           .agent-grid,
           .idea-list,
           .subdomain-grid,
-          .task-board {
+          .task-board,
+          .opportunity-grid {
             grid-template-columns: 1fr;
           }
 
