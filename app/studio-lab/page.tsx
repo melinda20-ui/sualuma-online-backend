@@ -2058,6 +2058,157 @@ function LiveSubdomainsView({ fallbackRows }: { fallbackRows: LiveSubdomain[] })
 }
 
 
+
+function LiveHealthView() {
+  const [payload, setPayload] = useState<any>(null);
+  const [source, setSource] = useState("visual");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadHealth() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const data = await response.json();
+
+        if (!cancelled) {
+          setPayload(data?.data || null);
+          setSource(data?.source || "api");
+        }
+      } catch (error) {
+        console.error("[Studio Lab] Falha ao carregar Saúde Geral:", error);
+      }
+    }
+
+    loadHealth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const tasks = payload?.systemTaskRows || [];
+  const products = payload?.storeProductRows || [];
+  const reports = payload?.communityModerationRows || [];
+  const cnpj = payload?.cnpjNotificationRows || [];
+  const subdomains = payload?.subdomainRows || [];
+
+  const riskyTasks = tasks.filter((item: any) => item.tone === "red" || item.value === "em risco");
+  const activeProducts = products.filter((item: any) => item.status === "ativo" || item.value === "ativo");
+  const reviewProducts = products.filter((item: any) => item.status === "revisar" || item.status === "editar" || item.value === "revisar");
+  const openReports = reports.filter((item: any) => item.status === "aberto");
+  const pendingCnpj = cnpj.filter((item: any) => item.status === "aberto" || item.tone === "yellow" || item.value === "atenção");
+  const onlineSubdomains = subdomains.filter((item: any) => item.status === "Online" || item.status === "Ativo");
+  const totalLinks = subdomains.reduce((acc: number, item: any) => acc + (item.links?.length || 0), 0);
+
+  const score =
+    100
+    - riskyTasks.length * 12
+    - reviewProducts.length * 5
+    - openReports.length * 8
+    - pendingCnpj.length * 6
+    + onlineSubdomains.length * 3;
+
+  const healthScore = Math.max(0, Math.min(100, score || 88));
+
+  const healthTone: Tone =
+    healthScore >= 85 ? "green" :
+    healthScore >= 70 ? "yellow" :
+    "red";
+
+  const healthLabel =
+    healthScore >= 85 ? "Saudável" :
+    healthScore >= 70 ? "Atenção" :
+    "Crítico";
+
+  return (
+    <>
+      <section className="metric-grid">
+        <MetricCard title="Saúde geral" value={`${healthScore}%`} detail={`Status atual: ${healthLabel}`} tone={healthTone} />
+        <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados puxados da API do Studio" tone="blue" />
+        <MetricCard title="Alertas reais" value={String(riskyTasks.length + openReports.length + pendingCnpj.length)} detail="Tarefas, comunidade e CNPJ" tone="red" />
+        <MetricCard title="Áreas online" value={String(onlineSubdomains.length)} detail="Subdomínios ativos no ecossistema" tone="green" />
+      </section>
+
+      <section className="health-hero">
+        <div className="panel">
+          <PanelTitle eyebrow="Saúde Geral" title="Diagnóstico vivo do ecossistema" action={source === "postgres" ? "Banco conectado" : "Visual"} />
+
+          <DataRow title="Tarefas do sistema" detail="Pontos operacionais que precisam ser resolvidos para o sistema vender e receber leads." value={`${tasks.length} tarefas`} tone={riskyTasks.length ? "red" : "green"} />
+          <DataRow title="Admin Loja" detail="Produtos digitais cadastrados: agentes, automações, skills e templates." value={`${products.length} produtos`} tone={reviewProducts.length ? "yellow" : "green"} />
+          <DataRow title="Comunidade" detail="Denúncias, moderação e possíveis violações de regra." value={`${openReports.length} abertas`} tone={openReports.length ? "red" : "green"} />
+          <DataRow title="CNPJ" detail="Pendências administrativas, lembretes e obrigações da empresa." value={`${pendingCnpj.length} atenção`} tone={pendingCnpj.length ? "yellow" : "green"} />
+          <DataRow title="Subdomínios" detail="Raiz do site, áreas online e sitemap interno." value={`${totalLinks} links`} tone="blue" />
+        </div>
+
+        <div className="panel">
+          <PanelTitle eyebrow="Sugestão da Mia" title="Prioridade inteligente de hoje" />
+
+          <DataRow title="1. Resolver riscos vermelhos" detail="Comece pelas tarefas em risco e pelas denúncias abertas." value={`${riskyTasks.length + openReports.length} itens`} tone="red" />
+          <DataRow title="2. Revisar loja" detail="Produtos com status revisar/editar podem travar vendas no marketplace." value={`${reviewProducts.length} itens`} tone="yellow" />
+          <DataRow title="3. Conferir CNPJ" detail="Pendências administrativas precisam ficar visíveis antes de virarem problema." value={`${pendingCnpj.length} itens`} tone="pink" />
+          <DataRow title="4. Fortalecer sitemap" detail="Quanto mais links monitorados, mais fácil achar página quebrada depois." value={`${totalLinks} links`} tone="blue" />
+        </div>
+      </section>
+
+      <section className="panel full">
+        <PanelTitle eyebrow="Mapa de saúde" title="Leitura por área conectada ao banco" action="Fase 1 conectada" />
+
+        <div className="store-table">
+          <div className="store-row">
+            <ToneDot tone={riskyTasks.length ? "red" : "green"} />
+            <div>
+              <strong>Tarefas do Sistema</strong>
+              <p>{tasks.length} tarefas no banco • {riskyTasks.length} em risco</p>
+            </div>
+            <button>{riskyTasks.length ? "corrigir" : "ok"}</button>
+          </div>
+
+          <div className="store-row">
+            <ToneDot tone={reviewProducts.length ? "yellow" : "green"} />
+            <div>
+              <strong>Admin Loja</strong>
+              <p>{products.length} produtos no banco • {activeProducts.length} ativos • {reviewProducts.length} em revisão</p>
+            </div>
+            <button>ver loja</button>
+          </div>
+
+          <div className="store-row">
+            <ToneDot tone={openReports.length ? "red" : "green"} />
+            <div>
+              <strong>Comunidade</strong>
+              <p>{reports.length} casos no banco • {openReports.length} denúncias abertas</p>
+            </div>
+            <button>moderar</button>
+          </div>
+
+          <div className="store-row">
+            <ToneDot tone={pendingCnpj.length ? "yellow" : "green"} />
+            <div>
+              <strong>CNPJ</strong>
+              <p>{cnpj.length} notificações no banco • {pendingCnpj.length} precisam atenção</p>
+            </div>
+            <button>ver CNPJ</button>
+          </div>
+
+          <div className="store-row">
+            <ToneDot tone="blue" />
+            <div>
+              <strong>Raiz do Site</strong>
+              <p>{subdomains.length} subdomínios no banco • {totalLinks} links mapeados</p>
+            </div>
+            <button>ver sitemap</button>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
@@ -2685,129 +2836,7 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "saude" && (
-          <>
-            <section className="health-hero">
-              <div className="health-main-card">
-                <PanelTitle eyebrow="Saúde Geral" title="Raio-X operacional do Studio Sualuma" action="Ver alertas" />
-
-                <div className="health-big-score">
-                  <small>Saúde consolidada do ecossistema</small>
-                  <strong>87%</strong>
-                  <span>Sistema está funcionando, mas pagamentos, onboarding e conexões futuras precisam cuidado.</span>
-                </div>
-
-                <div className="health-status-grid">
-                  <div>
-                    <span className="health-dot green" />
-                    <strong>Sistema online</strong>
-                    <small>PM2 + Next + Nginx</small>
-                  </div>
-                  <div>
-                    <span className="health-dot green" />
-                    <strong>Banco lendo</strong>
-                    <small>Postgres local ativo</small>
-                  </div>
-                  <div>
-                    <span className="health-dot yellow" />
-                    <strong>Onboarding médio</strong>
-                    <small>Precisa guiar melhor</small>
-                  </div>
-                  <div>
-                    <span className="health-dot red" />
-                    <strong>Pagamentos pendente</strong>
-                    <small>Stripe ainda mockado</small>
-                  </div>
-                </div>
-              </div>
-
-              <div className="health-side-card">
-                <PanelTitle eyebrow="Mia Diagnóstico" title="Leitura rápida" />
-                <p>
-                  O Studio já está forte visualmente e a API do banco respondeu. Agora o risco maior é conectar
-                  muitas abas de uma vez. A estratégia segura é ligar uma área por vez, testar e salvar.
-                </p>
-
-                <div className="health-mini-bars">
-                  {healthBars.map((item) => (
-                    <div key={item.label} className={`health-mini-bar ${item.tone}`}>
-                      <div>
-                        <strong>{item.label}</strong>
-                        <span>{item.value}</span>
-                      </div>
-                      <b style={{ width: item.value }} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            <section className="metric-grid health-metrics">
-              {healthGeneralCards.map((item) => (
-                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
-              ))}
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Sistema" title="Serviços principais" />
-                {healthSystemRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="APIs" title="Rotas e integrações críticas" />
-                {healthApiRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Jornada" title="Cadastro, onboarding, compra e suporte" />
-                {healthJourneyRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Áreas do negócio" title="O que está ativo no ecossistema" />
-                {healthBusinessRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Riscos" title="Pontos que podem quebrar ou travar crescimento" />
-                {healthRiskRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Checklist" title="Condições para considerar tudo saudável" />
-                {healthChecklistRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="panel full">
-              <PanelTitle eyebrow="Sugestões da Mia" title="Como deixar o sistema mais estável e inteligente" action="Criar tarefa" />
-              <div className="health-mia-grid">
-                {healthMiaRows.map((item) => (
-                  <div key={item.title} className={`health-mia-card ${item.tone}`}>
-                    <strong>{item.title}</strong>
-                    <p>{item.detail}</p>
-                    <span>{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </>
+          <LiveHealthView />
         )}
 
         {activeView === "stripe" && (
