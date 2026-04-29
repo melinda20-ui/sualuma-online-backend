@@ -2216,6 +2216,74 @@ export default function StudioLabPage() {
 
   const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || tabs[0], [activeView]);
 
+  const [financeLiveData, setFinanceLiveData] = useState<any>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFinanceData() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveFinance = payload?.data?.financeData;
+
+        if (!cancelled && liveFinance) {
+          setFinanceLiveData(liveFinance);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar financeiro do Studio:", error);
+      }
+    }
+
+    loadFinanceData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const liveFinanceSummary = financeLiveData?.summary || {};
+  const liveFinanceHealthScore =
+    typeof liveFinanceSummary.healthScore === "number" ? liveFinanceSummary.healthScore : 82;
+
+  const liveFinanceDashboardCards =
+    Array.isArray(financeLiveData?.financeDashboardCards) && financeLiveData.financeDashboardCards.length > 0
+      ? financeLiveData.financeDashboardCards
+      : financeDashboardCards;
+
+  const liveFinanceRevenueRows =
+    Array.isArray(financeLiveData?.financeRevenueRows) && financeLiveData.financeRevenueRows.length > 0
+      ? financeLiveData.financeRevenueRows
+      : financeRevenueRows;
+
+  const liveFinanceBars =
+    Array.isArray(financeLiveData?.financeBars) && financeLiveData.financeBars.length > 0
+      ? financeLiveData.financeBars
+      : financeBars;
+
+  const liveFinanceCostRows =
+    Array.isArray(financeLiveData?.financeCostRows) && financeLiveData.financeCostRows.length > 0
+      ? financeLiveData.financeCostRows
+      : financeCostRows;
+
+  const liveFinanceCostBars =
+    Array.isArray(financeLiveData?.financeCostBars) && financeLiveData.financeCostBars.length > 0
+      ? financeLiveData.financeCostBars
+      : financeCostBars;
+
+  const liveFinanceProjectionRows =
+    Array.isArray(financeLiveData?.financeProjectionRows) && financeLiveData.financeProjectionRows.length > 0
+      ? financeLiveData.financeProjectionRows
+      : financeProjectionRows;
+
+  const liveFinanceMiaRows =
+    Array.isArray(financeLiveData?.financeMiaRows) && financeLiveData.financeMiaRows.length > 0
+      ? financeLiveData.financeMiaRows
+      : financeMiaRows;
+
   return (
     <main className="lab-page">
       <aside className="lab-sidebar">
@@ -2952,24 +3020,24 @@ export default function StudioLabPage() {
 
                 <div className="finance-big-number">
                   <small>Saldo operacional estimado</small>
-                  <strong>R$ 36.320,00</strong>
-                  <span>Lucro líquido após custos principais do mês</span>
+                  <strong>{liveFinanceSummary.operatingBalance || "R$ 36.320,00"}</strong>
+                  <span>{liveFinanceSummary.profitLabel || "Lucro líquido após custos principais do mês"}</span>
                 </div>
 
                 <div className="finance-mini-grid">
                   <div>
                     <small>Receita</small>
-                    <strong>R$ 48.750</strong>
-                    <em>+18,6%</em>
+                    <strong>{liveFinanceSummary.revenue || "R$ 48.750"}</strong>
+                    <em>{liveFinanceSummary.revenueGrowth || "+18,6%"}</em>
                   </div>
                   <div>
                     <small>Gastos</small>
-                    <strong>R$ 12.430</strong>
+                    <strong>{liveFinanceSummary.costs || "R$ 12.430"}</strong>
                     <em className="negative">monitorar</em>
                   </div>
                   <div>
                     <small>Reinvestir</small>
-                    <strong>R$ 8.600</strong>
+                    <strong>{liveFinanceSummary.reinvestment || "R$ 8.600"}</strong>
                     <em>produto + marketing</em>
                   </div>
                 </div>
@@ -2977,19 +3045,16 @@ export default function StudioLabPage() {
 
               <div className="finance-side-card">
                 <PanelTitle eyebrow="Mia Financeira" title="Leitura rápida" />
-                <p>
-                  O financeiro está saudável, mas precisa separar origem da receita,
-                  custos fixos, custos variáveis e ROI dos agentes antes de escalar.
-                </p>
+                <p>{liveFinanceSummary.miaSummary || "O financeiro está saudável, mas precisa separar origem da receita, custos fixos, custos variáveis e ROI dos agentes antes de escalar."}</p>
                 <div className="finance-score">
-                  <strong>82%</strong>
+                  <strong>{liveFinanceHealthScore}%</strong>
                   <span>Saúde financeira</span>
                 </div>
               </div>
             </section>
 
             <section className="metric-grid finance-metrics">
-              {financeDashboardCards.map((item) => (
+              {liveFinanceDashboardCards.map((item: any) => (
                 <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
               ))}
             </section>
@@ -2997,7 +3062,7 @@ export default function StudioLabPage() {
             <section className="lower-grid">
               <div className="panel">
                 <PanelTitle eyebrow="Origem do dinheiro" title="De onde está vindo a receita" />
-                {financeRevenueRows.map((item) => (
+                {liveFinanceRevenueRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
@@ -3005,7 +3070,7 @@ export default function StudioLabPage() {
               <div className="panel">
                 <PanelTitle eyebrow="Distribuição" title="Receita por fonte" />
                 <div className="finance-bars">
-                  {financeBars.map((item) => (
+                  {liveFinanceBars.map((item: any) => (
                     <div key={item.label} className={`finance-bar ${item.tone}`}>
                       <div>
                         <strong>{item.label}</strong>
@@ -3021,7 +3086,7 @@ export default function StudioLabPage() {
             <section className="lower-grid">
               <div className="panel">
                 <PanelTitle eyebrow="Custos da plataforma" title="Onde o dinheiro está sendo gasto" />
-                {financeCostRows.map((item) => (
+                {liveFinanceCostRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
@@ -3029,7 +3094,7 @@ export default function StudioLabPage() {
               <div className="panel">
                 <PanelTitle eyebrow="Distribuição" title="Gastos por categoria" />
                 <div className="finance-bars">
-                  {financeCostBars.map((item) => (
+                  {liveFinanceCostBars.map((item: any) => (
                     <div key={item.label} className={`finance-bar ${item.tone}`}>
                       <div>
                         <strong>{item.label}</strong>
@@ -3045,14 +3110,14 @@ export default function StudioLabPage() {
             <section className="lower-grid">
               <div className="panel">
                 <PanelTitle eyebrow="Projeção" title="Cenários do mês" />
-                {financeProjectionRows.map((item) => (
+                {liveFinanceProjectionRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
 
               <div className="panel">
                 <PanelTitle eyebrow="Sugestões da Mia" title="Próximas decisões financeiras" />
-                {financeMiaRows.map((item) => (
+                {liveFinanceMiaRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
