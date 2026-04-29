@@ -1377,6 +1377,75 @@ const stripeRevenueBars = [
   { label: "Extras", value: "5%", tone: "yellow" as Tone },
 ];
 
+
+const healthGeneralCards = [
+  { title: "Saúde geral", value: "87%", detail: "Sistema está operacional, com pontos de atenção", tone: "green" as Tone },
+  { title: "APIs online", value: "12/14", detail: "Serviços principais respondendo", tone: "blue" as Tone },
+  { title: "Alertas ativos", value: "5", detail: "Itens que precisam revisão", tone: "yellow" as Tone },
+  { title: "Riscos críticos", value: "2", detail: "Podem afetar lead, login ou venda", tone: "red" as Tone },
+];
+
+const healthSystemRows = [
+  { title: "Aplicação principal", detail: "Next.js rodando via PM2, respondendo no domínio e subdomínio.", value: "online", tone: "green" as Tone },
+  { title: "Banco Postgres local", detail: "Postgres respondeu e a API do Studio já conseguiu ler dados reais.", value: "online", tone: "green" as Tone },
+  { title: "API Studio Dashboard", detail: "Rota /api/studio/dashboard retornando dados do banco.", value: "ok", tone: "green" as Tone },
+  { title: "Nginx / proxy", detail: "Proxy ativo, mas precisa monitorar 502 quando o app reinicia.", value: "atenção", tone: "yellow" as Tone },
+];
+
+const healthApiRows = [
+  { title: "API de leads", detail: "Responsável por capturar formulários, lista de espera e campanhas.", value: "monitorar", tone: "blue" as Tone },
+  { title: "API comunidade", detail: "Posts, comentários, compartilhamentos e perfis precisam rastreio constante.", value: "ativa", tone: "green" as Tone },
+  { title: "API cliente", detail: "Dashboard, entregas, reuniões, mensagens e notificações do cliente.", value: "ativa", tone: "green" as Tone },
+  { title: "API prestador", detail: "Oportunidades, kanban, reuniões e portfolio precisam logs de erro.", value: "atenção", tone: "yellow" as Tone },
+  { title: "API Stripe futura", detail: "Ainda visual/mockada; depois conecta backend seguro com chave secreta.", value: "pendente", tone: "yellow" as Tone },
+];
+
+const healthJourneyRows = [
+  { title: "Cadastro/Login", detail: "Usuário consegue entrar, mas precisamos monitorar confirmação de e-mail e sessão expirada.", value: "bom", tone: "green" as Tone },
+  { title: "Onboarding", detail: "Ainda precisa guiar melhor a primeira ação depois do cadastro.", value: "médio", tone: "yellow" as Tone },
+  { title: "Ativação", detail: "Usuário precisa entender rápido onde clicar e qual benefício usar primeiro.", value: "atenção", tone: "yellow" as Tone },
+  { title: "Compra", detail: "Checkout, pagamento e liberação de acesso precisam ficar 100% rastreáveis.", value: "em risco", tone: "red" as Tone },
+  { title: "Suporte", detail: "Precisa mostrar erro, último clique, plano e histórico sem abrir Supabase.", value: "prioridade", tone: "pink" as Tone },
+];
+
+const healthBusinessRows = [
+  { title: "Serviços", detail: "Área estratégica para transformar usuários em clientes e prestadores.", value: "ativo", tone: "green" as Tone },
+  { title: "Comunidade", detail: "Precisa monitorar denúncias, hashtags, retenção e debates fortes.", value: "ativo", tone: "green" as Tone },
+  { title: "Admin Loja", detail: "Produtos digitais: agentes, automações, skills e templates.", value: "ativo", tone: "green" as Tone },
+  { title: "Google / SEO", detail: "Central de presença digital pronta visualmente; falta conectar Search Console.", value: "em andamento", tone: "blue" as Tone },
+  { title: "Stripe", detail: "Aba criada; próxima etapa é API segura no backend.", value: "pendente", tone: "yellow" as Tone },
+];
+
+const healthRiskRows = [
+  { title: "Visual conectado em massa", detail: "Conectar muitas abas ao banco de uma vez pode quebrar a página. Fazer uma por vez.", value: "risco", tone: "red" as Tone },
+  { title: "Reinício do app", detail: "Durante restart, o Nginx pode mostrar 502 por alguns segundos.", value: "normal", tone: "yellow" as Tone },
+  { title: "Logs antigos do PM2", detail: "Existem erros antigos nos logs. Não significam necessariamente erro atual.", value: "limpar depois", tone: "blue" as Tone },
+  { title: "Ambiente misto", detail: "Projeto tem Supabase remoto e Postgres local. Precisamos padronizar leitura por área.", value: "atenção", tone: "yellow" as Tone },
+];
+
+const healthMiaRows = [
+  { title: "Próxima ação segura", detail: "Conectar primeiro Tarefas do Sistema ao banco, testar, salvar no Git e só depois ir para outra aba.", value: "fazer agora", tone: "pink" as Tone },
+  { title: "Monitoramento automático", detail: "Criar agente que verifica páginas, APIs, banco, e-mails e pagamentos a cada intervalo.", value: "agente futuro", tone: "green" as Tone },
+  { title: "Mapa de incidentes", detail: "Registrar cada erro com data, área, gravidade, causa e solução aplicada.", value: "importante", tone: "blue" as Tone },
+  { title: "Painel de confiança", detail: "Mostrar para você o que está verde, amarelo e vermelho sem precisar abrir terminal.", value: "alto impacto", tone: "yellow" as Tone },
+];
+
+const healthChecklistRows = [
+  { title: "Banco responde", detail: "API precisa retornar source postgres.", value: "ok", tone: "green" as Tone },
+  { title: "Build passa", detail: "npm run build precisa terminar sem erro.", value: "ok", tone: "green" as Tone },
+  { title: "PM2 online", detail: "Processo luma-os precisa estar online e escutando porta 3000.", value: "ok", tone: "green" as Tone },
+  { title: "Nginx responde", detail: "Domínio e subdomínio precisam abrir sem 502.", value: "ok", tone: "green" as Tone },
+  { title: "Página não quebra", detail: "Depois de cada conexão, abrir Studio Lab e testar navegação.", value: "obrigatório", tone: "pink" as Tone },
+];
+
+const healthBars = [
+  { label: "Sistema", value: "92%", tone: "green" as Tone },
+  { label: "Banco", value: "88%", tone: "blue" as Tone },
+  { label: "UX", value: "78%", tone: "yellow" as Tone },
+  { label: "Pagamentos", value: "58%", tone: "red" as Tone },
+  { label: "SEO/Google", value: "64%", tone: "pink" as Tone },
+];
+
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
 }
@@ -2278,18 +2347,129 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "saude" && (
-          <section className="metric-grid">
-            {[
-              { title: "Saúde do sistema", value: "92%", detail: "Servidor e APIs principais online", tone: "green" as Tone },
-              { title: "Saúde da UX", value: "78%", detail: "Cadastro bom, onboarding médio", tone: "yellow" as Tone },
-              { title: "Saúde dos agentes", value: "84%", detail: "Mia ativa, 2 automações em teste", tone: "blue" as Tone },
-              { title: "Saúde do suporte", value: "71%", detail: "11 usuários com erro recente", tone: "red" as Tone },
-              { title: "Saúde da comunidade", value: "88%", detail: "Interação subindo", tone: "pink" as Tone },
-              { title: "Saúde dos serviços", value: "76%", detail: "Empresas param no briefing", tone: "purple" as Tone },
-            ].map((item) => (
-              <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
-            ))}
-          </section>
+          <>
+            <section className="health-hero">
+              <div className="health-main-card">
+                <PanelTitle eyebrow="Saúde Geral" title="Raio-X operacional do Studio Sualuma" action="Ver alertas" />
+
+                <div className="health-big-score">
+                  <small>Saúde consolidada do ecossistema</small>
+                  <strong>87%</strong>
+                  <span>Sistema está funcionando, mas pagamentos, onboarding e conexões futuras precisam cuidado.</span>
+                </div>
+
+                <div className="health-status-grid">
+                  <div>
+                    <span className="health-dot green" />
+                    <strong>Sistema online</strong>
+                    <small>PM2 + Next + Nginx</small>
+                  </div>
+                  <div>
+                    <span className="health-dot green" />
+                    <strong>Banco lendo</strong>
+                    <small>Postgres local ativo</small>
+                  </div>
+                  <div>
+                    <span className="health-dot yellow" />
+                    <strong>Onboarding médio</strong>
+                    <small>Precisa guiar melhor</small>
+                  </div>
+                  <div>
+                    <span className="health-dot red" />
+                    <strong>Pagamentos pendente</strong>
+                    <small>Stripe ainda mockado</small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="health-side-card">
+                <PanelTitle eyebrow="Mia Diagnóstico" title="Leitura rápida" />
+                <p>
+                  O Studio já está forte visualmente e a API do banco respondeu. Agora o risco maior é conectar
+                  muitas abas de uma vez. A estratégia segura é ligar uma área por vez, testar e salvar.
+                </p>
+
+                <div className="health-mini-bars">
+                  {healthBars.map((item) => (
+                    <div key={item.label} className={`health-mini-bar ${item.tone}`}>
+                      <div>
+                        <strong>{item.label}</strong>
+                        <span>{item.value}</span>
+                      </div>
+                      <b style={{ width: item.value }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="metric-grid health-metrics">
+              {healthGeneralCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Sistema" title="Serviços principais" />
+                {healthSystemRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="APIs" title="Rotas e integrações críticas" />
+                {healthApiRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Jornada" title="Cadastro, onboarding, compra e suporte" />
+                {healthJourneyRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Áreas do negócio" title="O que está ativo no ecossistema" />
+                {healthBusinessRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Riscos" title="Pontos que podem quebrar ou travar crescimento" />
+                {healthRiskRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Checklist" title="Condições para considerar tudo saudável" />
+                {healthChecklistRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="panel full">
+              <PanelTitle eyebrow="Sugestões da Mia" title="Como deixar o sistema mais estável e inteligente" action="Criar tarefa" />
+              <div className="health-mia-grid">
+                {healthMiaRows.map((item) => (
+                  <div key={item.title} className={`health-mia-card ${item.tone}`}>
+                    <strong>{item.title}</strong>
+                    <p>{item.detail}</p>
+                    <span>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
         )}
 
         {activeView === "stripe" && (
@@ -3088,6 +3268,169 @@ export default function StudioLabPage() {
 
         .full { min-height: 650px; }
 
+        .health-hero {
+          display: grid;
+          grid-template-columns: 1.45fr .95fr;
+          gap: 18px;
+          margin-top: 18px;
+        }
+
+        .health-main-card,
+        .health-side-card {
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.28);
+          backdrop-filter: blur(24px);
+          border-radius: 28px;
+          padding: 22px;
+        }
+
+        .health-big-score {
+          margin-top: 18px;
+          padding: 24px;
+          border-radius: 26px;
+          background:
+            radial-gradient(circle at 22% 0%, rgba(34,197,94,.22), transparent 34%),
+            radial-gradient(circle at 84% 10%, rgba(255,79,189,.18), transparent 28%),
+            rgba(255,255,255,.04);
+          border: 1px solid rgba(34,197,94,.18);
+        }
+
+        .health-big-score small {
+          display: block;
+          color: rgba(255,255,255,.58);
+        }
+
+        .health-big-score strong {
+          display: block;
+          margin: 8px 0;
+          font-size: clamp(44px, 6vw, 82px);
+          letter-spacing: -.07em;
+          color: #86efac;
+          text-shadow: 0 0 36px rgba(34,197,94,.30);
+        }
+
+        .health-big-score span,
+        .health-side-card p {
+          color: rgba(255,255,255,.64);
+          line-height: 1.6;
+        }
+
+        .health-status-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-top: 14px;
+        }
+
+        .health-status-grid div {
+          padding: 14px;
+          border-radius: 18px;
+          background: rgba(255,255,255,.045);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .health-status-grid strong {
+          display: block;
+          margin: 8px 0 3px;
+          color: #fff;
+          font-size: 14px;
+        }
+
+        .health-status-grid small {
+          color: rgba(255,255,255,.55);
+          font-size: 12px;
+        }
+
+        .health-dot {
+          width: 11px;
+          height: 11px;
+          display: inline-block;
+          border-radius: 999px;
+          box-shadow: 0 0 18px currentColor;
+        }
+
+        .health-dot.green { color: #22c55e; background: #22c55e; }
+        .health-dot.yellow { color: #facc15; background: #facc15; }
+        .health-dot.red { color: #fb7185; background: #fb7185; }
+
+        .health-mini-bars {
+          display: grid;
+          gap: 14px;
+          margin-top: 18px;
+        }
+
+        .health-mini-bar {
+          display: grid;
+          gap: 8px;
+        }
+
+        .health-mini-bar div {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .health-mini-bar strong {
+          color: #fff;
+        }
+
+        .health-mini-bar span {
+          color: rgba(255,255,255,.62);
+          font-size: 13px;
+        }
+
+        .health-mini-bar b {
+          display: block;
+          height: 12px;
+          border-radius: 999px;
+          background: currentColor;
+          box-shadow: 0 0 22px currentColor;
+        }
+
+        .health-metrics {
+          margin-top: 18px;
+        }
+
+        .health-mia-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .health-mia-card {
+          min-height: 175px;
+          border-radius: 22px;
+          padding: 18px;
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.24);
+        }
+
+        .health-mia-card strong {
+          display: block;
+          color: #fff;
+          font-size: 17px;
+          margin-bottom: 8px;
+        }
+
+        .health-mia-card p {
+          color: rgba(255,255,255,.62);
+          line-height: 1.5;
+          margin: 0 0 14px;
+          font-size: 13px;
+        }
+
+        .health-mia-card span {
+          display: inline-flex;
+          padding: 7px 10px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.07);
+          color: #ff9be6;
+          font-size: 12px;
+        }
+
         .stripe-hero {
           display: grid;
           grid-template-columns: 1.7fr .9fr;
@@ -3759,6 +4102,7 @@ export default function StudioLabPage() {
 
         @media (max-width: 1280px) {
           .hero-grid,
+          .health-hero,
           .stripe-hero,
           .finance-hero,
           .community-hero,
@@ -3777,7 +4121,9 @@ export default function StudioLabPage() {
           .subdomain-grid,
           .task-board,
           .opportunity-grid,
-          .stripe-alert-grid {
+          .stripe-alert-grid,
+          .health-mia-grid,
+          .health-status-grid {
             grid-template-columns: repeat(2, 1fr);
           }
 
@@ -3815,7 +4161,9 @@ export default function StudioLabPage() {
           .subdomain-grid,
           .task-board,
           .opportunity-grid,
-          .stripe-alert-grid {
+          .stripe-alert-grid,
+          .health-mia-grid,
+          .health-status-grid {
             grid-template-columns: 1fr;
           }
 
