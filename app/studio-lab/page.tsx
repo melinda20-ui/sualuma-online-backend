@@ -1,9 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 
 type StudioView =
   | "visao"
+  | "ux"
+  | "relatorios"
+  | "blog"
+  | "email"
   | "sitemap"
   | "mia"
   | "agentes"
@@ -16,8 +21,27 @@ type StudioView =
 
 type Tone = "pink" | "blue" | "green" | "yellow" | "red" | "purple";
 
+type JourneyStatus = "ativo" | "andamento" | "risco" | "alerta";
+
+type JourneyNode = {
+  id: string;
+  title: string;
+  icon: string;
+  status: JourneyStatus;
+  position: {
+    left: string;
+    top: string;
+  };
+  steps: string[];
+  description: string;
+};
+
 const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = [
   { id: "visao", label: "Visão Geral", icon: "🏠" },
+  { id: "ux", label: "UX", icon: "🌳" },
+  { id: "relatorios", label: "Relatórios", icon: "📊" },
+  { id: "blog", label: "Relatórios Blog", icon: "📝", badge: "Novo" },
+  { id: "email", label: "Relatórios E-mail", icon: "📨", badge: "Novo" },
   { id: "sitemap", label: "Raiz do Site", icon: "🧬", badge: "12" },
   { id: "mia", label: "Painel da Mia", icon: "🧠" },
   { id: "agentes", label: "Agentes", icon: "🤖", badge: "9" },
@@ -85,6 +109,899 @@ const notifications = [
   { title: "Mia encontrou gargalo no onboarding", detail: "Usuários abandonando depois do cadastro", tone: "yellow" as Tone },
   { title: "Agente Sitemap pode ser criado agora", detail: "Impacto alto para manutenção do império", tone: "green" as Tone },
   { title: "Receita do mês subiu", detail: "Financeiro aponta crescimento de 18%", tone: "pink" as Tone },
+];
+
+
+const uxStatusLabel: Record<JourneyStatus, string> = {
+  ativo: "Ativo",
+  andamento: "Em andamento",
+  risco: "Em risco",
+  alerta: "Alerta",
+};
+
+const uxStatusClass: Record<JourneyStatus, string> = {
+  ativo: "ux-status-pink",
+  andamento: "ux-status-green",
+  risco: "ux-status-red",
+  alerta: "ux-status-yellow",
+};
+
+const uxNodes: JourneyNode[] = [
+  {
+    id: "entrada",
+    title: "Entrada do usuário",
+    icon: "👤",
+    status: "ativo",
+    position: { left: "18%", top: "12%" },
+    steps: ["Viu conteúdo", "Clicou no link", "Chegou na home"],
+    description: "Mostra por onde o usuário chega antes de conhecer o ecossistema Sualuma.",
+  },
+  {
+    id: "home",
+    title: "Home",
+    icon: "🏠",
+    status: "ativo",
+    position: { left: "50%", top: "8%" },
+    steps: ["Acessa a home", "Lê a promessa", "Escolhe uma ação"],
+    description: "Primeiro contato real com a plataforma, promessa principal e caminhos de entrada.",
+  },
+  {
+    id: "minha-empresa",
+    title: "Minha empresa",
+    icon: "🏢",
+    status: "ativo",
+    position: { left: "64%", top: "21%" },
+    steps: ["Entrou na área", "Visualizou dados da empresa", "Consultou documentos", "Acompanhou situação do CNPJ"],
+    description: "Mostra a jornada do usuário quando ele acessa a área Minha empresa para acompanhar situação, documentos e ações do negócio.",
+  },
+  {
+    id: "cadastro",
+    title: "Cadastro/Login",
+    icon: "🔐",
+    status: "ativo",
+    position: { left: "15%", top: "29%" },
+    steps: ["Clica em entrar", "Cria conta", "Confirma acesso"],
+    description: "Fluxo de autenticação, cadastro, login e possíveis limites de acesso.",
+  },
+  {
+    id: "onboarding",
+    title: "Onboarding",
+    icon: "🤖",
+    status: "andamento",
+    position: { left: "15%", top: "48%" },
+    steps: ["Boas-vindas", "Tour guiado", "Primeira ação", "Usuário pronto"],
+    description: "Explica o que acontece depois do cadastro e como o usuário aprende a usar.",
+  },
+  {
+    id: "suporte",
+    title: "Dúvida/Suporte",
+    icon: "🎧",
+    status: "ativo",
+    position: { left: "18%", top: "67%" },
+    steps: ["Abriu dúvida", "IA responde", "Ticket criado", "Resolvido"],
+    description: "Mostra o caminho quando o usuário tem uma dúvida ou precisa de atendimento.",
+  },
+  {
+    id: "email",
+    title: "E-mail enviado?",
+    icon: "✉️",
+    status: "alerta",
+    position: { left: "33%", top: "81%" },
+    steps: ["Evento disparado", "E-mail preparado", "Envio validado", "Entrega monitorada"],
+    description: "Confere se o usuário recebeu o e-mail certo depois de cada ação importante.",
+  },
+  {
+    id: "compra",
+    title: "Compra",
+    icon: "🛒",
+    status: "ativo",
+    position: { left: "82%", top: "12%" },
+    steps: ["Carrinho aberto", "Pagamento iniciado", "Pagamento concluído", "Confirmação enviada"],
+    description: "Acompanha o caminho completo de compra, pagamento e confirmação.",
+  },
+  {
+    id: "indicacao",
+    title: "Indicação",
+    icon: "👥",
+    status: "andamento",
+    position: { left: "78%", top: "30%" },
+    steps: ["Usuário indica", "Link rastreado", "Novo lead entra", "Recompensa registrada"],
+    description: "Mostra o que acontece quando alguém indica a plataforma para outra pessoa.",
+  },
+  {
+    id: "prestador",
+    title: "Prestador de serviço",
+    icon: "🧰",
+    status: "andamento",
+    position: { left: "78%", top: "49%" },
+    steps: ["Entra na área", "Completa perfil", "Ativa serviços", "Recebe oportunidades"],
+    description: "Fluxo para transformar um usuário em prestador dentro da plataforma.",
+  },
+  {
+    id: "empresa",
+    title: "Empresa cria proposta",
+    icon: "📄",
+    status: "alerta",
+    position: { left: "78%", top: "68%" },
+    steps: ["Empresa entra", "Publica demanda", "Recebe propostas", "Escolhe profissional"],
+    description: "Mostra como uma empresa consegue criar uma proposta ou contratar serviços.",
+  },
+  {
+    id: "contratacao",
+    title: "Contratação",
+    icon: "✅",
+    status: "ativo",
+    position: { left: "58%", top: "82%" },
+    steps: ["Proposta aceita", "Pagamento combinado", "Projeto iniciado", "Entrega acompanhada"],
+    description: "Acompanha o momento em que uma contratação acontece dentro do ecossistema.",
+  },
+  {
+    id: "retencao",
+    title: "Retenção",
+    icon: "💗",
+    status: "ativo",
+    position: { left: "82%", top: "84%" },
+    steps: ["Usuário volta", "Recebe novidades", "Gera novo valor", "Continua ativo"],
+    description: "Mostra o que mantém o usuário voltando, comprando e usando a plataforma.",
+  },
+];
+
+function UXTreeInline() {
+  const [selectedNode, setSelectedNode] = useState<JourneyNode | null>(null);
+  const [customNodes, setCustomNodes] = useState<JourneyNode[]>([]);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  const dragState = useRef({
+    active: false,
+    x: 0,
+    y: 0,
+    moved: false,
+  });
+
+  const activePath = useMemo(() => {
+    if (!selectedNode) return "";
+    return selectedNode.steps.join(" → ");
+  }, [selectedNode]);
+
+  const customSlots = [
+    { left: "63%", top: "36%" },
+    { left: "42%", top: "26%" },
+    { left: "64%", top: "58%" },
+    { left: "40%", top: "62%" },
+  ];
+
+  function addCustomBranch() {
+    if (dragState.current.moved) return;
+
+    const index = customNodes.length + 1;
+    const slot = customSlots[(index - 1) % customSlots.length];
+
+    setCustomNodes((current) => [
+      ...current,
+      {
+        id: `custom-${Date.now()}`,
+        title: index === 1 ? "Novo galho" : `Novo galho ${index}`,
+        icon: "✨",
+        status: "alerta",
+        position: slot,
+        steps: ["Galho criado", "Escolher destino", "Conectar fluxo", "Salvar jornada"],
+        description: "Novo ponto criado a partir do tronco para conectar uma nova área, fluxo ou jornada.",
+      },
+    ]);
+  }
+
+  function getPoint(position: { left: string; top: string }) {
+    return {
+      x: (parseFloat(position.left) / 100) * 1000,
+      y: (parseFloat(position.top) / 100) * 680,
+    };
+  }
+
+  function customBranchPath(position: { left: string; top: string }) {
+    const point = getPoint(position);
+    const middleX = (500 + point.x) / 2;
+    const middleY = (520 + point.y) / 2;
+
+    return `M500 520 C${middleX} ${middleY + 40} ${middleX} ${point.y - 40} ${point.x} ${point.y}`;
+  }
+
+  function handleStagePointerDown(event: PointerEvent<HTMLDivElement>) {
+    const target = event.target as HTMLElement;
+
+    if (target.closest("button, a, input, textarea, .ux-popup")) return;
+
+    dragState.current = {
+      active: true,
+      x: event.clientX,
+      y: event.clientY,
+      moved: false,
+    };
+
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
+
+  function handleStagePointerMove(event: PointerEvent<HTMLDivElement>) {
+    if (!dragState.current.active) return;
+
+    const dx = event.clientX - dragState.current.x;
+    const dy = event.clientY - dragState.current.y;
+
+    if (Math.abs(dx) + Math.abs(dy) > 3) {
+      dragState.current.moved = true;
+    }
+
+    dragState.current.x = event.clientX;
+    dragState.current.y = event.clientY;
+
+    setPan((current) => ({
+      x: current.x + dx,
+      y: current.y + dy,
+    }));
+  }
+
+  function handleStagePointerUp() {
+    dragState.current.active = false;
+    setIsDragging(false);
+  }
+
+  return (
+    <section className="ux-inline-shell">
+      <div
+        className={`ux-inline-stage ${isDragging ? "dragging" : ""}`}
+        onPointerDown={handleStagePointerDown}
+        onPointerMove={handleStagePointerMove}
+        onPointerUp={handleStagePointerUp}
+        onPointerLeave={handleStagePointerUp}
+      >
+        <div
+          className="ux-pan-layer"
+          style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}
+        >
+        <svg className="ux-branches" viewBox="0 0 1000 680" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="uxBranchGradient" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#ff4fbd" />
+              <stop offset="45%" stopColor="#a855f7" />
+              <stop offset="100%" stopColor="#38bdf8" />
+            </linearGradient>
+            <filter id="uxGlow">
+              <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <path d="M500 390 C420 260 300 120 180 82" />
+          <path d="M500 310 C500 200 500 110 500 54" />
+          <path d="M500 340 C555 255 605 175 650 140" />
+          <path d="M500 420 C385 330 260 220 150 197" />
+          <path d="M500 470 C380 420 260 340 150 326" />
+          <path d="M500 525 C390 520 285 460 180 456" />
+          <path d="M500 575 C435 570 380 545 330 551" />
+          <path d="M500 390 C610 255 720 120 820 82" />
+          <path d="M500 435 C610 360 700 240 780 204" />
+          <path d="M500 492 C620 465 700 355 780 333" />
+          <path d="M500 545 C620 540 710 470 780 462" />
+          <path d="M500 585 C535 562 560 552 580 558" />
+          <path d="M500 600 C620 615 725 578 820 571" />
+
+          {customNodes.map((node) => {
+            const point = getPoint(node.position);
+            return (
+              <g key={`branch-${node.id}`}>
+                <path className="ux-custom-branch" d={customBranchPath(node.position)} />
+                <circle cx={point.x} cy={point.y} r="7" />
+              </g>
+            );
+          })}
+
+          <circle cx="180" cy="82" r="7" />
+          <circle cx="500" cy="54" r="7" />
+          <circle cx="650" cy="140" r="7" />
+          <circle cx="150" cy="197" r="7" />
+          <circle cx="150" cy="326" r="7" />
+          <circle cx="180" cy="456" r="7" />
+          <circle cx="330" cy="551" r="7" />
+          <circle cx="820" cy="82" r="7" />
+          <circle cx="780" cy="204" r="7" />
+          <circle cx="780" cy="333" r="7" />
+          <circle cx="780" cy="462" r="7" />
+          <circle cx="580" cy="558" r="7" />
+          <circle cx="820" cy="571" r="7" />
+        </svg>
+
+        <div
+          className="ux-tree-trunk"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={addCustomBranch}
+          title="Clique para criar um novo galho"
+        >
+          <div className="ux-trunk-shine" />
+          <div className="ux-face">
+            <span className="ux-eye left" />
+            <span className="ux-eye right" />
+            <span className="ux-mouth" />
+          </div>
+          <div className="ux-speech one">Tá tudo bem? 😊</div>
+          <div className="ux-speech two">Vamos ver essa área? 👀</div>
+        </div>
+
+        {[...uxNodes, ...customNodes].map((node) => (
+          <button
+            key={node.id}
+            onClick={() => setSelectedNode(node)}
+            onPointerDown={(event) => event.stopPropagation()}
+            className={`ux-node ${uxStatusClass[node.status]} ${selectedNode?.id === node.id ? "selected" : ""}`}
+            style={{ left: node.position.left, top: node.position.top }}
+          >
+            <span className="ux-leaf a" />
+            <span className="ux-leaf b" />
+            <span className="ux-node-icon">{node.icon}</span>
+            <strong>{node.title}</strong>
+            <small>
+              <i /> {uxStatusLabel[node.status]}
+            </small>
+          </button>
+        ))}
+
+        {selectedNode && (
+          <div className={`ux-popup ${uxStatusClass[selectedNode.status]}`}>
+            <button className="ux-close" onClick={() => setSelectedNode(null)} aria-label="Fechar">
+              ×
+            </button>
+
+            <div className="ux-popup-icon">{selectedNode.icon}</div>
+            <h3>{selectedNode.title}</h3>
+            <p>{selectedNode.description}</p>
+
+            <div className="ux-flow-path">{activePath}</div>
+
+            <div className="ux-timeline">
+              {selectedNode.steps.map((step, index) => (
+                <div key={step} className={index === selectedNode.steps.length - 1 ? "done" : ""}>
+                  <span>{index + 1}</span>
+                  <strong>{step}</strong>
+                  <small>{index === selectedNode.steps.length - 1 ? "Concluído" : "Mapeado"}</small>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        </div>
+      </div>
+
+      <style>{`
+        .ux-inline-shell {
+          min-height: calc(100vh - 170px);
+          border-radius: 28px;
+          border: 1px solid rgba(255,255,255,.10);
+          background:
+            radial-gradient(circle at 50% 45%, rgba(255,79,189,.16), transparent 34%),
+            radial-gradient(circle at 75% 20%, rgba(56,189,248,.11), transparent 28%),
+            linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018));
+          box-shadow: 0 24px 90px rgba(0,0,0,.28);
+          overflow: hidden;
+        }
+
+        .ux-inline-stage {
+          position: relative;
+          height: calc(100vh - 170px);
+          min-height: 760px;
+          width: 100%;
+          overflow: hidden;
+          cursor: grab;
+          touch-action: none;
+        }
+
+        .ux-inline-stage.dragging {
+          cursor: grabbing;
+        }
+
+        .ux-pan-layer {
+          position: absolute;
+          inset: 0;
+          transform-origin: 0 0;
+          will-change: transform;
+        }
+
+        .ux-branches {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+          pointer-events: none;
+        }
+
+        .ux-branches path {
+          fill: none;
+          stroke: url(#uxBranchGradient);
+          stroke-width: 6;
+          stroke-linecap: round;
+          filter: url(#uxGlow);
+          opacity: .86;
+          animation: uxBranchPulse 5s ease-in-out infinite;
+        }
+
+        .ux-custom-branch {
+          stroke-dasharray: 12 10;
+          animation: uxBranchPulse 2.6s ease-in-out infinite;
+        }
+
+        .ux-branches circle {
+          fill: #ff9be6;
+          stroke: rgba(255,255,255,.92);
+          stroke-width: 2;
+          filter: drop-shadow(0 0 12px #ff4fbd);
+        }
+
+        @keyframes uxBranchPulse {
+          0%, 100% { opacity: .62; }
+          50% { opacity: 1; }
+        }
+
+        .ux-tree-trunk {
+          position: absolute;
+          cursor: pointer;
+          z-index: 2;
+          left: 50%;
+          bottom: -8px;
+          transform: translateX(-50%);
+          width: 250px;
+          height: 465px;
+          background:
+            linear-gradient(95deg, rgba(255,79,189,.25), rgba(168,85,247,.15), rgba(56,189,248,.11)),
+            linear-gradient(180deg, #ff4fbd, #a855f7 55%, #4f46e5);
+          clip-path: polygon(43% 0, 57% 0, 70% 38%, 84% 100%, 16% 100%, 30% 38%);
+          box-shadow:
+            0 0 45px rgba(255,79,189,.65),
+            0 0 120px rgba(168,85,247,.42);
+          animation: uxTrunkGlow 3.5s ease-in-out infinite;
+        }
+
+        .ux-trunk-shine {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(120deg, transparent, rgba(255,255,255,.36), transparent),
+            radial-gradient(circle at 50% 38%, rgba(255,255,255,.35), transparent 18%);
+          transform: translateX(-100%);
+          animation: uxEnergy 3s linear infinite;
+        }
+
+        @keyframes uxEnergy {
+          0% { transform: translateX(-120%) rotate(8deg); opacity: .2; }
+          45% { opacity: .7; }
+          100% { transform: translateX(120%) rotate(8deg); opacity: .15; }
+        }
+
+        @keyframes uxTrunkGlow {
+          0%, 100% {
+            filter: saturate(1);
+            box-shadow: 0 0 45px rgba(255,79,189,.58), 0 0 120px rgba(168,85,247,.38);
+          }
+          50% {
+            filter: saturate(1.25);
+            box-shadow: 0 0 70px rgba(255,79,189,.95), 0 0 160px rgba(56,189,248,.38);
+          }
+        }
+
+        .ux-face {
+          position: absolute;
+          left: 50%;
+          top: 46%;
+          transform: translate(-50%, -50%);
+          width: 90px;
+          height: 60px;
+          z-index: 3;
+        }
+
+        .ux-eye {
+          position: absolute;
+          top: 7px;
+          width: 20px;
+          height: 28px;
+          border-radius: 50%;
+          background: #ff9be6;
+          box-shadow: 0 0 22px #ff4fbd;
+          animation: uxBlink 4s infinite;
+        }
+
+        .ux-eye.left { left: 15px; }
+        .ux-eye.right { right: 15px; }
+
+        @keyframes uxBlink {
+          0%, 92%, 100% { transform: scaleY(1); }
+          95% { transform: scaleY(.12); }
+        }
+
+        .ux-mouth {
+          position: absolute;
+          left: 50%;
+          bottom: 5px;
+          width: 32px;
+          height: 16px;
+          transform: translateX(-50%);
+          border-bottom: 5px solid #ff9be6;
+          border-radius: 0 0 999px 999px;
+          filter: drop-shadow(0 0 10px #ff4fbd);
+        }
+
+        .ux-speech {
+          position: absolute;
+          padding: 9px 12px;
+          border-radius: 13px;
+          color: #fff;
+          font-size: 12px;
+          background: rgba(20,14,32,.78);
+          border: 1px solid rgba(255,79,189,.28);
+          box-shadow: 0 0 20px rgba(255,79,189,.20);
+          animation: uxFloat 4s ease-in-out infinite;
+          white-space: nowrap;
+        }
+
+        .ux-speech.one {
+          left: -108px;
+          top: 205px;
+        }
+
+        .ux-speech.two {
+          right: -128px;
+          top: 292px;
+          animation-delay: 1s;
+        }
+
+        @keyframes uxFloat {
+          0%, 100% { transform: translateY(0); opacity: .75; }
+          50% { transform: translateY(-9px); opacity: 1; }
+        }
+
+        .ux-node {
+          position: absolute;
+          z-index: 4;
+          width: 176px;
+          min-height: 88px;
+          transform: translate(-50%, -50%);
+          border-radius: 17px;
+          padding: 13px 14px;
+          color: #fff;
+          text-align: left;
+          cursor: pointer;
+          background: rgba(10,12,26,.82);
+          backdrop-filter: blur(18px);
+          transition: .25s ease;
+        }
+
+        .ux-node:hover,
+        .ux-node.selected {
+          transform: translate(-50%, -50%) scale(1.05);
+          z-index: 10;
+        }
+
+        .ux-node-icon {
+          font-size: 20px;
+        }
+
+        .ux-node strong {
+          display: block;
+          font-size: 14px;
+          line-height: 1.18;
+          margin-top: 6px;
+        }
+
+        .ux-node small {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 8px;
+          color: rgba(255,255,255,.72);
+        }
+
+        .ux-node small i {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+        }
+
+        .ux-leaf {
+          position: absolute;
+          width: 22px;
+          height: 12px;
+          border-radius: 100% 0;
+          opacity: .85;
+          z-index: -1;
+          filter: blur(.1px) drop-shadow(0 0 10px currentColor);
+          animation: uxLeaf 3.8s ease-in-out infinite;
+        }
+
+        .ux-leaf.a {
+          left: -21px;
+          top: 14px;
+          transform: rotate(-28deg);
+        }
+
+        .ux-leaf.b {
+          right: -18px;
+          bottom: 20px;
+          transform: rotate(145deg);
+          animation-delay: .9s;
+        }
+
+        @keyframes uxLeaf {
+          0%, 100% { translate: 0 0; }
+          50% { translate: 0 -5px; }
+        }
+
+        .ux-status-pink {
+          border: 1px solid rgba(255,79,189,.75);
+          box-shadow: 0 0 24px rgba(255,79,189,.28), inset 0 0 22px rgba(255,79,189,.08);
+        }
+
+        .ux-status-pink .ux-leaf,
+        .ux-status-pink small i {
+          color: #ff4fbd;
+          background: #ff4fbd;
+        }
+
+        .ux-status-green {
+          border: 1px solid rgba(34,197,94,.75);
+          box-shadow: 0 0 24px rgba(34,197,94,.24), inset 0 0 22px rgba(34,197,94,.07);
+        }
+
+        .ux-status-green .ux-leaf,
+        .ux-status-green small i {
+          color: #22c55e;
+          background: #22c55e;
+        }
+
+        .ux-status-red {
+          border: 1px solid rgba(248,63,94,.75);
+          box-shadow: 0 0 24px rgba(248,63,94,.24), inset 0 0 22px rgba(248,63,94,.07);
+        }
+
+        .ux-status-red .ux-leaf,
+        .ux-status-red small i {
+          color: #fb395f;
+          background: #fb395f;
+        }
+
+        .ux-status-yellow {
+          border: 1px solid rgba(250,204,21,.78);
+          box-shadow: 0 0 24px rgba(250,204,21,.22), inset 0 0 22px rgba(250,204,21,.07);
+        }
+
+        .ux-status-yellow .ux-leaf,
+        .ux-status-yellow small i {
+          color: #facc15;
+          background: #facc15;
+        }
+
+        .ux-popup {
+          position: absolute;
+          z-index: 30;
+          right: 18px;
+          top: 120px;
+          width: 335px;
+          border-radius: 22px;
+          padding: 18px;
+          background: rgba(12,13,30,.90);
+          backdrop-filter: blur(26px);
+        }
+
+        .ux-close {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          width: 34px;
+          height: 34px;
+          border: 1px solid rgba(255,255,255,.10);
+          color: rgba(255,255,255,.8);
+          font-size: 24px;
+          line-height: 1;
+          background: rgba(255,255,255,.05);
+          border-radius: 12px;
+          cursor: pointer;
+        }
+
+        .ux-popup-icon {
+          width: 58px;
+          height: 58px;
+          border-radius: 17px;
+          display: grid;
+          place-items: center;
+          font-size: 25px;
+          background: rgba(255,79,189,.15);
+          margin-bottom: 12px;
+        }
+
+        .ux-popup h3 {
+          margin: 0 0 8px;
+          font-size: 20px;
+        }
+
+        .ux-popup p {
+          margin: 0;
+          color: rgba(255,255,255,.62);
+          font-size: 13px;
+          line-height: 1.5;
+        }
+
+        .ux-flow-path {
+          margin: 14px 0;
+          border-radius: 13px;
+          padding: 11px;
+          color: #ff92dc;
+          background: rgba(255,79,189,.08);
+          font-size: 12px;
+          line-height: 1.5;
+        }
+
+        .ux-timeline {
+          display: grid;
+          gap: 10px;
+          margin: 14px 0 0;
+        }
+
+        .ux-timeline div {
+          display: grid;
+          grid-template-columns: 30px 1fr auto;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .ux-timeline span {
+          width: 27px;
+          height: 27px;
+          display: grid;
+          place-items: center;
+          border-radius: 50%;
+          background: rgba(255,255,255,.08);
+          color: #fff;
+          font-size: 12px;
+        }
+
+        .ux-timeline strong {
+          font-size: 13px;
+        }
+
+        .ux-timeline small {
+          color: rgba(255,255,255,.43);
+          font-size: 11px;
+        }
+
+        .ux-timeline .done span {
+          background: #ff4fbd;
+          box-shadow: 0 0 18px rgba(255,79,189,.55);
+        }
+
+        @media (max-width: 980px) {
+          .ux-inline-shell {
+            overflow: auto;
+          }
+
+          .ux-inline-stage {
+            width: 1040px;
+            height: 760px;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+
+
+const blogReportCards = [
+  { title: "Posts publicados", value: "38", detail: "Conteúdos ativos no blog", tone: "pink" as Tone },
+  { title: "Acessos no blog", value: "12.480", detail: "Últimos 30 dias", tone: "blue" as Tone },
+  { title: "Cliques para loja/site", value: "1.284", detail: "Tráfego enviado para conversão", tone: "green" as Tone },
+  { title: "Posts com problema", value: "4", detail: "Revisar links, SEO ou imagem", tone: "yellow" as Tone },
+];
+
+const blogReportRows = [
+  { title: "Melhor post da semana", detail: "Como automatizar atendimento e vender mais", value: "2.140 acessos", tone: "pink" as Tone },
+  { title: "Post com maior conversão", detail: "Guia de criação de site profissional", value: "18,4%", tone: "green" as Tone },
+  { title: "Alerta SEO", detail: "4 posts sem meta description forte", value: "corrigir", tone: "yellow" as Tone },
+  { title: "Link quebrado encontrado", detail: "Um CTA antigo pode estar indo para página errada", value: "verificar", tone: "red" as Tone },
+];
+
+
+const blogSeoCards = [
+  { title: "SEO geral", value: "74/100", detail: "Bom, mas ainda tem espaço para crescer", tone: "yellow" as Tone },
+  { title: "Posts indexáveis", value: "34", detail: "Conteúdos prontos para ranquear", tone: "green" as Tone },
+  { title: "Problemas SEO", value: "9", detail: "Títulos, metas, links e imagens", tone: "red" as Tone },
+  { title: "Oportunidades", value: "18", detail: "Novas pautas e palavras-chave", tone: "pink" as Tone },
+];
+
+const blogSeoRows = [
+  { title: "Meta descriptions fracas", detail: "Alguns posts precisam de descrição mais persuasiva para melhorar clique no Google.", value: "4 posts", tone: "yellow" as Tone },
+  { title: "Títulos pouco estratégicos", detail: "Criar títulos com promessa clara, palavra-chave e benefício direto.", value: "3 posts", tone: "pink" as Tone },
+  { title: "Imagens sem ALT forte", detail: "Adicionar texto alternativo com contexto e palavra-chave principal.", value: "7 imagens", tone: "red" as Tone },
+  { title: "Links internos insuficientes", detail: "Conectar posts do blog com páginas de serviço, planos e loja.", value: "alta prioridade", tone: "blue" as Tone },
+  { title: "Posts com potencial de ranqueamento", detail: "Conteúdos sobre IA, automação, sites e captação podem puxar tráfego qualificado.", value: "18 ideias", tone: "green" as Tone },
+];
+
+const blogKeywordRows = [
+  { title: "automação para pequenos negócios", detail: "Boa intenção comercial para atrair empreendedores.", value: "prioridade", tone: "pink" as Tone },
+  { title: "site profissional para empresa", detail: "Pode levar para página de construção de sites.", value: "vendas", tone: "green" as Tone },
+  { title: "como usar IA para vender mais", detail: "Boa pauta para topo de funil e autoridade.", value: "conteúdo", tone: "blue" as Tone },
+  { title: "ferramentas para microempreendedor", detail: "Pode conectar com Minha Empresa, serviços e automações.", value: "estratégico", tone: "yellow" as Tone },
+];
+
+const blogSeoChecklist = [
+  { title: "Sitemap do blog", detail: "Confirmar se o sitemap do blog está atualizado e enviado ao Google Search Console.", value: "verificar", tone: "blue" as Tone },
+  { title: "Canonical das páginas", detail: "Evitar duplicação e deixar claro qual URL deve ranquear.", value: "técnico", tone: "yellow" as Tone },
+  { title: "Schema/JSON-LD", detail: "Adicionar estrutura de Article, Breadcrumb e Organization.", value: "ganho SEO", tone: "pink" as Tone },
+  { title: "Velocidade mobile", detail: "O blog precisa carregar rápido no celular para melhorar experiência e ranking.", value: "importante", tone: "green" as Tone },
+];
+
+const emailReportCards = [
+  { title: "E-mails enviados", value: "8.420", detail: "Campanhas e automações", tone: "pink" as Tone },
+  { title: "Taxa de abertura", value: "41,8%", detail: "Média dos últimos envios", tone: "green" as Tone },
+  { title: "Cliques", value: "1.126", detail: "Pessoas que clicaram nos CTAs", tone: "blue" as Tone },
+  { title: "Falhas/Bounces", value: "72", detail: "E-mails que precisam limpeza", tone: "red" as Tone },
+];
+
+const emailReportRows = [
+  { title: "Campanha com melhor resultado", detail: "Lista de espera do Studio Sualuma", value: "52% abertura", tone: "pink" as Tone },
+  { title: "Automação principal", detail: "Boas-vindas após cadastro", value: "ativa", tone: "green" as Tone },
+  { title: "Alerta de entregabilidade", detail: "Limpar contatos inválidos e revisar assunto", value: "prioridade", tone: "yellow" as Tone },
+  { title: "Oportunidade", detail: "Criar sequência para leads que não compraram", value: "alto impacto", tone: "blue" as Tone },
+];
+
+
+const financeDashboardCards = [
+  { title: "Receita do mês", value: "R$ 48.750", detail: "+18,6% vs mês anterior", tone: "pink" as Tone },
+  { title: "Lucro líquido", value: "R$ 36.320", detail: "Margem estimada de 74,5%", tone: "green" as Tone },
+  { title: "Gastos totais", value: "R$ 12.430", detail: "Ferramentas, operação e marketing", tone: "red" as Tone },
+  { title: "Reinvestimento", value: "R$ 8.600", detail: "Reserva sugerida para crescer", tone: "blue" as Tone },
+];
+
+const financeRevenueRows = [
+  { title: "Planos e assinaturas", detail: "Receita recorrente dos usuários ativos no Studio e áreas membros.", value: "R$ 21.400", tone: "pink" as Tone },
+  { title: "Serviços contratados", detail: "Construção de sites, automações, suporte e projetos vendidos.", value: "R$ 14.200", tone: "green" as Tone },
+  { title: "Indicações / afiliados", detail: "Comissões, indicações internas e parcerias estratégicas.", value: "R$ 7.150", tone: "yellow" as Tone },
+  { title: "Marketplace e extras", detail: "Produtos digitais, upgrades, templates e recursos adicionais.", value: "R$ 6.000", tone: "blue" as Tone },
+];
+
+const financeCostRows = [
+  { title: "Infraestrutura", detail: "VPS, domínios, banco de dados, armazenamento e serviços técnicos.", value: "R$ 2.150", tone: "blue" as Tone },
+  { title: "IA e ferramentas", detail: "APIs, modelos, automações, editores e ferramentas de produtividade.", value: "R$ 3.280", tone: "yellow" as Tone },
+  { title: "Marketing", detail: "Testes de aquisição, criativos, tráfego, influenciadores e distribuição.", value: "R$ 2.900", tone: "pink" as Tone },
+  { title: "Operação", detail: "Equipe, suporte, freelancers, manutenção e execução de entregas.", value: "R$ 4.100", tone: "green" as Tone },
+];
+
+const financeProjectionRows = [
+  { title: "Projeção conservadora", detail: "Mantendo o ritmo atual sem escalar campanha.", value: "R$ 58 mil", tone: "blue" as Tone },
+  { title: "Projeção agressiva", detail: "Com correção de funil, blog, e-mail e melhoria de conversão.", value: "R$ 92 mil", tone: "pink" as Tone },
+  { title: "Meta de caixa", detail: "Reserva mínima para operar com segurança e reinvestir.", value: "R$ 20 mil", tone: "green" as Tone },
+  { title: "Ponto de atenção", detail: "Custo com ferramentas pode crescer se agentes não forem otimizados.", value: "monitorar", tone: "yellow" as Tone },
+];
+
+const financeMiaRows = [
+  { title: "Prioridade 1", detail: "Separar receita recorrente de receita avulsa para enxergar previsibilidade.", value: "fazer agora", tone: "pink" as Tone },
+  { title: "Prioridade 2", detail: "Criar categoria de reinvestimento para marketing, produto e infraestrutura.", value: "essencial", tone: "green" as Tone },
+  { title: "Prioridade 3", detail: "Medir ROI de cada agente: quanto economiza, vende ou evita suporte.", value: "alto impacto", tone: "blue" as Tone },
+  { title: "Alerta", detail: "Sem integração no banco, os números ainda são demonstrativos.", value: "mockado", tone: "yellow" as Tone },
+];
+
+const financeBars = [
+  { label: "Planos", value: "44%", tone: "pink" as Tone },
+  { label: "Serviços", value: "29%", tone: "green" as Tone },
+  { label: "Indicações", value: "15%", tone: "yellow" as Tone },
+  { label: "Marketplace", value: "12%", tone: "blue" as Tone },
+];
+
+const financeCostBars = [
+  { label: "Operação", value: "33%", tone: "green" as Tone },
+  { label: "Ferramentas/IA", value: "26%", tone: "yellow" as Tone },
+  { label: "Marketing", value: "23%", tone: "pink" as Tone },
+  { label: "Infra", value: "18%", tone: "blue" as Tone },
 ];
 
 function ToneDot({ tone }: { tone: Tone }) {
@@ -230,11 +1147,11 @@ export default function StudioLabPage() {
                   </div>
 
                   {[
-                    ["Sitemap", "🧬", "Online", "left-1"],
-                    ["Agentes", "🤖", "9 ativos", "left-2"],
-                    ["Serviços", "🧰", "5 gargalos", "left-3"],
+                    ["UX", "🌳", "Árvore", "left-1"],
+                    ["Relatórios", "📊", "Indicadores", "left-2"],
+                    ["Sitemap", "🧬", "12 links", "left-3"],
                     ["Usuários", "👥", "3 alertas", "right-1"],
-                    ["Comunidade", "💬", "Ativa", "right-2"],
+                    ["Agentes", "🤖", "9 ativos", "right-2"],
                     ["Financeiro", "💎", "+18%", "right-3"],
                   ].map(([title, icon, status, pos]) => (
                     <button key={title} className={`orbit-node ${pos}`}>
@@ -269,7 +1186,15 @@ export default function StudioLabPage() {
                 </div>
               </div>
             </section>
+          </>
+        )}
 
+        {activeView === "ux" && (
+          <UXTreeInline />
+        )}
+
+        {activeView === "relatorios" && (
+          <>
             <section className="metric-grid">
               {empireHealth.map((item) => (
                 <MetricCard key={item.title} {...item} />
@@ -303,13 +1228,83 @@ export default function StudioLabPage() {
           </>
         )}
 
+        {activeView === "blog" && (
+          <>
+            <section className="metric-grid">
+              {blogReportCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="metric-grid seo-grid">
+              {blogSeoCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Relatórios Blog" title="Performance de conteúdo" action="Novo post" />
+                {blogReportRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="SEO do Blog" title="Diagnóstico técnico e editorial" action="Auditar agora" />
+                {blogSeoRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Palavras-chave" title="Oportunidades para atrair leads" />
+                {blogKeywordRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Checklist SEO" title="O que precisa estar funcionando" />
+                {blogSeoChecklist.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
+        {activeView === "email" && (
+          <>
+            <section className="metric-grid">
+              {emailReportCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Relatórios E-mail" title="Campanhas e automações" action="Nova campanha" />
+                {emailReportRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Lista e entrega" title="Saúde dos envios" />
+                <DataRow title="Limpar lista" detail="Remover e-mails inválidos para melhorar entregabilidade" value="72 contatos" tone="red" />
+                <DataRow title="Criar sequência de nutrição" detail="Leads que entraram e ainda não compraram" value="prioridade" tone="pink" />
+                <DataRow title="Testar assunto novo" detail="Melhorar abertura dos próximos disparos" value="A/B test" tone="blue" />
+              </div>
+            </section>
+          </>
+        )}
+
         {activeView === "sitemap" && (
           <section className="panel full">
-            <PanelTitle
-              eyebrow="Raiz do site"
-              title="Sitemap vivo por domínio e subdomínio"
-              action="Verificar agora"
-            />
+            <PanelTitle eyebrow="Raiz do site" title="Sitemap vivo por domínio e subdomínio" action="Verificar agora" />
             <div className="sitemap-grid">
               {sitemapItems.map((item) => (
                 <div key={`${item.area}-${item.path}`} className={`site-card ${item.tone}`}>
@@ -453,31 +1448,125 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "financeiro" && (
-          <section className="lower-grid">
-            <div className="panel">
-              <PanelTitle eyebrow="Financeiro" title="Resultado resumido" />
-              <MetricCard title="Receita" value="R$ 48.750" detail="+18% vs mês anterior" tone="pink" />
-              <MetricCard title="Lucro líquido" value="R$ 36.320" detail="Margem em crescimento" tone="green" />
-            </div>
-            <div className="panel">
-              <PanelTitle eyebrow="Sinais" title="O que a Mia percebeu" />
-              <DataRow title="Crescimento saudável" detail="Receita subiu com estabilidade nos leads." value="positivo" tone="green" />
-              <DataRow title="Custo de suporte" detail="Pode cair com agente de dúvidas e onboarding." value="otimizar" tone="yellow" />
-              <DataRow title="Próxima campanha" detail="Leads parados podem virar venda." value="sugerido" tone="pink" />
-            </div>
-          </section>
+          <>
+            <section className="finance-hero">
+              <div className="finance-main-card">
+                <PanelTitle eyebrow="Financeiro estratégico" title="Painel de dinheiro, custos e reinvestimento" action="Conectar banco" />
+
+                <div className="finance-big-number">
+                  <small>Saldo operacional estimado</small>
+                  <strong>R$ 36.320,00</strong>
+                  <span>Lucro líquido após custos principais do mês</span>
+                </div>
+
+                <div className="finance-mini-grid">
+                  <div>
+                    <small>Receita</small>
+                    <strong>R$ 48.750</strong>
+                    <em>+18,6%</em>
+                  </div>
+                  <div>
+                    <small>Gastos</small>
+                    <strong>R$ 12.430</strong>
+                    <em className="negative">monitorar</em>
+                  </div>
+                  <div>
+                    <small>Reinvestir</small>
+                    <strong>R$ 8.600</strong>
+                    <em>produto + marketing</em>
+                  </div>
+                </div>
+              </div>
+
+              <div className="finance-side-card">
+                <PanelTitle eyebrow="Mia Financeira" title="Leitura rápida" />
+                <p>
+                  O financeiro está saudável, mas precisa separar origem da receita,
+                  custos fixos, custos variáveis e ROI dos agentes antes de escalar.
+                </p>
+                <div className="finance-score">
+                  <strong>82%</strong>
+                  <span>Saúde financeira</span>
+                </div>
+              </div>
+            </section>
+
+            <section className="metric-grid finance-metrics">
+              {financeDashboardCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Origem do dinheiro" title="De onde está vindo a receita" />
+                {financeRevenueRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Distribuição" title="Receita por fonte" />
+                <div className="finance-bars">
+                  {financeBars.map((item) => (
+                    <div key={item.label} className={`finance-bar ${item.tone}`}>
+                      <div>
+                        <strong>{item.label}</strong>
+                        <span>{item.value}</span>
+                      </div>
+                      <b style={{ width: item.value }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Custos da plataforma" title="Onde o dinheiro está sendo gasto" />
+                {financeCostRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Distribuição" title="Gastos por categoria" />
+                <div className="finance-bars">
+                  {financeCostBars.map((item) => (
+                    <div key={item.label} className={`finance-bar ${item.tone}`}>
+                      <div>
+                        <strong>{item.label}</strong>
+                        <span>{item.value}</span>
+                      </div>
+                      <b style={{ width: item.value }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Projeção" title="Cenários do mês" />
+                {financeProjectionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Sugestões da Mia" title="Próximas decisões financeiras" />
+                {financeMiaRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+          </>
         )}
       </section>
 
       <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        body {
-          margin: 0;
-          background: #050611;
-        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #050611; }
 
         .lab-page {
           min-height: 100vh;
@@ -503,12 +1592,7 @@ export default function StudioLabPage() {
             radial-gradient(circle at 10% 20%, rgba(255, 79, 189, .18), transparent 28%);
         }
 
-        .lab-brand {
-          display: flex;
-          align-items: center;
-          gap: 13px;
-          margin-bottom: 26px;
-        }
+        .lab-brand { display: flex; align-items: center; gap: 13px; margin-bottom: 26px; }
 
         .brand-orb {
           width: 50px;
@@ -521,20 +1605,10 @@ export default function StudioLabPage() {
           box-shadow: 0 0 35px rgba(255,79,189,.45);
         }
 
-        .lab-brand strong {
-          display: block;
-          font-size: 18px;
-        }
+        .lab-brand strong { display: block; font-size: 18px; }
+        .lab-brand span { color: #ff9be6; font-size: 13px; }
 
-        .lab-brand span {
-          color: #ff9be6;
-          font-size: 13px;
-        }
-
-        .lab-menu {
-          display: grid;
-          gap: 9px;
-        }
+        .lab-menu { display: grid; gap: 9px; }
 
         .lab-menu button {
           border: 0;
@@ -558,10 +1632,7 @@ export default function StudioLabPage() {
           box-shadow: inset 3px 0 0 #ff4fbd, 0 0 30px rgba(255,79,189,.11);
         }
 
-        .lab-menu strong {
-          font-size: 14px;
-          font-weight: 700;
-        }
+        .lab-menu strong { font-size: 14px; font-weight: 700; }
 
         .lab-menu em {
           margin-left: auto;
@@ -636,28 +1707,13 @@ export default function StudioLabPage() {
           box-shadow: 0 0 18px #ff4fbd;
         }
 
-        .mia-robot b:nth-child(2) {
-          left: 40px;
-        }
+        .mia-robot b:nth-child(2) { left: 40px; }
+        .mia-robot b:nth-child(3) { right: 40px; }
 
-        .mia-robot b:nth-child(3) {
-          right: 40px;
-        }
+        .mia-card strong { display: block; }
+        .mia-card p { color: rgba(255,255,255,.58); font-size: 13px; line-height: 1.45; }
 
-        .mia-card strong {
-          display: block;
-        }
-
-        .mia-card p {
-          color: rgba(255,255,255,.58);
-          font-size: 13px;
-          line-height: 1.45;
-        }
-
-        .lab-workspace {
-          width: calc(100% - 292px);
-          padding: 26px;
-        }
+        .lab-workspace { width: calc(100% - 292px); padding: 26px; }
 
         .lab-topbar {
           display: flex;
@@ -678,22 +1734,10 @@ export default function StudioLabPage() {
           font-size: 12px;
         }
 
-        .lab-topbar h1 {
-          margin: 0;
-          font-size: 32px;
-          letter-spacing: -.04em;
-        }
+        .lab-topbar h1 { margin: 0; font-size: 32px; letter-spacing: -.04em; }
+        .lab-topbar p { margin: 6px 0 0; color: rgba(255,255,255,.62); }
 
-        .lab-topbar p {
-          margin: 6px 0 0;
-          color: rgba(255,255,255,.62);
-        }
-
-        .command-center {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
+        .command-center { display: flex; align-items: center; gap: 12px; }
 
         .search-box {
           width: 390px;
@@ -717,17 +1761,10 @@ export default function StudioLabPage() {
           box-shadow: 0 0 30px rgba(255,79,189,.16);
         }
 
-        .hero-grid {
-          display: grid;
-          grid-template-columns: 1.9fr .8fr;
-          gap: 18px;
-        }
+        .hero-grid { display: grid; grid-template-columns: 1.9fr .8fr; gap: 18px; }
 
         .hero-panel,
-        .panel {
-          border-radius: 28px;
-          padding: 22px;
-        }
+        .panel { border-radius: 28px; padding: 22px; }
 
         .panel-title {
           display: flex;
@@ -745,11 +1782,7 @@ export default function StudioLabPage() {
           font-weight: 800;
         }
 
-        .panel-title h2 {
-          margin: 5px 0 0;
-          font-size: 23px;
-          letter-spacing: -.03em;
-        }
+        .panel-title h2 { margin: 5px 0 0; font-size: 23px; letter-spacing: -.03em; }
 
         .empire-map {
           height: 520px;
@@ -793,14 +1826,9 @@ export default function StudioLabPage() {
             radial-gradient(circle, rgba(255,255,255,.20), transparent 34%),
             conic-gradient(from 180deg, #ff4fbd, #38bdf8, #7c3aed, #ff4fbd);
           box-shadow: 0 0 70px rgba(255,79,189,.56);
-          animation: pulseCore 4s ease-in-out infinite;
         }
 
-        .core-orb span {
-          font-size: 36px;
-          font-weight: 950;
-          text-shadow: 0 0 25px rgba(0,0,0,.5);
-        }
+        .core-orb span { font-size: 36px; font-weight: 950; text-shadow: 0 0 25px rgba(0,0,0,.5); }
 
         .core-orb i {
           position: absolute;
@@ -812,18 +1840,8 @@ export default function StudioLabPage() {
           box-shadow: 0 0 18px #ff4fbd;
         }
 
-        .core-orb i:nth-child(2) {
-          left: 68px;
-        }
-
-        .core-orb i:nth-child(3) {
-          right: 68px;
-        }
-
-        @keyframes pulseCore {
-          0%, 100% { filter: saturate(1); transform: translate(-50%, -50%) scale(1); }
-          50% { filter: saturate(1.25); transform: translate(-50%, -50%) scale(1.03); }
-        }
+        .core-orb i:nth-child(2) { left: 68px; }
+        .core-orb i:nth-child(3) { right: 68px; }
 
         .orbit-node {
           position: absolute;
@@ -840,13 +1858,8 @@ export default function StudioLabPage() {
           box-shadow: 0 0 34px rgba(255,79,189,.14);
         }
 
-        .orbit-node span {
-          font-size: 25px;
-        }
-
-        .orbit-node small {
-          color: #ff9be6;
-        }
+        .orbit-node span { font-size: 25px; }
+        .orbit-node small { color: #ff9be6; }
 
         .left-1 { left: 12%; top: 12%; }
         .left-2 { left: 6%; top: 42%; }
@@ -855,14 +1868,8 @@ export default function StudioLabPage() {
         .right-2 { right: 6%; top: 42%; }
         .right-3 { right: 17%; bottom: 10%; }
 
-        .side-stack {
-          display: grid;
-          gap: 18px;
-        }
-
-        .compact {
-          min-height: 240px;
-        }
+        .side-stack { display: grid; gap: 18px; }
+        .compact { min-height: 240px; }
 
         .health-ring {
           width: 160px;
@@ -884,26 +1891,19 @@ export default function StudioLabPage() {
           background: #080918;
         }
 
-        .health-ring strong {
-          font-size: 31px;
-          margin-top: 20px;
-        }
-
-        .health-ring span {
-          color: rgba(255,255,255,.58);
-          margin-top: -24px;
-        }
-
-        .muted {
-          color: rgba(255,255,255,.58);
-          line-height: 1.5;
-        }
+        .health-ring strong { font-size: 31px; margin-top: 20px; }
+        .health-ring span { color: rgba(255,255,255,.58); margin-top: -24px; }
+        .muted { color: rgba(255,255,255,.58); line-height: 1.5; }
 
         .metric-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 16px;
           margin-top: 18px;
+        }
+
+        .seo-grid {
+          margin-top: 16px;
         }
 
         .metric-card {
@@ -941,10 +1941,7 @@ export default function StudioLabPage() {
           letter-spacing: -.05em;
         }
 
-        .metric-card p {
-          margin: 0;
-          color: rgba(255,255,255,.62);
-        }
+        .metric-card p { margin: 0; color: rgba(255,255,255,.62); }
 
         .pink { color: #ff4fbd; }
         .blue { color: #38bdf8; }
@@ -1000,9 +1997,146 @@ export default function StudioLabPage() {
           margin-top: 18px;
         }
 
-        .full {
-          min-height: 650px;
+        .finance-hero {
+          display: grid;
+          grid-template-columns: 1.7fr .9fr;
+          gap: 18px;
+          margin-top: 18px;
         }
+
+        .finance-main-card,
+        .finance-side-card {
+          border: 1px solid rgba(255,255,255,.10);
+          background: linear-gradient(180deg, rgba(255,255,255,.065), rgba(255,255,255,.025));
+          box-shadow: 0 24px 80px rgba(0,0,0,.28);
+          backdrop-filter: blur(24px);
+          border-radius: 28px;
+          padding: 22px;
+        }
+
+        .finance-big-number {
+          margin-top: 18px;
+          padding: 22px;
+          border-radius: 24px;
+          background:
+            radial-gradient(circle at 18% 0%, rgba(255,79,189,.22), transparent 34%),
+            rgba(255,255,255,.04);
+          border: 1px solid rgba(255,79,189,.18);
+        }
+
+        .finance-big-number small,
+        .finance-mini-grid small {
+          display: block;
+          color: rgba(255,255,255,.58);
+        }
+
+        .finance-big-number strong {
+          display: block;
+          margin: 8px 0;
+          font-size: clamp(34px, 4vw, 58px);
+          letter-spacing: -.06em;
+          color: #ff9be6;
+          text-shadow: 0 0 32px rgba(255,79,189,.28);
+        }
+
+        .finance-big-number span,
+        .finance-side-card p {
+          color: rgba(255,255,255,.62);
+          line-height: 1.55;
+        }
+
+        .finance-mini-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-top: 14px;
+        }
+
+        .finance-mini-grid div {
+          padding: 14px;
+          border-radius: 18px;
+          background: rgba(255,255,255,.045);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .finance-mini-grid strong {
+          display: block;
+          margin: 5px 0;
+          font-size: 22px;
+        }
+
+        .finance-mini-grid em {
+          font-style: normal;
+          color: #22c55e;
+          font-size: 12px;
+        }
+
+        .finance-mini-grid em.negative {
+          color: #facc15;
+        }
+
+        .finance-score {
+          width: 170px;
+          height: 170px;
+          margin: 22px auto 0;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          background: conic-gradient(#ff4fbd 0 82%, rgba(255,255,255,.08) 82% 100%);
+          box-shadow: 0 0 48px rgba(255,79,189,.30);
+        }
+
+        .finance-score strong {
+          display: block;
+          font-size: 36px;
+          margin-top: 24px;
+        }
+
+        .finance-score span {
+          margin-top: -34px;
+          color: rgba(255,255,255,.58);
+          font-size: 12px;
+        }
+
+        .finance-metrics {
+          margin-top: 18px;
+        }
+
+        .finance-bars {
+          display: grid;
+          gap: 16px;
+        }
+
+        .finance-bar {
+          display: grid;
+          gap: 8px;
+        }
+
+        .finance-bar div {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .finance-bar strong {
+          color: #fff;
+        }
+
+        .finance-bar span {
+          color: rgba(255,255,255,.62);
+          font-size: 13px;
+        }
+
+        .finance-bar b {
+          display: block;
+          height: 14px;
+          border-radius: 999px;
+          background: currentColor;
+          box-shadow: 0 0 22px currentColor;
+        }
+
+        .full { min-height: 650px; }
 
         .sitemap-grid,
         .agent-grid {
@@ -1018,21 +2152,9 @@ export default function StudioLabPage() {
           padding: 18px;
         }
 
-        .site-card div {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-        }
-
-        .site-card h3 {
-          font-size: 22px;
-          margin: 15px 0 8px;
-        }
-
-        .site-card em {
-          font-style: normal;
-          color: rgba(255,255,255,.66);
-        }
+        .site-card div { display: flex; align-items: center; gap: 9px; }
+        .site-card h3 { font-size: 22px; margin: 15px 0 8px; }
+        .site-card em { font-style: normal; color: rgba(255,255,255,.66); }
 
         .tone-dot {
           width: 11px;
@@ -1053,14 +2175,8 @@ export default function StudioLabPage() {
           border-bottom: 1px solid rgba(255,255,255,.07);
         }
 
-        .data-row strong {
-          display: block;
-        }
-
-        .data-row p {
-          margin: 4px 0 0;
-          font-size: 13px;
-        }
+        .data-row strong { display: block; }
+        .data-row p { margin: 4px 0 0; font-size: 13px; }
 
         .data-row em {
           font-style: normal;
@@ -1077,10 +2193,7 @@ export default function StudioLabPage() {
           overflow: hidden;
         }
 
-        .pulse-chart svg {
-          width: 100%;
-          height: 100%;
-        }
+        .pulse-chart svg { width: 100%; height: 100%; }
 
         .chat-window {
           height: 360px;
@@ -1134,19 +2247,9 @@ export default function StudioLabPage() {
           transform: translateY(-2px);
         }
 
-        .agent-card span {
-          font-size: 25px;
-        }
-
-        .agent-card strong {
-          display: block;
-          margin: 10px 0 6px;
-        }
-
-        .agent-card em {
-          font-style: normal;
-          color: #ff9be6;
-        }
+        .agent-card span { font-size: 25px; }
+        .agent-card strong { display: block; margin: 10px 0 6px; }
+        .agent-card em { font-style: normal; color: #ff9be6; }
 
         .idea-list {
           display: grid;
@@ -1154,9 +2257,7 @@ export default function StudioLabPage() {
           gap: 14px;
         }
 
-        .idea-card strong {
-          font-size: 18px;
-        }
+        .idea-card strong { font-size: 18px; }
 
         .idea-card div {
           display: flex;
@@ -1172,11 +2273,7 @@ export default function StudioLabPage() {
           font-size: 12px;
         }
 
-        .user-table {
-          margin-top: 16px;
-          display: grid;
-          gap: 10px;
-        }
+        .user-table { margin-top: 16px; display: grid; gap: 10px; }
 
         .user-row {
           display: grid;
@@ -1189,23 +2286,29 @@ export default function StudioLabPage() {
           background: rgba(255,255,255,.035);
         }
 
-        .user-row p {
-          margin: 3px 0 0;
-          color: rgba(255,255,255,.55);
-          font-size: 13px;
+        .user-row p { margin: 3px 0 0; color: rgba(255,255,255,.55); font-size: 13px; }
+        .user-row span { color: rgba(255,255,255,.72); }
+        .user-row em { font-style: normal; color: #ff9be6; }
+
+        .ux-only-wrap {
+          border-radius: 24px;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,.08);
+          background: rgba(255,255,255,.02);
+          min-height: 780px;
         }
 
-        .user-row span {
-          color: rgba(255,255,255,.72);
-        }
-
-        .user-row em {
-          font-style: normal;
-          color: #ff9be6;
+        .ux-frame {
+          width: 100%;
+          height: 780px;
+          border: 0;
+          display: block;
+          background: #050611;
         }
 
         @media (max-width: 1280px) {
           .hero-grid,
+          .finance-hero,
           .lower-grid,
           .brain-layout {
             grid-template-columns: 1fr;
@@ -1227,15 +2330,11 @@ export default function StudioLabPage() {
             flex-wrap: wrap;
           }
 
-          .search-box {
-            width: 100%;
-          }
+          .search-box { width: 100%; }
         }
 
         @media (max-width: 880px) {
-          .lab-page {
-            display: block;
-          }
+          .lab-page { display: block; }
 
           .lab-sidebar {
             width: 100%;
@@ -1255,13 +2354,8 @@ export default function StudioLabPage() {
             grid-template-columns: 1fr;
           }
 
-          .empire-map {
-            height: 760px;
-          }
-
-          .orbit-node {
-            width: 145px;
-          }
+          .empire-map { height: 760px; }
+          .orbit-node { width: 145px; }
 
           .left-1 { left: 8%; top: 6%; }
           .right-1 { right: 8%; top: 6%; }
@@ -1270,9 +2364,10 @@ export default function StudioLabPage() {
           .left-3 { left: 8%; bottom: 6%; }
           .right-3 { right: 8%; bottom: 6%; }
 
-          .user-row {
-            grid-template-columns: 20px 1fr;
-          }
+          .user-row { grid-template-columns: 20px 1fr; }
+          .finance-mini-grid { grid-template-columns: 1fr; }
+          .ux-frame { height: 680px; }
+          .ux-only-wrap { min-height: 680px; }
         }
       `}</style>
     </main>
