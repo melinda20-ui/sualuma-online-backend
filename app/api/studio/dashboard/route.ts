@@ -507,6 +507,7 @@ export async function GET() {
           cnpjNotificationRows: normalizeRows(cnpjRows, fallback.cnpjNotificationRows),
           subdomainRows,
         financeData,
+          stripeData,
         },
       },
       { headers: { "Cache-Control": "no-store" } }
