@@ -1719,6 +1719,116 @@ function LiveStoreProductsView({ fallbackRows }: { fallbackRows: LiveStoreProduc
 }
 
 
+
+type LiveCommunityReport = {
+  title: string;
+  detail?: string;
+  value?: string;
+  tone?: Tone;
+  reported_user?: string;
+  reporter_user?: string;
+  reason?: string;
+  status?: string;
+  created_at?: string;
+};
+
+function LiveCommunityView({ fallbackRows }: { fallbackRows: LiveCommunityReport[] }) {
+  const [rows, setRows] = useState<LiveCommunityReport[]>(fallbackRows);
+  const [source, setSource] = useState("visual");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCommunity() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveRows = payload?.data?.communityModerationRows;
+
+        if (!cancelled && Array.isArray(liveRows) && liveRows.length > 0) {
+          setRows(liveRows);
+          setSource(payload?.source || "api");
+        }
+      } catch (error) {
+        console.error("[Studio Lab] Falha ao carregar Comunidade do banco:", error);
+      }
+    }
+
+    loadCommunity();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const openRows = rows.filter((item) => item.status === "aberto");
+  const reviewedRows = rows.filter((item) => item.status === "revisado");
+  const warningRows = rows.filter((item) => item.tone === "red" || item.value === "enviar aviso");
+
+  return (
+    <>
+      <section className="metric-grid">
+        <MetricCard title="Denúncias no banco" value={String(rows.length)} detail="Casos puxados da moderação" tone="pink" />
+        <MetricCard title="Abertas" value={String(openRows.length)} detail="Precisam análise ou ação" tone="red" />
+        <MetricCard title="Revisadas" value={String(reviewedRows.length)} detail="Casos já tratados" tone="green" />
+        <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados carregados da API do Studio" tone="blue" />
+      </section>
+
+      <section className="community-hero">
+        <div className="panel">
+          <PanelTitle eyebrow="Comunidade" title="Moderação e denúncias reais" action={source === "postgres" ? "Banco conectado" : "Visual"} />
+
+          {rows.map((item) => (
+            <div key={item.title} className="moderation-row">
+              <ToneDot tone={item.tone || "yellow"} />
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.detail || item.reason || "Caso registrado no banco da comunidade."}</p>
+              </div>
+              <button>{item.status || "ver"}</button>
+              <button>{item.value || "ação"}</button>
+            </div>
+          ))}
+        </div>
+
+        <div className="panel">
+          <PanelTitle eyebrow="Resumo" title="Estado da rede social" />
+
+          <DataRow title="Casos abertos" detail="Denúncias ou alertas que ainda precisam decisão." value={String(openRows.length)} tone="red" />
+          <DataRow title="Casos revisados" detail="Itens já tratados ou encerrados pela moderação." value={String(reviewedRows.length)} tone="green" />
+          <DataRow title="Avisos necessários" detail="Usuários que podem precisar receber e-mail ou alerta." value={String(warningRows.length)} tone="yellow" />
+          <DataRow title="Próxima ação" detail="Criar botões reais para enviar aviso, bloquear ou liberar usuário." value="fase 2" tone="pink" />
+        </div>
+      </section>
+
+      <section className="panel full">
+        <PanelTitle eyebrow="Detalhes dos casos" title="Quem denunciou, quem foi denunciado e por quê" action="Ações futuras" />
+
+        <div className="store-table">
+          {rows.map((item) => (
+            <div key={`${item.title}-${item.reported_user || ""}`} className="store-row">
+              <ToneDot tone={item.tone || "yellow"} />
+              <div>
+                <strong>{item.reported_user || item.title}</strong>
+                <p>
+                  Denunciante: {item.reporter_user || "não informado"} • Motivo: {item.reason || item.detail || "sem motivo detalhado"}
+                </p>
+              </div>
+              <button>{item.status || "aberto"}</button>
+              <button>Ver caso</button>
+              <button>Enviar aviso</button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
@@ -2332,77 +2442,7 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "comunidade" && (
-          <>
-            <section className="metric-grid">
-              {communityDeepCards.map((item) => (
-                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
-              ))}
-            </section>
-
-            <section className="community-hero">
-              <div className="panel">
-                <PanelTitle eyebrow="Comunidade" title="Monitoramento real da rede social" action="Atualizar" />
-                {communityModerationRows.map((item) => (
-                  <div key={item.title} className="moderation-row">
-                    <ToneDot tone={item.tone} />
-                    <div>
-                      <strong>{item.title}</strong>
-                      <p>{item.detail}</p>
-                    </div>
-                    <button>Ver caso</button>
-                    <button>Enviar aviso por e-mail</button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Retenção" title="Nível de permanência da comunidade" />
-                <div className="community-retention-chart">
-                  <div className="retention-circle">
-                    <strong>68%</strong>
-                    <span>D7</span>
-                  </div>
-                  <p>Boa retenção semanal, mas ainda existe oportunidade de reativar usuários silenciosos.</p>
-                </div>
-
-                {communityRetentionRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Tópicos pesquisados" title="Assuntos com maior procura" />
-                {communityTopicRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Hashtags" title="Tags mais usadas" />
-                {communityHashtagRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="SEO da Comunidade" title="Como transformar interação em tráfego" />
-                {communitySeoRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Mia" title="Sugestões inteligentes para comunidade" />
-                {communityMiaRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-          </>
+          <LiveCommunityView fallbackRows={communityModerationRows} />
         )}
 
         {activeView === "ideias" && (
