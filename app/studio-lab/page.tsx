@@ -10,6 +10,7 @@ type StudioView =
   | "blog"
   | "email"
   | "tarefas"
+  | "loja"
   | "suporte"
   | "cnpj"
   | "sitemap"
@@ -46,6 +47,7 @@ const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = 
   { id: "blog", label: "Relatórios Blog", icon: "📝", badge: "Novo" },
   { id: "email", label: "Relatórios E-mail", icon: "📨", badge: "Novo" },
   { id: "tarefas", label: "Tarefas do Sistema", icon: "✅", badge: "24" },
+  { id: "loja", label: "Admin Loja", icon: "🛍️", badge: "Hub" },
   { id: "suporte", label: "Suporte", icon: "🛟", badge: "5" },
   { id: "sitemap", label: "Subdomínios", icon: "🧬", badge: "12" },
   { id: "cnpj", label: "CNPJ", icon: "🧾", badge: "Novo" },
@@ -1095,6 +1097,92 @@ const cnpjDeepRows = [
   { title: "Alertas importantes", detail: "Pendências que podem prejudicar emissão, venda ou regularidade.", value: "1 alerta", tone: "red" as Tone },
 ];
 
+
+const storeHubCards = [
+  { title: "Produtos ativos", value: "64", detail: "Agentes, automações, skills e templates publicados", tone: "green" as Tone },
+  { title: "Em revisão", value: "9", detail: "Produtos aguardando curadoria ou ajustes", tone: "yellow" as Tone },
+  { title: "Arquivados", value: "14", detail: "Itens pausados ou removidos da vitrine", tone: "blue" as Tone },
+  { title: "Alertas", value: "6", detail: "Produtos sem categoria, preço ou descrição forte", tone: "red" as Tone },
+];
+
+const storeProductRows = [
+  { title: "Agente Propostas Comerciais", detail: "Categoria: Agentes • Status: publicado • Conversão alta", value: "ativo", tone: "green" as Tone },
+  { title: "Automação Follow-up WhatsApp", detail: "Categoria: Automações • Falta revisar descrição e gatilho", value: "revisar", tone: "yellow" as Tone },
+  { title: "Skill SEO para Blog", detail: "Categoria: Skills • Produto novo para marketplace interno", value: "novo", tone: "pink" as Tone },
+  { title: "Template Página de Vendas", detail: "Categoria: Templates • Precisa trocar imagem e CTA", value: "editar", tone: "blue" as Tone },
+  { title: "Agente Suporte Inicial", detail: "Categoria: Agentes • Produto com erro no fluxo de teste", value: "em risco", tone: "red" as Tone },
+];
+
+const marketplaceRows = [
+  { title: "Marketplace interno", detail: "Hub principal de agentes, skills, automações e templates.", value: "64 produtos", tone: "pink" as Tone },
+  { title: "Área de serviços", detail: "Produtos que ajudam prestadores e empresas a contratar melhor.", value: "18 produtos", tone: "green" as Tone },
+  { title: "Área de cursos", detail: "Templates, aulas, materiais e recursos vendidos separadamente.", value: "12 itens", tone: "blue" as Tone },
+  { title: "Vitrine pública", detail: "Produtos que podem aparecer para captação e SEO.", value: "22 itens", tone: "yellow" as Tone },
+];
+
+const storeActionRows = [
+  { title: "Arquivar produto", detail: "Remover produto da vitrine sem apagar do banco.", value: "ação futura", tone: "blue" as Tone },
+  { title: "Tirar do ar", detail: "Pausar venda quando tiver erro, reclamação ou checkout quebrado.", value: "segurança", tone: "red" as Tone },
+  { title: "Trocar categoria", detail: "Mover entre Agentes, Automações, Skills e Templates.", value: "organização", tone: "green" as Tone },
+  { title: "Revisar SEO do produto", detail: "Melhorar título, promessa, descrição, tag e palavra-chave.", value: "vendas", tone: "pink" as Tone },
+];
+
+const storeCategoryRows = [
+  { title: "Agentes", detail: "Produtos que executam tarefas, atendem usuários ou tomam decisões.", value: "22", tone: "pink" as Tone },
+  { title: "Automações", detail: "Fluxos que conectam ações, notificações, e-mails e integrações.", value: "17", tone: "green" as Tone },
+  { title: "Skills", detail: "Habilidades reaproveitáveis para agentes, usuários e sistemas.", value: "11", tone: "blue" as Tone },
+  { title: "Templates", detail: "Modelos prontos de páginas, prompts, documentos e sistemas.", value: "14", tone: "yellow" as Tone },
+];
+
+const communityDeepCards = [
+  { title: "Posts criados", value: "128", detail: "Publicações totais da comunidade", tone: "pink" as Tone },
+  { title: "Denúncias abertas", value: "3", detail: "Precisam moderação", tone: "red" as Tone },
+  { title: "Retenção semanal", value: "68%", detail: "Usuários que voltaram a interagir", tone: "green" as Tone },
+  { title: "Debates fortes", value: "7", detail: "Tópicos com alta interação", tone: "blue" as Tone },
+];
+
+const communityModerationRows = [
+  { title: "Denúncia contra @marcos.dev", detail: "Motivo: autopromoção repetida em comentários. Denunciado por @ana.paula.", value: "enviar aviso", tone: "yellow" as Tone },
+  { title: "Post removido de @lojaexpress", detail: "Motivo: link externo sem contexto e possível spam.", value: "revisado", tone: "red" as Tone },
+  { title: "Comentário sinalizado de @criadora.ai", detail: "Motivo: linguagem agressiva em debate sobre preços.", value: "analisar", tone: "pink" as Tone },
+  { title: "Usuário @bruno.mkt ultrapassou limite", detail: "Publicou 12 respostas em sequência em menos de 10 minutos.", value: "limite", tone: "blue" as Tone },
+];
+
+const communityRetentionRows = [
+  { title: "Retenção D1", detail: "Usuários que voltam no dia seguinte após primeiro post.", value: "42%", tone: "yellow" as Tone },
+  { title: "Retenção D7", detail: "Usuários que continuam ativos depois de uma semana.", value: "68%", tone: "green" as Tone },
+  { title: "Usuários silenciosos", detail: "Entram, leem, mas não postam nem comentam.", value: "31%", tone: "blue" as Tone },
+  { title: "Usuários super ativos", detail: "Criam posts, comentam e compartilham com frequência.", value: "9%", tone: "pink" as Tone },
+];
+
+const communityTopicRows = [
+  { title: "IA para vender mais", detail: "Tema com mais buscas e comentários nos últimos 7 dias.", value: "alta", tone: "pink" as Tone },
+  { title: "Como conseguir clientes", detail: "Debate forte entre prestadores e empresas.", value: "crescendo", tone: "green" as Tone },
+  { title: "Automação no WhatsApp", detail: "Muitos usuários procurando fluxos prontos.", value: "produto", tone: "blue" as Tone },
+  { title: "Preço de site", detail: "Discussão com alto engajamento e possível oportunidade comercial.", value: "debate", tone: "yellow" as Tone },
+];
+
+const communityHashtagRows = [
+  { title: "#automacao", detail: "Usada em posts sobre n8n, WhatsApp, e-mail e processos.", value: "248 usos", tone: "green" as Tone },
+  { title: "#ia", detail: "Tema central de agentes, prompts e ferramentas.", value: "231 usos", tone: "pink" as Tone },
+  { title: "#clientes", detail: "Relacionada a captação, vendas e funil.", value: "176 usos", tone: "blue" as Tone },
+  { title: "#siteprofissional", detail: "Boa para conectar comunidade com serviço de sites.", value: "91 usos", tone: "yellow" as Tone },
+];
+
+const communitySeoRows = [
+  { title: "Transformar debates em posts SEO", detail: "Debates fortes podem virar artigos no blog para atrair tráfego orgânico.", value: "alto impacto", tone: "green" as Tone },
+  { title: "Criar páginas por hashtag", detail: "Cada hashtag forte pode ter página indexável com posts e materiais relacionados.", value: "SEO", tone: "pink" as Tone },
+  { title: "Melhorar títulos dos posts", detail: "Usuários postam títulos fracos; a Mia pode sugerir títulos melhores.", value: "melhorar", tone: "yellow" as Tone },
+  { title: "Linkar comunidade com marketplace", detail: "Quando um tópico cresce, sugerir agente, automação ou template relacionado.", value: "vendas", tone: "blue" as Tone },
+];
+
+const communityMiaRows = [
+  { title: "Sugestão da Mia", detail: "Criar alerta automático para usuários denunciados 2 vezes em 7 dias.", value: "prioridade", tone: "red" as Tone },
+  { title: "Oportunidade", detail: "Criar agente que transforma debates fortes em posts de blog e e-mails.", value: "crescimento", tone: "pink" as Tone },
+  { title: "Retenção", detail: "Enviar notificação para usuários silenciosos com tópicos que eles leram.", value: "reativar", tone: "green" as Tone },
+  { title: "Monetização", detail: "Tópicos mais pesquisados devem alimentar produtos da loja.", value: "loja", tone: "blue" as Tone },
+];
+
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
 }
@@ -1439,6 +1527,66 @@ export default function StudioLabPage() {
           </>
         )}
 
+        {activeView === "loja" && (
+          <>
+            <section className="metric-grid">
+              {storeHubCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Admin Loja" title="Hub dos produtos digitais" action="Novo produto" />
+                {storeProductRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Marketplaces" title="Onde os produtos aparecem" />
+                {marketplaceRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Categorias" title="Agentes, automações, skills e templates" />
+                {storeCategoryRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Ações de loja" title="Controle operacional dos produtos" />
+                {storeActionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="panel full">
+              <PanelTitle eyebrow="Tabela de produtos" title="Produtos que precisam atenção" action="Organizar categorias" />
+              <div className="store-table">
+                {storeProductRows.map((item) => (
+                  <div key={item.title} className="store-row">
+                    <ToneDot tone={item.tone} />
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.detail}</p>
+                    </div>
+                    <button>Editar</button>
+                    <button>Arquivar</button>
+                    <button>Tirar do ar</button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+
         {activeView === "suporte" && (
           <>
             <section className="metric-grid">
@@ -1611,11 +1759,77 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "comunidade" && (
-          <section className="metric-grid">
-            {communitySignals.map((item) => (
-              <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
-            ))}
-          </section>
+          <>
+            <section className="metric-grid">
+              {communityDeepCards.map((item) => (
+                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
+              ))}
+            </section>
+
+            <section className="community-hero">
+              <div className="panel">
+                <PanelTitle eyebrow="Comunidade" title="Monitoramento real da rede social" action="Atualizar" />
+                {communityModerationRows.map((item) => (
+                  <div key={item.title} className="moderation-row">
+                    <ToneDot tone={item.tone} />
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.detail}</p>
+                    </div>
+                    <button>Ver caso</button>
+                    <button>Enviar aviso por e-mail</button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Retenção" title="Nível de permanência da comunidade" />
+                <div className="community-retention-chart">
+                  <div className="retention-circle">
+                    <strong>68%</strong>
+                    <span>D7</span>
+                  </div>
+                  <p>Boa retenção semanal, mas ainda existe oportunidade de reativar usuários silenciosos.</p>
+                </div>
+
+                {communityRetentionRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="Tópicos pesquisados" title="Assuntos com maior procura" />
+                {communityTopicRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Hashtags" title="Tags mais usadas" />
+                {communityHashtagRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+
+            <section className="lower-grid">
+              <div className="panel">
+                <PanelTitle eyebrow="SEO da Comunidade" title="Como transformar interação em tráfego" />
+                {communitySeoRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+
+              <div className="panel">
+                <PanelTitle eyebrow="Mia" title="Sugestões inteligentes para comunidade" />
+                {communityMiaRows.map((item) => (
+                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
+                ))}
+              </div>
+            </section>
+          </>
         )}
 
         {activeView === "ideias" && (
@@ -2388,6 +2602,95 @@ export default function StudioLabPage() {
 
         .full { min-height: 650px; }
 
+        .store-table {
+          display: grid;
+          gap: 12px;
+        }
+
+        .store-row {
+          display: grid;
+          grid-template-columns: 18px 1fr auto auto auto;
+          gap: 12px;
+          align-items: center;
+          padding: 14px;
+          border-radius: 18px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .store-row p {
+          margin: 4px 0 0;
+          color: rgba(255,255,255,.58);
+          font-size: 13px;
+        }
+
+        .store-row button,
+        .moderation-row button {
+          border: 1px solid rgba(255,79,189,.28);
+          color: #fff;
+          background: rgba(255,79,189,.10);
+          border-radius: 12px;
+          padding: 10px 12px;
+          cursor: pointer;
+        }
+
+        .community-hero {
+          display: grid;
+          grid-template-columns: 1.45fr .9fr;
+          gap: 18px;
+          margin-top: 18px;
+        }
+
+        .moderation-row {
+          display: grid;
+          grid-template-columns: 18px 1fr auto auto;
+          gap: 12px;
+          align-items: center;
+          padding: 14px 0;
+          border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+
+        .moderation-row p {
+          margin: 4px 0 0;
+          color: rgba(255,255,255,.58);
+          font-size: 13px;
+          line-height: 1.45;
+        }
+
+        .community-retention-chart {
+          display: grid;
+          grid-template-columns: 150px 1fr;
+          gap: 16px;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+
+        .retention-circle {
+          width: 140px;
+          height: 140px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          background: conic-gradient(#22c55e 0 68%, rgba(255,255,255,.08) 68% 100%);
+          box-shadow: 0 0 42px rgba(34,197,94,.25);
+        }
+
+        .retention-circle strong {
+          display: block;
+          font-size: 32px;
+          margin-top: 25px;
+        }
+
+        .retention-circle span {
+          margin-top: -34px;
+          color: rgba(255,255,255,.58);
+        }
+
+        .community-retention-chart p {
+          color: rgba(255,255,255,.62);
+          line-height: 1.55;
+        }
+
         .subdomain-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -2677,6 +2980,7 @@ export default function StudioLabPage() {
         @media (max-width: 1280px) {
           .hero-grid,
           .finance-hero,
+          .community-hero,
           .lower-grid,
           .brain-layout {
             grid-template-columns: 1fr;
@@ -2736,7 +3040,14 @@ export default function StudioLabPage() {
           .left-3 { left: 8%; bottom: 6%; }
           .right-3 { right: 8%; bottom: 6%; }
 
-          .user-row { grid-template-columns: 20px 1fr; }
+          .user-row,
+          .store-row,
+          .moderation-row {
+            grid-template-columns: 20px 1fr;
+          }
+          .community-retention-chart {
+            grid-template-columns: 1fr;
+          }
           .finance-mini-grid { grid-template-columns: 1fr; }
           .ux-frame { height: 680px; }
           .ux-only-wrap { min-height: 680px; }
