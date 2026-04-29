@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 
 type StudioView =
   | "visao"
@@ -1515,6 +1515,97 @@ function DataRow({
   );
 }
 
+
+type LiveSystemTask = {
+  title: string;
+  detail?: string;
+  value?: string;
+  tone?: Tone;
+  tag?: string;
+  priority?: number;
+};
+
+function LiveSystemTasksView({ fallbackRows }: { fallbackRows: LiveSystemTask[] }) {
+  const [rows, setRows] = useState<LiveSystemTask[]>(fallbackRows);
+  const [source, setSource] = useState("visual");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTasks() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveRows = payload?.data?.systemTaskRows;
+
+        if (!cancelled && Array.isArray(liveRows) && liveRows.length > 0) {
+          setRows(liveRows);
+          setSource(payload?.source || "api");
+        }
+      } catch (error) {
+        console.error("[Studio Lab] Falha ao carregar tarefas do banco:", error);
+      }
+    }
+
+    loadTasks();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const riskRows = rows.filter((item) => item.value === "em risco");
+  const progressRows = rows.filter((item) => item.value === "em andamento");
+  const activeRows = rows.filter((item) => item.value === "ativo");
+
+  return (
+    <>
+      <section className="metric-grid">
+        <MetricCard title="Em risco" value={String(riskRows.length)} detail="Itens que travam leads, venda ou acesso" tone="red" />
+        <MetricCard title="Em andamento" value={String(progressRows.length)} detail="Tarefas sendo construídas agora" tone="yellow" />
+        <MetricCard title="Ativas" value={String(activeRows.length)} detail="Áreas funcionando e monitoradas" tone="green" />
+        <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados carregados da API do Studio" tone="blue" />
+      </section>
+
+      <section className="panel full">
+        <PanelTitle eyebrow="Tarefas do Sistema" title="Tudo catalogado por status e prioridade" action={source === "postgres" ? "Banco conectado" : "Visual"} />
+
+        <div className="task-board">
+          {[
+            ["em risco", riskRows],
+            ["em andamento", progressRows],
+            ["ativo", activeRows],
+          ].map(([status, items]) => (
+            <div key={String(status)} className="task-column">
+              <h3>{String(status)}</h3>
+
+              {(items as LiveSystemTask[]).map((item) => (
+                <div key={item.title} className={`task-card ${item.tone || "blue"}`}>
+                  <strong>{item.title}</strong>
+                  <p>{item.detail}</p>
+                  <span>{item.tag || "Sistema"}</span>
+                </div>
+              ))}
+
+              {(items as LiveSystemTask[]).length === 0 && (
+                <div className="task-card blue">
+                  <strong>Nenhuma tarefa aqui</strong>
+                  <p>Quando tiver uma tarefa com esse status no banco, ela aparece automaticamente.</p>
+                  <span>vazio</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
@@ -1949,32 +2040,7 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "tarefas" && (
-          <>
-            <section className="metric-grid">
-              <MetricCard title="Em risco" value="6" detail="Itens que travam leads, venda ou acesso" tone="red" />
-              <MetricCard title="Em andamento" value="9" detail="Tarefas sendo construídas agora" tone="yellow" />
-              <MetricCard title="Ativas" value="7" detail="Áreas funcionando e monitoradas" tone="green" />
-              <MetricCard title="Backlog" value="12" detail="Ideias e melhorias futuras" tone="blue" />
-            </section>
-
-            <section className="panel full">
-              <PanelTitle eyebrow="Tarefas do Sistema" title="Tudo catalogado por status e prioridade" action="Nova tarefa" />
-              <div className="task-board">
-                {["em risco", "em andamento", "ativo"].map((status) => (
-                  <div key={status} className="task-column">
-                    <h3>{status}</h3>
-                    {systemTaskRows.filter((item) => item.value === status).map((item) => (
-                      <div key={item.title} className={`task-card ${item.tone}`}>
-                        <strong>{item.title}</strong>
-                        <p>{item.detail}</p>
-                        <span>{item.tag}</span>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </section>
-          </>
+          <LiveSystemTasksView fallbackRows={systemTaskRows} />
         )}
 
         {activeView === "loja" && (
