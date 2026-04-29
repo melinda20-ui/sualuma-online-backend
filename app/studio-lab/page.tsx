@@ -1606,6 +1606,119 @@ function LiveSystemTasksView({ fallbackRows }: { fallbackRows: LiveSystemTask[] 
 }
 
 
+
+type LiveStoreProduct = {
+  title: string;
+  detail?: string;
+  value?: string;
+  tone?: Tone;
+  category?: string;
+  status?: string;
+  priority?: number;
+};
+
+function LiveStoreProductsView({ fallbackRows }: { fallbackRows: LiveStoreProduct[] }) {
+  const [rows, setRows] = useState<LiveStoreProduct[]>(fallbackRows);
+  const [source, setSource] = useState("visual");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProducts() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveRows = payload?.data?.storeProductRows;
+
+        if (!cancelled && Array.isArray(liveRows) && liveRows.length > 0) {
+          setRows(liveRows);
+          setSource(payload?.source || "api");
+        }
+      } catch (error) {
+        console.error("[Studio Lab] Falha ao carregar Admin Loja do banco:", error);
+      }
+    }
+
+    loadProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const activeRows = rows.filter((item) => item.status === "ativo" || item.value === "ativo");
+  const reviewRows = rows.filter((item) => item.status === "revisar" || item.value === "revisar" || item.value === "editar");
+  const categories = Array.from(new Set(rows.map((item) => item.category || "Sem categoria")));
+
+  return (
+    <>
+      <section className="metric-grid">
+        <MetricCard title="Produtos no banco" value={String(rows.length)} detail="Agentes, automações, skills e templates" tone="pink" />
+        <MetricCard title="Ativos" value={String(activeRows.length)} detail="Produtos publicados ou prontos para vitrine" tone="green" />
+        <MetricCard title="Para revisar" value={String(reviewRows.length)} detail="Itens que precisam ajuste antes de escalar" tone="yellow" />
+        <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados carregados da API do Studio" tone="blue" />
+      </section>
+
+      <section className="lower-grid">
+        <div className="panel">
+          <PanelTitle eyebrow="Admin Loja" title="Produtos digitais cadastrados" action={source === "postgres" ? "Banco conectado" : "Visual"} />
+
+          {rows.map((item) => (
+            <DataRow
+              key={item.title}
+              title={item.title}
+              detail={item.detail || "Produto sem descrição cadastrada."}
+              value={item.value || item.status || "ativo"}
+              tone={item.tone || "blue"}
+            />
+          ))}
+        </div>
+
+        <div className="panel">
+          <PanelTitle eyebrow="Categorias" title="Organização da loja" />
+
+          {categories.map((category) => {
+            const count = rows.filter((item) => (item.category || "Sem categoria") === category).length;
+
+            return (
+              <DataRow
+                key={category}
+                title={category}
+                detail="Categoria puxada do banco de produtos da loja."
+                value={`${count} itens`}
+                tone="pink"
+              />
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="panel full">
+        <PanelTitle eyebrow="Operação da Loja" title="Tabela rápida para gestão dos produtos" action="Ações futuras" />
+
+        <div className="store-table">
+          {rows.map((item) => (
+            <div key={item.title} className="store-row">
+              <ToneDot tone={item.tone || "blue"} />
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.detail || "Produto cadastrado no banco do Studio."}</p>
+              </div>
+              <button>{item.category || "Categoria"}</button>
+              <button>{item.status || item.value || "Status"}</button>
+              <button>Editar depois</button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
@@ -2044,63 +2157,7 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "loja" && (
-          <>
-            <section className="metric-grid">
-              {storeHubCards.map((item) => (
-                <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
-              ))}
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Admin Loja" title="Hub dos produtos digitais" action="Novo produto" />
-                {storeProductRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Marketplaces" title="Onde os produtos aparecem" />
-                {marketplaceRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Categorias" title="Agentes, automações, skills e templates" />
-                {storeCategoryRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Ações de loja" title="Controle operacional dos produtos" />
-                {storeActionRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-
-            <section className="panel full">
-              <PanelTitle eyebrow="Tabela de produtos" title="Produtos que precisam atenção" action="Organizar categorias" />
-              <div className="store-table">
-                {storeProductRows.map((item) => (
-                  <div key={item.title} className="store-row">
-                    <ToneDot tone={item.tone} />
-                    <div>
-                      <strong>{item.title}</strong>
-                      <p>{item.detail}</p>
-                    </div>
-                    <button>Editar</button>
-                    <button>Arquivar</button>
-                    <button>Tirar do ar</button>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </>
+          <LiveStoreProductsView fallbackRows={storeProductRows} />
         )}
 
         {activeView === "suporte" && (
