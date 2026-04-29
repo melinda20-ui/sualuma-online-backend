@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { Pool } from "pg";
+import pg from "pg";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const { Pool } = pg;
 
 type Tone = "pink" | "blue" | "green" | "yellow" | "red" | "purple";
 
@@ -11,18 +13,6 @@ const validTones = new Set(["pink", "blue", "green", "yellow", "red", "purple"])
 function safeTone(value: unknown, fallback: Tone = "blue"): Tone {
   return typeof value === "string" && validTones.has(value) ? (value as Tone) : fallback;
 }
-
-const connectionString =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  process.env.SUPABASE_DB_URL ||
-  "";
-
-const pool = connectionString
-  ? new Pool({
-      connectionString,
-    })
-  : null;
 
 const fallback = {
   systemTaskRows: [
@@ -87,6 +77,36 @@ const fallback = {
   ],
 };
 
+let pool: any = null;
+
+function getConnectionString() {
+  return (
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.SUPABASE_DB_URL ||
+    ""
+  );
+}
+
+function getPool() {
+  const connectionString = getConnectionString();
+
+  if (!connectionString) {
+    return null;
+  }
+
+  if (!pool) {
+    pool = new Pool({
+      connectionString,
+      max: 5,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 5000,
+    });
+  }
+
+  return pool;
+}
+
 function normalizeRows(rows: any[] | null | undefined, fallbackRows: any[]) {
   if (!rows || rows.length === 0) return fallbackRows;
 
@@ -96,21 +116,31 @@ function normalizeRows(rows: any[] | null | undefined, fallbackRows: any[]) {
   }));
 }
 
-async function query<T = any>(sql: string): Promise<T[]> {
-  if (!pool) return [];
-  const result = await pool.query(sql);
-  return result.rows as T[];
+async function query(sql: string) {
+  const activePool = getPool();
+
+  if (!activePool) {
+    return [];
+  }
+
+  const result = await activePool.query(sql);
+  return result.rows;
 }
 
 export async function GET() {
   try {
-    if (!pool) {
-      return NextResponse.json({
-        ok: false,
-        source: "fallback",
-        error: "DATABASE_URL/POSTGRES_URL/SUPABASE_DB_URL não encontrado.",
-        data: fallback,
-      });
+    const activePool = getPool();
+
+    if (!activePool) {
+      return NextResponse.json(
+        {
+          ok: false,
+          source: "fallback",
+          error: "DATABASE_URL/POSTGRES_URL/SUPABASE_DB_URL não encontrado no runtime.",
+          data: fallback,
+        },
+        { headers: { "Cache-Control": "no-store" } }
+      );
     }
 
     const [
@@ -155,14 +185,14 @@ export async function GET() {
 
     const linksBySubdomain = new Map<string, string[]>();
 
-    for (const link of linkRows as any[]) {
+    for (const link of linkRows) {
       const current = linksBySubdomain.get(link.subdomain_key) || [];
       current.push(link.path);
       linksBySubdomain.set(link.subdomain_key, current);
     }
 
     const subdomainRows = subdomainRowsRaw.length
-      ? (subdomainRowsRaw as any[]).map((item) => ({
+      ? subdomainRowsRaw.map((item: any) => ({
           name: item.name,
           status: item.status,
           tone: safeTone(item.tone),
@@ -170,23 +200,31 @@ export async function GET() {
         }))
       : fallback.subdomainRows;
 
-    return NextResponse.json({
-      ok: true,
-      source: "postgres",
-      data: {
-        systemTaskRows: normalizeRows(taskRows, fallback.systemTaskRows),
-        storeProductRows: normalizeRows(productRows, fallback.storeProductRows),
-        communityModerationRows: normalizeRows(reportRows, fallback.communityModerationRows),
-        cnpjNotificationRows: normalizeRows(cnpjRows, fallback.cnpjNotificationRows),
-        subdomainRows,
+    return NextResponse.json(
+      {
+        ok: true,
+        source: "postgres",
+        data: {
+          systemTaskRows: normalizeRows(taskRows, fallback.systemTaskRows),
+          storeProductRows: normalizeRows(productRows, fallback.storeProductRows),
+          communityModerationRows: normalizeRows(reportRows, fallback.communityModerationRows),
+          cnpjNotificationRows: normalizeRows(cnpjRows, fallback.cnpjNotificationRows),
+          subdomainRows,
+        },
       },
-    });
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (error) {
-    return NextResponse.json({
-      ok: false,
-      source: "fallback",
-      error: error instanceof Error ? error.message : String(error),
-      data: fallback,
-    });
+    console.error("[studio/dashboard] erro:", error);
+
+    return NextResponse.json(
+      {
+        ok: false,
+        source: "fallback",
+        error: error instanceof Error ? error.message : String(error),
+        data: fallback,
+      },
+      { status: 200, headers: { "Cache-Control": "no-store" } }
+    );
   }
 }
