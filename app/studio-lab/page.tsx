@@ -1829,6 +1829,110 @@ function LiveCommunityView({ fallbackRows }: { fallbackRows: LiveCommunityReport
 }
 
 
+
+type LiveCnpjNotification = {
+  title: string;
+  detail?: string;
+  value?: string;
+  tone?: Tone;
+  status?: string;
+  due_date?: string;
+  created_at?: string;
+};
+
+function LiveCnpjView({ fallbackRows }: { fallbackRows: LiveCnpjNotification[] }) {
+  const [rows, setRows] = useState<LiveCnpjNotification[]>(fallbackRows);
+  const [source, setSource] = useState("visual");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCnpj() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveRows = payload?.data?.cnpjNotificationRows;
+
+        if (!cancelled && Array.isArray(liveRows) && liveRows.length > 0) {
+          setRows(liveRows);
+          setSource(payload?.source || "api");
+        }
+      } catch (error) {
+        console.error("[Studio Lab] Falha ao carregar CNPJ do banco:", error);
+      }
+    }
+
+    loadCnpj();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const openRows = rows.filter((item) => item.status === "aberto");
+  const okRows = rows.filter((item) => item.status === "ok");
+  const attentionRows = rows.filter((item) => item.tone === "yellow" || item.value === "atenção");
+
+  return (
+    <>
+      <section className="metric-grid">
+        <MetricCard title="Notificações CNPJ" value={String(rows.length)} detail="Pendências e lembretes cadastrados" tone="pink" />
+        <MetricCard title="Em aberto" value={String(openRows.length)} detail="Itens que precisam conferência" tone="yellow" />
+        <MetricCard title="Regular" value={String(okRows.length)} detail="Itens marcados como ok" tone="green" />
+        <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados carregados da API do Studio" tone="blue" />
+      </section>
+
+      <section className="health-hero">
+        <div className="panel">
+          <PanelTitle eyebrow="CNPJ" title="Central de notificações da empresa" action={source === "postgres" ? "Banco conectado" : "Visual"} />
+
+          {rows.map((item) => (
+            <DataRow
+              key={item.title}
+              title={item.title}
+              detail={item.detail || "Notificação cadastrada no banco do Studio."}
+              value={item.value || item.status || "verificar"}
+              tone={item.tone || "yellow"}
+            />
+          ))}
+        </div>
+
+        <div className="panel">
+          <PanelTitle eyebrow="Diagnóstico" title="O que precisa atenção" />
+
+          <DataRow title="Pendências abertas" detail="Obrigações, documentos ou verificações ainda não concluídas." value={String(openRows.length)} tone="yellow" />
+          <DataRow title="Itens em atenção" detail="Pontos que podem virar problema se ficarem esquecidos." value={String(attentionRows.length)} tone="red" />
+          <DataRow title="Documentos" detail="Notas, comprovantes e registros precisam ficar organizados por mês." value="organizar" tone="blue" />
+          <DataRow title="Próxima fase" detail="Conectar consulta real de CNPJ e histórico de obrigações." value="fase 2" tone="pink" />
+        </div>
+      </section>
+
+      <section className="panel full">
+        <PanelTitle eyebrow="Relatório CNPJ" title="Histórico e tarefas administrativas" action="Ações futuras" />
+
+        <div className="store-table">
+          {rows.map((item) => (
+            <div key={`${item.title}-${item.created_at || ""}`} className="store-row">
+              <ToneDot tone={item.tone || "yellow"} />
+              <div>
+                <strong>{item.title}</strong>
+                <p>{item.detail || "Item administrativo registrado no banco."}</p>
+              </div>
+              <button>{item.status || "aberto"}</button>
+              <button>{item.value || "verificar"}</button>
+              <button>Marcar depois</button>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
@@ -2298,30 +2402,7 @@ export default function StudioLabPage() {
         )}
 
         {activeView === "cnpj" && (
-          <>
-            <section className="metric-grid">
-              <MetricCard title="Situação" value="Regular" detail="Resumo demonstrativo do CNPJ" tone="green" />
-              <MetricCard title="Pendências" value="1" detail="Item para verificar no mês" tone="yellow" />
-              <MetricCard title="Documentos" value="28" detail="Notas e comprovantes salvos" tone="blue" />
-              <MetricCard title="Alertas" value="3" detail="Notificações importantes" tone="pink" />
-            </section>
-
-            <section className="lower-grid">
-              <div className="panel">
-                <PanelTitle eyebrow="Relatório CNPJ" title="O que preciso saber sobre minha empresa" action="Atualizar" />
-                {cnpjDeepRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-
-              <div className="panel">
-                <PanelTitle eyebrow="Notificações" title="Acompanhamento do mês" />
-                {cnpjNotificationRows.map((item) => (
-                  <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
-                ))}
-              </div>
-            </section>
-          </>
+          <LiveCnpjView fallbackRows={cnpjNotificationRows} />
         )}
 
         {activeView === "sitemap" && (
