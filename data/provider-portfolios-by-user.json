@@ -1,0 +1,34 @@
+{
+  "f5ffd4c6-f0fb-43cc-bf4d-dcc75185e59e": {
+    "userId": "f5ffd4c6-f0fb-43cc-bf4d-dcc75185e59e",
+    "email": "ludmilacavalcante.r@gmail.com",
+    "profile": {
+      "name": "Prestador Sualuma",
+      "title": "Especialista em sites, automações e entregas digitais",
+      "email": "prestador@sualuma.online",
+      "phone": "",
+      "city": "Brasil",
+      "bio": "Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.",
+      "avatarInitial": "P",
+      "onboardingComplete": false,
+      "photoUrl": "",
+      "updatedAt": "2026-04-28T04:34:54.051Z"
+    },
+    "portfolio": [
+      {
+        "id": "port-demo-1",
+        "title": "Site institucional futurista",
+        "category": "Sites",
+        "url": "https://sualuma.online",
+        "description": "Modelo de apresentação profissional para empresas digitais.",
+        "createdAt": "2026-04-27T20:54:55.446Z",
+        "coverImage": "",
+        "youtubeUrl": "",
+        "clientName": "",
+        "status": "publicado",
+        "updatedAt": "2026-04-28T04:34:54.051Z"
+      }
+    ],
+    "updatedAt": "2026-04-28T04:34:54.051Z"
+  }
+}

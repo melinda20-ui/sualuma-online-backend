@@ -1,221 +1,196 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import fs from "fs/promises";
 import path from "path";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const MAIN_FILE = path.join(DATA_DIR, "provider-dashboard.json");
-const USER_FILE = path.join(DATA_DIR, "provider-portfolios-by-user.json");
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-type AnyRecord = Record<string, any>;
+const DB_FILE = path.join(process.cwd(), "data", "provider-portfolios.json");
 
-async function readJson<T>(file: string, fallback: T): Promise<T> {
-  try {
-    const raw = await fs.readFile(file, "utf8");
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
+function json(data: any, status = 200) {
+  return NextResponse.json(data, {
+    status,
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    },
+  });
 }
 
-async function writeJson(file: string, data: any) {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  await fs.writeFile(file, JSON.stringify(data, null, 2), "utf8");
+function normalizeKey(value: string) {
+  return String(value || "prestador-demo@sualuma.online")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9@._-]/g, "");
 }
 
-function pickString(...values: any[]) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim()) return value.trim();
-  }
-  return "";
-}
-
-function normalizeProfile(input: AnyRecord = {}) {
-  return {
-    name: pickString(input.name, input.fullName, input.full_name, input.displayName, input.title, "Prestador Sualuma"),
-    title: pickString(input.title, input.role, input.profession, input.headline, "Especialista em serviços digitais"),
-    bio: pickString(input.bio, input.description, input.about),
-    city: pickString(input.city, input.location),
-    email: pickString(input.email),
-    phone: pickString(input.phone, input.whatsapp),
-    photoUrl: pickString(input.photoUrl, input.avatarUrl, input.fotoUrl, input.imageUrl, input.photo, input.avatar),
-    avatarInitial: pickString(input.avatarInitial, input.initials, "P"),
-    updatedAt: new Date().toISOString(),
-  };
-}
-
-function normalizeItem(item: AnyRecord = {}, index = 0) {
-  const id = pickString(item.id, item.key) || `portfolio-${Date.now()}-${index}`;
-
-  return {
-    id,
-    title: pickString(item.title, item.name, item.projectTitle, "Trabalho sem título"),
-    category: pickString(item.category, item.type, "Portfólio"),
-    url: pickString(item.url, item.link, item.siteUrl, item.projectUrl),
-    description: pickString(item.description, item.body, item.text, item.summary),
-    coverImage: pickString(item.coverImage, item.imageUrl, item.photoUrl, item.previewImage, item.thumbnail),
-    youtubeUrl: pickString(item.youtubeUrl, item.videoUrl, item.youtube, item.video),
-    clientName: pickString(item.clientName, item.client),
-    status: pickString(item.status, "publicado"),
-    createdAt: pickString(item.createdAt) || new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-}
-
-function extractPortfolio(body: AnyRecord = {}) {
-  const state = body.state || body.data || body;
-
-  const profileSource =
-    body.profile ||
-    state.profile ||
-    state.providerProfile ||
-    state.provider ||
-    {};
-
-  const portfolioSource =
-    body.portfolio ||
-    state.portfolio ||
-    state.projects ||
-    state.works ||
-    state.items ||
-    [];
-
-  const profile = normalizeProfile(profileSource);
-  const portfolio = Array.isArray(portfolioSource)
-    ? portfolioSource.map((item, index) => normalizeItem(item, index)).filter((item) => item.title)
-    : [];
-
-  return { profile, portfolio };
-}
-
-async function getCurrentUser() {
+async function getAuthEmail() {
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
-    return data.user || null;
+    return data?.user?.email || "";
   } catch {
-    return null;
+    return "";
   }
 }
 
-function userKey(user: any) {
-  return user?.id || user?.email || "fallback-user";
+async function readDb() {
+  try {
+    return JSON.parse(await fs.readFile(DB_FILE, "utf8"));
+  } catch {
+    return {};
+  }
 }
 
-export async function GET() {
-  const user = await getCurrentUser();
-  const main = await readJson<AnyRecord>(MAIN_FILE, {});
-  const byUser = await readJson<AnyRecord>(USER_FILE, {});
+async function writeDb(db: any) {
+  await fs.mkdir(path.dirname(DB_FILE), { recursive: true });
+  await fs.writeFile(DB_FILE, JSON.stringify(db, null, 2), "utf8");
+}
 
-  const key = userKey(user);
-  const userData = byUser[key] || {};
-
-  const profile = {
-    ...(main.providerProfile || {}),
-    ...(userData.profile || {}),
-  };
-
-  const portfolio =
-    Array.isArray(userData.portfolio) && userData.portfolio.length
-      ? userData.portfolio
-      : Array.isArray(main.portfolio)
-        ? main.portfolio
-        : [];
-
-  return NextResponse.json({
+function defaultRecord(email: string) {
+  return {
     ok: true,
-    authenticated: Boolean(user),
-    user: user
-      ? {
-          id: user.id,
-          email: user.email,
-        }
-      : null,
-    profile,
-    portfolio,
-    total: portfolio.length,
-    updatedAt: userData.updatedAt || main.updatedAt || new Date().toISOString(),
-  });
-}
-
-export async function POST(request: Request) {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    return NextResponse.json(
+    email,
+    profile: {
+      name: "Prestador Sualuma",
+      title: "Especialista em sites, automações e presença digital",
+      bio: "Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.",
+      photoUrl: "",
+      platformJobs: 18,
+      outsideJobs: 43,
+      clients: 54,
+      satisfaction: 98,
+    },
+    projects: [
       {
-        ok: false,
-        error: "Faça login para salvar o portfólio no backend.",
+        id: "port-demo-1",
+        title: "Site institucional futurista",
+        category: "Sites",
+        url: "https://sualuma.online",
+        youtubeUrl: "",
+        imageUrl: "",
+        result: "Modelo de apresentação profissional para empresas digitais.",
+        description: "Projeto usado como exemplo inicial do portfólio.",
+        communityPublishedAt: "",
+        communityPostId: "",
+        createdAt: new Date().toISOString(),
       },
-      { status: 401 }
-    );
-  }
-
-  const body = await request.json().catch(() => ({}));
-  const { profile, portfolio } = extractPortfolio(body);
-
-  const main = await readJson<AnyRecord>(MAIN_FILE, {});
-  const byUser = await readJson<AnyRecord>(USER_FILE, {});
-  const key = userKey(user);
-
-  const currentUserData = byUser[key] || {};
-
-  const finalProfile = {
-    ...(main.providerProfile || {}),
-    ...(currentUserData.profile || {}),
-    ...profile,
-    email: profile.email || user.email || currentUserData.profile?.email || "",
+    ],
     updatedAt: new Date().toISOString(),
   };
+}
 
-  const currentPortfolio = Array.isArray(currentUserData.portfolio)
-    ? currentUserData.portfolio
-    : Array.isArray(main.portfolio)
-      ? main.portfolio
-      : [];
+function getRecord(db: any, key: string) {
+  if (!db[key]) db[key] = defaultRecord(key);
+  db[key].ok = true;
+  db[key].email = key;
+  db[key].profile = db[key].profile || defaultRecord(key).profile;
+  db[key].projects = Array.isArray(db[key].projects) ? db[key].projects : [];
+  db[key].updatedAt = db[key].updatedAt || new Date().toISOString();
+  return db[key];
+}
 
-  const map = new Map<string, AnyRecord>();
+export async function OPTIONS() {
+  return json({ ok: true });
+}
 
-  for (const item of currentPortfolio) {
-    if (item?.id) map.set(item.id, item);
+export async function GET(req: NextRequest) {
+  try {
+    const authEmail = await getAuthEmail();
+    const emailFromUrl = req.nextUrl.searchParams.get("email") || "";
+    const key = normalizeKey(authEmail || emailFromUrl || "prestador-demo@sualuma.online");
+
+    const db = await readDb();
+    const record = getRecord(db, key);
+    await writeDb(db);
+
+    return json(record);
+  } catch (error: any) {
+    return json({ ok: false, error: error?.message || "Erro ao carregar portfólio." }, 500);
   }
+}
 
-  for (const item of portfolio) {
-    if (item?.id) {
-      map.set(item.id, {
-        ...(map.get(item.id) || {}),
-        ...item,
-        updatedAt: new Date().toISOString(),
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const authEmail = await getAuthEmail();
+    const key = normalizeKey(authEmail || body.email || body.ownerEmail || "prestador-demo@sualuma.online");
+
+    const db = await readDb();
+    const record = getRecord(db, key);
+
+    const action = String(body.action || "");
+
+    if (action === "profile") {
+      record.profile = {
+        ...record.profile,
+        name: String(body.name || record.profile.name || ""),
+        title: String(body.title || record.profile.title || ""),
+        bio: String(body.bio || record.profile.bio || ""),
+        photoUrl: String(body.photoUrl || record.profile.photoUrl || ""),
+      };
+    }
+
+    if (action === "add") {
+      record.projects.unshift({
+        id: "work-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+        title: String(body.title || "Novo trabalho"),
+        category: String(body.category || "Portfólio"),
+        url: String(body.url || ""),
+        youtubeUrl: String(body.youtubeUrl || ""),
+        imageUrl: String(body.imageUrl || ""),
+        result: String(body.result || ""),
+        description: String(body.description || ""),
+        communityPublishedAt: "",
+        communityPostId: "",
+        createdAt: new Date().toISOString(),
       });
     }
+
+    if (action === "update") {
+      const id = String(body.id || "");
+      record.projects = record.projects.map((item: any) => {
+        if (String(item.id) !== id) return item;
+        return {
+          ...item,
+          title: String(body.title || item.title || ""),
+          category: String(body.category || item.category || ""),
+          url: String(body.url || ""),
+          youtubeUrl: String(body.youtubeUrl || ""),
+          imageUrl: String(body.imageUrl || item.imageUrl || ""),
+          result: String(body.result || ""),
+          description: String(body.description || ""),
+          updatedAt: new Date().toISOString(),
+        };
+      });
+    }
+
+    if (action === "mark_published") {
+      const id = String(body.id || "");
+      record.projects = record.projects.map((item: any) => {
+        if (String(item.id) !== id) return item;
+        return {
+          ...item,
+          communityPublishedAt: new Date().toISOString(),
+          communityPostId: String(body.communityPostId || item.communityPostId || ""),
+        };
+      });
+    }
+
+    if (action === "delete") {
+      const id = String(body.id || "");
+      record.projects = record.projects.filter((item: any) => String(item.id) !== id);
+    }
+
+    record.updatedAt = new Date().toISOString();
+    db[key] = record;
+    await writeDb(db);
+
+    return json(record);
+  } catch (error: any) {
+    return json({ ok: false, error: error?.message || "Erro ao salvar portfólio." }, 500);
   }
-
-  const finalPortfolio = Array.from(map.values());
-
-  byUser[key] = {
-    userId: user.id,
-    email: user.email,
-    profile: finalProfile,
-    portfolio: finalPortfolio,
-    updatedAt: new Date().toISOString(),
-  };
-
-  main.providerProfile = {
-    ...(main.providerProfile || {}),
-    ...finalProfile,
-  };
-
-  main.portfolio = finalPortfolio;
-  main.updatedAt = new Date().toISOString();
-
-  await writeJson(USER_FILE, byUser);
-  await writeJson(MAIN_FILE, main);
-
-  return NextResponse.json({
-    ok: true,
-    profile: finalProfile,
-    portfolio: finalPortfolio,
-    total: finalPortfolio.length,
-    message: "Portfólio salvo no backend.",
-  });
 }

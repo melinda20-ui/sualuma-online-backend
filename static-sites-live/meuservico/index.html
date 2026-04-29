@@ -153,268 +153,6 @@
       .sidepanel{position:relative;top:0}
     }
   </style>
-<style id="sualuma-service-mobile-cleanup-v2">
-  @media (max-width: 860px) {
-    html,
-    body {
-      width: 100% !important;
-      max-width: 100% !important;
-      overflow-x: hidden !important;
-      scroll-behavior: smooth !important;
-    }
-
-    body {
-      background: #040615 !important;
-    }
-
-    body * {
-      box-sizing: border-box !important;
-    }
-
-    body::before,
-    body::after {
-      pointer-events: none !important;
-    }
-
-    main,
-    section,
-    .section,
-    .dashboard,
-    .dashboard-shell,
-    .provider-dashboard,
-    .provider-shell,
-    .provider-layout,
-    .app-shell,
-    .shell,
-    .container,
-    .content,
-    .main,
-    .page,
-    [class*="dashboard"],
-    [class*="Dashboard"] {
-      max-width: 100% !important;
-    }
-
-    aside,
-    .sidebar,
-    .side,
-    .menu,
-    [class*="sidebar"],
-    [class*="Sidebar"] {
-      position: relative !important;
-      inset: auto !important;
-      width: calc(100% - 24px) !important;
-      max-width: calc(100% - 24px) !important;
-      height: auto !important;
-      max-height: none !important;
-      min-height: auto !important;
-      margin: 12px auto 14px !important;
-      padding: 14px !important;
-      border-radius: 26px !important;
-      overflow: visible !important;
-      background: rgba(5, 8, 25, 0.92) !important;
-      border: 1px solid rgba(255,255,255,.10) !important;
-      box-shadow: 0 18px 50px rgba(0,0,0,.28) !important;
-    }
-
-    aside nav,
-    .sidebar nav,
-    .side nav,
-    [class*="sidebar"] nav,
-    [class*="Sidebar"] nav {
-      display: flex !important;
-      gap: 10px !important;
-      overflow-x: auto !important;
-      overflow-y: hidden !important;
-      padding: 4px 2px 8px !important;
-      scrollbar-width: none !important;
-      -webkit-overflow-scrolling: touch !important;
-    }
-
-    aside nav::-webkit-scrollbar,
-    .sidebar nav::-webkit-scrollbar {
-      display: none !important;
-    }
-
-    aside a,
-    aside button,
-    .sidebar a,
-    .sidebar button,
-    .side a,
-    .side button,
-    [class*="sidebar"] a,
-    [class*="sidebar"] button,
-    [class*="Sidebar"] a,
-    [class*="Sidebar"] button {
-      flex: 0 0 auto !important;
-      min-width: max-content !important;
-      width: auto !important;
-      min-height: 50px !important;
-      padding: 12px 15px !important;
-      border-radius: 18px !important;
-      font-size: 14px !important;
-      line-height: 1.2 !important;
-      white-space: nowrap !important;
-    }
-
-    main,
-    .main,
-    .content,
-    .page-content,
-    .dashboard-content,
-    [class*="content"],
-    [class*="Content"] {
-      width: 100% !important;
-      margin: 0 !important;
-      padding: 12px !important;
-      overflow-x: hidden !important;
-    }
-
-    .hero,
-    .page-hero,
-    .dashboard-header,
-    .provider-header,
-    .topbar,
-    .header,
-    [class*="hero"],
-    [class*="Hero"],
-    [class*="header"],
-    [class*="Header"] {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: 14px !important;
-      width: 100% !important;
-      min-height: auto !important;
-      padding: 20px !important;
-      border-radius: 26px !important;
-      overflow: hidden !important;
-    }
-
-    .sualuma-floating-switch,
-    .floating-switch,
-    .auth-pill,
-    .login-pill,
-    .user-pill,
-    [class*="floating"],
-    [class*="Floating"] {
-      position: static !important;
-      inset: auto !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      display: flex !important;
-      flex-wrap: wrap !important;
-      justify-content: flex-start !important;
-      align-items: center !important;
-      gap: 10px !important;
-      margin: 0 !important;
-      transform: none !important;
-      z-index: 1 !important;
-    }
-
-    .sualuma-floating-switch a,
-    .sualuma-floating-switch button,
-    .floating-switch a,
-    .floating-switch button,
-    .auth-pill a,
-    .auth-pill button,
-    .login-pill a,
-    .login-pill button {
-      flex: 1 1 auto !important;
-      min-width: 130px !important;
-      text-align: center !important;
-      justify-content: center !important;
-    }
-
-    h1 {
-      font-size: clamp(34px, 10vw, 52px) !important;
-      line-height: 1.02 !important;
-      letter-spacing: -1.8px !important;
-    }
-
-    h2 {
-      font-size: clamp(26px, 7vw, 38px) !important;
-      line-height: 1.08 !important;
-    }
-
-    p {
-      line-height: 1.55 !important;
-    }
-
-    .grid,
-    .cards,
-    .stats,
-    .content-grid,
-    .dashboard-grid,
-    .provider-grid,
-    [class*="grid"],
-    [class*="Grid"] {
-      display: grid !important;
-      grid-template-columns: 1fr !important;
-      gap: 14px !important;
-      width: 100% !important;
-    }
-
-    .card,
-    .panel,
-    .box,
-    .glass,
-    .stat,
-    .item,
-    article,
-    [class*="card"],
-    [class*="Card"],
-    [class*="panel"],
-    [class*="Panel"] {
-      width: 100% !important;
-      max-width: 100% !important;
-      min-width: 0 !important;
-      overflow-wrap: anywhere !important;
-    }
-
-    input,
-    textarea,
-    select,
-    button,
-    .btn,
-    a.btn {
-      max-width: 100% !important;
-      font-size: 16px !important;
-    }
-
-    textarea {
-      min-height: 130px !important;
-    }
-
-    img,
-    video,
-    iframe {
-      max-width: 100% !important;
-      height: auto !important;
-    }
-
-    .portfolio-hero,
-    .portfolio-preview,
-    .profile-card,
-    .work-preview,
-    .preview-card {
-      min-height: auto !important;
-    }
-
-    .portfolio-hero img,
-    .profile-card img,
-    .avatar img {
-      object-fit: cover !important;
-    }
-
-    * {
-      animation-duration: .01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: .12s !important;
-    }
-  }
-</style>
-
 </head>
 <body>
   <header class="top">
@@ -527,7 +265,7 @@
           <a href="#prestador">🏠 Painel</a>
           <a href="#prestador-onboarding">🧭 Configurar conta</a>
           <a href="#prestador-propostas">📨 Propostas</a>
-          <a href="#prestador-portfolio">🖼️ Portfólio</a>
+          <a href="/portfolio/">🖼️ Portfólio</a>
           <a href="#github">🐙 GitHub</a>
           <a href="#whatsapp">📲 WhatsApp</a>
           <a href="#comunidade">💬 Comunidade</a>
@@ -5667,631 +5405,6 @@
   },1800);
 })();
 </script>
-<style id="sualuma-portfolio-edit-community-v18-style">
-  .pf18-wrap{display:grid;gap:22px}
-  .pf18-card{border:1px solid rgba(144,170,255,.18);border-radius:30px;background:radial-gradient(circle at top right,rgba(125,92,255,.18),transparent 26%),radial-gradient(circle at bottom left,rgba(24,242,255,.10),transparent 24%),linear-gradient(135deg,rgba(11,18,53,.96),rgba(17,21,72,.90));box-shadow:0 20px 60px rgba(0,0,0,.28);color:#fff;padding:26px;overflow:hidden}
-  .pf18-hero{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:center}
-  .pf18-title{font-size:44px;line-height:1.02;margin:10px 0;font-weight:1000;letter-spacing:-.03em}
-  .pf18-role{color:#9ffbff;font-weight:900;font-size:19px;margin-bottom:12px}
-  .pf18-text{color:#d6dcff;line-height:1.7;margin:0}
-  .pf18-kicker{display:inline-flex;padding:8px 13px;border-radius:999px;background:rgba(24,242,255,.08);border:1px solid rgba(24,242,255,.18);color:#9ffbff;font-weight:1000;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
-  .pf18-photo{min-height:300px;border-radius:28px;border:1px solid rgba(255,255,255,.11);background:linear-gradient(135deg,rgba(125,92,255,.22),rgba(24,242,255,.10));display:grid;place-items:center;overflow:hidden}
-  .pf18-photo img{width:100%;height:100%;object-fit:cover}
-  .pf18-avatar{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#8d5cff,#18f2ff);font-size:46px;font-weight:1000}
-  .pf18-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
-  .pf18-stat{border-radius:22px;padding:16px;background:linear-gradient(135deg,rgba(125,92,255,.22),rgba(24,242,255,.10));border:1px solid rgba(255,255,255,.10)}
-  .pf18-stat small{display:block;color:#c8d2ff;font-weight:900;margin-bottom:8px}
-  .pf18-stat strong{font-size:30px;font-weight:1000}
-  .pf18-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:18px}
-  .pf18-head h2{font-size:34px;margin:0;font-weight:1000}
-  .pf18-projects{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-  .pf18-project{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);border-radius:26px;overflow:hidden;transition:.22s}
-  .pf18-cover{height:190px;background:linear-gradient(135deg,rgba(125,92,255,.30),rgba(24,242,255,.13));display:grid;place-items:center;color:#fff;font-weight:1000;text-align:center;padding:18px}
-  .pf18-cover img{width:100%;height:100%;object-fit:cover}
-  .pf18-body{padding:18px}
-  .pf18-body h3{font-size:24px;margin:0 0 8px}
-  .pf18-meta{color:#9ffbff;font-weight:900;font-size:13px;margin-bottom:8px}
-  .pf18-result{margin-top:12px;border-radius:16px;padding:12px;background:rgba(24,242,255,.08);border:1px solid rgba(24,242,255,.15);color:#bafcff;font-weight:800}
-  .pf18-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-  .pf18-btn,.pf18-upload-label{border:0;border-radius:16px;padding:12px 16px;font-weight:1000;cursor:pointer;color:#fff;background:linear-gradient(135deg,#8d5cff,#18f2ff);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
-  .pf18-btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13)}
-  .pf18-btn.danger{background:rgba(255,82,122,.18);border:1px solid rgba(255,82,122,.28)}
-  .pf18-form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-  .pf18-input,.pf18-textarea{width:100%;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.06);color:#fff;font-family:inherit;padding:14px 16px;outline:none}
-  .pf18-textarea{min-height:110px;resize:vertical}
-  .pf18-file{display:none}
-  .pf18-upload-box{border:1px dashed rgba(24,242,255,.30);background:rgba(24,242,255,.06);border-radius:20px;padding:14px;display:grid;gap:10px}
-  .pf18-status{font-size:13px;color:#cbd5ff;font-weight:800}
-  .pf18-preview{width:110px;height:90px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.12);display:none;background:rgba(255,255,255,.06)}
-  .pf18-preview img{width:100%;height:100%;object-fit:cover}
-  .pf18-badge{display:inline-flex;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:1000;background:rgba(24,242,255,.10);border:1px solid rgba(24,242,255,.18);color:#9ffbff}
-  .pf18-community-list{display:grid;gap:16px}
-  .pf18-post{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.045);border-radius:24px;padding:18px}
-  .pf18-post-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
-  .pf18-post h3{margin:0 0 8px;font-size:23px}
-  .pf18-post small{color:#9ffbff;font-weight:900}
-  .pf18-modal{position:fixed;inset:0;z-index:999998;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:22px}
-  .pf18-modal.show{display:flex}
-  .pf18-modal-box{width:min(1100px,96vw);height:min(760px,88vh);border-radius:28px;border:1px solid rgba(255,255,255,.14);background:#080b24;box-shadow:0 30px 90px rgba(0,0,0,.45);overflow:hidden;display:grid;grid-template-rows:auto 1fr}
-  .pf18-modal-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.06);color:#fff}
-  .pf18-modal-body iframe{width:100%;height:100%;border:0;background:#fff}
-  .pf18-toast{position:fixed;right:24px;bottom:24px;z-index:999999;background:linear-gradient(135deg,rgba(14,22,56,.98),rgba(18,34,66,.98));border:1px solid rgba(24,242,255,.20);color:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 22px 60px rgba(0,0,0,.34);font-weight:900;opacity:0;transform:translateY(14px);transition:.25s}
-  .pf18-toast.show{opacity:1;transform:translateY(0)}
-  @media(max-width:1100px){.pf18-hero,.pf18-projects{grid-template-columns:1fr}.pf18-stats,.pf18-form-grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:720px){.pf18-stats,.pf18-form-grid{grid-template-columns:1fr}.pf18-title{font-size:34px}}
-</style>
-
-<script id="sualuma-portfolio-edit-community-v18-script">
-(function(){
-  if(window.__SualumaPortfolioEditCommunityV18) return;
-  window.__SualumaPortfolioEditCommunityV18 = true;
-
-  const STORAGE_KEY = 'sualuma_provider_portfolio_v14';
-  const COMMUNITY_KEY = 'sualuma_provider_community_v18';
-
-  let state = null;
-  let editingId = null;
-
-  function isPortfolio(){ return location.hostname.includes('meuservico') && location.hash === '#prestador-portfolio'; }
-  function isCommunity(){ return location.hostname.includes('meuservico') && ['#prestador-comunidade','#comunidade'].includes(location.hash); }
-
-  function esc(v){ return String(v ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;"); }
-  function id(){ return 'proj-' + Date.now() + '-' + Math.random().toString(36).slice(2,8); }
-  function now(){ return new Date().toISOString(); }
-
-  function initials(name){
-    const parts = String(name || 'SL').trim().split(/\s+/).slice(0,2);
-    return parts.map(p=>p[0]?.toUpperCase() || '').join('') || 'SL';
-  }
-
-  function toast(msg){
-    let box = document.getElementById('pf18Toast');
-    if(!box){
-      box = document.createElement('div');
-      box.id = 'pf18Toast';
-      box.className = 'pf18-toast';
-      document.body.appendChild(box);
-    }
-    box.textContent = msg;
-    box.classList.add('show');
-    setTimeout(()=>box.classList.remove('show'),2600);
-  }
-
-  function defaults(){
-    return {
-      profile:{
-        name:'Ludimila Cavalcante',
-        role:'Especialista em sites, automação e presença digital',
-        city:'Brasil',
-        photo:'',
-        bio:'Crio sites, páginas estratégicas, automações e estruturas digitais com foco em posicionamento, conversão e organização do negócio.'
-      },
-      stats:{inside:18,outside:43,clients:54,satisfaction:'98%'},
-      projects:[
-        {
-          id:id(),
-          title:'Site institucional futurista',
-          category:'Sites',
-          description:'Estrutura visual premium com foco em autoridade, apresentação profissional, CTA e navegação clara.',
-          result:'Melhor percepção de valor e apresentação mais premium da marca.',
-          link:'https://sualuma.online',
-          siteUrl:'https://sualuma.online',
-          youtubeUrl:'',
-          coverImage:'',
-          createdAt:now(),
-          updatedAt:now()
-        }
-      ]
-    };
-  }
-
-  function load(){
-    try{
-      state = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || defaults();
-    }catch{
-      state = defaults();
-    }
-
-    let changed = false;
-    state.projects = (state.projects || []).map((p)=>{
-      if(!p.id){ p.id = id(); changed = true; }
-      if(!p.createdAt){ p.createdAt = now(); changed = true; }
-      return {
-        coverImage:'',
-        siteUrl:p.link || '',
-        youtubeUrl:'',
-        updatedAt:p.updatedAt || now(),
-        ...p
-      };
-    });
-
-    if(!state.profile) state.profile = defaults().profile;
-    if(!state.stats) state.stats = defaults().stats;
-
-    if(changed) save();
-    syncAllProjectsToCommunity();
-  }
-
-  function save(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  function getCommunity(){
-    try{ return JSON.parse(localStorage.getItem(COMMUNITY_KEY) || '[]') || []; }
-    catch{ return []; }
-  }
-
-  function saveCommunity(list){
-    localStorage.setItem(COMMUNITY_KEY, JSON.stringify(list));
-  }
-
-  function communityPostFromProject(project, type){
-    return {
-      id:'community-project-' + project.id,
-      projectId:project.id,
-      type:'portfolio_project',
-      author:state.profile?.name || 'Prestador',
-      title:type === 'updated' ? 'Trabalho atualizado no portfólio' : 'Novo trabalho publicado no portfólio',
-      projectTitle:project.title || 'Projeto',
-      category:project.category || '',
-      content:project.description || '',
-      result:project.result || '',
-      coverImage:project.coverImage || '',
-      siteUrl:project.siteUrl || project.link || '',
-      youtubeUrl:project.youtubeUrl || '',
-      createdAt:project.createdAt || now(),
-      updatedAt:now()
-    };
-  }
-
-  function upsertCommunityProject(project, type='created'){
-    const list = getCommunity();
-    const post = communityPostFromProject(project,type);
-    const idx = list.findIndex(item=>item.id === post.id);
-
-    if(idx >= 0){
-      post.createdAt = list[idx].createdAt || post.createdAt;
-      list[idx] = post;
-    }else{
-      list.unshift(post);
-    }
-
-    saveCommunity(list);
-  }
-
-  function removeCommunityProject(projectId){
-    const list = getCommunity().filter(item=>item.projectId !== projectId);
-    saveCommunity(list);
-  }
-
-  function syncAllProjectsToCommunity(){
-    (state.projects || []).forEach(project=>upsertCommunityProject(project,'created'));
-  }
-
-  function main(){
-    return document.querySelector('#sualumaProviderDashboardV7 .v7-main');
-  }
-
-  function host(){
-    const m = main();
-    if(!m) return null;
-
-    Array.from(m.children).forEach(child=>{
-      if(child.classList.contains('v7-topbar')) return;
-      if(child.classList.contains('v7-modal')) return;
-      child.remove();
-    });
-
-    const h = document.createElement('section');
-    h.className = 'pf18-wrap';
-
-    const modal = m.querySelector('.v7-modal');
-    if(modal) m.insertBefore(h, modal);
-    else m.appendChild(h);
-
-    return h;
-  }
-
-  function youtubeEmbed(url){
-    const value = String(url || '').trim();
-    if(!value) return '';
-
-    const patterns = [
-      /youtube\.com\/watch\?v=([^&]+)/,
-      /youtu\.be\/([^?&]+)/,
-      /youtube\.com\/shorts\/([^?&]+)/,
-      /youtube\.com\/embed\/([^?&]+)/
-    ];
-
-    for(const p of patterns){
-      const m = value.match(p);
-      if(m && m[1]) return 'https://www.youtube.com/embed/' + encodeURIComponent(m[1]);
-    }
-
-    return value;
-  }
-
-  function renderPhoto(){
-    if(state.profile?.photo) return `<img src="${esc(state.profile.photo)}" alt="${esc(state.profile.name)}">`;
-    return `<div class="pf18-avatar">${esc(initials(state.profile?.name))}</div>`;
-  }
-
-  function renderProjects(){
-    if(!state.projects?.length){
-      return `<article class="pf18-project"><div class="pf18-body"><h3>Nenhum trabalho ainda</h3><p class="pf18-text">Adicione seu primeiro trabalho com foto, site ou vídeo.</p></div></article>`;
-    }
-
-    return state.projects.map((item)=>`
-      <article class="pf18-project">
-        <div class="pf18-cover">
-          ${item.coverImage ? `<img src="${esc(item.coverImage)}" alt="${esc(item.title)}">` : `<span>${esc(item.category || 'Projeto')}</span>`}
-        </div>
-        <div class="pf18-body">
-          <div class="pf18-meta">${esc(item.category || 'Projeto')}</div>
-          <h3>${esc(item.title || 'Projeto')}</h3>
-          <p class="pf18-text">${esc(item.description || '')}</p>
-          <div class="pf18-result">${esc(item.result || 'Resultado não informado')}</div>
-          <div class="pf18-actions">
-            <span class="pf18-badge">Publicado na comunidade</span>
-            ${item.siteUrl || item.link ? `<button class="pf18-btn" onclick="PortfolioV18.openSite('${esc(item.id)}')">Prévia do site</button>` : ''}
-            ${item.youtubeUrl ? `<button class="pf18-btn secondary" onclick="PortfolioV18.openVideo('${esc(item.id)}')">Ver vídeo</button>` : ''}
-            ${item.link || item.siteUrl ? `<a class="pf18-btn secondary" href="${esc(item.link || item.siteUrl)}" target="_blank" rel="noopener">Abrir link</a>` : ''}
-            <button class="pf18-btn secondary" onclick="PortfolioV18.editProject('${esc(item.id)}')">Editar</button>
-            <button class="pf18-btn danger" onclick="PortfolioV18.deleteProject('${esc(item.id)}')">Excluir</button>
-          </div>
-        </div>
-      </article>
-    `).join('');
-  }
-
-  function getEditingProject(){
-    return editingId ? state.projects.find(p=>p.id === editingId) : null;
-  }
-
-  function renderPortfolio(){
-    const h = host();
-    if(!h) return;
-
-    const editing = getEditingProject();
-    const formTitle = editing ? 'Editar trabalho publicado' : 'Adicionar trabalho multimídia';
-    const formButton = editing ? 'Salvar edição' : 'Adicionar trabalho';
-
-    h.innerHTML = `
-      <section class="pf18-card pf18-hero">
-        <div>
-          <span class="pf18-kicker">Portfólio multimídia</span>
-          <h1 class="pf18-title">${esc(state.profile?.name || '')}</h1>
-          <div class="pf18-role">${esc(state.profile?.role || '')}</div>
-          <p class="pf18-text">${esc(state.profile?.bio || '')}</p>
-
-          <div class="pf18-stats">
-            <div class="pf18-stat"><small>Na plataforma</small><strong>${esc(state.stats?.inside || 0)}</strong></div>
-            <div class="pf18-stat"><small>Fora da plataforma</small><strong>${esc(state.stats?.outside || 0)}</strong></div>
-            <div class="pf18-stat"><small>Clientes</small><strong>${esc(state.stats?.clients || 0)}</strong></div>
-            <div class="pf18-stat"><small>Satisfação</small><strong>${esc(state.stats?.satisfaction || '0%')}</strong></div>
-          </div>
-        </div>
-
-        <div class="pf18-photo">${renderPhoto()}</div>
-      </section>
-
-      <section class="pf18-card">
-        <div class="pf18-head">
-          <div>
-            <h2>Trabalhos em destaque</h2>
-            <p class="pf18-text">Você pode editar depois de publicar. Todo trabalho também aparece na comunidade.</p>
-          </div>
-          <button class="pf18-btn secondary" onclick="location.href='?v=18#prestador-comunidade'">Ver comunidade</button>
-        </div>
-
-        <div class="pf18-projects">${renderProjects()}</div>
-      </section>
-
-      <section class="pf18-card" id="pf18ProjectForm">
-        <div class="pf18-head">
-          <div>
-            <h2>${formTitle}</h2>
-            <p class="pf18-text">Suba uma imagem/capa, coloque link do site para prévia e vídeo do YouTube.</p>
-          </div>
-          ${editing ? `<button class="pf18-btn secondary" onclick="PortfolioV18.cancelEdit()">Cancelar edição</button>` : ''}
-        </div>
-
-        <div class="pf18-form-grid">
-          <input id="pf18ProjectTitle" class="pf18-input" placeholder="Título do projeto" value="${esc(editing?.title || '')}">
-          <input id="pf18ProjectCategory" class="pf18-input" placeholder="Categoria. Ex: Site, Landing Page, Automação" value="${esc(editing?.category || '')}">
-          <input id="pf18ProjectSite" class="pf18-input" placeholder="Link do site para prévia. Ex: https://site.com" value="${esc(editing?.siteUrl || editing?.link || '')}">
-          <input id="pf18ProjectYoutube" class="pf18-input" placeholder="Link do vídeo YouTube" value="${esc(editing?.youtubeUrl || '')}">
-          <input id="pf18ProjectImage" class="pf18-input" placeholder="Link da imagem/capa ou use upload abaixo" value="${esc(editing?.coverImage || '')}">
-          <input id="pf18ProjectResult" class="pf18-input" placeholder="Resultado gerado. Ex: +30% contatos" value="${esc(editing?.result || '')}">
-        </div>
-
-        <div class="pf18-upload-box" style="margin-top:14px">
-          <div class="pf18-actions">
-            <label class="pf18-upload-label" for="pf18ProjectFile">🖼️ Enviar foto/capa do trabalho</label>
-            <input class="pf18-file" id="pf18ProjectFile" type="file" accept="image/*">
-            <span class="pf18-status" id="pf18ProjectUploadStatus">Ou cole o link da imagem no campo acima.</span>
-          </div>
-          <div class="pf18-preview" id="pf18ProjectPreview" style="${editing?.coverImage ? 'display:block' : ''}">
-            <img id="pf18ProjectPreviewImg" alt="Prévia" src="${esc(editing?.coverImage || '')}">
-          </div>
-        </div>
-
-        <textarea id="pf18ProjectDesc" class="pf18-textarea" style="margin-top:14px" placeholder="Descreva o que foi feito nesse trabalho">${esc(editing?.description || '')}</textarea>
-
-        <div class="pf18-actions">
-          <button class="pf18-btn" onclick="PortfolioV18.saveProject()">${formButton}</button>
-        </div>
-      </section>
-
-      <div class="pf18-modal" id="pf18Modal">
-        <div class="pf18-modal-box">
-          <div class="pf18-modal-top">
-            <strong id="pf18ModalTitle">Prévia</strong>
-            <button class="pf18-btn secondary" onclick="PortfolioV18.closeModal()">Fechar</button>
-          </div>
-          <div class="pf18-modal-body" id="pf18ModalBody"></div>
-        </div>
-      </div>
-    `;
-
-    const file = document.getElementById('pf18ProjectFile');
-    if(file && !file.dataset.bound){
-      file.dataset.bound = '1';
-      file.addEventListener('change', uploadProjectImage);
-    }
-  }
-
-  function renderCommunity(){
-    const h = host();
-    if(!h) return;
-
-    const posts = getCommunity();
-
-    h.innerHTML = `
-      <section class="pf18-card">
-        <div class="pf18-head">
-          <div>
-            <span class="pf18-kicker">Comunidade dos prestadores</span>
-            <h2>Atualizações, trabalhos e bastidores</h2>
-            <p class="pf18-text">Todos os trabalhos publicados no portfólio aparecem automaticamente aqui.</p>
-          </div>
-          <button class="pf18-btn" onclick="location.href='?v=18#prestador-portfolio'">Voltar ao portfólio</button>
-        </div>
-      </section>
-
-      <section class="pf18-card">
-        <div class="pf18-community-list">
-          ${posts.length ? posts.map(post=>`
-            <article class="pf18-post">
-              <div class="pf18-post-top">
-                <div>
-                  <small>${esc(post.author || 'Prestador')} · ${new Date(post.updatedAt || post.createdAt || Date.now()).toLocaleString('pt-BR')}</small>
-                  <h3>${esc(post.title || 'Publicação')}</h3>
-                  <p class="pf18-text"><strong>${esc(post.projectTitle || '')}</strong></p>
-                </div>
-                <span class="pf18-badge">${esc(post.category || 'Projeto')}</span>
-              </div>
-
-              <p class="pf18-text" style="margin-top:12px">${esc(post.content || '')}</p>
-
-              ${post.result ? `<div class="pf18-result">${esc(post.result)}</div>` : ''}
-
-              <div class="pf18-actions">
-                ${post.siteUrl ? `<button class="pf18-btn" onclick="PortfolioV18.openCommunitySite('${esc(post.id)}')">Prévia do site</button>` : ''}
-                ${post.youtubeUrl ? `<button class="pf18-btn secondary" onclick="PortfolioV18.openCommunityVideo('${esc(post.id)}')">Ver vídeo</button>` : ''}
-                ${post.siteUrl ? `<a class="pf18-btn secondary" href="${esc(post.siteUrl)}" target="_blank" rel="noopener">Abrir link</a>` : ''}
-              </div>
-            </article>
-          `).join('') : `
-            <article class="pf18-post">
-              <h3>Nenhuma publicação ainda</h3>
-              <p class="pf18-text">Quando você adicionar um trabalho no portfólio, ele aparece aqui automaticamente.</p>
-            </article>
-          `}
-        </div>
-      </section>
-
-      <div class="pf18-modal" id="pf18Modal">
-        <div class="pf18-modal-box">
-          <div class="pf18-modal-top">
-            <strong id="pf18ModalTitle">Prévia</strong>
-            <button class="pf18-btn secondary" onclick="PortfolioV18.closeModal()">Fechar</button>
-          </div>
-          <div class="pf18-modal-body" id="pf18ModalBody"></div>
-        </div>
-      </div>
-    `;
-  }
-
-  async function uploadProjectImage(){
-    const file = this.files && this.files[0];
-    if(!file) return;
-
-    if(!file.type.startsWith('image/')){
-      toast('Envie apenas imagem.');
-      return;
-    }
-
-    if(file.size > 5 * 1024 * 1024){
-      toast('Imagem muito grande. Máximo 5MB.');
-      return;
-    }
-
-    const status = document.getElementById('pf18ProjectUploadStatus');
-    const imgField = document.getElementById('pf18ProjectImage');
-    const preview = document.getElementById('pf18ProjectPreview');
-    const previewImg = document.getElementById('pf18ProjectPreviewImg');
-
-    try{
-      if(status) status.textContent = 'Enviando imagem...';
-
-      const form = new FormData();
-      form.append('photo', file);
-
-      const res = await fetch('/api/prestador/upload-photo', { method:'POST', body:form });
-      const json = await res.json();
-
-      if(!json.ok) throw new Error(json.error || 'Erro ao enviar imagem.');
-
-      if(imgField) imgField.value = json.url;
-      if(preview && previewImg){
-        preview.style.display = 'block';
-        previewImg.src = json.url;
-      }
-
-      if(status) status.textContent = 'Imagem enviada.';
-      toast('Imagem do trabalho enviada.');
-    }catch(e){
-      if(status) status.textContent = 'Erro ao enviar imagem.';
-      toast(e.message || 'Erro ao enviar imagem.');
-    }
-  }
-
-  function findProject(projectId){
-    return state.projects.find(p=>p.id === projectId);
-  }
-
-  function openFrame(title, url){
-    const modal = document.getElementById('pf18Modal');
-    const titleEl = document.getElementById('pf18ModalTitle');
-    const body = document.getElementById('pf18ModalBody');
-
-    if(titleEl) titleEl.textContent = title;
-    if(body) body.innerHTML = `<iframe src="${esc(url)}"></iframe>`;
-
-    modal?.classList.add('show');
-  }
-
-  window.PortfolioV18 = {
-    saveProject(){
-      const payload = {
-        title:document.getElementById('pf18ProjectTitle')?.value || '',
-        category:document.getElementById('pf18ProjectCategory')?.value || '',
-        siteUrl:document.getElementById('pf18ProjectSite')?.value || '',
-        youtubeUrl:document.getElementById('pf18ProjectYoutube')?.value || '',
-        coverImage:document.getElementById('pf18ProjectImage')?.value || '',
-        result:document.getElementById('pf18ProjectResult')?.value || '',
-        description:document.getElementById('pf18ProjectDesc')?.value || ''
-      };
-
-      if(!payload.title || !payload.description){
-        toast('Preencha título e descrição do trabalho.');
-        return;
-      }
-
-      if(editingId){
-        const idx = state.projects.findIndex(p=>p.id === editingId);
-        if(idx >= 0){
-          state.projects[idx] = {
-            ...state.projects[idx],
-            ...payload,
-            link:payload.siteUrl,
-            updatedAt:now()
-          };
-
-          upsertCommunityProject(state.projects[idx],'updated');
-          toast('Trabalho editado e comunidade atualizada.');
-        }
-        editingId = null;
-      }else{
-        const project = {
-          id:id(),
-          ...payload,
-          link:payload.siteUrl,
-          createdAt:now(),
-          updatedAt:now()
-        };
-
-        state.projects.unshift(project);
-        upsertCommunityProject(project,'created');
-        toast('Trabalho publicado no portfólio e na comunidade.');
-      }
-
-      save();
-      renderPortfolio();
-    },
-
-    editProject(projectId){
-      editingId = projectId;
-      renderPortfolio();
-      setTimeout(()=>{
-        document.getElementById('pf18ProjectForm')?.scrollIntoView({behavior:'smooth',block:'start'});
-      },80);
-    },
-
-    cancelEdit(){
-      editingId = null;
-      renderPortfolio();
-    },
-
-    deleteProject(projectId){
-      state.projects = state.projects.filter(p=>p.id !== projectId);
-      removeCommunityProject(projectId);
-      save();
-      toast('Trabalho removido do portfólio e da comunidade.');
-      renderPortfolio();
-    },
-
-    openSite(projectId){
-      const item = findProject(projectId);
-      const url = item?.siteUrl || item?.link;
-
-      if(!url){
-        toast('Esse trabalho não tem link de site.');
-        return;
-      }
-
-      openFrame('Prévia do site — ' + (item.title || 'Projeto'), url);
-    },
-
-    openVideo(projectId){
-      const item = findProject(projectId);
-      const embed = youtubeEmbed(item?.youtubeUrl);
-
-      if(!embed){
-        toast('Esse trabalho não tem vídeo.');
-        return;
-      }
-
-      openFrame('Vídeo do projeto — ' + (item.title || 'Projeto'), embed);
-    },
-
-    openCommunitySite(postId){
-      const post = getCommunity().find(p=>p.id === postId);
-      if(post?.siteUrl) openFrame('Prévia do site — ' + (post.projectTitle || 'Projeto'), post.siteUrl);
-    },
-
-    openCommunityVideo(postId){
-      const post = getCommunity().find(p=>p.id === postId);
-      const embed = youtubeEmbed(post?.youtubeUrl);
-      if(embed) openFrame('Vídeo do projeto — ' + (post.projectTitle || 'Projeto'), embed);
-    },
-
-    closeModal(){
-      const modal = document.getElementById('pf18Modal');
-      const body = document.getElementById('pf18ModalBody');
-      if(body) body.innerHTML = '';
-      modal?.classList.remove('show');
-    }
-  };
-
-  function boot(){
-    if(!isPortfolio() && !isCommunity()) return;
-    load();
-
-    if(isPortfolio()) renderPortfolio();
-    if(isCommunity()) renderCommunity();
-  }
-
-  window.addEventListener('load', boot);
-  window.addEventListener('hashchange', boot);
-  document.addEventListener('DOMContentLoaded', boot);
-
-  setTimeout(boot,500);
-  setTimeout(boot,1200);
-})();
-</script>
-
 <style id="trabalhosja-dashboard-button-v1-style">
   .tj-dashboard-btn{
     border:0 !important;
@@ -6344,112 +5457,6 @@
   setInterval(addButton,2000);
 })();
 </script>
-
-<script id="portfolio-community-backend-sync-v1">
-(function(){
-  if(window.__portfolioCommunityBackendSyncV1) return;
-  window.__portfolioCommunityBackendSyncV1 = true;
-
-  const SUPABASE_URL = "https://vadljxyykrhyeuarzyat.supabase.co";
-  const SUPABASE_ANON = "sb_publishable_1O8rZojnDMZeYkBOtFF6jA_8m64Y-Yo";
-  const STORAGE_KEY = "sualuma_provider_portfolio_v14";
-
-  let sb = null;
-
-  function loadSupabase(callback){
-    if(window.supabase){
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      callback();
-      return;
-    }
-
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-    s.onload = function(){
-      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-      callback();
-    };
-    document.head.appendChild(s);
-  }
-
-  async function token(){
-    if(!sb) return "";
-    const { data } = await sb.auth.getSession();
-    return data.session?.access_token || "";
-  }
-
-  function toast(msg){
-    if(typeof alert !== "undefined") console.log(msg);
-    let box = document.getElementById("pf18Toast") || document.getElementById("pf16Toast");
-    if(box){
-      box.textContent = msg;
-      box.classList.add("show");
-      setTimeout(()=>box.classList.remove("show"),2600);
-    }
-  }
-
-  async function syncPortfolioToCommunity(){
-    const t = await token();
-
-    if(!t){
-      toast("Portfólio salvo, mas não publicado na comunidade: faça login na plataforma.");
-      return;
-    }
-
-    let data = null;
-    try{
-      data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
-    }catch{
-      data = null;
-    }
-
-    const projects = data?.projects || [];
-
-    for(const project of projects){
-      if(!project?.id || !project?.title) continue;
-
-      await fetch("/api/comunidade/posts", {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json",
-          "Authorization":"Bearer " + t
-        },
-        body:JSON.stringify({
-          source:"portfolio",
-          sourceExternalId:project.id,
-          category:"Trabalhos",
-          title:project.title,
-          body:project.description || "Novo trabalho publicado no portfólio.",
-          imageUrl:project.coverImage || "",
-          linkUrl:project.siteUrl || project.link || "",
-          videoUrl:project.youtubeUrl || ""
-        })
-      });
-    }
-
-    toast("Portfólio publicado/atualizado na comunidade.");
-  }
-
-  loadSupabase(function(){
-    const wait = setInterval(function(){
-      if(window.PortfolioV18 && !window.PortfolioV18.__communitySyncPatched){
-        window.PortfolioV18.__communitySyncPatched = true;
-
-        const originalSave = window.PortfolioV18.saveProject;
-
-        window.PortfolioV18.saveProject = async function(){
-          const result = originalSave.apply(this, arguments);
-          setTimeout(syncPortfolioToCommunity, 500);
-          return result;
-        };
-
-        clearInterval(wait);
-      }
-    },500);
-  });
-})();
-</script>
-
 <script id="sualuma-portfolio-backend-bridge-final">
 (function(){
   if(window.__sualumaPortfolioBackendBridgeFinal) return;
@@ -6598,6 +5605,1393 @@
   document.addEventListener("visibilitychange", function(){
     if(!document.hidden) syncPortfolio();
   });
+})();
+</script>
+
+<style id="sualuma-service-mobile-rescue-v1">
+  @media (max-width: 860px) {
+    html,
+    body {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    body * {
+      box-sizing: border-box !important;
+    }
+
+    body {
+      background: #050714 !important;
+    }
+
+    main,
+    section,
+    .section,
+    .page,
+    .app,
+    .shell,
+    .layout,
+    .dashboard,
+    .dashboard-layout,
+    .provider-layout,
+    .provider-dashboard,
+    .provider-page,
+    .provider-shell,
+    .sualuma-provider-layout,
+    [class*="dashboard"],
+    [class*="provider"] {
+      max-width: 100% !important;
+      min-width: 0 !important;
+      overflow-x: hidden !important;
+    }
+
+    section,
+    .section,
+    #prestador,
+    #prestador-servicos,
+    #prestador-propostas,
+    #prestador-projetos,
+    #prestador-kanban,
+    #prestador-chat,
+    #prestador-ia,
+    #prestador-reunioes,
+    #prestador-financeiro,
+    #prestador-portfolio,
+    #prestador-github,
+    #prestador-whatsapp,
+    #prestador-indicacoes {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 14px !important;
+      overflow-x: hidden !important;
+    }
+
+    .dashboard-layout,
+    .provider-layout,
+    .provider-shell,
+    .sualuma-provider-layout,
+    .layout,
+    .shell,
+    .app-shell {
+      display: flex !important;
+      flex-direction: column !important;
+      grid-template-columns: 1fr !important;
+      gap: 16px !important;
+      width: 100% !important;
+    }
+
+    aside,
+    nav,
+    .sidebar,
+    .provider-sidebar,
+    .dashboard-sidebar,
+    [class*="sidebar"] {
+      position: relative !important;
+      top: auto !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      height: auto !important;
+      max-height: none !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      margin: 0 0 16px 0 !important;
+      padding: 18px !important;
+      border-radius: 26px !important;
+    }
+
+    aside nav,
+    aside .menu,
+    .sidebar nav,
+    .sidebar .menu,
+    .provider-sidebar nav,
+    .dashboard-sidebar nav {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 10px !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      padding: 4px 0 8px 0 !important;
+      width: 100% !important;
+    }
+
+    aside a,
+    aside button,
+    .sidebar a,
+    .sidebar button,
+    .provider-sidebar a,
+    .provider-sidebar button,
+    .dashboard-sidebar a,
+    .dashboard-sidebar button {
+      flex: 0 0 auto !important;
+      min-width: max-content !important;
+      white-space: nowrap !important;
+      padding: 12px 16px !important;
+      border-radius: 18px !important;
+    }
+
+    .content,
+    .main,
+    .page-content,
+    .provider-content,
+    .dashboard-content,
+    [class*="content"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-x: hidden !important;
+    }
+
+    .hero,
+    .header,
+    .topbar,
+    .page-hero,
+    .provider-hero,
+    .dashboard-hero,
+    .panel-header,
+    .glass,
+    .card,
+    .box,
+    .panel,
+    [class*="hero"],
+    [class*="header"],
+    [class*="card"],
+    [class*="panel"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      border-radius: 26px !important;
+    }
+
+    .hero,
+    .page-hero,
+    .provider-hero,
+    .dashboard-hero,
+    .panel-header {
+      padding: 22px 18px !important;
+    }
+
+    h1 {
+      font-size: clamp(32px, 10vw, 46px) !important;
+      line-height: 1.02 !important;
+      max-width: 100% !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere !important;
+      word-break: normal !important;
+    }
+
+    h2 {
+      font-size: clamp(24px, 7vw, 34px) !important;
+      line-height: 1.1 !important;
+      max-width: 100% !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    h3,
+    p,
+    span,
+    small,
+    strong,
+    label {
+      max-width: 100% !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    .actions,
+    .top-actions,
+    .hero-actions,
+    .header-actions,
+    .sualuma-floating-switch,
+    .auth-row,
+    [class*="actions"],
+    [class*="switch"] {
+      position: static !important;
+      inset: auto !important;
+      transform: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      justify-content: flex-start !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      gap: 10px !important;
+      margin-top: 14px !important;
+    }
+
+    .actions a,
+    .actions button,
+    .top-actions a,
+    .top-actions button,
+    .hero-actions a,
+    .hero-actions button,
+    .header-actions a,
+    .header-actions button,
+    .sualuma-floating-switch a,
+    .sualuma-floating-switch button {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: 52px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
+      white-space: normal !important;
+      border-radius: 20px !important;
+    }
+
+    .stats,
+    .cards,
+    .grid,
+    .metrics,
+    .quick-actions,
+    .provider-stats,
+    .dashboard-stats,
+    [class*="stats"],
+    [class*="grid"] {
+      display: grid !important;
+      grid-template-columns: 1fr !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      gap: 14px !important;
+    }
+
+    .email,
+    .user-email,
+    [class*="email"] {
+      max-width: 100% !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+
+    img,
+    video,
+    iframe,
+    canvas {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    input,
+    textarea,
+    select,
+    button {
+      max-width: 100% !important;
+      font-size: 16px !important;
+    }
+
+    table {
+      display: block !important;
+      max-width: 100% !important;
+      overflow-x: auto !important;
+    }
+  }
+</style>
+<style id="sualuma-hamburger-final-v2">
+  @media (max-width: 860px) {
+    html,
+    body {
+      width: 100% !important;
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    body {
+      padding-top: 84px !important;
+      background: #050714 !important;
+    }
+
+    body * {
+      box-sizing: border-box !important;
+    }
+
+    /* Esconde o menu lateral antigo no mobile */
+    aside,
+    .sidebar,
+    .provider-sidebar,
+    .dashboard-sidebar,
+    .sualuma-mobile-drawer,
+    [class*="sidebar"] {
+      display: none !important;
+    }
+
+    /* Barra fixa de cima */
+    #sualumaMobileMenuBtnFinal {
+      position: fixed !important;
+      top: 14px !important;
+      left: 14px !important;
+      z-index: 9999999 !important;
+      width: 58px !important;
+      height: 58px !important;
+      border-radius: 20px !important;
+      border: 1px solid rgba(255,255,255,.18) !important;
+      background: linear-gradient(135deg, #8d5cff, #18f2ff) !important;
+      color: #fff !important;
+      font-size: 30px !important;
+      font-weight: 1000 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      box-shadow: 0 18px 45px rgba(24,242,255,.28) !important;
+      cursor: pointer !important;
+    }
+
+    #sualumaMobileTopTitleFinal {
+      position: fixed !important;
+      top: 14px !important;
+      left: 86px !important;
+      right: 14px !important;
+      z-index: 9999998 !important;
+      min-height: 58px !important;
+      border-radius: 22px !important;
+      border: 1px solid rgba(255,255,255,.12) !important;
+      background: rgba(5,7,20,.88) !important;
+      backdrop-filter: blur(18px) !important;
+      color: #fff !important;
+      display: flex !important;
+      align-items: center !important;
+      padding: 0 18px !important;
+      font-size: 17px !important;
+      font-weight: 1000 !important;
+      overflow: hidden !important;
+      white-space: nowrap !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #sualumaMobileOverlayFinal {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 9999990 !important;
+      background: rgba(0,0,0,.68) !important;
+      backdrop-filter: blur(7px) !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transition: opacity .22s ease !important;
+    }
+
+    body.sualuma-menu-final-open #sualumaMobileOverlayFinal {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    #sualumaMobileDrawerFinal {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      bottom: 0 !important;
+      width: min(86vw, 370px) !important;
+      max-width: min(86vw, 370px) !important;
+      height: 100dvh !important;
+      z-index: 9999995 !important;
+      padding: 22px 18px 34px !important;
+      border-radius: 0 30px 30px 0 !important;
+      border-right: 1px solid rgba(255,255,255,.14) !important;
+      background:
+        radial-gradient(circle at top left, rgba(24,242,255,.18), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(141,92,255,.22), transparent 40%),
+        #050714 !important;
+      box-shadow: 28px 0 70px rgba(0,0,0,.6) !important;
+      transform: translateX(-110%) !important;
+      transition: transform .25s ease !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      display: block !important;
+    }
+
+    body.sualuma-menu-final-open #sualumaMobileDrawerFinal {
+      transform: translateX(0) !important;
+    }
+
+    .sf-brand {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      margin-bottom: 18px !important;
+      padding-bottom: 18px !important;
+      border-bottom: 1px solid rgba(255,255,255,.10) !important;
+    }
+
+    .sf-brand img {
+      width: 58px !important;
+      height: 58px !important;
+      border-radius: 18px !important;
+      object-fit: cover !important;
+    }
+
+    .sf-brand strong {
+      display: block !important;
+      color: #fff !important;
+      font-size: 20px !important;
+      font-weight: 1000 !important;
+      line-height: 1.1 !important;
+    }
+
+    .sf-brand span {
+      display: block !important;
+      color: rgba(255,255,255,.65) !important;
+      font-size: 13px !important;
+      margin-top: 4px !important;
+    }
+
+    .sf-close {
+      width: 100% !important;
+      min-height: 52px !important;
+      border: 1px solid rgba(255,255,255,.12) !important;
+      border-radius: 18px !important;
+      background: rgba(255,255,255,.07) !important;
+      color: #fff !important;
+      font-weight: 1000 !important;
+      font-size: 15px !important;
+      margin-bottom: 16px !important;
+      cursor: pointer !important;
+    }
+
+    .sf-menu {
+      display: grid !important;
+      gap: 10px !important;
+    }
+
+    .sf-menu a {
+      min-height: 54px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding: 14px 16px !important;
+      border-radius: 18px !important;
+      border: 1px solid rgba(255,255,255,.10) !important;
+      background: rgba(255,255,255,.055) !important;
+      color: #fff !important;
+      text-decoration: none !important;
+      font-weight: 900 !important;
+      font-size: 15px !important;
+    }
+
+    .sf-menu a.sf-active {
+      background: linear-gradient(135deg, rgba(141,92,255,.52), rgba(24,242,255,.24)) !important;
+      border-color: rgba(24,242,255,.32) !important;
+    }
+
+    main,
+    section,
+    .section,
+    .content,
+    .main,
+    .page-content,
+    .provider-content,
+    .dashboard-content,
+    [class*="content"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-left: 0 !important;
+      overflow-x: hidden !important;
+    }
+
+    h1 {
+      font-size: clamp(34px, 11vw, 52px) !important;
+      line-height: 1.02 !important;
+      overflow-wrap: anywhere !important;
+    }
+
+    h2 {
+      font-size: clamp(26px, 8vw, 38px) !important;
+      line-height: 1.08 !important;
+    }
+
+    .hero,
+    .page-hero,
+    .provider-hero,
+    .dashboard-hero,
+    .panel-header,
+    [class*="hero"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-top: 0 !important;
+      overflow: hidden !important;
+      border-radius: 28px !important;
+    }
+  }
+
+  @media (min-width: 861px) {
+    #sualumaMobileMenuBtnFinal,
+    #sualumaMobileTopTitleFinal,
+    #sualumaMobileOverlayFinal,
+    #sualumaMobileDrawerFinal {
+      display: none !important;
+    }
+  }
+</style>
+
+<script id="sualuma-hamburger-final-v2-script">
+(function(){
+  if(window.__sualumaHamburgerFinalV2) return;
+  window.__sualumaHamburgerFinalV2 = true;
+
+  const menuItems = [
+    ["🏠", "Visão geral", "#prestador"],
+    ["🔎", "Serviços disponíveis", "#prestador-servicos"],
+    ["🧾", "Propostas", "#prestador-propostas"],
+    ["📁", "Projetos", "#prestador-projetos"],
+    ["🧩", "Kanban", "#prestador-kanban"],
+    ["💬", "Chat com cliente", "#prestador-chat"],
+    ["🤖", "Chat IA", "#prestador-ia"],
+    ["🗓️", "Reuniões", "#prestador-reunioes"],
+    ["💳", "Financeiro", "#prestador-financeiro"],
+    ["🖼️", "Portfólio", "#prestador-portfolio"],
+    ["🛠️", "GitHub", "#prestador-github"],
+    ["📲", "WhatsApp", "#prestador-whatsapp"],
+    ["💰", "Indicações", "#prestador-indicacoes"],
+    ["⚙️", "Configurar", "#prestador-configurar"]
+  ];
+
+  function closeMenu(){
+    document.body.classList.remove("sualuma-menu-final-open");
+  }
+
+  function openMenu(){
+    document.body.classList.add("sualuma-menu-final-open");
+  }
+
+  function setup(){
+    if(document.getElementById("sualumaMobileDrawerFinal")) return;
+
+    const btn = document.createElement("button");
+    btn.id = "sualumaMobileMenuBtnFinal";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Abrir menu");
+    btn.textContent = "☰";
+
+    const title = document.createElement("div");
+    title.id = "sualumaMobileTopTitleFinal";
+    title.textContent = "Dashboard do prestador";
+
+    const overlay = document.createElement("div");
+    overlay.id = "sualumaMobileOverlayFinal";
+
+    const drawer = document.createElement("div");
+    drawer.id = "sualumaMobileDrawerFinal";
+
+    const logo =
+      document.querySelector("img[src*='logodosite']")?.getAttribute("src") ||
+      "/logodosite.png";
+
+    drawer.innerHTML = `
+      <div class="sf-brand">
+        <img src="${logo}" alt="Sualuma">
+        <div>
+          <strong>Sualuma Online</strong>
+          <span>Dashboard do prestador</span>
+        </div>
+      </div>
+      <button type="button" class="sf-close">✕ Fechar menu</button>
+      <div class="sf-menu">
+        ${menuItems.map(([icon,label,href]) => `
+          <a href="${href}" data-href="${href}">
+            <span>${icon}</span>
+            <strong>${label}</strong>
+          </a>
+        `).join("")}
+      </div>
+    `;
+
+    document.body.appendChild(btn);
+    document.body.appendChild(title);
+    document.body.appendChild(overlay);
+    document.body.appendChild(drawer);
+
+    btn.addEventListener("click", openMenu);
+    overlay.addEventListener("click", closeMenu);
+    drawer.querySelector(".sf-close")?.addEventListener("click", closeMenu);
+
+    drawer.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => {
+        setTimeout(closeMenu, 120);
+      });
+    });
+
+    function markActive(){
+      const hash = location.hash || "#prestador";
+      drawer.querySelectorAll("a").forEach(a => {
+        a.classList.toggle("sf-active", a.getAttribute("data-href") === hash);
+      });
+    }
+
+    window.addEventListener("hashchange", markActive);
+    markActive();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", setup);
+  } else {
+    setup();
+  }
+
+  window.addEventListener("load", function(){
+    setTimeout(setup, 300);
+  });
+})();
+</script>
+<style id="portfolio-clean-final-style">
+  #portfolioUnifiedFinal {
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    gap: 24px;
+  }
+
+  .pf-final-hero,
+  .pf-final-card {
+    border: 1px solid rgba(255,255,255,.12);
+    background:
+      radial-gradient(circle at 10% 0%, rgba(24,242,255,.15), transparent 32%),
+      radial-gradient(circle at 90% 10%, rgba(141,92,255,.24), transparent 36%),
+      rgba(255,255,255,.04);
+    border-radius: 34px;
+    padding: 34px;
+    overflow: hidden;
+  }
+
+  .pf-final-label {
+    display: inline-flex;
+    padding: 9px 14px;
+    border-radius: 999px;
+    background: rgba(24,242,255,.10);
+    border: 1px solid rgba(24,242,255,.24);
+    color: #aefbff;
+    font-size: 13px;
+    font-weight: 1000;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  .pf-final-grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 26px;
+    align-items: center;
+  }
+
+  .pf-final-title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(46px, 7vw, 82px);
+    line-height: .96;
+    font-weight: 1000;
+  }
+
+  .pf-final-sub {
+    margin: 18px 0 0;
+    color: rgba(255,255,255,.74);
+    font-size: 20px;
+    line-height: 1.6;
+  }
+
+  .pf-final-photo {
+    min-height: 300px;
+    border-radius: 32px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: linear-gradient(135deg, rgba(141,92,255,.28), rgba(24,242,255,.14));
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .pf-final-photo img {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    object-fit: cover;
+  }
+
+  .pf-final-avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#8d5cff,#18f2ff);
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 62px;
+    font-weight: 1000;
+  }
+
+  .pf-final-stats {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 14px;
+  }
+
+  .pf-final-stat {
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.05);
+    border-radius: 24px;
+    padding: 20px;
+  }
+
+  .pf-final-stat strong {
+    display: block;
+    color: white;
+    font-size: 36px;
+    font-weight: 1000;
+  }
+
+  .pf-final-stat span {
+    display: block;
+    color: rgba(255,255,255,.62);
+    font-weight: 800;
+    margin-top: 6px;
+  }
+
+  .pf-final-card h2 {
+    margin: 0 0 8px;
+    color: white;
+    font-size: 34px;
+    line-height: 1.1;
+  }
+
+  .pf-final-card p {
+    color: rgba(255,255,255,.70);
+    line-height: 1.6;
+  }
+
+  .pf-final-form {
+    margin-top: 18px;
+    display: grid;
+    gap: 14px;
+  }
+
+  .pf-final-input,
+  .pf-final-textarea {
+    width: 100%;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.07);
+    color: white;
+    border-radius: 20px;
+    padding: 17px 18px;
+    font-size: 16px;
+    outline: none;
+  }
+
+  .pf-final-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .pf-final-btn {
+    min-height: 56px;
+    border: 0;
+    border-radius: 20px;
+    padding: 15px 22px;
+    background: linear-gradient(135deg,#8d5cff,#18f2ff);
+    color: white;
+    font-weight: 1000;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pf-final-btn.secondary {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.13);
+  }
+
+  .pf-final-btn.danger {
+    background: rgba(255,70,120,.15);
+    border: 1px solid rgba(255,70,120,.35);
+  }
+
+  .pf-final-works {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 18px;
+    margin-top: 20px;
+  }
+
+  .pf-final-work {
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.045);
+    border-radius: 28px;
+    padding: 18px;
+    overflow: hidden;
+  }
+
+  .pf-final-cover {
+    width: 100%;
+    min-height: 220px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(141,92,255,.28), rgba(24,242,255,.14));
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .pf-final-cover img {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    object-fit: cover;
+  }
+
+  .pf-final-cover span {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg,#8d5cff,#18f2ff);
+    color: white;
+    font-size: 42px;
+    font-weight: 1000;
+  }
+
+  .pf-final-work h3 {
+    margin: 0 0 8px;
+    color: white;
+    font-size: 22px;
+  }
+
+  .pf-final-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .pf-final-tag {
+    border: 1px solid rgba(24,242,255,.22);
+    background: rgba(24,242,255,.10);
+    color: #aefbff;
+    border-radius: 999px;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .pf-final-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .pf-final-actions > * {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .pf-final-empty {
+    border: 1px dashed rgba(255,255,255,.18);
+    border-radius: 24px;
+    padding: 24px;
+    color: rgba(255,255,255,.7);
+  }
+
+  @media (max-width: 860px) {
+    #portfolioUnifiedFinal {
+      gap: 18px;
+    }
+
+    .pf-final-hero,
+    .pf-final-card {
+      padding: 24px;
+      border-radius: 28px;
+    }
+
+    .pf-final-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .pf-final-title {
+      font-size: clamp(42px, 13vw, 64px);
+      line-height: .96;
+    }
+
+    .pf-final-sub {
+      font-size: 18px;
+    }
+
+    .pf-final-photo {
+      min-height: 220px;
+    }
+
+    .pf-final-photo img {
+      min-height: 220px;
+    }
+
+    .pf-final-avatar {
+      width: 130px;
+      height: 130px;
+      font-size: 48px;
+    }
+
+    .pf-final-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .pf-final-works {
+      grid-template-columns: 1fr;
+    }
+
+    .pf-final-card h2 {
+      font-size: 30px;
+    }
+
+    .pf-final-actions {
+      flex-direction: column;
+    }
+
+    .pf-final-actions > * {
+      width: 100%;
+      min-width: 100%;
+    }
+  }
+</style>
+
+<script id="portfolio-clean-final-script">
+(function(){
+  if(window.__portfolioCleanFinal) return;
+  window.__portfolioCleanFinal = true;
+
+  const STORAGE_KEY = 'sualuma_provider_portfolio_v14';
+
+  function isPortfolioPage(){
+    return location.hash === '#prestador-portfolio' || location.hash === '#prestador-portifolio';
+  }
+
+  function esc(v){
+    return String(v ?? '').replace(/[&<>"']/g, function(m){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];
+    });
+  }
+
+  function initials(name){
+    return String(name || 'Prestador Sualuma')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0,2)
+      .map(p => p[0])
+      .join('')
+      .toUpperCase() || 'PS';
+  }
+
+  function localPortfolio(){
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    } catch {
+      return null;
+    }
+  }
+
+  async function getDashboard(){
+    try {
+      const r = await fetch('/api/prestador/dashboard', { credentials:'include', cache:'no-store' });
+      const j = await r.json();
+      return j?.data || {};
+    } catch {
+      return {};
+    }
+  }
+
+  async function postPortfolio(item){
+    const body = {
+      action: 'add_portfolio',
+      title: item.title || '',
+      category: item.category || '',
+      url: item.url || item.siteUrl || '',
+      description: item.description || '',
+      imageUrl: item.imageUrl || item.coverImage || '',
+      youtubeUrl: item.youtubeUrl || item.videoUrl || '',
+      result: item.result || ''
+    };
+
+    try {
+      await fetch('/api/prestador/dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        credentials:'include',
+        body: JSON.stringify(body)
+      });
+    } catch {}
+  }
+
+  async function migrateLocal(){
+    const local = localPortfolio();
+    const list = local?.projects || local?.portfolio || [];
+    if(!Array.isArray(list) || !list.length) return;
+
+    const data = await getDashboard();
+    const existing = data.portfolio || [];
+    const titles = new Set(existing.map(x => String(x.title || '').trim().toLowerCase()));
+
+    for(const item of list){
+      const title = String(item.title || item.name || '').trim();
+      if(!title) continue;
+      if(titles.has(title.toLowerCase())) continue;
+
+      await postPortfolio({
+        title,
+        category: item.category || 'Portfólio',
+        url: item.url || item.siteUrl || item.projectUrl || '',
+        description: item.description || item.text || '',
+        imageUrl: item.imageUrl || item.coverImage || item.image || '',
+        youtubeUrl: item.youtubeUrl || item.videoUrl || '',
+        result: item.result || ''
+      });
+    }
+  }
+
+  function youtubeEmbed(url){
+    if(!url) return '';
+    const patterns = [
+      /youtu\.be\/([^?&]+)/,
+      /youtube\.com\/watch\?v=([^&]+)/,
+      /youtube\.com\/shorts\/([^?&]+)/,
+      /youtube\.com\/embed\/([^?&]+)/
+    ];
+
+    for(const p of patterns){
+      const m = String(url).match(p);
+      if(m && m[1]) return 'https://www.youtube.com/embed/' + encodeURIComponent(m[1]);
+    }
+
+    return '';
+  }
+
+  function findBestRoot(){
+    const selectors = [
+      '#portfolioContent',
+      '#providerContent',
+      '#dashboardContent',
+      '#mainContent',
+      '#content',
+      '.dashboard-content',
+      '.provider-content',
+      '.main-content',
+      'main'
+    ];
+
+    for(const s of selectors){
+      const el = document.querySelector(s);
+      if(el) return el;
+    }
+
+    return document.body;
+  }
+
+  async function render(){
+    if(!isPortfolioPage()) return;
+
+    const root = findBestRoot();
+    if(!root) return;
+
+    if(root.querySelector('#portfolioUnifiedFinal')) return;
+
+    root.innerHTML = '<div id="portfolioUnifiedFinal"><section class="pf-final-card"><h2>Carregando portfólio...</h2><p>Buscando dados salvos.</p></section></div>';
+
+    await migrateLocal();
+
+    const data = await getDashboard();
+    const profile = data.providerProfile || {};
+    const works = Array.isArray(data.portfolio) ? data.portfolio : [];
+
+    const name = profile.name || 'Prestador Sualuma';
+    const title = profile.title || 'Especialista em sites, automação e presença digital';
+    const bio = profile.bio || 'Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.';
+    const photo = profile.photoUrl || profile.avatarUrl || profile.imageUrl || '';
+
+    root.innerHTML = `
+      <div id="portfolioUnifiedFinal">
+        <section class="pf-final-hero">
+          <div class="pf-final-grid">
+            <div>
+              <div class="pf-final-label">Portfólio multimídia</div>
+              <h1 class="pf-final-title">${esc(name)}</h1>
+              <p class="pf-final-sub"><strong style="color:#aefbff">${esc(title)}</strong></p>
+              <p class="pf-final-sub">${esc(bio)}</p>
+            </div>
+
+            <div class="pf-final-photo">
+              ${photo ? `<img src="${esc(photo)}" alt="${esc(name)}">` : `<div class="pf-final-avatar">${esc(initials(name))}</div>`}
+            </div>
+          </div>
+
+          <div class="pf-final-stats">
+            <div class="pf-final-stat"><strong>${works.length}</strong><span>trabalhos publicados</span></div>
+            <div class="pf-final-stat"><strong>18</strong><span>na plataforma</span></div>
+            <div class="pf-final-stat"><strong>43</strong><span>fora da plataforma</span></div>
+            <div class="pf-final-stat"><strong>98%</strong><span>satisfação</span></div>
+          </div>
+        </section>
+
+        <section class="pf-final-card">
+          <h2>Adicionar trabalho multimídia</h2>
+          <p>Publique trabalhos com imagem, link do site, vídeo do YouTube e resultado gerado.</p>
+
+          <form id="pfFinalForm" class="pf-final-form">
+            <input class="pf-final-input" name="title" placeholder="Título do projeto" required>
+            <input class="pf-final-input" name="category" placeholder="Categoria. Ex: Site, Landing Page, Automação">
+            <input class="pf-final-input" name="url" placeholder="Link do site para prévia">
+            <input class="pf-final-input" name="youtubeUrl" placeholder="Link do vídeo YouTube">
+            <input class="pf-final-input" name="imageUrl" placeholder="Link da imagem/capa">
+            <input class="pf-final-input" name="result" placeholder="Resultado gerado. Ex: +30% contatos">
+            <textarea class="pf-final-textarea" name="description" placeholder="Descreva o que foi feito"></textarea>
+            <button class="pf-final-btn" type="submit">Publicar no portfólio</button>
+          </form>
+        </section>
+
+        <section class="pf-final-card">
+          <h2>Trabalhos em destaque</h2>
+          <p>Todos os trabalhos publicados aqui também podem aparecer na comunidade.</p>
+
+          <div style="margin:16px 0">
+            <a class="pf-final-btn secondary" href="https://trabalhosja.sualuma.online" target="_blank">Ver comunidade</a>
+          </div>
+
+          <div class="pf-final-works">
+            ${
+              works.length ? works.map(function(w){
+                const img = w.imageUrl || w.coverImage || w.image || '';
+                const video = w.youtubeUrl || w.videoUrl || '';
+                const embed = youtubeEmbed(video);
+
+                return `
+                  <article class="pf-final-work">
+                    <div class="pf-final-cover">
+                      ${img ? `<img src="${esc(img)}" alt="${esc(w.title)}">` : `<span>${esc(initials(w.title || 'Projeto'))}</span>`}
+                    </div>
+
+                    <h3>${esc(w.title || 'Projeto sem título')}</h3>
+                    <p>${esc(w.description || '')}</p>
+
+                    <div class="pf-final-tags">
+                      ${w.category ? `<span class="pf-final-tag">${esc(w.category)}</span>` : ''}
+                      ${w.result ? `<span class="pf-final-tag">${esc(w.result)}</span>` : ''}
+                      <span class="pf-final-tag">Publicado na comunidade</span>
+                    </div>
+
+                    ${embed ? `<iframe style="width:100%;aspect-ratio:16/9;border:0;border-radius:18px;margin-top:12px" src="${esc(embed)}" allowfullscreen></iframe>` : ''}
+
+                    <div class="pf-final-actions">
+                      ${w.url ? `<a class="pf-final-btn secondary" href="${esc(w.url)}" target="_blank">Abrir projeto</a>` : ''}
+                      <button class="pf-final-btn secondary" type="button" onclick="alert('Edição será conectada ao backend na próxima etapa.')">Editar</button>
+                      <button class="pf-final-btn danger" type="button" onclick="alert('Exclusão será conectada ao backend na próxima etapa.')">Excluir</button>
+                    </div>
+                  </article>
+                `;
+              }).join('') : `
+                <div class="pf-final-empty">
+                  <strong>Nenhum trabalho publicado ainda.</strong>
+                  <p>Adicione seu primeiro trabalho no formulário acima.</p>
+                </div>
+              `
+            }
+          </div>
+        </section>
+      </div>
+    `;
+
+    document.getElementById('pfFinalForm')?.addEventListener('submit', async function(e){
+      e.preventDefault();
+
+      const fd = new FormData(e.currentTarget);
+      const item = Object.fromEntries(fd.entries());
+
+      const btn = e.currentTarget.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      await postPortfolio(item);
+
+      try {
+        const local = localPortfolio() || { projects: [] };
+        local.projects = Array.isArray(local.projects) ? local.projects : [];
+        local.projects.push({
+          id: 'local-' + Date.now(),
+          ...item,
+          coverImage: item.imageUrl,
+          createdAt: new Date().toISOString()
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(local));
+      } catch {}
+
+      root.innerHTML = '';
+      setTimeout(render, 80);
+    });
+  }
+
+  window.renderPortfolioCleanFinal = render;
+
+  function forceRenderLoop(){
+    if(!isPortfolioPage()) return;
+
+    let count = 0;
+    const timer = setInterval(function(){
+      count++;
+      if(!isPortfolioPage() || count > 20){
+        clearInterval(timer);
+        return;
+      }
+
+      const root = findBestRoot();
+      if(!root) return;
+
+      if(!root.querySelector('#portfolioUnifiedFinal')){
+        render();
+      }
+    }, 400);
+  }
+
+  window.addEventListener('hashchange', function(){
+    setTimeout(render, 80);
+    setTimeout(forceRenderLoop, 200);
+  });
+
+  window.addEventListener('load', function(){
+    setTimeout(render, 100);
+    setTimeout(forceRenderLoop, 300);
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(render, 100);
+    setTimeout(forceRenderLoop, 300);
+  });
+
+  setTimeout(render, 300);
+  setTimeout(forceRenderLoop, 600);
+})();
+</script>
+
+
+<style id="portfolio-force-lock-style">
+  body.pf-final-mode #portfolioContent,
+  body.pf-final-mode #providerContent,
+  body.pf-final-mode main {
+    max-width: 100% !important;
+  }
+
+  body.pf-final-mode #portfolioUnifiedFinal {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  @media (max-width: 860px) {
+    body.pf-final-mode {
+      overflow-x: hidden !important;
+    }
+
+    body.pf-final-mode #portfolioUnifiedFinal {
+      padding-bottom: 90px !important;
+    }
+  }
+</style>
+
+<script id="portfolio-force-lock-script">
+(function(){
+  if(window.__portfolioForceLock) return;
+  window.__portfolioForceLock = true;
+
+  function isPortfolio(){
+    return location.hash === '#prestador-portfolio' || location.hash === '#prestador-portifolio';
+  }
+
+  function force(){
+    if(!isPortfolio()){
+      document.body.classList.remove('pf-final-mode');
+      return;
+    }
+
+    document.body.classList.add('pf-final-mode');
+
+    if(typeof window.renderPortfolioCleanFinal === 'function'){
+      window.renderPortfolioCleanFinal();
+    }
+  }
+
+  function repeat(){
+    force();
+
+    let count = 0;
+    const timer = setInterval(function(){
+      count++;
+      force();
+
+      if(count >= 20){
+        clearInterval(timer);
+      }
+    }, 250);
+  }
+
+  const observer = new MutationObserver(function(){
+    if(!isPortfolio()) return;
+
+    if(!document.querySelector('#portfolioUnifiedFinal')){
+      force();
+    }
+  });
+
+  function start(){
+    try {
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    } catch(e) {}
+
+    repeat();
+  }
+
+  window.addEventListener('hashchange', repeat);
+  window.addEventListener('load', start);
+  document.addEventListener('DOMContentLoaded', start);
+
+  setTimeout(start, 300);
+  setTimeout(repeat, 1000);
+})();
+</script>
+
+
+<script id="portfolio-redirect-clean-page">
+(function(){
+  function go(){
+    if(location.pathname !== "/portfolio/" && (location.hash === "#prestador-portfolio" || location.hash === "#prestador-portifolio")){
+      location.href = "/portfolio/?v=clean";
+    }
+  }
+
+  window.addEventListener("hashchange", go);
+  document.addEventListener("click", function(e){
+    const a = e.target.closest && e.target.closest("a");
+    if(!a) return;
+    const href = a.getAttribute("href") || "";
+    if(href === "#prestador-portfolio" || href === "#prestador-portifolio"){
+      e.preventDefault();
+      location.href = "/portfolio/?v=clean";
+    }
+  });
+
+  setTimeout(go, 100);
 })();
 </script>
 

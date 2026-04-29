@@ -1,61 +1,28 @@
-export async function POST(req: Request) {
+import { NextRequest, NextResponse } from "next/server";
+import { getBrainStatus, runMiaBrain } from "@/lib/brain/mia";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+export async function GET() {
+  return NextResponse.json(getBrainStatus());
+}
+
+export async function POST(req: NextRequest) {
   try {
-    const { message, attachments = [] } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const result = await runMiaBrain(body);
 
-    let attachmentText = "";
-
-    if (attachments.length > 0) {
-      attachmentText = `
-Arquivos recebidos:
-${attachments
-  .map(
-    (f: any) =>
-      `- ${f.name} (${f.type || "desconhecido"}, ${f.size} bytes)`
-  )
-  .join("\n")}
-`;
-    }
-
-    const prompt = `
-Você é o Luma OS, um sistema inteligente de negócios.
-
-IMPORTANTE:
-- Nunca diga que não consegue analisar arquivos
-- Sempre reconheça arquivos enviados
-- Seja útil, estratégica e prática
-- Se não puder ler conteúdo interno, diga que pode analisar com ferramentas adicionais
-
-Mensagem do usuário:
-${message}
-
-${attachmentText}
-
-Responda de forma inteligente, útil e estratégica.
-`;
-
-    const ollamaRes = await fetch("http://127.0.0.1:11434/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    return NextResponse.json(result);
+  } catch (err: any) {
+    return NextResponse.json(
+      {
+        ok: false,
+        provider: "server-error",
+        agent: "Mia",
+        reply: "Tive um erro interno no cérebro da Mia. Verifique os logs do servidor.",
+        error: err?.message || String(err),
       },
-      body: JSON.stringify({
-        model: "luma-brain",
-        prompt,
-        stream: false,
-      }),
-    });
-
-    const data = await ollamaRes.json();
-
-    return Response.json({
-      ok: true,
-      reply: data.response,
-    });
-  } catch (error: any) {
-    console.error(error);
-
-    return Response.json(
-      { ok: false, error: "Erro no backend" },
       { status: 500 }
     );
   }

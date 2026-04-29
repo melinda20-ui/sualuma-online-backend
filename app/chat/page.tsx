@@ -1,297 +1,304 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
-type ChatMessage = {
+type Msg = {
   role: "user" | "assistant";
   content: string;
 };
 
-type AutomationJson = {
-  name?: string;
-  description?: string;
-  sourcePrompt?: string;
-  steps?: string[];
-  nodes?: { type: string; name: string }[];
-};
+function cleanText(value: any) {
+  let text =
+    typeof value === "string"
+      ? value
+      : value?.reply || value?.message || value?.content || JSON.stringify(value);
 
-export default function ChatPage() {
+  return String(text)
+    .replace(/\\n/g, "\n")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/^\s*["']|["']\s*$/g, "")
+    .trim();
+}
+
+async function readMiaReply(response: Response) {
+  const raw = await response.text();
+
+  try {
+    const json = JSON.parse(raw);
+    return cleanText(json);
+  } catch {
+    return cleanText(raw);
+  }
+}
+
+export default function ChatTesteSemLoginPage() {
+  const [messages, setMessages] = useState<Msg[]>([
+    {
+      role: "assistant",
+      content:
+        "Oi, eu sou a Mia em modo teste. Por enquanto você pode testar o chat sem login.",
+    },
+  ]);
+
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+  const boxRef = useRef<HTMLDivElement | null>(null);
 
-  const [showAutomationModal, setShowAutomationModal] = useState(false);
-  const [automationStep, setAutomationStep] = useState("Preparando automação...");
-  const [automationJson, setAutomationJson] = useState<AutomationJson | null>(null);
-  const [showImportQuestion, setShowImportQuestion] = useState(false);
-  const [importStatus, setImportStatus] = useState("");
+  async function sendMessage(event: FormEvent) {
+    event.preventDefault();
 
-  const simulateAutomationProgress = async () => {
-    setAutomationStep("Lendo o seu pedido...");
-    await new Promise((r) => setTimeout(r, 900));
+    const text = input.trim();
+    if (!text || loading) return;
 
-    setAutomationStep("Interpretando a lógica da automação...");
-    await new Promise((r) => setTimeout(r, 900));
+    const nextMessages: Msg[] = [...messages, { role: "user", content: text }];
 
-    setAutomationStep("Montando estrutura e nós...");
-    await new Promise((r) => setTimeout(r, 1000));
-
-    setAutomationStep("Preparando JSON final...");
-    await new Promise((r) => setTimeout(r, 900));
-  };
-
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
-
-    const userText = input;
-    const userMessage: ChatMessage = { role: "user", content: userText };
-
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(nextMessages);
     setInput("");
     setLoading(true);
 
+    setTimeout(() => {
+      boxRef.current?.scrollTo({
+        top: boxRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 80);
+
     try {
-      const res = await fetch("/api/ai/router", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt: userText }),
+        body: JSON.stringify({
+          message: text,
+          messages: nextMessages.slice(-10),
+        }),
       });
 
-      const data = await res.json();
+      const reply = await readMiaReply(response);
 
-      if (data.mode === "automation") {
-        setShowAutomationModal(true);
-        setAutomationJson(null);
-        setShowImportQuestion(false);
-        setImportStatus("");
-
-        await simulateAutomationProgress();
-
-        setAutomationJson(data.json || null);
-        setShowImportQuestion(!!data.askToImport);
-
-        const aiMessage: ChatMessage = {
-          role: "assistant",
-          content: `Automação pronta: ${data.json?.name || "Workflow sem nome"}`,
-        };
-
-        setMessages((prev) => [...prev, aiMessage]);
-      } else {
-        const aiMessage: ChatMessage = {
-          role: "assistant",
-          content: data.reply || "Erro ao responder.",
-        };
-
-        setMessages((prev) => [...prev, aiMessage]);
-      }
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
+      setMessages((current) => [
+        ...current,
         {
           role: "assistant",
-          content: "Erro na conexão com a IA.",
+          content:
+            reply ||
+            "Recebi sua mensagem, mas a resposta veio vazia. Tente novamente.",
+        },
+      ]);
+    } catch (error: any) {
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          content:
+            "Modo teste ativo, mas a API do chat falhou agora: " +
+            (error?.message || "erro desconhecido"),
         },
       ]);
     } finally {
       setLoading(false);
-    }
-  };
 
-  const handleImportToN8N = async () => {
-    setImportStatus("Enviando para o n8n...");
-    await new Promise((r) => setTimeout(r, 1500));
-    setImportStatus(
-      "Automação pronta para importação no n8n. Na próxima etapa vamos conectar isso de verdade."
-    );
-  };
+      setTimeout(() => {
+        boxRef.current?.scrollTo({
+          top: boxRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 120);
+    }
+  }
 
   return (
-    <main className="min-h-screen bg-[#050507] text-white px-4 py-6">
-      <div className="mx-auto w-full max-w-5xl">
-        <h1 className="mb-6 text-3xl font-semibold">Chat IA Luma OS</h1>
+    <main className="chatPage">
+      <header className="chatHeader">
+        <div>
+          <h1>
+            Mia <span>(Teste)</span>
+          </h1>
+          <p>Teste livre do chat sem autenticação.</p>
+        </div>
 
-        <div className="mb-6 rounded-3xl border border-white/10 bg-[#0b0d12] p-4">
-          <div className="space-y-5">
-            {messages.length === 0 && (
-              <p className="text-white/45">
-                Peça automações, ajuda com código, organização ou estruturação de fluxos.
-              </p>
-            )}
+        <div className="badge">sem login</div>
+      </header>
 
-            {messages.map((msg, i) => (
-              <div key={i}>
-                <p className="mb-1 text-sm font-semibold text-white/70">
-                  {msg.role === "user" ? "Você" : "IA"}
-                </p>
-                <div
-                  className={`rounded-2xl p-4 text-sm leading-7 ${
-                    msg.role === "user"
-                      ? "bg-[#7A00FF]/15 border border-[#7A00FF]/20 text-white"
-                      : "bg-white/[0.04] border border-white/10 text-white/90"
-                  }`}
-                >
-                  <pre className="whitespace-pre-wrap font-sans">{msg.content}</pre>
-                </div>
-              </div>
-            ))}
-
-            {loading && (
-              <div>
-                <p className="mb-1 text-sm font-semibold text-white/70">IA</p>
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm text-white/70">
-                  Pensando...
-                </div>
-              </div>
-            )}
+      <section ref={boxRef} className="messages">
+        {messages.map((msg, index) => (
+          <div key={index} className={`bubble ${msg.role}`}>
+            {msg.content}
           </div>
-        </div>
+        ))}
 
-        <div className="flex gap-3">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Digite sua mensagem..."
-            className="w-full rounded-2xl border border-white/10 bg-[#0b0d12] px-4 py-4 text-white outline-none placeholder:text-white/35"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={loading}
-            className="rounded-2xl bg-[#7A00FF] px-5 py-4 font-semibold text-white disabled:opacity-60"
-          >
-            Enviar
-          </button>
-        </div>
-      </div>
+        {loading && <div className="bubble assistant small">Pensando...</div>}
+      </section>
 
-      {showAutomationModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm p-3 sm:p-4">
-          <div className="mx-auto flex min-h-full items-center justify-center">
-            <div className="w-full max-w-[95vw] sm:max-w-2xl lg:max-w-3xl rounded-3xl border border-white/10 bg-[#0b0d12] shadow-[0_0_50px_rgba(122,0,255,0.25)]">
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-4 sm:px-6">
-                <h2 className="text-lg sm:text-2xl font-semibold">Criando automação</h2>
-                <button
-                  onClick={() => setShowAutomationModal(false)}
-                  className="rounded-xl border border-white/10 px-3 py-2 text-xs sm:text-sm text-white/70"
-                >
-                  Fechar
-                </button>
-              </div>
+      <form className="composer" onSubmit={sendMessage}>
+        <textarea
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          placeholder="Escreva sua mensagem para a Mia..."
+          rows={3}
+        />
 
-              <div className="max-h-[78vh] overflow-y-auto px-4 py-4 sm:px-6 sm:py-5 space-y-5">
-                {!automationJson ? (
-                  <div className="space-y-4">
-                    <div className="h-3 w-full overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-[#00F0FF] to-[#7A00FF]" />
-                    </div>
+        <button disabled={loading || !input.trim()} type="submit">
+          {loading ? "Enviando..." : "Enviar"}
+        </button>
+      </form>
 
-                    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-sm sm:text-base text-white/85">
-                      {automationStep}
-                    </div>
+      <style jsx>{`
+        .chatPage {
+          min-height: 100dvh;
+          background:
+            radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.22), transparent 32%),
+            radial-gradient(circle at 90% 20%, rgba(124, 58, 237, 0.25), transparent 35%),
+            linear-gradient(135deg, #071225, #11104a 55%, #0c0820);
+          color: white;
+          display: flex;
+          flex-direction: column;
+          font-family:
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        }
 
-                    <div className="space-y-2 text-xs sm:text-sm text-white/50">
-                      <p>• Lendo seu pedido</p>
-                      <p>• Definindo a lógica</p>
-                      <p>• Organizando a automação</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4 sm:space-y-5">
-                    <div className="rounded-2xl border border-[#00F0FF]/20 bg-[#00F0FF]/10 p-4">
-                      <p className="text-xs sm:text-sm text-[#00F0FF]">Automação pronta</p>
-                      <h3 className="mt-2 text-lg sm:text-xl font-semibold text-white">
-                        {automationJson.name || "Workflow gerado"}
-                      </h3>
-                      {automationJson.description && (
-                        <p className="mt-2 text-sm text-white/70">
-                          {automationJson.description}
-                        </p>
-                      )}
-                    </div>
+        .chatHeader {
+          padding: 36px 36px 26px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 24px;
+          border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
 
-                    {automationJson.sourcePrompt && (
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                        <p className="mb-2 text-sm font-semibold text-white/80">
-                          Pedido entendido
-                        </p>
-                        <p className="text-sm text-white/65 break-words">
-                          {automationJson.sourcePrompt}
-                        </p>
-                      </div>
-                    )}
+        h1 {
+          margin: 0;
+          font-size: clamp(42px, 7vw, 74px);
+          line-height: 0.95;
+          font-weight: 500;
+          letter-spacing: -0.07em;
+        }
 
-                    {automationJson.steps && automationJson.steps.length > 0 && (
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                        <p className="mb-3 text-sm font-semibold text-white/80">Etapas</p>
-                        <ul className="space-y-2 text-sm text-white/70">
-                          {automationJson.steps.map((step, idx) => (
-                            <li key={idx}>• {step}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+        h1 span {
+          color: #8b5cf6;
+        }
 
-                    {automationJson.nodes && automationJson.nodes.length > 0 && (
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-                        <p className="mb-3 text-sm font-semibold text-white/80">Nós</p>
-                        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-                          {automationJson.nodes.map((node, idx) => (
-                            <div
-                              key={idx}
-                              className="rounded-2xl border border-white/10 bg-black/20 p-3 text-sm"
-                            >
-                              <p className="font-semibold text-white">{node.name}</p>
-                              <p className="mt-1 text-white/50">{node.type}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+        .chatHeader p {
+          margin: 18px 0 0;
+          color: rgba(255, 255, 255, 0.72);
+          font-size: clamp(18px, 3.5vw, 30px);
+          line-height: 1.35;
+          max-width: 560px;
+        }
 
-                    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                      <p className="mb-3 text-sm font-semibold text-white/80">JSON gerado</p>
-                      <div className="max-h-64 overflow-y-auto rounded-2xl bg-black/30 p-3 sm:p-4">
-                        <pre className="whitespace-pre-wrap break-words text-[11px] sm:text-xs leading-6 text-white/70">
-                          {JSON.stringify(automationJson, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
+        .badge {
+          border: 1px solid rgba(56, 189, 248, 0.55);
+          color: #9ee7ff;
+          border-radius: 999px;
+          padding: 18px 28px;
+          font-size: clamp(18px, 3vw, 26px);
+          font-weight: 800;
+          background: rgba(15, 23, 42, 0.45);
+          white-space: nowrap;
+        }
 
-                    {showImportQuestion && (
-                      <div className="rounded-2xl border border-[#7A00FF]/20 bg-[#7A00FF]/10 p-4">
-                        <p className="text-sm text-white">
-                          Deseja importar essa automação agora para o n8n?
-                        </p>
+        .messages {
+          flex: 1;
+          overflow-y: auto;
+          padding: 40px 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+          scroll-behavior: smooth;
+        }
 
-                        <div className="mt-4 flex flex-col sm:flex-row gap-3">
-                          <button
-                            onClick={handleImportToN8N}
-                            className="rounded-2xl bg-[#7A00FF] px-4 py-3 text-sm font-semibold text-white"
-                          >
-                            Sim, importar para o n8n
-                          </button>
+        .bubble {
+          max-width: min(82%, 780px);
+          border-radius: 34px;
+          padding: 30px 36px;
+          font-size: clamp(18px, 4vw, 30px);
+          line-height: 1.45;
+          white-space: pre-wrap;
+          word-break: break-word;
+          box-shadow: 0 22px 60px rgba(0, 0, 0, 0.18);
+        }
 
-                          <button
-                            onClick={() => setShowImportQuestion(false)}
-                            className="rounded-2xl border border-white/10 px-4 py-3 text-sm text-white/70"
-                          >
-                            Não agora
-                          </button>
-                        </div>
+        .assistant {
+          align-self: flex-start;
+          background: rgba(255, 255, 255, 0.13);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+        }
 
-                        {importStatus && (
-                          <p className="mt-4 text-sm text-[#d7b8ff]">{importStatus}</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        .user {
+          align-self: flex-end;
+          background: linear-gradient(135deg, #1d8cff, #8b35ff);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .small {
+          max-width: fit-content;
+        }
+
+        .composer {
+          padding: 32px;
+          border-top: 1px solid rgba(148, 163, 184, 0.22);
+          background: rgba(3, 7, 18, 0.4);
+          display: grid;
+          gap: 22px;
+        }
+
+        textarea {
+          width: 100%;
+          resize: none;
+          border-radius: 28px;
+          padding: 28px 34px;
+          border: 1px solid rgba(125, 211, 252, 0.65);
+          background: rgba(255, 255, 255, 0.08);
+          color: white;
+          font-size: clamp(18px, 4vw, 28px);
+          outline: none;
+        }
+
+        textarea::placeholder {
+          color: rgba(255, 255, 255, 0.45);
+        }
+
+        button {
+          border: 0;
+          border-radius: 28px;
+          padding: 26px;
+          font-size: clamp(18px, 4vw, 28px);
+          font-weight: 800;
+          color: white;
+          background: linear-gradient(135deg, #6d28d9, #0891b2);
+          cursor: pointer;
+        }
+
+        button:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+          .chatHeader {
+            padding: 32px 32px 24px;
+          }
+
+          .messages {
+            padding: 32px 32px;
+          }
+
+          .bubble {
+            max-width: 92%;
+          }
+
+          .composer {
+            padding: 28px 32px 36px;
+          }
+        }
+      `}</style>
     </main>
   );
 }

@@ -1,52 +1,62 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-function sharedCookieOptions(options: any = {}) {
-  const domain = process.env.SUALUMA_COOKIE_DOMAIN || ".sualuma.online";
+function getCookieOptions() {
+  const domain = process.env.NEXT_PUBLIC_SUPABASE_COOKIE_DOMAIN;
 
-  return {
-    ...options,
+  const options: any = {
     path: "/",
-    sameSite: "lax" as const,
-    domain,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
   };
+
+  if (domain) {
+    options.domain = domain;
+  }
+
+  return options;
 }
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
+  let response = NextResponse.next({
     request,
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-          });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response;
+  }
 
-          cookiesToSet.forEach(({ name, value, options }) => {
-            supabaseResponse.cookies.set(
-              name,
-              value,
-              sharedCookieOptions(options)
-            );
-          });
-        },
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookieOptions: getCookieOptions(),
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => {
+          request.cookies.set(name, value);
+        });
 
-  await supabase.auth.getUser();
+        response = NextResponse.next({
+          request,
+        });
 
-  return supabaseResponse;
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, {
+            ...options,
+            ...getCookieOptions(),
+          });
+        });
+
+        response.headers.set("Cache-Control", "private, no-store");
+      },
+    },
+  });
+
+  await supabase.auth.getClaims();
+
+  return response;
 }

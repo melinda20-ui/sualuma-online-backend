@@ -138,7 +138,7 @@ export default function PlansPage() {
               <p className="mt-6 text-xs leading-5 text-white/40">{plan.note}</p>
 
               <Link
-                href="/auth"
+                href="/login"
                 className={`mt-8 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold ${
                   plan.highlight
                     ? "bg-[#7A00FF] text-white"

@@ -1,28 +1,23 @@
-# dependências/build
 node_modules/
 .next/
 out/
 dist/
 
-# ambiente/chaves
 .env
 .env.local
 .env.*
 !.env.example
 
-# backups locais
 backups/
 *.bak
 *.backup
 *.backup-*
 *.backup*
 
-# logs/cache
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .DS_Store
 
-# dados sensíveis/temporários
 data/login-rate-limit-alerts.json
