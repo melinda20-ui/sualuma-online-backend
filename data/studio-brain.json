@@ -1,0 +1,166 @@
+{
+  "summary": {
+    "revenueToday": "R$ 0,00",
+    "revenueMonth": "R$ 0,00",
+    "leadsToday": 0,
+    "usersToday": 0,
+    "openRisks": 4
+  },
+  "alerts": [
+    {
+      "type": "risco",
+      "title": "Login em observação",
+      "text": "O fluxo de autenticação foi alterado recentemente. Testar cadastro, confirmação e entrada.",
+      "href": "/login"
+    },
+    {
+      "type": "andamento",
+      "title": "Studio sendo montado",
+      "text": "Primeira versão do cérebro administrativo está ativa para organizar operação, UX e financeiro.",
+      "href": "/studio"
+    },
+    {
+      "type": "parado",
+      "title": "Financeiro ainda sem conexão real",
+      "text": "Os cards financeiros estão prontos visualmente, mas ainda precisam ser conectados ao banco.",
+      "href": "/studio#financeiro"
+    }
+  ],
+  "modules": [
+    {
+      "title": "Marketing",
+      "status": "andamento",
+      "reason": "Funil visual criado, falta conectar origem dos leads, campanhas e conversões.",
+      "href": "/admin/leads"
+    },
+    {
+      "title": "Blog & Conteúdo",
+      "status": "ativo",
+      "reason": "Área de conteúdo existe e pode virar motor de tráfego orgânico.",
+      "href": "/admin/conteudo"
+    },
+    {
+      "title": "Leads & CRM",
+      "status": "andamento",
+      "reason": "Leads entram no sistema, falta classificar por origem, intenção e etapa.",
+      "href": "/admin/leads"
+    },
+    {
+      "title": "Chat Mia",
+      "status": "andamento",
+      "reason": "Chat liberado para teste sem login temporariamente.",
+      "href": "/chat"
+    },
+    {
+      "title": "Suporte",
+      "status": "risco",
+      "reason": "Ainda falta uma visão clara de tickets, conversas pendentes e prioridade.",
+      "href": "/chat"
+    },
+    {
+      "title": "Marketplace",
+      "status": "parado",
+      "reason": "Estrutura existe, mas ainda falta fluxo de compra, entrega e comissão.",
+      "href": "/marketplace"
+    },
+    {
+      "title": "Agentes",
+      "status": "andamento",
+      "reason": "Precisa separar agentes que executam, planejam, vendem e dão suporte.",
+      "href": "/agents"
+    },
+    {
+      "title": "Serviços",
+      "status": "ativo",
+      "reason": "Área de cliente e prestador já existe, falta medir conversão e satisfação.",
+      "href": "/portal"
+    },
+    {
+      "title": "Financeiro",
+      "status": "risco",
+      "reason": "Painel visual pronto, falta conectar receita, planos, serviços, marketplace e custos.",
+      "href": "/studio#financeiro"
+    },
+    {
+      "title": "UX / Jornada",
+      "status": "andamento",
+      "reason": "Mapa de experiência criado para enxergar onde o usuário entra, trava e compra.",
+      "href": "/studio#jornada"
+    },
+    {
+      "title": "Automações",
+      "status": "parado",
+      "reason": "Falta painelar automações ativas, quebradas, pausadas e oportunidades.",
+      "href": "/automations"
+    },
+    {
+      "title": "Sistema / APIs",
+      "status": "risco",
+      "reason": "Muitas rotas novas foram criadas. Precisa monitorar erros, login, e-mails e integrações.",
+      "href": "/admin"
+    }
+  ],
+  "journey": [
+    {
+      "step": "Entrada",
+      "status": "ativo",
+      "items": "Blog, redes sociais, indicação, tráfego direto, WhatsApp"
+    },
+    {
+      "step": "Lead",
+      "status": "andamento",
+      "items": "Formulário, cadastro, lista de espera, interesse em serviço"
+    },
+    {
+      "step": "Cadastro",
+      "status": "risco",
+      "items": "Cria conta, recebe e-mail, confirma acesso"
+    },
+    {
+      "step": "Portal",
+      "status": "andamento",
+      "items": "Escolhe área, vê planos, acessa chat, comunidade ou serviços"
+    },
+    {
+      "step": "Conversão",
+      "status": "parado",
+      "items": "Compra agente, plano, serviço ou produto do marketplace"
+    },
+    {
+      "step": "Suporte",
+      "status": "risco",
+      "items": "Pede ajuda, tira dúvida, recebe orientação ou solução"
+    },
+    {
+      "step": "Resultado",
+      "status": "andamento",
+      "items": "Entrega, satisfação, recompra, indicação e retenção"
+    }
+  ],
+  "finance": [
+    {
+      "title": "Receita de planos",
+      "value": "R$ 0,00",
+      "status": "parado",
+      "detail": "Ainda sem checkout conectado ao painel financeiro."
+    },
+    {
+      "title": "Receita de serviços",
+      "value": "R$ 0,00",
+      "status": "andamento",
+      "detail": "Precisa puxar vendas de sites, social media e automações."
+    },
+    {
+      "title": "Marketplace",
+      "value": "R$ 0,00",
+      "status": "parado",
+      "detail": "Aguardando fluxo de compra de agentes, produtos e serviços."
+    },
+    {
+      "title": "Leads com potencial",
+      "value": "0",
+      "status": "andamento",
+      "detail": "Depois vamos classificar leads por intenção e valor provável."
+    }
+  ]
+}
