@@ -1,3 +1,4 @@
+import SualumaPublicChat from "@/components/SualumaPublicChat";
 import Link from "next/link";
 
 const plans = [
@@ -160,6 +161,7 @@ export default function PlansPage() {
           </Link>
         </div>
       </div>
+          <SualumaPublicChat sourcePage="Plans Sua Luma" />
     </main>
   );
 }

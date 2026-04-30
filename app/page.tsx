@@ -1,3 +1,4 @@
+import SualumaPublicChat from "@/components/SualumaPublicChat";
 import Link from "next/link";
 import LeadCaptureForm from "@/components/LeadCaptureForm";
 
@@ -903,6 +904,7 @@ export default function HomePage() {
           }
         }
       `}</style>
+          <SualumaPublicChat sourcePage="Home Sua Luma" />
     </main>
   );
 }

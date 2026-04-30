@@ -1,5 +1,6 @@
 "use client";
 
+import SualumaPublicChat from "@/components/SualumaPublicChat";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 
@@ -5024,6 +5025,7 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
           .ux-only-wrap { min-height: 680px; }
         }
       `}</style>
+          <SualumaPublicChat sourcePage="Dashboard Studio Lab" />
     </main>
   );
 }
