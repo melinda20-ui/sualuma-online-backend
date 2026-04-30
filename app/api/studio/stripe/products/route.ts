@@ -1,130 +1,115 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 function getStripe() {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const key = process.env.STRIPE_SECRET_KEY;
 
-  if (!secretKey) {
+  if (!key) {
     throw new Error("STRIPE_SECRET_KEY não configurada.");
   }
 
-  return new Stripe(secretKey);
+  return new Stripe(key);
 }
 
-function moneyFromCents(amount: number | null | undefined, currency = "brl") {
-  const value = typeof amount === "number" ? amount / 100 : 0;
-
+function formatBRL(cents: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(value);
+    currency: "BRL",
+  }).format(cents / 100);
 }
 
-function checkAdmin(req: NextRequest) {
-  const expected = process.env.STUDIO_ADMIN_KEY;
+function parseFeatures(metadata: Stripe.Metadata | null | undefined) {
+  if (!metadata) return [];
 
-  if (!expected) {
-    return false;
-  }
+  const raw = metadata.features || metadata.benefits || "";
 
-  const headerKey =
-    req.headers.get("x-studio-admin-key") ||
-    req.headers.get("x-admin-key") ||
-    "";
+  if (!raw) return [];
 
-  const auth = req.headers.get("authorization") || "";
-  const bearer = auth.startsWith("Bearer ") ? auth.replace("Bearer ", "").trim() : "";
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+  } catch {}
 
-  return headerKey === expected || bearer === expected;
+  return raw
+    .split(/\n|\|/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
-function safeSlug(text: string) {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 60);
+function classifyProduct(product: Stripe.Product) {
+  const metadataCategory = String(product.metadata?.category || "").toLowerCase();
+  const name = product.name.toLowerCase();
+
+  if (metadataCategory) return metadataCategory;
+  if (name.includes("serviço") || name.includes("servico") || name.includes("site") || name.includes("landing")) return "servicos";
+  if (name.includes("ia") || name.includes("ai") || name.includes("agente")) return "ia";
+
+  return "geral";
+}
+
+async function listStripeProducts() {
+  const stripe = getStripe();
+
+  const prices = await stripe.prices.list({
+    active: true,
+    limit: 100,
+    expand: ["data.product"],
+  });
+
+  const products = prices.data
+    .map((price) => {
+      const product = price.product as Stripe.Product;
+
+      if (!product || product.deleted) return null;
+
+      const amount = price.unit_amount || 0;
+      const interval = price.recurring?.interval || null;
+      const category = classifyProduct(product);
+
+      return {
+        id: product.id,
+        productId: product.id,
+        priceId: price.id,
+        name: product.name,
+        title: product.name,
+        description: product.description || "",
+        active: product.active,
+        priceActive: price.active,
+        amount,
+        amountCents: amount,
+        amountNumber: amount / 100,
+        currency: price.currency,
+        price: formatBRL(amount),
+        priceFormatted: formatBRL(amount),
+        interval,
+        recurring: interval ? `/${interval}` : "",
+        type: price.type,
+        category,
+        lookupKey: price.lookup_key || "",
+        metadata: product.metadata || {},
+        features: parseFeatures(product.metadata),
+        checkoutPath: "/api/stripe/checkout-price",
+        created: product.created,
+      };
+    })
+    .filter(Boolean)
+    .sort((a: any, b: any) => b.created - a.created);
+
+  return products;
+}
+
+function getAdminKey(req: NextRequest) {
+  const headerKey = req.headers.get("x-studio-admin-key") || "";
+  const bearer = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || "";
+  return headerKey || bearer;
 }
 
 export async function GET() {
   try {
-    const stripe = getStripe();
-
-    const prices = await stripe.prices.list({
-      active: true,
-      limit: 100,
-      expand: ["data.product"],
-    });
-
-    const products = prices.data
-      .map((price) => {
-        const product =
-          typeof price.product === "string" ? null : price.product;
-
-        if (!product || product.deleted) {
-          return null;
-        }
-
-        const interval = price.recurring?.interval || null;
-        const amount = price.unit_amount || 0;
-        const currency = price.currency || "brl";
-
-        const featuresRaw =
-          product.metadata?.features ||
-          product.metadata?.features_json ||
-          "";
-
-        let features: string[] = [];
-
-        try {
-          const parsed = JSON.parse(featuresRaw);
-          if (Array.isArray(parsed)) {
-            features = parsed.map(String);
-          }
-        } catch {
-          features = featuresRaw
-            ? featuresRaw
-                .split("|")
-                .map((item) => item.trim())
-                .filter(Boolean)
-            : [];
-        }
-
-        return {
-          id: product.id,
-          productId: product.id,
-          priceId: price.id,
-          name: product.name,
-          title: product.name,
-          description: product.description || "",
-          active: product.active,
-          priceActive: price.active,
-          amount,
-          amountCents: amount,
-          amountNumber: amount / 100,
-          currency,
-          price: moneyFromCents(amount, currency),
-          priceFormatted: moneyFromCents(amount, currency),
-          interval,
-          recurring: interval ? `/${interval}` : "",
-          type: price.type,
-          lookupKey: price.lookup_key || "",
-          metadata: product.metadata || {},
-          features,
-          checkoutPath: `/api/stripe/checkout-price`,
-          created: product.created,
-        };
-      })
-      .filter(Boolean)
-      .sort((a: any, b: any) => {
-        if (a.amountNumber !== b.amountNumber) return a.amountNumber - b.amountNumber;
-        return String(a.name).localeCompare(String(b.name));
-      });
+    const products = await listStripeProducts();
 
     return NextResponse.json({
       ok: true,
@@ -139,6 +124,7 @@ export async function GET() {
       {
         ok: false,
         error: error?.message || "Erro ao listar produtos da Stripe.",
+        products: [],
       },
       { status: 500 }
     );
@@ -147,11 +133,25 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    if (!checkAdmin(req)) {
+    const adminKey = process.env.STUDIO_ADMIN_KEY;
+
+    if (!adminKey) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Acesso negado. Informe a chave admin do Studio.",
+          error: "STUDIO_ADMIN_KEY não configurada no servidor.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const receivedKey = getAdminKey(req);
+
+    if (receivedKey !== adminKey) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Chave admin inválida.",
         },
         { status: 401 }
       );
@@ -159,48 +159,29 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const name = String(body.name || body.title || "").trim();
+    const name = String(body.name || "").trim();
     const description = String(body.description || "").trim();
-    const amountInput = body.amount ?? body.price ?? body.valor;
-    const amountNumber = Number(
-      String(amountInput || "")
-        .replace("R$", "")
-        .replace(/\./g, "")
-        .replace(",", ".")
-        .trim()
-    );
+    const category = String(body.category || "servicos").trim();
+    const interval = String(body.interval || "month").trim() as Stripe.PriceCreateParams.Recurring.Interval;
+    const currency = String(body.currency || "brl").trim().toLowerCase();
+    const rawAmount = Number(body.amountNumber || body.amount || body.price || 0);
+    const amountCents = Math.round(rawAmount * 100);
 
-    const currency = String(body.currency || "brl").toLowerCase();
-    const interval = String(body.interval || "month").toLowerCase();
-    const project = String(body.project || "services").trim();
-    const slug = String(body.slug || safeSlug(name)).trim();
-
-    const features = Array.isArray(body.features)
-      ? body.features.map(String).filter(Boolean)
-      : String(body.features || "")
-          .split("\n")
-          .map((item) => item.trim())
-          .filter(Boolean);
+    const features = String(body.features || "")
+      .split(/\n|\|/)
+      .map((item) => item.trim())
+      .filter(Boolean);
 
     if (!name) {
       return NextResponse.json(
-        { ok: false, error: "Nome do produto obrigatório." },
+        { ok: false, error: "Informe o nome do plano/produto." },
         { status: 400 }
       );
     }
 
-    if (!amountNumber || amountNumber <= 0) {
+    if (!amountCents || amountCents < 100) {
       return NextResponse.json(
-        { ok: false, error: "Valor inválido. Exemplo: 97 ou 97,00." },
-        { status: 400 }
-      );
-    }
-
-    const allowedIntervals = ["day", "week", "month", "year"];
-
-    if (!allowedIntervals.includes(interval)) {
-      return NextResponse.json(
-        { ok: false, error: "Intervalo inválido. Use: day, week, month ou year." },
+        { ok: false, error: "Informe um valor válido. Exemplo: 97." },
         { status: 400 }
       );
     }
@@ -209,47 +190,38 @@ export async function POST(req: NextRequest) {
 
     const product = await stripe.products.create({
       name,
-      description: description || undefined,
+      description,
       active: true,
       metadata: {
-        source: "sualuma-studio",
-        project,
-        slug,
-        public: "true",
-        features_json: JSON.stringify(features),
+        category,
+        features: JSON.stringify(features),
+        created_from: "studio_sualuma",
       },
     });
 
     const price = await stripe.prices.create({
       product: product.id,
-      unit_amount: Math.round(amountNumber * 100),
+      unit_amount: amountCents,
       currency,
       recurring: {
-        interval: interval as Stripe.PriceCreateParams.Recurring.Interval,
+        interval,
       },
       metadata: {
-        source: "sualuma-studio",
-        project,
-        slug,
+        category,
+        created_from: "studio_sualuma",
       },
     });
 
+    const products = await listStripeProducts();
+
     return NextResponse.json({
       ok: true,
-      message: "Produto e preço criados com sucesso.",
-      product: {
-        id: product.id,
-        productId: product.id,
-        priceId: price.id,
-        name: product.name,
-        description: product.description || "",
-        amount: price.unit_amount || 0,
-        amountNumber,
-        currency,
-        price: moneyFromCents(price.unit_amount, currency),
-        interval,
-        features,
-      },
+      message: "Produto e preço criados na Stripe.",
+      productId: product.id,
+      priceId: price.id,
+      product,
+      price,
+      products,
     });
   } catch (error: any) {
     console.error("[studio/stripe/products][POST]", error);
@@ -257,7 +229,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error: error?.message || "Erro ao criar produto/plano na Stripe.",
+        error: error?.message || "Erro ao criar produto na Stripe.",
       },
       { status: 500 }
     );

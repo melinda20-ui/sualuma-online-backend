@@ -2976,6 +2976,33 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
               <div className="stripe-main-card">
                 <PanelTitle eyebrow="Stripe / Pagamentos" title="Central de assinaturas, cobranças e checkout" action={stripeLiveData ? "Banco conectado" : "Conectar Stripe"} />
 
+                <div id="stripe-planos-studio-lab" style={{ marginTop: 24, border: "1px solid rgba(148,163,184,.22)", borderRadius: 28, overflow: "hidden", background: "linear-gradient(180deg, rgba(88,28,135,.22), rgba(2,6,23,.92))", boxShadow: "0 24px 80px rgba(0,0,0,.35)" }}>
+                  <div style={{ padding: 18, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                    <div>
+                      <p style={{ margin: "0 0 6px", color: "#67e8f9", fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", fontWeight: 800 }}>
+                        Studio • Stripe
+                      </p>
+                      <h3 style={{ margin: 0, color: "#fff", fontSize: 24 }}>
+                        Produtos, serviços e planos Stripe
+                      </h3>
+                      <p style={{ margin: "8px 0 0", color: "rgba(226,232,240,.72)", maxWidth: 760 }}>
+                        Lista real dos produtos já criados na Stripe + formulário para criar novos planos.
+                      </p>
+                    </div>
+
+                    <a href="/studio/stripe-planos" style={{ color: "#fff", textDecoration: "none", border: "1px solid rgba(255,255,255,.22)", borderRadius: 999, padding: "12px 18px", fontWeight: 800, background: "rgba(255,255,255,.08)" }}>
+                      Abrir tela cheia
+                    </a>
+                  </div>
+
+                  <iframe
+                    title="Produtos e planos Stripe"
+                    src="/studio/stripe-planos?embed=1"
+                    style={{ width: "100%", height: "1280px", border: 0, background: "#050816", display: "block" }}
+                  />
+                </div>
+
+
                 <div className="stripe-big-number">
                   <small>Receita processada no mês</small>
                   <strong>{liveStripeDashboardCards?.[0]?.value || "R$ 0,00"}</strong>
