@@ -1988,6 +1988,45 @@ function LiveSubdomainsView({ fallbackRows }: { fallbackRows: LiveSubdomain[] })
         <MetricCard title="Fonte" value={source === "postgres" ? "Banco" : "Visual"} detail="Dados carregados da API do Studio" tone="yellow" />
       </section>
 
+      <section className="panel">
+        <div style={{ display: "grid", gap: 14 }}>
+          <PanelTitle
+            eyebrow="Catálogo automático"
+            title="Páginas e subdomínios criados na VPS"
+            action="Atualiza sozinho"
+          />
+
+          <p style={{ margin: 0, color: "rgba(226,232,240,.76)", lineHeight: 1.7 }}>
+            Aqui você abre a lista completa das páginas que já existem no projeto, incluindo rotas do Next.js
+            e sites estáticos criados direto na VPS. Use quando quiser encontrar um link sem ficar adivinhando.
+          </p>
+
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+            <a
+              href="/studio/catalogo-paginas"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "13px 18px",
+                borderRadius: 999,
+                background: "linear-gradient(135deg, #38bdf8, #a855f7)",
+                color: "#fff",
+                fontWeight: 900,
+                textDecoration: "none",
+                boxShadow: "0 18px 44px rgba(56,189,248,.22)"
+              }}
+            >
+              Abrir catálogo de páginas
+            </a>
+
+            <span style={{ color: "rgba(148,163,184,.9)", fontSize: 13 }}>
+              Mostra últimas páginas criadas hoje, busca por nome, rota, subdomínio, arquivo e status.
+            </span>
+          </div>
+        </div>
+      </section>
+
       <section className="lower-grid">
         <div className="panel">
           <PanelTitle eyebrow="Raiz do Site" title="Subdomínios monitorados" action={source === "postgres" ? "Banco conectado" : "Visual"} />
@@ -2349,6 +2388,32 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
 
   return (
     <main className="lab-page">
+      <a
+        className="studio-links-quick-button"
+        href="/studio/catalogo-paginas"
+        title="Abrir catálogo de links, páginas e subdomínios"
+        style={{
+          position: "fixed",
+          right: 18,
+          bottom: 18,
+          zIndex: 9999,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+          padding: "13px 18px",
+          borderRadius: 999,
+          background: "linear-gradient(135deg, #38bdf8, #a855f7)",
+          color: "#fff",
+          fontWeight: 900,
+          textDecoration: "none",
+          border: "1px solid rgba(255,255,255,.25)",
+          boxShadow: "0 18px 50px rgba(56,189,248,.28)"
+        }}
+      >
+        🔗 Links
+      </a>
+
       <aside className="lab-sidebar">
         <div className="lab-brand">
           <div className="brand-orb">S</div>
