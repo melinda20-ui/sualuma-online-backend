@@ -1,3 +1,4 @@
+import StudioMenuCollapse from "@/components/StudioMenuCollapse";
 import './globals.css'
 import AuthWelcomeEmail from "@/components/AuthWelcomeEmail";
 import ChoosePlanPopup from "@/components/ChoosePlanPopup";
@@ -20,7 +21,8 @@ export default function RootLayout({
         
         <AuthCookieBridge />{children}          <AuthWelcomeEmail />
                   <ChoosePlanPopup />
-        </body>
+                <StudioMenuCollapse />
+      </body>
     </html>
   )
 }
