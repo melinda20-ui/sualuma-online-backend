@@ -1,5 +1,7 @@
 "use client";
 
+
+import PrestadorPlanosChat from "./PrestadorPlanosChat";
 import { useState } from "react";
 
 const planos = [
@@ -12,7 +14,7 @@ const planos = [
     descricao: "Ideal para prestadores que querem testar a plataforma e receber as primeiras oportunidades.",
     propostas: "3 propostas por mês",
     prioridade: "Visibilidade padrão",
-    comissao: "12% por contrato fechado",
+    taxaAdministrativa: "12% por contrato fechado",
     botao: "Começar grátis",
     popular: false,
     gratuito: true,
@@ -32,7 +34,7 @@ const planos = [
     descricao: "Para quem acabou as propostas gratuitas e quer continuar enviando propostas sem assinar um plano mensal.",
     propostas: "10 propostas extras",
     prioridade: "Visibilidade padrão",
-    comissao: "12% por contrato fechado",
+    taxaAdministrativa: "12% por contrato fechado",
     botao: "Comprar créditos",
     popular: false,
     gratuito: false,
@@ -52,7 +54,7 @@ const planos = [
     descricao: "Para prestadores que querem aparecer melhor, enviar mais propostas e aumentar as chances de fechar contratos.",
     propostas: "40 propostas por mês",
     prioridade: "Prioridade alta",
-    comissao: "10% por contrato fechado",
+    taxaAdministrativa: "10% por contrato fechado",
     botao: "Assinar plano",
     popular: true,
     gratuito: false,
@@ -72,7 +74,7 @@ const planos = [
     descricao: "Plano para equipes, agências e prestadores fortes que querem mais oportunidades e mais escala.",
     propostas: "120 propostas por mês",
     prioridade: "Prioridade máxima",
-    comissao: "8% por contrato fechado",
+    taxaAdministrativa: "8% por contrato fechado",
     botao: "Assinar plano Pro",
     popular: false,
     gratuito: false,
@@ -208,8 +210,8 @@ export default function PlanosPrestadorPage() {
                   <strong>{plano.prioridade}</strong>
                 </div>
                 <div>
-                  <small>Comissão</small>
-                  <strong>{plano.comissao}</strong>
+                  <small>Taxa administrativa</small>
+                  <strong>{plano.taxaAdministrativa}</strong>
                 </div>
               </div>
 
@@ -267,6 +269,12 @@ export default function PlanosPrestadorPage() {
         <div className="sectionTitle">
           <p>Dúvidas comuns</p>
           <h2>Perguntas rápidas</h2>
+
+          <article className="faq-card">
+            <strong>O que é a taxa administrativa?</strong>
+            <p>A taxa administrativa ajuda a manter a plataforma funcionando com segurança, suporte, manutenção, organização das propostas e melhorias constantes para os prestadores.</p>
+          </article>
+
         </div>
 
         <div className="faqGrid">
@@ -664,6 +672,8 @@ export default function PlanosPrestadorPage() {
           }
         }
       `}</style>
-    </main>
+      <PrestadorPlanosChat />
+
+</main>
   );
 }

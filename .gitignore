@@ -24,3 +24,5 @@ data/login-rate-limit-alerts.json
 
 # tarefas locais do executor Mia
 data/brain-executor-tasks.json
+data/prestador-chat-publico.json
+data/*.json
