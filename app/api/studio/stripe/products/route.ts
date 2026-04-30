@@ -61,9 +61,13 @@ async function listStripeProducts() {
 
   const products = prices.data
     .map((price) => {
-      const product = price.product as Stripe.Product;
+      const rawProduct = price.product as any;
 
-      if (!product || product.deleted) return null;
+      if (!rawProduct || typeof rawProduct === "string" || rawProduct.deleted === true) {
+        return null;
+      }
+
+      const product = rawProduct as Stripe.Product;
 
       const amount = price.unit_amount || 0;
       const interval = price.recurring?.interval || null;
