@@ -2,115 +2,99 @@
 
 import { useEffect, useState } from "react";
 
-function findStudioMenu(): HTMLElement | null {
-  const selectors = [
-    "[data-studio-sidebar]",
-    ".studio-sidebar",
-    ".studio-menu",
-    ".sidebar",
-    ".side-nav",
-    ".sidenav",
-    ".menu-lateral",
-    "aside",
-    "nav"
-  ];
-
-  const all = selectors.flatMap((selector) =>
-    Array.from(document.querySelectorAll<HTMLElement>(selector))
+function isStudioPath() {
+  return (
+    window.location.pathname.startsWith("/studio-lab") ||
+    window.location.pathname.startsWith("/studio")
   );
+}
 
-  const unique = Array.from(new Set(all));
+function findCorrectStudioSidebar(): HTMLElement | null {
+  const all = Array.from(document.querySelectorAll<HTMLElement>("aside, nav, div"));
 
-  const keywords = [
-    "Studio",
-    "Painel",
-    "Dashboard",
-    "Financeiro",
-    "Stripe",
-    "Planos",
-    "Serviços",
-    "Indique",
-    "Marketing",
-    "Usuários",
-    "Conteúdo",
-    "Notificações",
-    "Sistema"
-  ];
-
-  const scored = unique
+  const candidates = all
     .map((el) => {
       const rect = el.getBoundingClientRect();
-      const text = el.innerText || "";
-      const className = String(el.className || "").toLowerCase();
+      const text = (el.innerText || "").trim();
 
       let score = 0;
 
-      if (el.tagName.toLowerCase() === "aside") score += 8;
-      if (el.tagName.toLowerCase() === "nav") score += 4;
-      if (className.includes("sidebar")) score += 10;
-      if (className.includes("side")) score += 6;
-      if (className.includes("menu")) score += 5;
-      if (rect.width >= 160) score += 4;
-      if (rect.height >= window.innerHeight * 0.45) score += 4;
-      if (rect.left < 80) score += 3;
+      if (text.includes("Studio Sualuma")) score += 50;
+      if (text.includes("Torre de Controle")) score += 40;
+      if (text.includes("Visão Geral")) score += 15;
+      if (text.includes("Relatórios")) score += 10;
+      if (text.includes("Marketing Orgânico")) score += 10;
+      if (text.includes("Suporte")) score += 8;
 
-      for (const keyword of keywords) {
-        if (text.includes(keyword)) score += 2;
-      }
+      if (rect.left <= 40) score += 20;
+      if (rect.width >= 220 && rect.width <= 390) score += 25;
+      if (rect.height >= window.innerHeight * 0.65) score += 10;
 
-      return { el, score };
+      // Penaliza blocos gigantes que são conteúdo/página inteira
+      if (rect.width > window.innerWidth * 0.92) score -= 80;
+      if (text.includes("Uma visão de startup gigante")) score -= 80;
+      if (text.includes("Pesquisar usuário")) score -= 60;
+      if (text.includes("Seu império")) score -= 50;
+
+      return { el, score, area: rect.width * rect.height };
     })
-    .filter((item) => item.score >= 8)
-    .sort((a, b) => b.score - a.score);
+    .filter((item) => item.score >= 60)
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return a.area - b.area;
+    });
 
-  return scored[0]?.el || null;
+  return candidates[0]?.el || null;
+}
+
+function applySidebarState(collapsed: boolean) {
+  document.body.classList.toggle("sualuma-studio-menu-collapsed", collapsed);
+
+  const currentTargets = document.querySelectorAll(".sualuma-studio-menu-target");
+  currentTargets.forEach((el) => el.classList.remove("sualuma-studio-menu-target"));
+
+  const sidebar = findCorrectStudioSidebar();
+
+  if (sidebar) {
+    sidebar.classList.add("sualuma-studio-menu-target");
+    return true;
+  }
+
+  return false;
 }
 
 export default function StudioMenuCollapse() {
   const [enabled, setEnabled] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [found, setFound] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
-    const isStudio =
-      window.location.pathname.startsWith("/studio") ||
-      window.location.pathname.startsWith("/studio-lab");
-
-    if (!isStudio) return;
+    if (!isStudioPath()) return;
 
     setEnabled(true);
 
     const saved = window.localStorage.getItem("sualuma-studio-menu-collapsed");
-    const shouldCollapse = saved === "true";
-    setCollapsed(shouldCollapse);
+    const initialCollapsed = saved === null ? true : saved === "true";
 
-    const applyTarget = () => {
-      const target = findStudioMenu();
+    setCollapsed(initialCollapsed);
 
-      if (!target) {
-        setFound(false);
-        return;
-      }
+    const run = () => applySidebarState(initialCollapsed);
 
-      target.classList.add("sualuma-studio-menu-target");
-      setFound(true);
-    };
-
-    applyTarget();
-
-    const timer1 = window.setTimeout(applyTarget, 600);
-    const timer2 = window.setTimeout(applyTarget, 1400);
+    run();
+    const t1 = window.setTimeout(run, 500);
+    const t2 = window.setTimeout(run, 1200);
+    const t3 = window.setTimeout(run, 2200);
 
     return () => {
-      window.clearTimeout(timer1);
-      window.clearTimeout(timer2);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
     };
   }, []);
 
   useEffect(() => {
     if (!enabled) return;
 
-    document.body.classList.toggle("sualuma-studio-menu-collapsed", collapsed);
+    applySidebarState(collapsed);
     window.localStorage.setItem(
       "sualuma-studio-menu-collapsed",
       collapsed ? "true" : "false"
@@ -125,97 +109,84 @@ export default function StudioMenuCollapse() {
         type="button"
         className="sualuma-studio-collapse-button"
         onClick={() => {
-          const target = findStudioMenu();
-          if (target) {
-            target.classList.add("sualuma-studio-menu-target");
-            setFound(true);
-          }
-          setCollapsed((current) => !current);
+          const next = !collapsed;
+          setCollapsed(next);
+          window.setTimeout(() => applySidebarState(next), 50);
         }}
-        title={collapsed ? "Expandir menu" : "Recolher menu"}
-        aria-label={collapsed ? "Expandir menu do Studio" : "Recolher menu do Studio"}
+        aria-label={collapsed ? "Abrir menu do Studio" : "Fechar menu do Studio"}
+        title={collapsed ? "Abrir menu" : "Fechar menu"}
       >
-        <span>{collapsed ? "☰" : "‹"}</span>
+        {collapsed ? "☰" : "‹"}
       </button>
 
-      {!found ? null : (
-        <style jsx global>{`
-          .sualuma-studio-menu-target {
-            transition:
-              width 0.25s ease,
-              min-width 0.25s ease,
-              max-width 0.25s ease,
-              transform 0.25s ease,
-              opacity 0.25s ease !important;
+      <style jsx global>{`
+        .sualuma-studio-menu-target {
+          transition:
+            transform 0.28s ease,
+            opacity 0.28s ease,
+            box-shadow 0.28s ease !important;
+          will-change: transform;
+        }
+
+        body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target {
+          transform: translateX(calc(-100% + 10px)) !important;
+          opacity: 0.98 !important;
+          pointer-events: none !important;
+        }
+
+        body:not(.sualuma-studio-menu-collapsed) .sualuma-studio-menu-target {
+          transform: translateX(0) !important;
+          opacity: 1 !important;
+          pointer-events: auto !important;
+          z-index: 99990 !important;
+        }
+
+        .sualuma-studio-collapse-button {
+          position: fixed;
+          left: 20px;
+          bottom: 78px;
+          z-index: 999999;
+          width: 56px;
+          height: 56px;
+          border: 1px solid rgba(255, 255, 255, 0.24);
+          border-radius: 999px;
+          background: linear-gradient(135deg, #8b5cf6, #22d3ee);
+          color: white;
+          box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+          display: grid;
+          place-items: center;
+          cursor: pointer;
+          font-size: 34px;
+          font-weight: 900;
+          line-height: 1;
+          backdrop-filter: blur(16px);
+        }
+
+        @media (max-width: 780px) {
+          .sualuma-studio-collapse-button {
+            left: 20px;
+            bottom: 78px;
+            width: 58px;
+            height: 58px;
+            font-size: 34px;
           }
 
           body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target {
-            width: 76px !important;
-            min-width: 76px !important;
-            max-width: 76px !important;
-            overflow: hidden !important;
+            transform: translateX(calc(-100% + 8px)) !important;
           }
 
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target a,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target button,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target div {
-            white-space: nowrap !important;
+          body:not(.sualuma-studio-menu-collapsed) .sualuma-studio-menu-target {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            overflow-y: auto !important;
+            z-index: 99990 !important;
           }
-
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target p,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target small,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target h1,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target h2,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target h3,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target .label,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target .text,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target .title,
-          body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target .description {
-            opacity: 0 !important;
-            max-width: 0 !important;
-            pointer-events: none !important;
-          }
-
-          .sualuma-studio-collapse-button {
-            position: fixed;
-            left: 16px;
-            bottom: 18px;
-            z-index: 999999;
-            width: 46px;
-            height: 46px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 999px;
-            background:
-              linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(56, 189, 248, 0.95));
-            color: white;
-            box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-            display: grid;
-            place-items: center;
-            cursor: pointer;
-            backdrop-filter: blur(14px);
-          }
-
-          .sualuma-studio-collapse-button span {
-            font-size: 28px;
-            line-height: 1;
-            transform: translateY(-1px);
-          }
-
-          @media (max-width: 780px) {
-            .sualuma-studio-collapse-button {
-              left: 14px;
-              bottom: 14px;
-              width: 48px;
-              height: 48px;
-            }
-
-            body.sualuma-studio-menu-collapsed .sualuma-studio-menu-target {
-              transform: translateX(-82%) !important;
-              opacity: 0.96 !important;
-            }
-          }
-        `}</style>
-      )}
+        }
+      `}</style>
     </>
   );
 }
