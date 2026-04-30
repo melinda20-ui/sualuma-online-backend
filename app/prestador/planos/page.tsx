@@ -272,7 +272,22 @@ export default function PlanosPrestadorPage() {
 
           <article className="faq-card">
             <strong>O que é a taxa administrativa?</strong>
-            <p>A taxa administrativa ajuda a manter a plataforma funcionando com segurança, suporte, manutenção, organização das propostas e melhorias constantes para os prestadores.</p>
+            <p
+              style={{
+                marginTop: "10px",
+                maxWidth: "760px",
+                color: "rgba(255,255,255,.78)",
+                fontSize: "15px",
+                lineHeight: "1.7",
+                fontWeight: 500,
+                letterSpacing: "0",
+                textTransform: "none",
+              }}
+            >
+              Essa taxa ajuda a manter a plataforma funcionando com segurança,
+              suporte, manutenção, organização das propostas e melhorias
+              constantes para os prestadores.
+            </p>
           </article>
 
         </div>
