@@ -95,9 +95,10 @@ export async function GET() {
     const skills = rowsFrom(tables, "mia_brain_skills");
     const prompts = rowsFrom(tables, "mia_brain_prompts");
     const voices = rowsFrom(tables, "mia_brain_voices");
-    const logs = rowsFrom(tables, "mia_brain_logs");
-    const usage = rowsFrom(tables, "mia_brain_usage");
-    const costs = rowsFrom(tables, "mia_brain_costs");
+    const settings = rowsFrom(tables, "mia_brain_settings");
+    const transcriptions = rowsFrom(tables, "mia_brain_transcriptions");
+    const usageLogs = rowsFrom(tables, "mia_brain_usage_logs");
+    const costs: unknown[] = [];
 
     const metrics = {
       providers_total: providers.length,
@@ -105,8 +106,10 @@ export async function GET() {
       skills_total: skills.length,
       prompts_total: prompts.length,
       voices_total: voices.length,
-      logs_total: logs.length,
-      usage_events_total: usage.length,
+      logs_total: usageLogs.length,
+      usage_events_total: usageLogs.length,
+      transcriptions_total: transcriptions.length,
+      settings_total: settings.length,
       costs_rows_total: costs.length,
       tables_total: tableNames.length,
     };
@@ -123,8 +126,9 @@ export async function GET() {
       skills,
       prompts,
       voices,
-      logs,
-      usage,
+      settings,
+      transcriptions,
+      usage_logs: usageLogs,
       costs,
       tables,
     });
