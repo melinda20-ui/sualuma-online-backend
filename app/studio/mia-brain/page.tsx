@@ -179,179 +179,128 @@ function HolographicBrain() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = canvas.getContext("2d", { alpha: true }) as CanvasRenderingContext2D;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const width = 720;
     const height = 430;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = "100%";
     canvas.style.height = "100%";
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const rand = seededRandom(2026);
+    type BrainNode = {
+      x: number; y: number; z: number; r: number; phase: number;
+    };
 
-    const nodes = Array.from({ length: 115 }, (_, index) => {
-      const angle = rand() * Math.PI * 2;
-      const radius = rand() * 145 + 16;
-      const lobe = index % 4;
-      const offsetX = lobe === 0 ? -72 : lobe === 1 ? 68 : lobe === 2 ? -20 : 34;
-      const offsetY = lobe === 0 ? -22 : lobe === 1 ? -18 : lobe === 2 ? 38 : 8;
+    let seed = 987654321;
+    const rand = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
 
-      return {
-        baseX: Math.cos(angle) * radius * 1.18 + offsetX,
-        baseY: Math.sin(angle) * radius * 0.62 + offsetY,
-        z: rand() * 2 - 1,
-        size: rand() * 2.4 + 1.1,
-        speed: rand() * 0.4 + 0.2,
-      };
-    });
+    const nodes: BrainNode[] = [];
 
-    let time = 0;
+    // Nós mais orgânicos e densos (próximo do estilo da imagem)
+    for (let i = 0; i < 320; i++) {
+      const a = rand() * Math.PI * 2;
+      const b = Math.pow(rand(), 0.55);
+
+      let x = Math.cos(a) * 128 * b * (0.88 + rand() * 0.35);
+      let y = Math.sin(a) * 96 * b * (0.92 + rand() * 0.28) - 20;
+      let z = (rand() * 2 - 1) * 82 * (0.65 + rand() * 0.6);
+
+      if (Math.abs(x) > 50) y += (Math.abs(x) - 50) * 0.08;
+
+      nodes.push({
+        x: x + (rand() - 0.5) * 16,
+        y: y + (rand() - 0.5) * 18,
+        z,
+        r: 1.05 + rand() * 2.6,
+        phase: rand() * Math.PI * 2 + i,
+      });
+    }
+
+    let t = 0;
 
     function draw() {
-      if (!ctx) return;
+      t += 0.007; // rotação bem lenta e suave
 
-      time += 0.012;
       ctx.clearRect(0, 0, width, height);
 
       const cx = width / 2;
-      const cy = height / 2 - 4;
-      const rotation = time * 0.65;
+      const cy = height / 2 - 10;
+      const rot = t * 0.25; // giro lento
 
-      const bgGradient = ctx.createRadialGradient(cx, cy, 10, cx, cy, 300);
-      bgGradient.addColorStop(0, "rgba(255, 79, 163, 0.18)");
-      bgGradient.addColorStop(0.35, "rgba(255, 59, 95, 0.08)");
-      bgGradient.addColorStop(0.72, "rgba(217, 70, 239, 0.03)");
-      bgGradient.addColorStop(1, "transparent");
-      ctx.fillStyle = bgGradient;
+      const cos = Math.cos(rot);
+      const sin = Math.sin(rot);
+
+      // Aura forte estilo neon da imagem
+      const aura = ctx.createRadialGradient(cx, cy, 30, cx, cy, 270);
+      aura.addColorStop(0, "rgba(255, 65, 150, 0.28)");
+      aura.addColorStop(0.45, "rgba(190, 40, 230, 0.13)");
+      aura.addColorStop(1, "transparent");
+      ctx.fillStyle = aura;
       ctx.fillRect(0, 0, width, height);
 
-      for (let ring = 0; ring < 5; ring++) {
-        ctx.beginPath();
-        ctx.ellipse(
-          cx,
-          cy + 150,
-          188 - ring * 26,
-          28 - ring * 3,
-          0,
-          0,
-          Math.PI * 2
-        );
-        ctx.strokeStyle = `rgba(255, 59, 95, ${0.22 - ring * 0.035})`;
-        ctx.lineWidth = ring === 0 ? 2 : 1;
-        ctx.stroke();
-      }
-
-      const projected = nodes.map((node, index) => {
-        const cos = Math.cos(rotation + node.z * 0.22);
-        const sin = Math.sin(rotation + node.z * 0.22);
-
-        const x3 = node.baseX;
-        const z3 = node.z * 80;
-        const y3 = node.baseY;
-
-        const x = cx + x3 * cos + z3 * sin * 0.35;
-        const y = cy + y3 + Math.sin(time * node.speed + index) * 5;
-        const depth = (z3 * cos - x3 * sin) / 120;
+      const projected = nodes.map(node => {
+        const xr = node.x * cos + node.z * sin;
+        const zr = node.z * cos - node.x * sin;
+        const pers = 1 + zr / 290;
 
         return {
-          x,
-          y,
-          depth,
-          size: node.size * (1.1 + depth * 0.18),
-          index,
+          x: cx + xr * pers * 0.97,
+          y: cy + node.y * pers * 0.99,
+          z: zr,
+          r: Math.max(0.95, node.r * pers * 0.96),
+          phase: node.phase,
         };
       });
 
-      projected.forEach((a, i) => {
-        for (let j = i + 1; j < projected.length; j++) {
+      // Conexões neurais densas
+      ctx.lineWidth = 0.8;
+      for (let i = 0; i < projected.length; i += 2) {
+        for (let j = i + 1; j < projected.length; j += 4) {
+          const a = projected[i];
           const b = projected[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 74) {
-            const alpha = (1 - dist / 74) * 0.32 * (1 + Math.sin(time * 2 + i) * 0.16);
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          if (dist < 72 && dist > 6) {
+            const alpha = (1 - dist / 72) * 0.26;
+            ctx.strokeStyle = `rgba(255, 90, 190, ${alpha})`;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = `rgba(255, 64, 112, ${alpha})`;
-            ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         }
-      });
-
-      projected.forEach((node, index) => {
-        const pulse = 0.7 + Math.sin(time * 3 + index * 0.7) * 0.3;
-        const hueColor =
-          index % 3 === 0
-            ? "255, 79, 163"
-            : index % 3 === 1
-              ? "255, 59, 95"
-              : "217, 70, 239";
-
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, Math.max(0.6, node.size * pulse), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${hueColor}, ${0.72 + node.depth * 0.18})`;
-        ctx.fill();
-
-        if (index % 9 === 0) {
-          const glow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.size * 10);
-          glow.addColorStop(0, `rgba(${hueColor}, 0.35)`);
-          glow.addColorStop(1, "transparent");
-          ctx.fillStyle = glow;
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, node.size * 10, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(Math.sin(time * 0.3) * 0.015);
-
-      const outlineAlpha = 0.34 + Math.sin(time * 2) * 0.08;
-      ctx.strokeStyle = `rgba(255, 79, 163, ${outlineAlpha})`;
-      ctx.lineWidth = 2;
-
-      ctx.beginPath();
-      ctx.moveTo(-190, -30);
-      ctx.bezierCurveTo(-210, -120, -80, -168, 20, -150);
-      ctx.bezierCurveTo(140, -165, 245, -82, 220, 40);
-      ctx.bezierCurveTo(200, 128, 65, 126, 15, 102);
-      ctx.bezierCurveTo(-50, 136, -178, 90, -190, -30);
-      ctx.stroke();
-
-      ctx.strokeStyle = "rgba(255, 59, 95, 0.24)";
-      ctx.lineWidth = 1.2;
-      for (let i = 0; i < 7; i++) {
-        ctx.beginPath();
-        ctx.moveTo(-140 + i * 45, -112 + Math.sin(time + i) * 8);
-        ctx.bezierCurveTo(
-          -118 + i * 30,
-          -72 + Math.cos(time + i) * 16,
-          -96 + i * 42,
-          -20 + Math.sin(time * 0.8 + i) * 14,
-          -120 + i * 52,
-          48 + Math.cos(time * 1.2 + i) * 8
-        );
-        ctx.stroke();
       }
 
-      ctx.restore();
+      // Neurônios com glow
+      projected.sort((a, b) => a.z - b.z).forEach((node, idx) => {
+        const pulse = 0.78 + Math.sin(t * 4.8 + node.phase) * 0.42;
 
-      const scanY = cy - 166 + ((time * 70) % 330);
-      const scanGradient = ctx.createLinearGradient(cx - 260, scanY, cx + 260, scanY);
-      scanGradient.addColorStop(0, "transparent");
-      scanGradient.addColorStop(0.5, "rgba(255, 79, 163, 0.12)");
-      scanGradient.addColorStop(1, "transparent");
-      ctx.fillStyle = scanGradient;
-      ctx.fillRect(cx - 260, scanY, 520, 3);
+        const col = idx % 3 === 0 ? "255,75,165" : "215,50,245";
+
+        const glow = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, node.r * 10);
+        glow.addColorStop(0, `rgba(${col},0.38)`);
+        glow.addColorStop(1, "transparent");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.r * 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(${col},0.96)`;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.r * pulse, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Scan line sutil
+      const scanY = cy - 155 + ((t * 48) % 320);
+      ctx.fillStyle = "rgba(255, 110, 200, 0.16)";
+      ctx.fillRect(cx - 230, scanY, 460, 2.5);
 
       animationRef.current = requestAnimationFrame(draw);
     }
@@ -359,14 +308,13 @@ function HolographicBrain() {
     animationRef.current = requestAnimationFrame(draw);
 
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, []);
 
   return (
     <div className="brain-stage">
+      {/* tags e conexões mantidas */}
       <div className="brain-connection left-one" />
       <div className="brain-connection left-two" />
       <div className="brain-connection left-three" />
@@ -376,15 +324,14 @@ function HolographicBrain() {
       <div className="brain-connection right-three" />
       <div className="brain-connection right-four" />
 
-      <div className="brain-tag tag-left tag-1">Modelos de IA</div>
-      <div className="brain-tag tag-left tag-2">Voz & Áudio</div>
-      <div className="brain-tag tag-left tag-3">Memória</div>
-      <div className="brain-tag tag-left tag-4">Dados</div>
-
-      <div className="brain-tag tag-right tag-5">Prompt Studio</div>
-      <div className="brain-tag tag-right tag-6">Skills</div>
-      <div className="brain-tag tag-right tag-7">APIs</div>
-      <div className="brain-tag tag-right tag-8">Automação</div>
+      <div className="brain-tag tag-1">Modelos de IA</div>
+      <div className="brain-tag tag-2">Voz & Áudio</div>
+      <div className="brain-tag tag-3">Memória</div>
+      <div className="brain-tag tag-4">Dados</div>
+      <div className="brain-tag tag-5">Prompt Studio</div>
+      <div className="brain-tag tag-6">Skills</div>
+      <div className="brain-tag tag-7">APIs</div>
+      <div className="brain-tag tag-8">Automação</div>
 
       <canvas ref={canvasRef} className="brain-canvas" />
     </div>
