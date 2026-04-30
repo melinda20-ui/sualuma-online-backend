@@ -1,575 +1,677 @@
 "use client";
 
-import { useState } from "react";
-
-const planosServicos = [
+const resumoCards = [
   {
-    nome: "Gratuito",
-    preco: "R$ 0/mês",
-    propostas: "3 propostas grátis por mês",
-    prioridade: "Sem prioridade",
-    comissao: "12% por contrato fechado",
-    ideal: "Prestador novo testando a plataforma",
-    slug: "",
-    cta: "Plano gratuito",
+    label: "Modelo principal",
+    title: "Venda de serviços",
+    text: "A Sua Luma ganha com serviços como sites, automações, conteúdo e marketing.",
   },
   {
-    nome: "Pacote de Propostas",
-    preco: "R$ 19,90",
-    propostas: "10 propostas extras",
-    prioridade: "Sem mensalidade",
-    comissao: "12% por contrato fechado",
-    ideal: "Prestador que quer comprar créditos avulsos",
-    slug: "pacote-propostas",
-    cta: "Comprar propostas",
+    label: "Motor de escala",
+    title: "Indicações",
+    text: "Pessoas e parceiros trazem novos clientes através de links e campanhas.",
   },
   {
-    nome: "Prestador Prioritário",
-    preco: "R$ 49,90/mês",
-    propostas: "40 propostas por mês",
-    prioridade: "Prioridade alta na listagem",
-    comissao: "10% por contrato fechado",
-    ideal: "Freelancer que quer aparecer mais",
-    slug: "prioritario",
-    cta: "Assinar prioridade",
+    label: "Receita da plataforma",
+    title: "Taxa administrativa",
+    text: "Parte do valor mantém a operação, suporte, organização, tecnologia e crescimento.",
   },
   {
-    nome: "Agência / Time",
-    preco: "R$ 97/mês",
-    propostas: "120 propostas por mês",
-    prioridade: "Prioridade máxima",
-    comissao: "8% por contrato fechado",
-    ideal: "Agência, especialista ou prestador forte",
-    slug: "agencia-time",
-    cta: "Assinar plano agência",
+    label: "Objetivo",
+    title: "Tudo simples",
+    text: "Você precisa entender rápido o que entra, o que sai e o que precisa ser feito.",
   },
 ];
 
-const produtosAvulsos = [
-  ["Pacote 5 propostas", "R$ 9,90", "Para quem acabou as propostas grátis."],
-  ["Pacote 15 propostas", "R$ 19,90", "Mais chances de fechar serviço."],
-  ["Destaque em proposta", "R$ 7,90", "A proposta sobe visualmente na lista do cliente."],
-  ["Prioridade 24h", "R$ 17,90", "Aparece primeiro nas oportunidades por 24h."],
+const passos = [
+  {
+    n: "01",
+    title: "O cliente chega",
+    text: "Uma pessoa quer site, automação, conteúdo, estratégia ou outro serviço.",
+  },
+  {
+    n: "02",
+    title: "O pedido é organizado",
+    text: "A plataforma registra o que a pessoa quer e direciona para o fluxo certo.",
+  },
+  {
+    n: "03",
+    title: "O prestador executa",
+    text: "O profissional certo recebe a demanda e entrega o serviço.",
+  },
+  {
+    n: "04",
+    title: "A plataforma recebe a taxa",
+    text: "Uma parte do valor fica com a Sua Luma para manter o sistema funcionando.",
+  },
+  {
+    n: "05",
+    title: "A indicação pode ganhar",
+    text: "Se alguém trouxe esse cliente, essa pessoa pode receber comissão.",
+  },
 ];
 
-const regrasComissao = [
-  ["Contrato de R$ 500", "12%", "R$ 60 para a plataforma", "R$ 440 para o prestador"],
-  ["Contrato de R$ 1.000", "10%", "R$ 100 para a plataforma", "R$ 900 para o prestador"],
-  ["Contrato de R$ 2.500", "8%", "R$ 200 para a plataforma", "R$ 2.300 para o prestador"],
-  ["Contrato de R$ 5.000", "6%", "R$ 300 para a plataforma", "R$ 4.700 para o prestador"],
+const servicos = [
+  {
+    icon: "🌐",
+    title: "Sites e landing pages",
+    price: "R$ 500+",
+    text: "Páginas de vendas, captura, institucionais e sites completos.",
+    badge: "Alta procura",
+  },
+  {
+    icon: "🤖",
+    title: "Automações e IA",
+    price: "R$ 790+",
+    text: "Fluxos automáticos, agentes, atendimento, processos e funis.",
+    badge: "Escalável",
+  },
+  {
+    icon: "🎬",
+    title: "Conteúdo e vídeos",
+    price: "R$ 450+",
+    text: "Cortes, edição, thumbnails, roteiros e organização de conteúdo.",
+    badge: "Recorrente",
+  },
+  {
+    icon: "📈",
+    title: "Marketing e estratégia",
+    price: "R$ 790/mês+",
+    text: "Linha editorial, calendário, planejamento e direção estratégica.",
+    badge: "Assinatura",
+  },
 ];
 
 const indicacoes = [
   {
-    tipo: "Indicação de cliente",
-    recompensa: "10% do primeiro pagamento ou cupom",
-    exemplo: "Cliente indicado contrata R$ 1.000 → indicador recebe R$ 100.",
+    icon: "🔗",
+    title: "Link de indicação",
+    text: "Cada parceiro recebe um link único para divulgar os serviços.",
   },
   {
-    tipo: "Indicação de prestador",
-    recompensa: "Crédito de propostas ou prêmio fixo",
-    exemplo: "Prestador indicado fecha primeiro contrato → indicador ganha R$ 20 ou 20 propostas.",
+    icon: "📍",
+    title: "Origem rastreada",
+    text: "O painel precisa mostrar de onde veio o lead ou cliente.",
   },
   {
-    tipo: "Indicação recorrente premium",
-    recompensa: "Comissão por mensalidade ativa",
-    exemplo: "Assinatura de R$ 49/mês → indicador ganha R$ 4,90/mês enquanto estiver ativo.",
+    icon: "💸",
+    title: "Comissão por resultado",
+    text: "A indicação ganha quando a venda ou contrato realmente acontece.",
   },
 ];
 
-const movimentos = [
-  ["Entrada", "Comissão contrato #1042", "R$ 120,00", "Pago pelo cliente", "Confirmado"],
-  ["Saída", "Prêmio indicação Ana", "R$ 30,00", "Indicação validada", "Pendente"],
-  ["Entrada", "Pacote de propostas", "R$ 19,90", "Prestador comprou créditos", "Confirmado"],
-  ["Saída", "Cupom de indicação", "R$ 15,00", "Desconto concedido", "Aplicado"],
+const proximosPassos = [
+  "Criar links únicos para cada indicação.",
+  "Mostrar quanto entrou de serviço, taxa e comissão.",
+  "Listar quais prestadores executam cada tipo de serviço.",
+  "Centralizar dúvidas do chat dentro do painel.",
+  "Conectar tudo com WhatsApp e notificações.",
+];
+
+const perguntas = [
+  {
+    q: "O que essa página mostra?",
+    a: "Ela mostra como a Sua Luma ganha dinheiro com serviços, prestadores e indicações.",
+  },
+  {
+    q: "Quem executa o trabalho?",
+    a: "O prestador. Pode ser editor, designer, desenvolvedor, estrategista ou outro profissional.",
+  },
+  {
+    q: "O que é taxa administrativa?",
+    a: "É a parte que mantém a plataforma viva: suporte, tecnologia, gestão e estrutura.",
+  },
+  {
+    q: "O que é indicação?",
+    a: "É quando alguém traz um cliente. Se esse cliente fechar, pode gerar comissão.",
+  },
 ];
 
 export default function ServicosEIndiquePage() {
-  const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
-  const [checkoutError, setCheckoutError] = useState("");
-
-  async function comprarPlano(slug: string) {
-    if (!slug || loadingSlug) return;
-
-    try {
-      setCheckoutError("");
-      setLoadingSlug(slug);
-
-      const response = await fetch("/api/stripe/checkout-service-plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data?.checkoutUrl) {
-        throw new Error(data?.error || data?.message || "Não consegui abrir o checkout agora.");
-      }
-
-      window.location.href = data.checkoutUrl;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Erro inesperado ao abrir o checkout.";
-      setCheckoutError(message);
-      setLoadingSlug(null);
-    }
-  }
-
   return (
-    <main className="serviceStudio">
+    <main className="page">
+      <div className="glow glow1" />
+      <div className="glow glow2" />
+
       <section className="hero">
-        <div>
-          <p className="eyebrow">Studio Sualuma • Serviços</p>
-          <h1>Economia interna de serviços e indicações</h1>
-          <p className="lead">
-            Painel para desenhar o modelo estilo Workana/99Freelas: plano grátis,
-            venda de propostas, prioridade, comissão por contrato e rastreio de indicações.
+        <div className="heroLeft">
+          <span className="eyebrow">Studio • Serviços e Indicações</span>
+          <h1>Dashboard da economia interna</h1>
+          <p className="heroText">
+            Aqui você entende de forma simples como os serviços entram, como os prestadores executam,
+            como a plataforma ganha e como as indicações ajudam a escalar.
           </p>
+
+          <div className="heroButtons">
+            <a href="/studio-lab" className="btnPrimary">Voltar ao Studio Lab</a>
+            <a href="/studio/indique" className="btnSecondary">Abrir área de indicações</a>
+          </div>
         </div>
 
-        <div className="heroCard">
-          <span>Modelo base</span>
-          <strong>Gratuito + créditos + comissão</strong>
-          <small>Supabase + Stripe conectados. Botões levam para checkout real.</small>
+        <div className="heroRight">
+          <div className="focusBox">
+            <span className="focusTag">Leitura rápida</span>
+            <h2>Leia assim:</h2>
+            <ul>
+              <li>1. Veja o resumo</li>
+              <li>2. Entenda o caminho do dinheiro</li>
+              <li>3. Veja os serviços</li>
+              <li>4. Veja como a indicação cresce</li>
+              <li>5. Veja o que falta fazer</li>
+            </ul>
+          </div>
         </div>
       </section>
 
-      <section className="grid four">
-        <div className="metric">
-          <span>Comissão padrão</span>
-          <strong>12%</strong>
-          <small>No plano gratuito</small>
-        </div>
-        <div className="metric">
-          <span>Propostas grátis</span>
-          <strong>3/mês</strong>
-          <small>Depois compra créditos</small>
-        </div>
-        <div className="metric">
-          <span>Prioridade</span>
-          <strong>Paga</strong>
-          <small>Destaque por proposta ou por 24h</small>
-        </div>
-        <div className="metric">
-          <span>Indicações</span>
-          <strong>Rastreáveis</strong>
-          <small>Link, cupom, entrada e saída</small>
-        </div>
-      </section>
-
-      <section className="panel">
-        <div className="panelTitle">
-          <p>Planos de prestadores</p>
-          <h2>Plano gratuito + upgrades pagos</h2>
-        </div>
-
-        {checkoutError ? (
-          <div className="checkoutFeedback">{checkoutError}</div>
-        ) : null}
-
-        <div className="plans">
-          {planosServicos.map((plano) => (
-            <article className="plan" key={plano.nome}>
-              <div>
-                <p className="tag">{plano.nome}</p>
-                <h3>{plano.preco}</h3>
-              </div>
-              <ul>
-                <li>{plano.propostas}</li>
-                <li>{plano.prioridade}</li>
-                <li>{plano.comissao}</li>
-                <li>{plano.ideal}</li>
-              </ul>
-
-              <button
-                className={`checkoutButton ${!plano.slug ? "disabled" : ""}`}
-                type="button"
-                disabled={!plano.slug || loadingSlug === plano.slug}
-                onClick={() => comprarPlano(plano.slug)}
-              >
-                {loadingSlug === plano.slug ? "Abrindo checkout..." : plano.cta}
-              </button>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid two">
-        <div className="panel">
-          <div className="panelTitle">
-            <p>Produtos avulsos</p>
-            <h2>O que o prestador pode comprar</h2>
-          </div>
-
-          <div className="table">
-            {produtosAvulsos.map(([nome, preco, detalhe]) => (
-              <div className="row" key={nome}>
-                <div>
-                  <strong>{nome}</strong>
-                  <small>{detalhe}</small>
-                </div>
-                <span>{preco}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="panelTitle">
-            <p>Comissão</p>
-            <h2>Como a plataforma ganha</h2>
-          </div>
-
-          <div className="table">
-            {regrasComissao.map(([contrato, taxa, plataforma, prestador]) => (
-              <div className="row" key={contrato}>
-                <div>
-                  <strong>{contrato}</strong>
-                  <small>{plataforma} • {prestador}</small>
-                </div>
-                <span>{taxa}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <section className="grid4">
+        {resumoCards.map((card) => (
+          <article className="card summaryCard" key={card.title}>
+            <span className="cardLabel">{card.label}</span>
+            <h3>{card.title}</h3>
+            <p>{card.text}</p>
+          </article>
+        ))}
       </section>
 
       <section className="panel">
-        <div className="panelTitle">
-          <p>Indique</p>
-          <h2>Links rastreados, prêmios, cupons e dinheiro</h2>
-        </div>
-
-        <div className="refBox">
+        <div className="panelHeader">
           <div>
-            <span>Exemplo de link rastreado</span>
-            <strong>https://sualuma.online/servicos?ref=ANA2026</strong>
-            <small>
-              Esse link identifica quem indicou, qual campanha trouxe a pessoa e
-              quanto entrou ou saiu por causa dessa indicação.
-            </small>
+            <span className="eyebrow">Mapa simples</span>
+            <h2>Como o dinheiro circula</h2>
           </div>
+          <span className="tag">Cliente → Serviço → Prestador → Plataforma → Indicação</span>
         </div>
 
-        <div className="plans compact">
-          {indicacoes.map((item) => (
-            <article className="plan" key={item.tipo}>
-              <p className="tag">{item.tipo}</p>
-              <h3>{item.recompensa}</h3>
-              <small>{item.exemplo}</small>
+        <div className="flowGrid">
+          {passos.map((item) => (
+            <article className="card flowCard" key={item.n}>
+              <div className="number">{item.n}</div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="panel">
-        <div className="panelTitle">
-          <p>Financeiro de indicações</p>
-          <h2>Rastreio de entrada e saída</h2>
+      <section className="split">
+        <div className="panel">
+          <div className="panelHeader">
+            <div>
+              <span className="eyebrow">Serviços</span>
+              <h2>O que gera receita</h2>
+            </div>
+          </div>
+
+          <div className="serviceGrid">
+            {servicos.map((item) => (
+              <article className="card serviceCard" key={item.title}>
+                <div className="serviceTop">
+                  <span className="serviceIcon">{item.icon}</span>
+                  <span className="miniTag">{item.badge}</span>
+                </div>
+                <h3>{item.title}</h3>
+                <strong>{item.price}</strong>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
         </div>
 
-        <div className="table">
-          {movimentos.map(([tipo, origem, valor, detalhe, status]) => (
-            <div className="row money" key={origem}>
-              <div>
-                <strong>{tipo} • {origem}</strong>
-                <small>{detalhe}</small>
-              </div>
-              <span>{valor}</span>
-              <em>{status}</em>
+        <aside className="panel sidePanel">
+          <span className="eyebrow">Resumo infantil</span>
+          <h2>Em português claro</h2>
+
+          <div className="plainBox">
+            <p><b>1.</b> O cliente pede ajuda.</p>
+            <p><b>2.</b> A Sua Luma organiza.</p>
+            <p><b>3.</b> O prestador faz.</p>
+            <p><b>4.</b> O cliente recebe.</p>
+            <p><b>5.</b> A plataforma ganha uma parte.</p>
+            <p><b>6.</b> Quem indicou também pode ganhar.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section className="split reverse">
+        <div className="panel">
+          <div className="panelHeader">
+            <div>
+              <span className="eyebrow">Indicações</span>
+              <h2>Como crescer sem depender só de anúncios</h2>
             </div>
+          </div>
+
+          <div className="refGrid">
+            {indicacoes.map((item) => (
+              <article className="card refCard" key={item.title}>
+                <span className="refIcon">{item.icon}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panelHeader">
+            <div>
+              <span className="eyebrow">Próximos passos</span>
+              <h2>O que ainda falta</h2>
+            </div>
+          </div>
+
+          <div className="todoList">
+            {proximosPassos.map((item, index) => (
+              <div className="todoItem" key={item}>
+                <span>{index + 1}</span>
+                <p>{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panelHeader">
+          <div>
+            <span className="eyebrow">Perguntas rápidas</span>
+            <h2>Sem confusão</h2>
+          </div>
+        </div>
+
+        <div className="faqGrid">
+          {perguntas.map((item) => (
+            <article className="card faqCard" key={item.q}>
+              <h3>{item.q}</h3>
+              <p>{item.a}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="panel next">
-        <div className="panelTitle">
-          <p>Próxima conexão</p>
-          <h2>Tabelas que vamos criar no Supabase</h2>
-        </div>
+      <style jsx>{`
+        * {
+          box-sizing: border-box;
+        }
 
-        <div className="chips">
-          <span>service_plans</span>
-          <span>proposal_credits</span>
-          <span>service_contracts</span>
-          <span>platform_commissions</span>
-          <span>referral_links</span>
-          <span>referral_ledger</span>
-        </div>
-      </section>
-
-      <style>{`
-        .serviceStudio {
+        .page {
           min-height: 100vh;
-          padding: 44px 24px 80px;
-          color: #f8fbff;
+          padding: 28px 18px 80px;
+          color: #f5f3ff;
           background:
-            radial-gradient(circle at top left, rgba(255, 0, 190, .22), transparent 34%),
-            radial-gradient(circle at top right, rgba(0, 240, 255, .16), transparent 28%),
-            linear-gradient(135deg, #070815, #08101f 55%, #040610);
-          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            radial-gradient(circle at top left, rgba(168, 85, 247, 0.22), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.18), transparent 30%),
+            linear-gradient(135deg, #05050a 0%, #0b0714 45%, #12081f 100%);
+          position: relative;
+          overflow: hidden;
+          font-family:
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        }
+
+        .glow {
+          position: fixed;
+          width: 340px;
+          height: 340px;
+          border-radius: 999px;
+          filter: blur(60px);
+          opacity: 0.22;
+          pointer-events: none;
+          animation: floaty 7s ease-in-out infinite alternate;
+        }
+
+        .glow1 {
+          top: 70px;
+          left: -120px;
+          background: #a855f7;
+        }
+
+        .glow2 {
+          right: -120px;
+          bottom: 120px;
+          background: #7c3aed;
+          animation-delay: 1.5s;
+        }
+
+        @keyframes floaty {
+          from { transform: translateY(0px) scale(1); }
+          to { transform: translateY(-18px) scale(1.08); }
+        }
+
+        .hero,
+        .grid4,
+        .panel,
+        .split {
+          width: min(1180px, 100%);
+          margin: 0 auto 18px;
+          position: relative;
+          z-index: 1;
         }
 
         .hero {
-          max-width: 1180px;
-          margin: 0 auto 24px;
           display: grid;
-          grid-template-columns: 1.4fr .8fr;
-          gap: 22px;
-          align-items: stretch;
-        }
-
-        .eyebrow, .panelTitle p {
-          margin: 0 0 10px;
-          text-transform: uppercase;
-          letter-spacing: .2em;
-          color: #7ff7ff;
-          font-size: 12px;
-          font-weight: 800;
-        }
-
-        h1 {
-          margin: 0;
-          font-size: clamp(38px, 6vw, 76px);
-          line-height: .95;
-          letter-spacing: -0.06em;
-        }
-
-        .lead {
-          max-width: 760px;
-          color: #b8c0d8;
-          font-size: 20px;
-          line-height: 1.6;
-        }
-
-        .heroCard, .panel, .metric {
-          border: 1px solid rgba(255,255,255,.12);
-          background: rgba(10, 13, 31, .74);
-          box-shadow: 0 24px 80px rgba(0,0,0,.35);
-          border-radius: 34px;
-        }
-
-        .heroCard {
-          padding: 34px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-        }
-
-        .heroCard span, .metric span {
-          color: #ff8edf;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: .12em;
-          font-size: 12px;
-        }
-
-        .heroCard strong {
-          display: block;
-          margin: 12px 0;
-          font-size: 30px;
-          line-height: 1.05;
-        }
-
-        small {
-          color: #9ea7c2;
-          line-height: 1.5;
-        }
-
-        .grid {
-          max-width: 1180px;
-          margin: 0 auto 22px;
-          display: grid;
+          grid-template-columns: 1.5fr 0.8fr;
           gap: 18px;
         }
 
-        .four { grid-template-columns: repeat(4, 1fr); }
-        .two { grid-template-columns: repeat(2, 1fr); }
-
-        .metric {
-          padding: 22px;
-        }
-
-        .metric strong {
-          display: block;
-          font-size: 32px;
-          margin: 8px 0;
-        }
-
+        .heroLeft,
+        .heroRight,
         .panel {
-          max-width: 1180px;
-          margin: 0 auto 22px;
-          padding: 28px;
+          border-radius: 28px;
+          border: 1px solid rgba(196, 181, 253, 0.16);
+          background: linear-gradient(180deg, rgba(14, 10, 24, 0.95), rgba(8, 7, 15, 0.9));
+          box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+          backdrop-filter: blur(14px);
         }
 
-        .panelTitle h2 {
-          margin: 0 0 20px;
-          font-size: clamp(26px, 4vw, 44px);
-          letter-spacing: -0.04em;
+        .heroLeft {
+          padding: 34px;
         }
 
-        .plans {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 16px;
+        .heroRight {
+          padding: 24px;
+          display: flex;
+          align-items: stretch;
         }
 
-        .plans.compact {
-          grid-template-columns: repeat(3, 1fr);
-          margin-top: 18px;
-        }
-
-        .plan {
-          border: 1px solid rgba(255,255,255,.12);
-          background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-          border-radius: 26px;
-          padding: 22px;
-        }
-
-        .tag {
-          display: inline-flex;
-          padding: 8px 12px;
-          border-radius: 999px;
-          background: rgba(255, 43, 184, .16);
-          color: #ff9ee4;
-          font-weight: 900;
-          margin: 0 0 12px;
-        }
-
-        .plan h3 {
-          margin: 0 0 16px;
-          font-size: 25px;
-        }
-
-        .checkoutFeedback {
-          margin: 0 0 18px;
-          padding: 14px 16px;
-          border-radius: 18px;
-          background: rgba(255, 54, 122, .14);
-          border: 1px solid rgba(255, 54, 122, .28);
-          color: #ffd8e5;
-          font-weight: 800;
-        }
-
-        .checkoutButton {
+        .focusBox {
           width: 100%;
-          margin-top: 18px;
-          border: 0;
-          border-radius: 18px;
-          padding: 14px 16px;
-          color: #06101f;
-          background: linear-gradient(135deg, #7ff7ff, #ff9ee4);
-          font-weight: 950;
-          cursor: pointer;
-          box-shadow: 0 18px 40px rgba(0, 240, 255, .18);
+          border-radius: 22px;
+          padding: 22px;
+          background: rgba(168, 85, 247, 0.08);
+          border: 1px solid rgba(196, 181, 253, 0.18);
         }
 
-        .checkoutButton:hover:not(:disabled) {
-          transform: translateY(-1px);
-        }
-
-        .checkoutButton:disabled {
-          cursor: not-allowed;
-          opacity: .72;
-        }
-
-        .checkoutButton.disabled {
-          color: #dce7ff;
-          background: rgba(255,255,255,.08);
-          border: 1px solid rgba(255,255,255,.12);
-          box-shadow: none;
-        }
-
-        ul {
+        .focusBox ul {
+          margin: 14px 0 0;
           padding-left: 18px;
-          margin: 0;
-          color: #cdd4ea;
+          color: #ddd6fe;
           line-height: 1.8;
         }
 
-        .table {
+        .focusTag,
+        .tag,
+        .miniTag,
+        .cardLabel {
+          display: inline-flex;
+          align-items: center;
+          width: fit-content;
+          border-radius: 999px;
+          padding: 7px 12px;
+          font-size: 0.75rem;
+          font-weight: 800;
+        }
+
+        .focusTag,
+        .tag {
+          color: #f3e8ff;
+          background: rgba(168, 85, 247, 0.14);
+          border: 1px solid rgba(192, 132, 252, 0.25);
+        }
+
+        .miniTag,
+        .cardLabel {
+          color: #ddd6fe;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .eyebrow {
+          display: inline-block;
+          margin-bottom: 10px;
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          font-weight: 900;
+          color: #c4b5fd;
+        }
+
+        h1, h2, h3, p {
+          margin-top: 0;
+        }
+
+        h1 {
+          margin-bottom: 14px;
+          font-size: clamp(2.2rem, 6vw, 4.6rem);
+          line-height: 0.95;
+          letter-spacing: -0.06em;
+        }
+
+        h2 {
+          margin-bottom: 10px;
+          font-size: clamp(1.35rem, 3vw, 2.1rem);
+          letter-spacing: -0.04em;
+        }
+
+        h3 {
+          margin-bottom: 8px;
+          font-size: 1.02rem;
+        }
+
+        .heroText,
+        .card p,
+        .plainBox p,
+        .todoItem p {
+          color: #d6d3f1;
+          line-height: 1.7;
+        }
+
+        .heroButtons {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 24px;
+        }
+
+        .btnPrimary,
+        .btnSecondary {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 48px;
+          padding: 13px 18px;
+          border-radius: 999px;
+          font-weight: 800;
+          text-decoration: none;
+          transition: 0.25s ease;
+        }
+
+        .btnPrimary {
+          color: #ffffff;
+          background: linear-gradient(135deg, #7c3aed, #a855f7);
+          box-shadow: 0 16px 40px rgba(124, 58, 237, 0.3);
+        }
+
+        .btnSecondary {
+          color: #f5f3ff;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btnPrimary:hover,
+        .btnSecondary:hover {
+          transform: translateY(-2px);
+        }
+
+        .grid4 {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .card {
+          border-radius: 22px;
+          border: 1px solid rgba(196, 181, 253, 0.12);
+          background: rgba(255, 255, 255, 0.03);
+          padding: 20px;
+          transition: 0.25s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(192, 132, 252, 0.28);
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .summaryCard h3 {
+          margin-top: 10px;
+        }
+
+        .panel {
+          padding: 24px;
+        }
+
+        .panelHeader {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 14px;
+          margin-bottom: 18px;
+        }
+
+        .flowGrid {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .flowCard .number {
+          width: 46px;
+          height: 46px;
+          display: grid;
+          place-items: center;
+          border-radius: 14px;
+          margin-bottom: 14px;
+          font-size: 0.95rem;
+          font-weight: 900;
+          color: #ffffff;
+          background: linear-gradient(135deg, #7c3aed, #a855f7);
+        }
+
+        .split {
+          display: grid;
+          grid-template-columns: 1.2fr 0.8fr;
+          gap: 18px;
+          align-items: start;
+        }
+
+        .serviceGrid,
+        .refGrid,
+        .faqGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .serviceTop {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin-bottom: 12px;
+        }
+
+        .serviceIcon,
+        .refIcon {
+          font-size: 1.9rem;
+        }
+
+        .serviceCard strong {
+          display: block;
+          margin-bottom: 10px;
+          color: #e9d5ff;
+          font-size: 1rem;
+        }
+
+        .sidePanel {
+          position: sticky;
+          top: 16px;
+        }
+
+        .plainBox {
+          display: grid;
+          gap: 10px;
+        }
+
+        .plainBox p {
+          margin: 0;
+          padding: 12px 14px;
+          border-radius: 16px;
+          background: rgba(168, 85, 247, 0.08);
+          border: 1px solid rgba(196, 181, 253, 0.12);
+        }
+
+        .todoList {
           display: grid;
           gap: 12px;
         }
 
-        .row {
+        .todoItem {
           display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 18px;
-          align-items: center;
-          padding: 16px 18px;
-          border-radius: 20px;
-          background: rgba(255,255,255,.06);
-          border: 1px solid rgba(255,255,255,.08);
+          grid-template-columns: 40px 1fr;
+          gap: 12px;
+          align-items: start;
+          padding: 14px;
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(196, 181, 253, 0.1);
         }
 
-        .row strong {
-          display: block;
-          margin-bottom: 4px;
-        }
-
-        .row span {
+        .todoItem span {
+          width: 40px;
+          height: 40px;
+          display: grid;
+          place-items: center;
+          border-radius: 14px;
           font-weight: 900;
-          color: #7ff7ff;
-          white-space: nowrap;
+          background: linear-gradient(135deg, #7c3aed, #a855f7);
+          color: #fff;
         }
 
-        .row.money {
-          grid-template-columns: 1fr auto auto;
+        .todoItem p {
+          margin: 0;
         }
 
-        .row em {
-          font-style: normal;
-          color: #ff9ee4;
-          border: 1px solid rgba(255, 43, 184, .22);
-          border-radius: 999px;
-          padding: 8px 10px;
-          white-space: nowrap;
+        @media (max-width: 980px) {
+          .hero,
+          .split,
+          .grid4,
+          .flowGrid,
+          .serviceGrid,
+          .refGrid,
+          .faqGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .panelHeader {
+            display: grid;
+          }
+
+          .sidePanel {
+            position: static;
+          }
         }
 
-        .refBox {
-          padding: 22px;
-          border-radius: 24px;
-          background: linear-gradient(135deg, rgba(124,58,237,.35), rgba(6,182,212,.18));
-          border: 1px solid rgba(255,255,255,.14);
-          word-break: break-word;
-        }
+        @media (max-width: 640px) {
+          .page {
+            padding: 16px 12px 60px;
+          }
 
-        .refBox span {
-          display: block;
-          color: #7ff7ff;
-          font-weight: 900;
-          margin-bottom: 8px;
-        }
+          .heroLeft,
+          .heroRight,
+          .panel {
+            border-radius: 22px;
+            padding: 18px;
+          }
 
-        .refBox strong {
-          display: block;
-          font-size: 20px;
-          margin-bottom: 8px;
-        }
-
-        .chips {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-        }
-
-        .chips span {
-          padding: 12px 14px;
-          border-radius: 999px;
-          background: rgba(255,255,255,.08);
-          border: 1px solid rgba(255,255,255,.12);
-          color: #dce7ff;
-          font-weight: 800;
-        }
-
-        @media (max-width: 900px) {
-          .serviceStudio { padding: 26px 14px 70px; }
-          .hero, .two, .four { grid-template-columns: 1fr; }
-          .plans, .plans.compact { grid-template-columns: 1fr; }
-          .panel, .heroCard { border-radius: 26px; padding: 20px; }
-          .row, .row.money { grid-template-columns: 1fr; }
-          .lead { font-size: 17px; }
+          h1 {
+            font-size: 2.35rem;
+          }
         }
       `}</style>
     </main>
