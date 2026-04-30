@@ -42,14 +42,13 @@ function makeCode(name: string) {
 }
 
 function buildTrackedUrl(destinationUrl: string, code: string) {
-  try {
-    const url = new URL(destinationUrl);
-    url.searchParams.set("ref", code);
-    return url.toString();
-  } catch {
-    const separator = destinationUrl.includes("?") ? "&" : "?";
-    return `${destinationUrl}${separator}ref=${encodeURIComponent(code)}`;
-  }
+  const baseUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "https://sualuma.online";
+
+  const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  return `${cleanBaseUrl}/r/${encodeURIComponent(code)}`;
 }
 
 function mapLink(row: any) {
