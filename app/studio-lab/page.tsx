@@ -2211,10 +2211,73 @@ function LiveHealthView() {
 
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
+  const [stripeLiveData, setStripeLiveData] = useState<any>(null);
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
   const [selectedSubdomain, setSelectedSubdomain] = useState(subdomainRows[0]);
 
-  const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || tabs[0], [activeView]);
+  
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadStripeData() {
+      try {
+        const response = await fetch("/api/studio/dashboard", {
+          cache: "no-store",
+        });
+
+        const payload = await response.json();
+        const liveStripe = payload?.data?.stripeData;
+
+        if (!cancelled && liveStripe) {
+          setStripeLiveData(liveStripe);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar stripeData:", error);
+      }
+    }
+
+    loadStripeData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const liveStripeDashboardCards =
+    Array.isArray(stripeLiveData?.stripeDashboardCards) && stripeLiveData.stripeDashboardCards.length > 0
+      ? stripeLiveData.stripeDashboardCards
+      : stripeDashboardCards;
+
+  const liveStripePaymentRows =
+    Array.isArray(stripeLiveData?.stripePaymentRows) && stripeLiveData.stripePaymentRows.length > 0
+      ? stripeLiveData.stripePaymentRows
+      : stripePaymentRows;
+
+  const liveStripeSubscriptionRows =
+    Array.isArray(stripeLiveData?.stripeSubscriptionRows) && stripeLiveData.stripeSubscriptionRows.length > 0
+      ? stripeLiveData.stripeSubscriptionRows
+      : stripeSubscriptionRows;
+
+  const liveStripeActionRows =
+    Array.isArray(stripeLiveData?.stripeActionRows) && stripeLiveData.stripeActionRows.length > 0
+      ? stripeLiveData.stripeActionRows
+      : stripeActionRows;
+
+  const liveStripeAlertRows =
+    Array.isArray(stripeLiveData?.stripeAlertRows) && stripeLiveData.stripeAlertRows.length > 0
+      ? stripeLiveData.stripeAlertRows
+      : stripeAlertRows;
+
+  const liveStripeRevenueBars =
+    Array.isArray(stripeLiveData?.stripeRevenueBars) && stripeLiveData.stripeRevenueBars.length > 0
+      ? stripeLiveData.stripeRevenueBars
+      : stripeRevenueBars;
+
+  const liveStripeSummary = stripeLiveData?.summary || {};
+  const liveStripeHealthScore =
+    typeof liveStripeSummary.healthScore === "number" ? liveStripeSummary.healthScore : 0;
+
+const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || tabs[0], [activeView]);
 
   const [financeLiveData, setFinanceLiveData] = useState<any>(null);
 
@@ -2911,12 +2974,12 @@ export default function StudioLabPage() {
           <>
             <section className="stripe-hero">
               <div className="stripe-main-card">
-                <PanelTitle eyebrow="Stripe / Pagamentos" title="Central de assinaturas, cobranças e checkout" action="Conectar Stripe" />
+                <PanelTitle eyebrow="Stripe / Pagamentos" title="Central de assinaturas, cobranças e checkout" action={stripeLiveData ? "Banco conectado" : "Conectar Stripe"} />
 
                 <div className="stripe-big-number">
                   <small>Receita processada no mês</small>
-                  <strong>R$ 32.480,00</strong>
-                  <span>Dados demonstrativos até conectar a API do Stripe com segurança no backend.</span>
+                  <strong>{liveStripeDashboardCards?.[0]?.value || "R$ 0,00"}</strong>
+                  <span>{stripeLiveData ? "Dados vindos do banco do Studio. A integração real do Stripe entra quando a chave secreta for configurada." : "Dados demonstrativos até conectar a API do Stripe com segurança no backend."}</span>
                 </div>
 
                 <div className="stripe-mini-grid">
@@ -2952,7 +3015,7 @@ export default function StudioLabPage() {
             </section>
 
             <section className="metric-grid stripe-metrics">
-              {stripeDashboardCards.map((item) => (
+              {liveStripeDashboardCards.map((item: any) => (
                 <MetricCard key={item.title} title={item.title} value={item.value} detail={item.detail} tone={item.tone} />
               ))}
             </section>
@@ -2960,14 +3023,14 @@ export default function StudioLabPage() {
             <section className="lower-grid">
               <div className="panel">
                 <PanelTitle eyebrow="Pagamentos" title="Últimos eventos importantes" action="Ver eventos" />
-                {stripePaymentRows.map((item) => (
+                {liveStripePaymentRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
 
               <div className="panel">
                 <PanelTitle eyebrow="Assinaturas" title="Planos e recorrência" />
-                {stripeSubscriptionRows.map((item) => (
+                {liveStripeSubscriptionRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
@@ -2977,7 +3040,7 @@ export default function StudioLabPage() {
               <div className="panel">
                 <PanelTitle eyebrow="Distribuição de receita" title="Receita por plano/produto" />
                 <div className="stripe-bars">
-                  {stripeRevenueBars.map((item) => (
+                  {liveStripeRevenueBars.map((item: any) => (
                     <div key={item.label} className={`stripe-bar ${item.tone}`}>
                       <div>
                         <strong>{item.label}</strong>
@@ -2991,7 +3054,7 @@ export default function StudioLabPage() {
 
               <div className="panel">
                 <PanelTitle eyebrow="Ações rápidas" title="Controle sem abrir o Stripe" />
-                {stripeActionRows.map((item) => (
+                {liveStripeActionRows.map((item: any) => (
                   <DataRow key={item.title} title={item.title} detail={item.detail} value={item.value} tone={item.tone} />
                 ))}
               </div>
@@ -3000,7 +3063,7 @@ export default function StudioLabPage() {
             <section className="panel full">
               <PanelTitle eyebrow="Alertas da Mia" title="O que fazer para recuperar e aumentar receita" />
               <div className="stripe-alert-grid">
-                {stripeAlertRows.map((item) => (
+                {liveStripeAlertRows.map((item: any) => (
                   <div key={item.title} className={`stripe-alert-card ${item.tone}`}>
                     <strong>{item.title}</strong>
                     <p>{item.detail}</p>
