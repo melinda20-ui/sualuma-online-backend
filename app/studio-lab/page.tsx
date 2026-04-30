@@ -2248,6 +2248,219 @@ function LiveHealthView() {
 }
 
 
+
+type StudioShortcut = {
+  id: string;
+  title: string;
+  url: string;
+  createdAt: string;
+};
+
+function normalizeStudioShortcutUrl(rawUrl: string) {
+  const cleanUrl = rawUrl.trim();
+
+  if (!cleanUrl) return "";
+  if (cleanUrl.startsWith("/") || cleanUrl.startsWith("#")) return cleanUrl;
+  if (/^https?:\/\//i.test(cleanUrl)) return cleanUrl;
+
+  return `https://${cleanUrl}`;
+}
+
+function StudioQuickShortcutsPanel() {
+  const [ready, setReady] = useState(false);
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+  const [shortcuts, setShortcuts] = useState<StudioShortcut[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("studio_quick_shortcuts");
+      const parsed = saved ? JSON.parse(saved) : [];
+
+      if (Array.isArray(parsed)) {
+        setShortcuts(parsed);
+      }
+    } catch {
+      setShortcuts([]);
+    } finally {
+      setReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    window.localStorage.setItem("studio_quick_shortcuts", JSON.stringify(shortcuts));
+  }, [ready, shortcuts]);
+
+  function addShortcut(event: { preventDefault: () => void }) {
+    event.preventDefault();
+
+    const normalizedUrl = normalizeStudioShortcutUrl(url);
+    const cleanTitle = title.trim() || normalizedUrl.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+
+    if (!normalizedUrl) return;
+
+    const newShortcut: StudioShortcut = {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      title: cleanTitle,
+      url: normalizedUrl,
+      createdAt: new Date().toISOString(),
+    };
+
+    setShortcuts((current) => [newShortcut, ...current].slice(0, 30));
+    setTitle("");
+    setUrl("");
+  }
+
+  function removeShortcut(id: string) {
+    setShortcuts((current) => current.filter((item) => item.id !== id));
+  }
+
+  return (
+    <section className="panel" style={{ marginBottom: 24 }}>
+      <div style={{ display: "grid", gap: 18 }}>
+        <PanelTitle
+          eyebrow="Acesso rápido"
+          title="Atalhos"
+          action={`${shortcuts.length} salvos`}
+        />
+
+        <form
+          onSubmit={addShortcut}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "minmax(140px, 220px) 1fr auto",
+            gap: 10,
+            alignItems: "center",
+          }}
+        >
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            placeholder="Nome do botão"
+            style={{
+              width: "100%",
+              border: "1px solid rgba(148,163,184,.26)",
+              background: "rgba(15,23,42,.72)",
+              color: "#fff",
+              borderRadius: 16,
+              padding: "13px 14px",
+              outline: "none",
+              fontWeight: 700,
+            }}
+          />
+
+          <input
+            value={url}
+            onChange={(event) => setUrl(event.target.value)}
+            placeholder="Cole o link aqui. Ex: https://studio.sualuma.online/studio/catalogo-paginas"
+            style={{
+              width: "100%",
+              border: "1px solid rgba(148,163,184,.26)",
+              background: "rgba(15,23,42,.72)",
+              color: "#fff",
+              borderRadius: 16,
+              padding: "13px 14px",
+              outline: "none",
+              fontWeight: 700,
+            }}
+          />
+
+          <button
+            type="submit"
+            style={{
+              border: 0,
+              borderRadius: 16,
+              padding: "13px 18px",
+              background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
+              color: "#fff",
+              fontWeight: 900,
+              cursor: "pointer",
+              boxShadow: "0 16px 36px rgba(124,58,237,.28)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            + Adicionar
+          </button>
+        </form>
+
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 10,
+          }}
+        >
+          {shortcuts.length === 0 ? (
+            <div
+              style={{
+                border: "1px dashed rgba(148,163,184,.35)",
+                background: "rgba(15,23,42,.35)",
+                color: "rgba(226,232,240,.78)",
+                borderRadius: 18,
+                padding: "16px 18px",
+                width: "100%",
+                fontWeight: 700,
+              }}
+            >
+              Nenhum atalho salvo ainda. Cole um link acima para transformar em botão.
+            </div>
+          ) : (
+            shortcuts.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  border: "1px solid rgba(148,163,184,.24)",
+                  background: "rgba(255,255,255,.07)",
+                  borderRadius: 999,
+                  padding: "7px 8px 7px 14px",
+                }}
+              >
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    color: "#fff",
+                    textDecoration: "none",
+                    fontWeight: 900,
+                    fontSize: 13,
+                  }}
+                >
+                  🔗 {item.title}
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => removeShortcut(item.id)}
+                  title="Remover atalho"
+                  style={{
+                    border: 0,
+                    width: 24,
+                    height: 24,
+                    borderRadius: 999,
+                    background: "rgba(248,113,113,.18)",
+                    color: "#fecaca",
+                    cursor: "pointer",
+                    fontWeight: 900,
+                    lineHeight: "24px",
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function StudioLabPage() {
   const [activeView, setActiveView] = useState<StudioView>("visao");
   const [stripeLiveData, setStripeLiveData] = useState<any>(null);
@@ -2464,6 +2677,8 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
 
         {activeView === "visao" && (
           <>
+
+          <StudioQuickShortcutsPanel />
             <section className="hero-grid">
               <div className="hero-panel">
                 <PanelTitle
