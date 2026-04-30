@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 const planosServicos = [
   {
     nome: "Gratuito",
@@ -6,30 +10,38 @@ const planosServicos = [
     prioridade: "Sem prioridade",
     comissao: "12% por contrato fechado",
     ideal: "Prestador novo testando a plataforma",
+    slug: "",
+    cta: "Plano gratuito",
   },
   {
-    nome: "Impulso",
-    preco: "R$ 19/mês",
-    propostas: "25 propostas por mês",
-    prioridade: "Selo ativo + melhor posição",
+    nome: "Pacote de Propostas",
+    preco: "R$ 19,90",
+    propostas: "10 propostas extras",
+    prioridade: "Sem mensalidade",
+    comissao: "12% por contrato fechado",
+    ideal: "Prestador que quer comprar créditos avulsos",
+    slug: "pacote-propostas",
+    cta: "Comprar propostas",
+  },
+  {
+    nome: "Prestador Prioritário",
+    preco: "R$ 49,90/mês",
+    propostas: "40 propostas por mês",
+    prioridade: "Prioridade alta na listagem",
     comissao: "10% por contrato fechado",
     ideal: "Freelancer que quer aparecer mais",
+    slug: "prioritario",
+    cta: "Assinar prioridade",
   },
   {
-    nome: "Profissional",
-    preco: "R$ 49/mês",
-    propostas: "80 propostas por mês",
-    prioridade: "Prioridade alta nas oportunidades",
-    comissao: "8% por contrato fechado",
-    ideal: "Prestador recorrente",
-  },
-  {
-    nome: "Parceiro Pro",
+    nome: "Agência / Time",
     preco: "R$ 97/mês",
-    propostas: "Propostas ampliadas com anti-spam",
-    prioridade: "Topo, destaque e selo parceiro",
-    comissao: "6% por contrato fechado",
+    propostas: "120 propostas por mês",
+    prioridade: "Prioridade máxima",
+    comissao: "8% por contrato fechado",
     ideal: "Agência, especialista ou prestador forte",
+    slug: "agencia-time",
+    cta: "Assinar plano agência",
   },
 ];
 
@@ -73,6 +85,36 @@ const movimentos = [
 ];
 
 export default function ServicosEIndiquePage() {
+  const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
+
+  async function comprarPlano(slug: string) {
+    if (!slug || loadingSlug) return;
+
+    try {
+      setCheckoutError("");
+      setLoadingSlug(slug);
+
+      const response = await fetch("/api/stripe/checkout-service-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data?.checkoutUrl) {
+        throw new Error(data?.error || data?.message || "Não consegui abrir o checkout agora.");
+      }
+
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erro inesperado ao abrir o checkout.";
+      setCheckoutError(message);
+      setLoadingSlug(null);
+    }
+  }
+
   return (
     <main className="serviceStudio">
       <section className="hero">
@@ -88,7 +130,7 @@ export default function ServicosEIndiquePage() {
         <div className="heroCard">
           <span>Modelo base</span>
           <strong>Gratuito + créditos + comissão</strong>
-          <small>Próximo passo: conectar Supabase + Stripe + rastreio por link.</small>
+          <small>Supabase + Stripe conectados. Botões levam para checkout real.</small>
         </div>
       </section>
 
@@ -121,6 +163,10 @@ export default function ServicosEIndiquePage() {
           <h2>Plano gratuito + upgrades pagos</h2>
         </div>
 
+        {checkoutError ? (
+          <div className="checkoutFeedback">{checkoutError}</div>
+        ) : null}
+
         <div className="plans">
           {planosServicos.map((plano) => (
             <article className="plan" key={plano.nome}>
@@ -134,6 +180,15 @@ export default function ServicosEIndiquePage() {
                 <li>{plano.comissao}</li>
                 <li>{plano.ideal}</li>
               </ul>
+
+              <button
+                className={`checkoutButton ${!plano.slug ? "disabled" : ""}`}
+                type="button"
+                disabled={!plano.slug || loadingSlug === plano.slug}
+                onClick={() => comprarPlano(plano.slug)}
+              >
+                {loadingSlug === plano.slug ? "Abrindo checkout..." : plano.cta}
+              </button>
             </article>
           ))}
         </div>
@@ -384,6 +439,45 @@ export default function ServicosEIndiquePage() {
         .plan h3 {
           margin: 0 0 16px;
           font-size: 25px;
+        }
+
+        .checkoutFeedback {
+          margin: 0 0 18px;
+          padding: 14px 16px;
+          border-radius: 18px;
+          background: rgba(255, 54, 122, .14);
+          border: 1px solid rgba(255, 54, 122, .28);
+          color: #ffd8e5;
+          font-weight: 800;
+        }
+
+        .checkoutButton {
+          width: 100%;
+          margin-top: 18px;
+          border: 0;
+          border-radius: 18px;
+          padding: 14px 16px;
+          color: #06101f;
+          background: linear-gradient(135deg, #7ff7ff, #ff9ee4);
+          font-weight: 950;
+          cursor: pointer;
+          box-shadow: 0 18px 40px rgba(0, 240, 255, .18);
+        }
+
+        .checkoutButton:hover:not(:disabled) {
+          transform: translateY(-1px);
+        }
+
+        .checkoutButton:disabled {
+          cursor: not-allowed;
+          opacity: .72;
+        }
+
+        .checkoutButton.disabled {
+          color: #dce7ff;
+          background: rgba(255,255,255,.08);
+          border: 1px solid rgba(255,255,255,.12);
+          box-shadow: none;
         }
 
         ul {
