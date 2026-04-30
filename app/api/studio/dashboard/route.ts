@@ -408,6 +408,246 @@ async function readStudioStripeData(): Promise<any> {
   }
 }
 
+
+function formatStripeMoney(amount: unknown, currency: string = "brl") {
+  const numberValue = Number(amount || 0) / 100;
+
+  return numberValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: (currency || "brl").toUpperCase(),
+  });
+}
+
+function stripeStatusLabel(status: unknown) {
+  const labels: Record<string, string> = {
+    succeeded: "pago",
+    processing: "processando",
+    requires_payment_method: "aguardando pagamento",
+    requires_confirmation: "aguardando confirmação",
+    canceled: "cancelado",
+    active: "ativa",
+    trialing: "em teste",
+    past_due: "pagamento atrasado",
+    unpaid: "não paga",
+    incomplete: "incompleta",
+    incomplete_expired: "expirada",
+  };
+
+  const key = String(status || "");
+  return labels[key] || key || "sem status";
+}
+
+async function enrichStripeDataWithLiveApi(baseData: any): Promise<any> {
+  const secret = process.env.STRIPE_SECRET_KEY;
+
+  if (!secret) {
+    return baseData;
+  }
+
+  try {
+    const StripeModule: any = await import("stripe");
+    const StripeClient: any = StripeModule.default || StripeModule;
+    const stripe = new StripeClient(secret);
+
+    const now = new Date();
+    const startOfMonth = Math.floor(new Date(now.getFullYear(), now.getMonth(), 1).getTime() / 1000);
+
+    const [
+      account,
+      balance,
+      recentPayments,
+      monthPayments,
+      subscriptions,
+      customers,
+    ] = await Promise.all([
+      stripe.accounts.retrieve(),
+      stripe.balance.retrieve(),
+      stripe.paymentIntents.list({ limit: 5 }),
+      stripe.paymentIntents.list({ limit: 100, created: { gte: startOfMonth } }),
+      stripe.subscriptions.list({ limit: 20, status: "all" }),
+      stripe.customers.list({ limit: 20 }),
+    ]);
+
+    const currency =
+      account?.default_currency ||
+      balance?.available?.[0]?.currency ||
+      balance?.pending?.[0]?.currency ||
+      "brl";
+
+    const availableBalance = balance?.available?.find((item: any) => item.currency === currency) || balance?.available?.[0];
+    const pendingBalance = balance?.pending?.find((item: any) => item.currency === currency) || balance?.pending?.[0];
+
+    const monthRevenue = monthPayments.data
+      .filter((payment: any) => payment.status === "succeeded")
+      .reduce((total: number, payment: any) => total + Number(payment.amount_received || payment.amount || 0), 0);
+
+    const activeSubscriptions = subscriptions.data.filter((sub: any) =>
+      ["active", "trialing", "past_due"].includes(sub.status)
+    );
+
+    const trialingSubscriptions = subscriptions.data.filter((sub: any) => sub.status === "trialing");
+    const paidPayments = recentPayments.data.filter((payment: any) => payment.status === "succeeded");
+
+    const accountName =
+      account?.business_profile?.name ||
+      account?.settings?.dashboard?.display_name ||
+      account?.email ||
+      "Conta Stripe";
+
+    const stripeMode = secret.startsWith("sk_live") ? "produção" : "teste";
+
+    const paymentRows = recentPayments.data.length > 0
+      ? recentPayments.data.slice(0, 5).map((payment: any) => ({
+          title: `Pagamento ${payment.id}`,
+          detail: `Criado em ${new Date(payment.created * 1000).toLocaleDateString("pt-BR")} · ${stripeStatusLabel(payment.status)}`,
+          value: formatStripeMoney(payment.amount_received || payment.amount || 0, payment.currency || currency),
+          tone: payment.status === "succeeded" ? "green" as Tone : payment.status === "canceled" ? "red" as Tone : "yellow" as Tone,
+        }))
+      : [
+          {
+            title: "Nenhum pagamento recebido ainda",
+            detail: "A Stripe está conectada, mas ainda não existem pagamentos confirmados.",
+            value: formatStripeMoney(0, currency),
+            tone: "yellow" as Tone,
+          },
+        ];
+
+    const subscriptionRows = subscriptions.data.length > 0
+      ? subscriptions.data.slice(0, 5).map((subscription: any) => ({
+          title: `Assinatura ${subscription.id}`,
+          detail: `Cliente ${typeof subscription.customer === "string" ? subscription.customer : subscription.customer?.id || "sem cliente"} · ${stripeStatusLabel(subscription.status)}`,
+          value: stripeStatusLabel(subscription.status),
+          tone: subscription.status === "active" ? "green" as Tone : subscription.status === "trialing" ? "blue" as Tone : subscription.status === "past_due" ? "yellow" as Tone : "red" as Tone,
+        }))
+      : [
+          {
+            title: "Nenhuma assinatura encontrada",
+            detail: "Quando alguém assinar um plano, vai aparecer aqui.",
+            value: "0",
+            tone: "yellow" as Tone,
+          },
+        ];
+
+    return {
+      ...baseData,
+      summary: {
+        ...(baseData?.summary || {}),
+        status: "Stripe real conectado",
+        accountName,
+        mode: stripeMode,
+        revenue: formatStripeMoney(monthRevenue, currency),
+        availableBalance: formatStripeMoney(availableBalance?.amount || 0, availableBalance?.currency || currency),
+        pendingBalance: formatStripeMoney(pendingBalance?.amount || 0, pendingBalance?.currency || currency),
+        activeSubscriptions: activeSubscriptions.length,
+        trialingSubscriptions: trialingSubscriptions.length,
+        customers: customers.data.length,
+        payments: recentPayments.data.length,
+        healthScore: secret.startsWith("sk_live") ? 92 : 78,
+      },
+      stripeDashboardCards: [
+        {
+          title: "Receita Stripe",
+          value: formatStripeMoney(monthRevenue, currency),
+          detail: "Receita confirmada no mês atual pela API real da Stripe.",
+          tone: monthRevenue > 0 ? "green" as Tone : "yellow" as Tone,
+        },
+        {
+          title: "Assinaturas",
+          value: String(activeSubscriptions.length),
+          detail: `${trialingSubscriptions.length} assinatura(s) em período de teste.`,
+          tone: activeSubscriptions.length > 0 ? "blue" as Tone : "yellow" as Tone,
+        },
+        {
+          title: "Clientes",
+          value: String(customers.data.length),
+          detail: "Clientes recentes encontrados na Stripe.",
+          tone: customers.data.length > 0 ? "green" as Tone : "yellow" as Tone,
+        },
+        {
+          title: "Saldo disponível",
+          value: formatStripeMoney(availableBalance?.amount || 0, availableBalance?.currency || currency),
+          detail: "Saldo disponível para repasse na Stripe.",
+          tone: Number(availableBalance?.amount || 0) > 0 ? "green" as Tone : "yellow" as Tone,
+        },
+      ],
+      stripePaymentRows: paymentRows,
+      stripeSubscriptionRows: subscriptionRows,
+      stripeRevenueBars: [
+        {
+          label: "Receita mês",
+          value: formatStripeMoney(monthRevenue, currency),
+          percent: monthRevenue > 0 ? 100 : 8,
+          tone: monthRevenue > 0 ? "green" as Tone : "yellow" as Tone,
+        },
+        {
+          label: "Disponível",
+          value: formatStripeMoney(availableBalance?.amount || 0, availableBalance?.currency || currency),
+          percent: Number(availableBalance?.amount || 0) > 0 ? 80 : 8,
+          tone: "blue" as Tone,
+        },
+        {
+          label: "Pendente",
+          value: formatStripeMoney(pendingBalance?.amount || 0, pendingBalance?.currency || currency),
+          percent: Number(pendingBalance?.amount || 0) > 0 ? 60 : 8,
+          tone: "yellow" as Tone,
+        },
+        {
+          label: "Trials",
+          value: String(trialingSubscriptions.length),
+          percent: trialingSubscriptions.length > 0 ? 70 : 8,
+          tone: "pink" as Tone,
+        },
+      ],
+      stripeAlertRows: [
+        {
+          title: "Stripe real conectada",
+          detail: `Conta ${accountName} conectada em modo ${stripeMode}.`,
+          value: "ativo",
+          tone: "green" as Tone,
+        },
+        {
+          title: "Pagamentos confirmados",
+          detail: "Total de pagamentos recentes com status pago.",
+          value: String(paidPayments.length),
+          tone: paidPayments.length > 0 ? "green" as Tone : "yellow" as Tone,
+        },
+        {
+          title: "Assinaturas em teste",
+          detail: "Usuários que ainda estão no período trial.",
+          value: String(trialingSubscriptions.length),
+          tone: trialingSubscriptions.length > 0 ? "blue" as Tone : "yellow" as Tone,
+        },
+        {
+          title: "Próxima etapa",
+          detail: "Criar checkout real dos planos e webhook para atualizar Supabase automaticamente.",
+          value: "pendente",
+          tone: "blue" as Tone,
+        },
+      ],
+    };
+  } catch (error) {
+    console.error("Erro ao enriquecer Stripe com API real:", error);
+
+    return {
+      ...baseData,
+      summary: {
+        ...(baseData?.summary || {}),
+        status: "Erro ao ler Stripe",
+        healthScore: 35,
+      },
+      stripeAlertRows: [
+        {
+          title: "Erro ao ler Stripe",
+          detail: error instanceof Error ? error.message : String(error),
+          value: "erro",
+          tone: "red" as Tone,
+        },
+        ...((baseData?.stripeAlertRows || []) as any[]),
+      ],
+    };
+  }
+}
+
 export async function GET() {
   let financeData: any = getFinanceFallbackData();
   let stripeData: any = getStripeFallbackData();
@@ -420,6 +660,7 @@ export async function GET() {
 
   try {
     stripeData = await readStudioStripeData();
+    stripeData = await enrichStripeDataWithLiveApi(stripeData);
   } catch (stripeError) {
     console.error("Erro ao preparar stripeData:", stripeError);
   }
