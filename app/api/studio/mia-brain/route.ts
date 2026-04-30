@@ -1,129 +1,139 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { Pool } from "pg";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function getSupabaseAdmin() {
-  const url =
-    process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.SUPABASE_URL;
+type PgGlobal = typeof globalThis & {
+  miaBrainPool?: Pool;
+};
 
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.SUPABASE_SERVICE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const globalForPg = globalThis as PgGlobal;
 
-  if (!url || !key) {
-    throw new Error("Supabase não configurado no ambiente.");
+function getPool() {
+  const connectionString = process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error("DATABASE_URL não configurada no ambiente.");
   }
 
-  return createClient(url, key, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
+  if (!globalForPg.miaBrainPool) {
+    globalForPg.miaBrainPool = new Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
+    });
+  }
+
+  return globalForPg.miaBrainPool;
+}
+
+function safeTableName(tableName: string) {
+  if (!/^mia_brain_[a-z0-9_]+$/.test(tableName)) {
+    throw new Error(`Nome de tabela inválido: ${tableName}`);
+  }
+
+  return `"public"."${tableName}"`;
+}
+
+async function loadTable(pool: Pool, tableName: string) {
+  try {
+    const safeName = safeTableName(tableName);
+    const result = await pool.query(`select * from ${safeName} limit 300`);
+
+    return {
+      ok: true,
+      rows: result.rows,
+      count: result.rowCount ?? result.rows.length,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      rows: [],
+      count: 0,
+      error: error instanceof Error ? error.message : "Erro desconhecido",
+    };
+  }
+}
+
+function rowsFrom(
+  tables: Record<string, { ok: boolean; rows: unknown[]; count: number; error?: string }>,
+  tableName: string
+) {
+  return tables[tableName]?.rows ?? [];
 }
 
 export async function GET() {
   try {
-    const supabase = getSupabaseAdmin();
+    const pool = getPool();
 
-    const [
-      providersRes,
-      modelsRes,
-      skillsRes,
-      promptsRes,
-      voicesRes,
-      transcriptionsRes,
-      logsRes,
-      settingsRes,
-    ] = await Promise.all([
-      supabase.from("mia_brain_providers").select("*").order("priority", { ascending: true }),
-      supabase.from("mia_brain_models").select("*").order("quality_score", { ascending: false }),
-      supabase.from("mia_brain_skills").select("*").order("usage_count", { ascending: false }),
-      supabase.from("mia_brain_prompts").select("*").order("updated_at", { ascending: false }),
-      supabase.from("mia_brain_voices").select("*").order("created_at", { ascending: false }),
-      supabase.from("mia_brain_transcriptions").select("*").order("created_at", { ascending: false }).limit(10),
-      supabase.from("mia_brain_usage_logs").select("*").order("created_at", { ascending: false }).limit(50),
-      supabase.from("mia_brain_settings").select("*"),
-    ]);
+    const tableList = await pool.query(`
+      select tablename
+      from pg_tables
+      where schemaname = 'public'
+        and tablename like 'mia_brain_%'
+      order by tablename asc
+    `);
 
-    const errors = [
-      providersRes.error,
-      modelsRes.error,
-      skillsRes.error,
-      promptsRes.error,
-      voicesRes.error,
-      transcriptionsRes.error,
-      logsRes.error,
-      settingsRes.error,
-    ].filter(Boolean);
+    const tableNames = tableList.rows.map((row) => row.tablename as string);
 
-    if (errors.length) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: errors[0]?.message || "Erro ao buscar dados da Mia Brain.",
-        },
-        { status: 500 }
-      );
-    }
+    const tables: Record<
+      string,
+      { ok: boolean; rows: unknown[]; count: number; error?: string }
+    > = {};
 
-    const providers = providersRes.data || [];
-    const models = modelsRes.data || [];
-    const skills = skillsRes.data || [];
-    const prompts = promptsRes.data || [];
-    const voices = voicesRes.data || [];
-    const transcriptions = transcriptionsRes.data || [];
-    const logs = logsRes.data || [];
-    const settingsRows = settingsRes.data || [];
-
-    const activeProviders = providers.filter((p) => p.status === "active").length;
-    const activeSkills = skills.filter((s) => s.status === "active").length;
-    const todayCost = providers.reduce((sum, p) => sum + Number(p.today_cost || 0), 0);
-    const latencyItems = providers.filter((p) => Number(p.avg_latency_ms || 0) > 0);
-    const avgLatency =
-      latencyItems.length > 0
-        ? Math.round(
-            latencyItems.reduce((sum, p) => sum + Number(p.avg_latency_ms || 0), 0) /
-              latencyItems.length
-          )
-        : 0;
-
-    const settings = Object.fromEntries(
-      settingsRows.map((row) => [row.key, row.value])
+    await Promise.all(
+      tableNames.map(async (tableName) => {
+        tables[tableName] = await loadTable(pool, tableName);
+      })
     );
+
+    const providers = rowsFrom(tables, "mia_brain_providers");
+    const models = rowsFrom(tables, "mia_brain_models");
+    const skills = rowsFrom(tables, "mia_brain_skills");
+    const prompts = rowsFrom(tables, "mia_brain_prompts");
+    const voices = rowsFrom(tables, "mia_brain_voices");
+    const logs = rowsFrom(tables, "mia_brain_logs");
+    const usage = rowsFrom(tables, "mia_brain_usage");
+    const costs = rowsFrom(tables, "mia_brain_costs");
+
+    const metrics = {
+      providers_total: providers.length,
+      models_total: models.length,
+      skills_total: skills.length,
+      prompts_total: prompts.length,
+      voices_total: voices.length,
+      logs_total: logs.length,
+      usage_events_total: usage.length,
+      costs_rows_total: costs.length,
+      tables_total: tableNames.length,
+    };
 
     return NextResponse.json({
       ok: true,
-      generatedAt: new Date().toISOString(),
-      metrics: {
-        activeProviders,
-        activeSkills,
-        todayCost,
-        avgLatency,
-        totalLogs: logs.length,
-        totalPrompts: prompts.length,
-        totalVoices: voices.length,
-        totalTranscriptions: transcriptions.length,
-      },
+      source: "postgres-direct",
+      message: "Mia Brain conectada diretamente ao banco PostgreSQL/Supabase.",
+      generated_at: new Date().toISOString(),
+      tableNames,
+      metrics,
       providers,
       models,
       skills,
       prompts,
       voices,
-      transcriptions,
       logs,
-      settings,
+      usage,
+      costs,
+      tables,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro desconhecido.";
-
     return NextResponse.json(
       {
         ok: false,
-        error: message,
+        source: "postgres-direct",
+        error: error instanceof Error ? error.message : "Erro desconhecido",
       },
       { status: 500 }
     );
