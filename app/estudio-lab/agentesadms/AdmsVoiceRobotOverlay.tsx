@@ -11,6 +11,21 @@ type PiperVoice = {
   quality: string;
 };
 
+const LOCAL_PIPER_VOICES: PiperVoice[] = [
+  {
+    id: "pt_BR-cadu-medium",
+    name: "Piper Cadu",
+    lang: "pt-BR",
+    quality: "medium",
+  },
+  {
+    id: "pt_BR-jeff-medium",
+    name: "Piper Jeff",
+    lang: "pt-BR",
+    quality: "medium",
+  },
+];
+
 const ASSISTANT_SELECTORS = [
   ".msg:not(.user) .m-bubble",
   ".agent-intro",
@@ -78,7 +93,7 @@ export default function AdmsVoiceRobotOverlay() {
   const [selectedText, setSelectedText] = useState("");
   const [pickMode, setPickMode] = useState(false);
   const [availableBrowserVoices, setAvailableBrowserVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [piperVoices, setPiperVoices] = useState<PiperVoice[]>([]);
+  const [piperVoices, setPiperVoices] = useState<PiperVoice[]>(LOCAL_PIPER_VOICES);
   const [voiceChoice, setVoiceChoice] = useState("browser:auto");
   const [rate, setRate] = useState(1);
   const [pitch, setPitch] = useState(1.08);
@@ -501,7 +516,27 @@ export default function AdmsVoiceRobotOverlay() {
 
         {voicePanelOpen && (
           <div className="adms-voice-config">
-            <label>
+                        <div className="adms-piper-quick-title">Vozes locais do servidor</div>
+
+            <div className="adms-piper-quick">
+              <button
+                type="button"
+                className={`adms-piper-choice ${voiceChoice === "piper:pt_BR-cadu-medium" ? "active" : ""}`}
+                onClick={() => setVoiceChoice("piper:pt_BR-cadu-medium")}
+              >
+                🎙️ Piper Cadu
+              </button>
+
+              <button
+                type="button"
+                className={`adms-piper-choice ${voiceChoice === "piper:pt_BR-jeff-medium" ? "active" : ""}`}
+                onClick={() => setVoiceChoice("piper:pt_BR-jeff-medium")}
+              >
+                🎙️ Piper Jeff
+              </button>
+            </div>
+
+<label>
               Motor e voz
               <select
                 value={voiceChoice}

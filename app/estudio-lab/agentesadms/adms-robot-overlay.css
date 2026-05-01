@@ -625,3 +625,50 @@
 .adms-voice-config input[type="range"] {
   accent-color: #ff65c8;
 }
+
+/* Piper visível */
+.adms-piper-quick-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: #ffd8f0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.adms-piper-quick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.adms-piper-choice {
+  border: 1px solid rgba(255, 145, 218, 0.28);
+  background: rgba(255, 105, 200, 0.08);
+  color: #fff6fb;
+  border-radius: 13px;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.adms-piper-choice:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 105, 200, 0.15);
+  box-shadow: 0 10px 22px rgba(255, 101, 200, 0.13);
+}
+
+.adms-piper-choice.active {
+  border-color: rgba(255, 145, 218, 0.75);
+  background: linear-gradient(135deg, rgba(224, 64, 160, 0.45), rgba(124, 58, 237, 0.35));
+  box-shadow: 0 0 24px rgba(255, 101, 200, 0.2);
+}
+
+@media (max-width: 768px) {
+  .adms-piper-quick {
+    grid-template-columns: 1fr;
+  }
+}
