@@ -1,3 +1,4 @@
+import CopilotChatBox from "@/components/copilot/CopilotChatBox";
 export const dynamic = "force-dynamic";
 
 export default function CopilotKanbanPage() {
@@ -279,6 +280,8 @@ setInterval(load, 60000);
           .metrics { grid-template-columns: 1fr; }
         }
       `}</style>
-    </main>
+    
+      <CopilotChatBox />
+</main>
   );
 }

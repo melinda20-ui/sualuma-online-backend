@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import CopilotChatBox from "@/components/copilot/CopilotChatBox";
 
 type Status = "todo" | "doing" | "ready" | "validated";
 
@@ -603,6 +604,8 @@ export default function LaunchCopilotPage() {
           }
         }
       `}</style>
-    </main>
+    
+      <CopilotChatBox />
+</main>
   );
 }
