@@ -49,11 +49,13 @@ function findAssistantMessages() {
   return Array.from(found);
 }
 
-function pickVoice() {
+function pickVoice(voices: SpeechSynthesisVoice[], selectedVoiceURI: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
 
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
+  if (selectedVoiceURI) {
+    const chosen = voices.find((voice) => voice.voiceURI === selectedVoiceURI);
+    if (chosen) return chosen;
+  }
 
   return (
     voices.find((v) => v.lang?.toLowerCase() === "pt-br") ||
@@ -70,8 +72,13 @@ export default function AdmsVoiceRobotOverlay() {
   const [supported, setSupported] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [pickMode, setPickMode] = useState(false);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceURI, setSelectedVoiceURI] = useState("");
+  const [rate, setRate] = useState(1);
+  const [pitch, setPitch] = useState(1.08);
+  const [voicePanelOpen, setVoicePanelOpen] = useState(false);
   const [lastReply, setLastReply] = useState(
-    "Oi, Luma. Você pode selecionar um trecho do chat ou clicar em escolher no chat para eu ler exatamente o balão que você quiser."
+    "Oi, Luma. Agora você pode escolher a voz que mais gostar, ajustar velocidade, ajustar tom e escolher qualquer texto do chat para eu ler."
   );
 
   const lastSeenRef = useRef("");
@@ -84,6 +91,17 @@ export default function AdmsVoiceRobotOverlay() {
     if (mood === "happy") return "Feliz";
     return "Aguardando";
   }, [mood, pickMode, speaking]);
+
+  const preferredVoices = useMemo(() => {
+    const pt = availableVoices.filter((voice) => voice.lang?.toLowerCase().startsWith("pt"));
+    const others = availableVoices.filter((voice) => !voice.lang?.toLowerCase().startsWith("pt"));
+    return [...pt, ...others];
+  }, [availableVoices]);
+
+  const selectedVoiceName = useMemo(() => {
+    const voice = availableVoices.find((item) => item.voiceURI === selectedVoiceURI);
+    return voice ? `${voice.name} · ${voice.lang}` : "Automática";
+  }, [availableVoices, selectedVoiceURI]);
 
   const setMoodForAWhile = useCallback((next: Mood, ms = 1800) => {
     setMood(next);
@@ -115,12 +133,15 @@ export default function AdmsVoiceRobotOverlay() {
 
       const utter = new SpeechSynthesisUtterance(clean);
       utter.lang = "pt-BR";
-      utter.rate = 1;
-      utter.pitch = 1.08;
+      utter.rate = rate;
+      utter.pitch = pitch;
       utter.volume = 1;
 
-      const voice = pickVoice();
-      if (voice) utter.voice = voice;
+      const voice = pickVoice(availableVoices, selectedVoiceURI);
+      if (voice) {
+        utter.voice = voice;
+        utter.lang = voice.lang || "pt-BR";
+      }
 
       setLastReply(clean);
 
@@ -141,7 +162,7 @@ export default function AdmsVoiceRobotOverlay() {
 
       window.speechSynthesis.speak(utter);
     },
-    [setMoodForAWhile]
+    [availableVoices, pitch, rate, selectedVoiceURI, setMoodForAWhile]
   );
 
   const readSelection = useCallback(() => {
@@ -161,12 +182,25 @@ export default function AdmsVoiceRobotOverlay() {
 
     setSupported("speechSynthesis" in window);
 
-    const saved = localStorage.getItem("adms_voice_enabled");
-    if (saved === "0") setVoiceEnabled(false);
+    const savedEnabled = localStorage.getItem("adms_voice_enabled");
+    const savedVoice = localStorage.getItem("adms_voice_uri");
+    const savedRate = localStorage.getItem("adms_voice_rate");
+    const savedPitch = localStorage.getItem("adms_voice_pitch");
 
-    try {
-      window.speechSynthesis.getVoices();
-    } catch {}
+    if (savedEnabled === "0") setVoiceEnabled(false);
+    if (savedVoice) setSelectedVoiceURI(savedVoice);
+    if (savedRate) setRate(Number(savedRate) || 1);
+    if (savedPitch) setPitch(Number(savedPitch) || 1.08);
+
+    const loadVoices = () => {
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        setAvailableVoices(voices);
+      } catch {}
+    };
+
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
 
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -180,6 +214,21 @@ export default function AdmsVoiceRobotOverlay() {
     if (typeof window === "undefined") return;
     localStorage.setItem("adms_voice_enabled", voiceEnabled ? "1" : "0");
   }, [voiceEnabled]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("adms_voice_uri", selectedVoiceURI);
+  }, [selectedVoiceURI]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("adms_voice_rate", String(rate));
+  }, [rate]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("adms_voice_pitch", String(pitch));
+  }, [pitch]);
 
   useEffect(() => {
     const updateSelection = () => {
@@ -313,7 +362,7 @@ export default function AdmsVoiceRobotOverlay() {
         <div className="adms-voice-header">
           <div>
             <div className="adms-voice-title">Assistente de Voz</div>
-            <div className="adms-voice-subtitle">{moodLabel}</div>
+            <div className="adms-voice-subtitle">{moodLabel} · {selectedVoiceName}</div>
           </div>
 
           <div className={`adms-voice-dot ${voiceEnabled ? "on" : "off"}`} />
@@ -335,6 +384,66 @@ export default function AdmsVoiceRobotOverlay() {
           <div className="robot-arm right" />
           <div className="robot-shadow" />
         </div>
+
+        <button
+          type="button"
+          className="adms-voice-config-toggle"
+          onClick={() => setVoicePanelOpen((value) => !value)}
+        >
+          {voicePanelOpen ? "Fechar vozes" : "Escolher voz"}
+        </button>
+
+        {voicePanelOpen && (
+          <div className="adms-voice-config">
+            <label>
+              Voz
+              <select
+                value={selectedVoiceURI}
+                onChange={(event) => setSelectedVoiceURI(event.target.value)}
+              >
+                <option value="">Automática / melhor português</option>
+                {preferredVoices.map((voice) => (
+                  <option key={voice.voiceURI} value={voice.voiceURI}>
+                    {voice.lang?.toLowerCase().startsWith("pt") ? "🇧🇷 " : ""}
+                    {voice.name} · {voice.lang}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              Velocidade: {rate.toFixed(2)}
+              <input
+                type="range"
+                min="0.7"
+                max="1.35"
+                step="0.05"
+                value={rate}
+                onChange={(event) => setRate(Number(event.target.value))}
+              />
+            </label>
+
+            <label>
+              Tom: {pitch.toFixed(2)}
+              <input
+                type="range"
+                min="0.75"
+                max="1.45"
+                step="0.05"
+                value={pitch}
+                onChange={(event) => setPitch(Number(event.target.value))}
+              />
+            </label>
+
+            <button
+              type="button"
+              className="adms-voice-btn primary"
+              onClick={() => speak("Oi, Luma. Essa é uma prévia da voz escolhida para os agentes administrativos do Studio Sualuma.")}
+            >
+              Testar esta voz
+            </button>
+          </div>
+        )}
 
         <div className="adms-selected-box">
           {selectedText ? (
