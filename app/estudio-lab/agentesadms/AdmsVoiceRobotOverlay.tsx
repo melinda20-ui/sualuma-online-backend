@@ -4,6 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Mood = "idle" | "thinking" | "talking" | "happy";
 
+type PiperVoice = {
+  id: string;
+  name: string;
+  lang: string;
+  quality: string;
+};
+
 const ASSISTANT_SELECTORS = [
   ".msg:not(.user) .m-bubble",
   ".agent-intro",
@@ -49,9 +56,7 @@ function findAssistantMessages() {
   return Array.from(found);
 }
 
-function pickVoice(voices: SpeechSynthesisVoice[], selectedVoiceURI: string) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
-
+function pickBrowserVoice(voices: SpeechSynthesisVoice[], selectedVoiceURI: string) {
   if (selectedVoiceURI) {
     const chosen = voices.find((voice) => voice.voiceURI === selectedVoiceURI);
     if (chosen) return chosen;
@@ -66,39 +71,27 @@ function pickVoice(voices: SpeechSynthesisVoice[], selectedVoiceURI: string) {
 }
 
 export default function AdmsVoiceRobotOverlay() {
-  const [isMinimized, setIsMinimized] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [mood, setMood] = useState<Mood>("idle");
   const [speaking, setSpeaking] = useState(false);
-  const [supported, setSupported] = useState(false);
+  const [browserSupported, setBrowserSupported] = useState(false);
   const [selectedText, setSelectedText] = useState("");
   const [pickMode, setPickMode] = useState(false);
-  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selectedVoiceURI, setSelectedVoiceURI] = useState("");
+  const [availableBrowserVoices, setAvailableBrowserVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [piperVoices, setPiperVoices] = useState<PiperVoice[]>([]);
+  const [voiceChoice, setVoiceChoice] = useState("browser:auto");
   const [rate, setRate] = useState(1);
   const [pitch, setPitch] = useState(1.08);
   const [voicePanelOpen, setVoicePanelOpen] = useState(false);
   const [lastReply, setLastReply] = useState(
-    "Oi, Luma. Agora você pode escolher a voz que mais gostar, ajustar velocidade, ajustar tom e escolher qualquer texto do chat para eu ler."
+    "Oi, Luma. Agora você pode usar vozes locais do Piper ou vozes do navegador para ler qualquer texto do chat."
   );
 
   const lastSeenRef = useRef("");
   const timerRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const saved = localStorage.getItem("adms_voice_minimized");
-    if (saved === "1") {
-      setIsMinimized(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem("adms_voice_minimized", isMinimized ? "1" : "0");
-  }, [isMinimized]);
-
+  const canSpeak = browserSupported || piperVoices.length > 0;
 
   const moodLabel = useMemo(() => {
     if (pickMode) return "Escolha um balão";
@@ -108,16 +101,27 @@ export default function AdmsVoiceRobotOverlay() {
     return "Aguardando";
   }, [mood, pickMode, speaking]);
 
-  const preferredVoices = useMemo(() => {
-    const pt = availableVoices.filter((voice) => voice.lang?.toLowerCase().startsWith("pt"));
-    const others = availableVoices.filter((voice) => !voice.lang?.toLowerCase().startsWith("pt"));
+  const preferredBrowserVoices = useMemo(() => {
+    const pt = availableBrowserVoices.filter((voice) => voice.lang?.toLowerCase().startsWith("pt"));
+    const others = availableBrowserVoices.filter((voice) => !voice.lang?.toLowerCase().startsWith("pt"));
     return [...pt, ...others];
-  }, [availableVoices]);
+  }, [availableBrowserVoices]);
 
   const selectedVoiceName = useMemo(() => {
-    const voice = availableVoices.find((item) => item.voiceURI === selectedVoiceURI);
-    return voice ? `${voice.name} · ${voice.lang}` : "Automática";
-  }, [availableVoices, selectedVoiceURI]);
+    if (voiceChoice.startsWith("piper:")) {
+      const id = voiceChoice.replace("piper:", "");
+      const voice = piperVoices.find((item) => item.id === id);
+      return voice ? `${voice.name} · Piper local` : "Piper local";
+    }
+
+    const browserURI = voiceChoice.replace("browser:", "");
+    if (browserURI && browserURI !== "auto") {
+      const voice = availableBrowserVoices.find((item) => item.voiceURI === browserURI);
+      return voice ? `${voice.name} · navegador` : "Navegador";
+    }
+
+    return "Automática";
+  }, [availableBrowserVoices, piperVoices, voiceChoice]);
 
   const setMoodForAWhile = useCallback((next: Mood, ms = 1800) => {
     setMood(next);
@@ -132,13 +136,21 @@ export default function AdmsVoiceRobotOverlay() {
   }, []);
 
   const stopSpeaking = useCallback(() => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis?.cancel();
+    } catch {}
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+
     setSpeaking(false);
     setMood("idle");
   }, []);
 
-  const speak = useCallback(
+  const speakWithBrowser = useCallback(
     (text: string) => {
       if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
@@ -153,7 +165,9 @@ export default function AdmsVoiceRobotOverlay() {
       utter.pitch = pitch;
       utter.volume = 1;
 
-      const voice = pickVoice(availableVoices, selectedVoiceURI);
+      const browserURI = voiceChoice.startsWith("browser:") ? voiceChoice.replace("browser:", "") : "";
+      const voice = pickBrowserVoice(availableBrowserVoices, browserURI === "auto" ? "" : browserURI);
+
       if (voice) {
         utter.voice = voice;
         utter.lang = voice.lang || "pt-BR";
@@ -178,7 +192,77 @@ export default function AdmsVoiceRobotOverlay() {
 
       window.speechSynthesis.speak(utter);
     },
-    [availableVoices, pitch, rate, selectedVoiceURI, setMoodForAWhile]
+    [availableBrowserVoices, pitch, rate, setMoodForAWhile, voiceChoice]
+  );
+
+  const speakWithPiper = useCallback(
+    async (text: string, voiceId: string) => {
+      const clean = normalizeText(text);
+      if (!clean) return;
+
+      stopSpeaking();
+      setLastReply(clean);
+      setSpeaking(true);
+      setMood("talking");
+
+      try {
+        const response = await fetch("/api/tts/speak", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: clean,
+            voiceId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          URL.revokeObjectURL(url);
+          setSpeaking(false);
+          setMoodForAWhile("happy", 1400);
+        };
+
+        audio.onerror = () => {
+          URL.revokeObjectURL(url);
+          setSpeaking(false);
+          setMoodForAWhile("idle", 500);
+        };
+
+        await audio.play();
+      } catch {
+        setSpeaking(false);
+        setMoodForAWhile("idle", 500);
+        setLastReply("Não consegui tocar a voz Piper agora. Tente clicar em Testar voz de novo.");
+      }
+    },
+    [setMoodForAWhile, stopSpeaking]
+  );
+
+  const speak = useCallback(
+    (text: string) => {
+      const clean = normalizeText(text);
+      if (!clean) return;
+
+      if (voiceChoice.startsWith("piper:")) {
+        const voiceId = voiceChoice.replace("piper:", "") || "pt_BR-cadu-medium";
+        void speakWithPiper(clean, voiceId);
+        return;
+      }
+
+      speakWithBrowser(clean);
+    },
+    [speakWithBrowser, speakWithPiper, voiceChoice]
   );
 
   const readSelection = useCallback(() => {
@@ -196,53 +280,59 @@ export default function AdmsVoiceRobotOverlay() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    setSupported("speechSynthesis" in window);
+    setBrowserSupported("speechSynthesis" in window);
 
     const savedEnabled = localStorage.getItem("adms_voice_enabled");
-    const savedVoice = localStorage.getItem("adms_voice_uri");
+    const savedChoice = localStorage.getItem("adms_voice_choice");
     const savedRate = localStorage.getItem("adms_voice_rate");
     const savedPitch = localStorage.getItem("adms_voice_pitch");
 
     if (savedEnabled === "0") setVoiceEnabled(false);
-    if (savedVoice) setSelectedVoiceURI(savedVoice);
+    if (savedChoice) setVoiceChoice(savedChoice);
     if (savedRate) setRate(Number(savedRate) || 1);
     if (savedPitch) setPitch(Number(savedPitch) || 1.08);
 
-    const loadVoices = () => {
+    const loadBrowserVoices = () => {
       try {
         const voices = window.speechSynthesis.getVoices();
-        setAvailableVoices(voices);
+        setAvailableBrowserVoices(voices);
       } catch {}
     };
 
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    loadBrowserVoices();
+
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.onvoiceschanged = loadBrowserVoices;
+    }
+
+    fetch("/api/tts/voices", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.voices)) {
+          setPiperVoices(data.voices);
+        }
+      })
+      .catch(() => {});
 
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
-      try {
-        window.speechSynthesis.cancel();
-      } catch {}
+      stopSpeaking();
     };
-  }, []);
+  }, [stopSpeaking]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     localStorage.setItem("adms_voice_enabled", voiceEnabled ? "1" : "0");
   }, [voiceEnabled]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem("adms_voice_uri", selectedVoiceURI);
-  }, [selectedVoiceURI]);
+    localStorage.setItem("adms_voice_choice", voiceChoice);
+  }, [voiceChoice]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     localStorage.setItem("adms_voice_rate", String(rate));
   }, [rate]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
     localStorage.setItem("adms_voice_pitch", String(pitch));
   }, [pitch]);
 
@@ -350,7 +440,7 @@ export default function AdmsVoiceRobotOverlay() {
       lastSeenRef.current = newest;
       setLastReply(newest);
 
-      if (voiceEnabled && supported) {
+      if (voiceEnabled && canSpeak) {
         speak(newest);
       } else {
         setMoodForAWhile("happy", 1200);
@@ -370,24 +460,7 @@ export default function AdmsVoiceRobotOverlay() {
     scan();
 
     return () => observer.disconnect();
-  }, [voiceEnabled, supported, speak, setMoodForAWhile]);
-
-  if (isMinimized) {
-    return (
-      <div className="adms-voice-mini-shell">
-        <button
-          type="button"
-          className={`adms-voice-mini ${speaking ? "speaking" : ""} ${voiceEnabled ? "on" : "off"}`}
-          onClick={() => setIsMinimized(false)}
-          title="Abrir assistente de voz"
-        >
-          <span className="adms-mini-robot">🤖</span>
-          <span className="adms-mini-text">Voz</span>
-          <span className="adms-mini-status">{speaking ? "falando" : voiceEnabled ? "ligada" : "off"}</span>
-        </button>
-      </div>
-    );
-  }
+  }, [canSpeak, setMoodForAWhile, speak, voiceEnabled]);
 
   return (
     <div className="adms-voice-shell">
@@ -398,18 +471,7 @@ export default function AdmsVoiceRobotOverlay() {
             <div className="adms-voice-subtitle">{moodLabel} · {selectedVoiceName}</div>
           </div>
 
-          <div className="adms-voice-head-actions">
-            <button
-              type="button"
-              className="adms-voice-min-btn"
-              onClick={() => setIsMinimized(true)}
-              title="Minimizar assistente de voz"
-            >
-              —
-            </button>
-
-            <div className={`adms-voice-dot ${voiceEnabled ? "on" : "off"}`} />
-          </div>
+          <div className={`adms-voice-dot ${voiceEnabled ? "on" : "off"}`} />
         </div>
 
         <div className={`pink-robot ${mood} ${speaking ? "speaking" : ""} ${pickMode ? "picking" : ""}`}>
@@ -440,44 +502,63 @@ export default function AdmsVoiceRobotOverlay() {
         {voicePanelOpen && (
           <div className="adms-voice-config">
             <label>
-              Voz
+              Motor e voz
               <select
-                value={selectedVoiceURI}
-                onChange={(event) => setSelectedVoiceURI(event.target.value)}
+                value={voiceChoice}
+                onChange={(event) => setVoiceChoice(event.target.value)}
               >
-                <option value="">Automática / melhor português</option>
-                {preferredVoices.map((voice) => (
-                  <option key={voice.voiceURI} value={voice.voiceURI}>
-                    {voice.lang?.toLowerCase().startsWith("pt") ? "🇧🇷 " : ""}
-                    {voice.name} · {voice.lang}
-                  </option>
-                ))}
+                <option value="browser:auto">Navegador · automática</option>
+
+                {piperVoices.length > 0 && (
+                  <optgroup label="Piper local no servidor">
+                    {piperVoices.map((voice) => (
+                      <option key={voice.id} value={`piper:${voice.id}`}>
+                        {voice.name} · {voice.lang} · {voice.quality}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+
+                {preferredBrowserVoices.length > 0 && (
+                  <optgroup label="Vozes do navegador">
+                    {preferredBrowserVoices.map((voice) => (
+                      <option key={voice.voiceURI} value={`browser:${voice.voiceURI}`}>
+                        {voice.lang?.toLowerCase().startsWith("pt") ? "🇧🇷 " : ""}
+                        {voice.name} · {voice.lang}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
             </label>
 
-            <label>
-              Velocidade: {rate.toFixed(2)}
-              <input
-                type="range"
-                min="0.7"
-                max="1.35"
-                step="0.05"
-                value={rate}
-                onChange={(event) => setRate(Number(event.target.value))}
-              />
-            </label>
+            {!voiceChoice.startsWith("piper:") && (
+              <>
+                <label>
+                  Velocidade: {rate.toFixed(2)}
+                  <input
+                    type="range"
+                    min="0.7"
+                    max="1.35"
+                    step="0.05"
+                    value={rate}
+                    onChange={(event) => setRate(Number(event.target.value))}
+                  />
+                </label>
 
-            <label>
-              Tom: {pitch.toFixed(2)}
-              <input
-                type="range"
-                min="0.75"
-                max="1.45"
-                step="0.05"
-                value={pitch}
-                onChange={(event) => setPitch(Number(event.target.value))}
-              />
-            </label>
+                <label>
+                  Tom: {pitch.toFixed(2)}
+                  <input
+                    type="range"
+                    min="0.75"
+                    max="1.45"
+                    step="0.05"
+                    value={pitch}
+                    onChange={(event) => setPitch(Number(event.target.value))}
+                  />
+                </label>
+              </>
+            )}
 
             <button
               type="button"
@@ -515,7 +596,7 @@ export default function AdmsVoiceRobotOverlay() {
             type="button"
             className="adms-voice-btn"
             onClick={readSelection}
-            disabled={!supported}
+            disabled={!canSpeak}
           >
             Ler seleção
           </button>
@@ -524,7 +605,7 @@ export default function AdmsVoiceRobotOverlay() {
             type="button"
             className={`adms-voice-btn ${pickMode ? "active" : ""}`}
             onClick={() => setPickMode((v) => !v)}
-            disabled={!supported}
+            disabled={!canSpeak}
           >
             {pickMode ? "Clique no balão" : "Escolher no chat"}
           </button>
@@ -533,7 +614,7 @@ export default function AdmsVoiceRobotOverlay() {
             type="button"
             className="adms-voice-btn"
             onClick={() => speak(lastReply)}
-            disabled={!supported}
+            disabled={!canSpeak}
           >
             Ouvir última
           </button>
@@ -542,15 +623,15 @@ export default function AdmsVoiceRobotOverlay() {
             type="button"
             className="adms-voice-btn"
             onClick={stopSpeaking}
-            disabled={!supported}
+            disabled={!canSpeak}
           >
             Parar
           </button>
         </div>
 
-        {!supported && (
+        {!canSpeak && (
           <div className="adms-voice-warning">
-            Seu navegador não suporta leitura em voz. No Chrome e Edge isso costuma funcionar normalmente.
+            Nenhuma voz disponível ainda. Verifique se o Piper local foi instalado ou use Chrome/Edge.
           </div>
         )}
       </div>
