@@ -299,8 +299,8 @@ export default function CopilotCommandCenter() {
                 if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) sendMessage();
               }}
             />
-            <button onClick={sendMessage} disabled={sending || !input.trim()}>
-              {sending ? "Executando..." : "Enviar"}
+            <button className="send-main-button" type="button" onClick={sendMessage} disabled={sending || !input.trim()}>
+              {sending ? "Enviando..." : "Enviar mensagem"}
             </button>
           </div>
 
@@ -698,6 +698,38 @@ export default function CopilotCommandCenter() {
           color: rgba(255, 255, 255, 0.65);
           font-size: 11px;
           white-space: normal;
+        }
+
+
+        /* FIX: botão enviar sempre visível no chat do Copiloto */
+        .composer {
+          position: sticky;
+          bottom: 0;
+          z-index: 50;
+          background: rgba(7, 8, 20, 0.96);
+          backdrop-filter: blur(14px);
+          border-top: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .send-main-button {
+          display: flex !important;
+          width: 100%;
+          min-height: 56px;
+          align-items: center;
+          justify-content: center;
+          border-radius: 16px;
+          font-size: 15px;
+          font-weight: 950;
+          background: linear-gradient(135deg, #38bdf8, #d946ef) !important;
+          color: #ffffff !important;
+          box-shadow: 0 16px 34px rgba(56, 189, 248, 0.22);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .send-main-button:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+          filter: grayscale(0.2);
         }
 
         @media (max-width: 1180px) {
