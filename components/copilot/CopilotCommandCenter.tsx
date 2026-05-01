@@ -1076,6 +1076,63 @@ export default function CopilotCommandCenter() {
         }
 
 
+
+
+        /* ==================================================
+           AJUSTE FINAL: input compacto do chat do Copiloto
+        ================================================== */
+
+        div:has(textarea):has(.send-main-button) textarea {
+          min-height: 68px !important;
+          height: 78px !important;
+          max-height: 115px !important;
+          padding: 16px 18px !important;
+          font-size: 16px !important;
+          line-height: 1.45 !important;
+          resize: vertical !important;
+        }
+
+        div:has(textarea):has(.send-main-button) textarea:focus {
+          height: 96px !important;
+          max-height: 130px !important;
+        }
+
+        .send-main-button {
+          min-height: 50px !important;
+          height: 52px !important;
+          font-size: 15.5px !important;
+          border-radius: 18px !important;
+          margin-top: 10px !important;
+        }
+
+        div:has(textarea):has(.send-main-button) {
+          padding-bottom: 18px !important;
+        }
+
+        div:has(textarea):has(.send-main-button) [class*="messages" i],
+        div:has(textarea):has(.send-main-button) [class*="history" i],
+        div:has(textarea):has(.send-main-button) [class*="conversation" i],
+        div:has(textarea):has(.send-main-button) [class*="log" i] {
+          max-height: 430px !important;
+          min-height: 190px !important;
+        }
+
+        @media (max-width: 900px) {
+          div:has(textarea):has(.send-main-button) textarea {
+            min-height: 64px !important;
+            height: 72px !important;
+            max-height: 105px !important;
+            font-size: 15px !important;
+          }
+
+          .send-main-button {
+            min-height: 48px !important;
+            height: 50px !important;
+            font-size: 15px !important;
+          }
+        }
+
+
 `}</style>
     </main>
   );
