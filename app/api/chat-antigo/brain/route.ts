@@ -15,10 +15,10 @@ type EndpointAttempt = {
 };
 
 const CANDIDATE_ENDPOINTS = [
+  "/api/chat",
   "/api/ai/router",
   "/api/brain/task",
   "/api/brain/executor",
-  "/api/chat",
 ];
 
 function getDatabaseUrl() {
@@ -240,7 +240,7 @@ async function callEndpoint({
   brain: AnyObj;
 }): Promise<EndpointAttempt & { answer?: string; raw?: unknown }> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 25000);
+  const timer = setTimeout(() => controller.abort(), 8000);
 
   const payload = {
     source: "chat-antigo",
