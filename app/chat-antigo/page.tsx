@@ -76,6 +76,163 @@ function Badge({ children, blue = false }: { children: React.ReactNode; blue?: b
   return <span className={blue ? "badge blue" : "badge"}>{children}</span>;
 }
 
+
+function ChatAntigoBrainBridge() {
+  const [message, setMessage] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [online, setOnline] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/chat-antigo/brain", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((json) => setOnline(Boolean(json?.ok)))
+      .catch(() => setOnline(false));
+  }, []);
+
+  async function sendToBrain() {
+    const clean = message.trim();
+    if (!clean || loading) return;
+
+    setLoading(true);
+    setAnswer("");
+
+    try {
+      const res = await fetch("/api/chat-antigo/brain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({ message: clean }),
+      });
+
+      const json = await res.json();
+
+      if (!json?.ok) {
+        setAnswer(json?.error || "A Mia não conseguiu responder agora.");
+        return;
+      }
+
+      setAnswer(json.answer || "A Mia respondeu, mas não veio texto.");
+      setMessage("");
+      setOnline(true);
+    } catch (error) {
+      setAnswer("Erro ao falar com o cérebro da Mia.");
+      setOnline(false);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section
+      style={{
+        marginTop: 18,
+        padding: 18,
+        borderRadius: 22,
+        border: "1px solid rgba(255,255,255,.12)",
+        background:
+          "radial-gradient(circle at top left, rgba(255,0,120,.16), transparent 34%), rgba(10,10,18,.72)",
+        boxShadow: "0 20px 60px rgba(0,0,0,.28)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+        <div>
+          <p style={{ margin: 0, color: "rgba(255,255,255,.58)", fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase" }}>
+            Cérebro Mia
+          </p>
+          <h3 style={{ margin: "4px 0 0", color: "#fff", fontSize: 20 }}>
+            Ponte viva com o cérebro da plataforma
+          </h3>
+        </div>
+
+        <span
+          style={{
+            padding: "8px 12px",
+            borderRadius: 999,
+            background: online ? "rgba(34,197,94,.14)" : "rgba(251,191,36,.14)",
+            color: online ? "#86efac" : "#fde68a",
+            border: online ? "1px solid rgba(34,197,94,.28)" : "1px solid rgba(251,191,36,.28)",
+            fontSize: 12,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {online ? "Online" : "Conectando"}
+        </span>
+      </div>
+
+      <textarea
+        value={message}
+        onChange={(event) => setMessage(event.target.value)}
+        placeholder="Digite uma ordem para a Mia: resumir conversa, criar automação, analisar cliente, puxar contexto..."
+        style={{
+          width: "100%",
+          minHeight: 96,
+          resize: "vertical",
+          borderRadius: 18,
+          border: "1px solid rgba(255,255,255,.12)",
+          background: "rgba(0,0,0,.24)",
+          color: "#fff",
+          padding: 14,
+          outline: "none",
+        }}
+      />
+
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
+        <button
+          type="button"
+          onClick={sendToBrain}
+          disabled={loading}
+          style={{
+            border: 0,
+            borderRadius: 999,
+            padding: "12px 18px",
+            cursor: loading ? "not-allowed" : "pointer",
+            color: "#fff",
+            fontWeight: 800,
+            background: "linear-gradient(135deg, #ff2f8f, #7c3aed)",
+            boxShadow: "0 12px 34px rgba(255,47,143,.28)",
+          }}
+        >
+          {loading ? "Pensando..." : "Enviar para o cérebro"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMessage("Analise o estado atual do meu sistema e me diga o próximo passo mais importante.")}
+          style={{
+            borderRadius: 999,
+            padding: "12px 18px",
+            cursor: "pointer",
+            color: "#fff",
+            background: "rgba(255,255,255,.08)",
+            border: "1px solid rgba(255,255,255,.12)",
+          }}
+        >
+          Diagnóstico rápido
+        </button>
+      </div>
+
+      {answer ? (
+        <div
+          style={{
+            marginTop: 14,
+            padding: 14,
+            borderRadius: 18,
+            background: "rgba(255,255,255,.07)",
+            border: "1px solid rgba(255,255,255,.10)",
+            color: "rgba(255,255,255,.86)",
+            whiteSpace: "pre-wrap",
+            lineHeight: 1.55,
+          }}
+        >
+          {answer}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+
 export default function ChatAntigoPage() {
   const [tab, setTab] = useState<Tab>("tudo");
   const [data, setData] = useState<DashboardData | null>(null);
@@ -528,6 +685,7 @@ export default function ChatAntigoPage() {
         @media(max-width:1180px){.chat-shell{grid-template-columns:300px 1fr}.chat-body{grid-template-columns:1fr}.context-panel{display:none}}
         @media(max-width:820px){.chat-shell{grid-template-columns:1fr;padding:8px}.sidebar{max-height:48vh}.topbar{height:auto;padding:14px;align-items:flex-start;gap:12px;flex-direction:column}.top-actions{flex-wrap:wrap}.chat-body{padding:14px}.composer{padding:10px 14px}}
       `}</style>
+          <ChatAntigoBrainBridge />
     </main>
   );
 }
