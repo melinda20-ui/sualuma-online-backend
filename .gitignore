@@ -26,3 +26,5 @@ data/login-rate-limit-alerts.json
 data/brain-executor-tasks.json
 data/prestador-chat-publico.json
 data/*.json
+reports/copilot/
+reports/*.txt
