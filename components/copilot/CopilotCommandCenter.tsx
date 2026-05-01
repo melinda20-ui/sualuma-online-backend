@@ -938,7 +938,145 @@ export default function CopilotCommandCenter() {
             grid-template-columns: repeat(5, 82vw);
           }
         }
-      `}</style>
+      
+
+        /* ==================================================
+           MODO LEITURA: chat grande do Copiloto
+        ================================================== */
+
+        /* força a área principal a não esmagar o chat na lateral */
+        @media (max-width: 1800px) {
+          main,
+          section,
+          .page,
+          .shell,
+          .container,
+          .workspace,
+          .dashboard,
+          .content,
+          .main-grid,
+          .dashboard-grid,
+          .workspace-grid,
+          .copilot-grid,
+          [class*="workspace" i],
+          [class*="dashboard" i],
+          [class*="content" i],
+          [class*="layout" i],
+          [class*="grid" i] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* pega o bloco que contém textarea + botão de envio e transforma em painel grande */
+        div:has(textarea):has(.send-main-button),
+        section:has(textarea):has(.send-main-button),
+        aside:has(textarea):has(.send-main-button) {
+          grid-column: 1 / -1 !important;
+          width: 100% !important;
+          max-width: 1180px !important;
+          margin: 28px auto 0 auto !important;
+          background: rgba(3, 7, 18, 0.96) !important;
+          border: 1px solid rgba(125, 211, 252, 0.34) !important;
+          border-radius: 28px !important;
+          box-shadow: 0 30px 80px rgba(0,0,0,.42) !important;
+        }
+
+        /* melhora a área das mensagens */
+        div:has(textarea):has(.send-main-button) [class*="message" i],
+        div:has(textarea):has(.send-main-button) [class*="bubble" i],
+        div:has(textarea):has(.send-main-button) [class*="msg" i],
+        div:has(textarea):has(.send-main-button) p {
+          font-size: 17px !important;
+          line-height: 1.7 !important;
+          color: rgba(255,255,255,.97) !important;
+        }
+
+        div:has(textarea):has(.send-main-button) h2,
+        div:has(textarea):has(.send-main-button) h3 {
+          font-size: 30px !important;
+          line-height: 1.15 !important;
+          color: #ffffff !important;
+        }
+
+        div:has(textarea):has(.send-main-button) strong,
+        div:has(textarea):has(.send-main-button) b {
+          color: #67e8f9 !important;
+        }
+
+        /* deixa o histórico alto para ler sem ficar tudo escondido */
+        div:has(textarea):has(.send-main-button) [class*="messages" i],
+        div:has(textarea):has(.send-main-button) [class*="history" i],
+        div:has(textarea):has(.send-main-button) [class*="conversation" i],
+        div:has(textarea):has(.send-main-button) [class*="log" i] {
+          max-height: 620px !important;
+          min-height: 260px !important;
+          overflow-y: auto !important;
+          padding-right: 12px !important;
+        }
+
+        /* input grande e fácil de ler */
+        div:has(textarea):has(.send-main-button) textarea {
+          min-height: 150px !important;
+          font-size: 18px !important;
+          line-height: 1.6 !important;
+          color: #ffffff !important;
+          background: rgba(2, 6, 23, 0.96) !important;
+          border: 1px solid rgba(125, 211, 252, 0.55) !important;
+          border-radius: 22px !important;
+          padding: 22px !important;
+        }
+
+        div:has(textarea):has(.send-main-button) textarea::placeholder {
+          color: rgba(255,255,255,.72) !important;
+        }
+
+        /* botão enviar bem visível */
+        .send-main-button {
+          min-height: 64px !important;
+          border-radius: 22px !important;
+          font-size: 18px !important;
+          font-weight: 950 !important;
+          color: #03101f !important;
+          background: linear-gradient(135deg, #67e8f9, #a78bfa, #f0abfc) !important;
+          border: 0 !important;
+          opacity: 1 !important;
+          box-shadow: 0 18px 42px rgba(103,232,249,.22) !important;
+        }
+
+        .send-main-button:disabled {
+          opacity: .55 !important;
+          color: rgba(255,255,255,.82) !important;
+          background: rgba(148, 163, 184, .35) !important;
+          box-shadow: none !important;
+        }
+
+        /* no notebook pequeno fica ainda mais confortável */
+        @media (max-width: 900px) {
+          div:has(textarea):has(.send-main-button),
+          section:has(textarea):has(.send-main-button),
+          aside:has(textarea):has(.send-main-button) {
+            border-radius: 22px !important;
+            margin-top: 22px !important;
+          }
+
+          div:has(textarea):has(.send-main-button) h2,
+          div:has(textarea):has(.send-main-button) h3 {
+            font-size: 25px !important;
+          }
+
+          div:has(textarea):has(.send-main-button) textarea {
+            min-height: 130px !important;
+            font-size: 16.5px !important;
+          }
+
+          .send-main-button {
+            min-height: 58px !important;
+            font-size: 16.5px !important;
+          }
+        }
+
+
+`}</style>
     </main>
   );
 }
