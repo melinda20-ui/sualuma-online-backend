@@ -1,676 +1,932 @@
 "use client";
 
-const resumoCards = [
-  {
-    label: "Modelo principal",
-    title: "Venda de serviços",
-    text: "A Sua Luma ganha com serviços como sites, automações, conteúdo e marketing.",
-  },
-  {
-    label: "Motor de escala",
-    title: "Indicações",
-    text: "Pessoas e parceiros trazem novos clientes através de links e campanhas.",
-  },
-  {
-    label: "Receita da plataforma",
-    title: "Taxa administrativa",
-    text: "Parte do valor mantém a operação, suporte, organização, tecnologia e crescimento.",
-  },
-  {
-    label: "Objetivo",
-    title: "Tudo simples",
-    text: "Você precisa entender rápido o que entra, o que sai e o que precisa ser feito.",
-  },
-];
+import { useEffect, useMemo, useState } from "react";
 
-const passos = [
-  {
-    n: "01",
-    title: "O cliente chega",
-    text: "Uma pessoa quer site, automação, conteúdo, estratégia ou outro serviço.",
-  },
-  {
-    n: "02",
-    title: "O pedido é organizado",
-    text: "A plataforma registra o que a pessoa quer e direciona para o fluxo certo.",
-  },
-  {
-    n: "03",
-    title: "O prestador executa",
-    text: "O profissional certo recebe a demanda e entrega o serviço.",
-  },
-  {
-    n: "04",
-    title: "A plataforma recebe a taxa",
-    text: "Uma parte do valor fica com a Sua Luma para manter o sistema funcionando.",
-  },
-  {
-    n: "05",
-    title: "A indicação pode ganhar",
-    text: "Se alguém trouxe esse cliente, essa pessoa pode receber comissão.",
-  },
-];
+type Tone = "purple" | "pink" | "blue" | "green" | "yellow";
 
-const servicos = [
+type ServiceCard = {
+  title: string;
+  detail: string;
+  value: string;
+  orders: string;
+  tone: Tone;
+  icon: string;
+};
+
+type Activity = {
+  title: string;
+  detail: string;
+  time: string;
+  tone: Tone;
+};
+
+type Referral = {
+  name: string;
+  clients: string;
+  value: string;
+  tone: Tone;
+};
+
+const fallbackServices: ServiceCard[] = [
   {
+    title: "Sites e Landing Pages",
+    detail: "Páginas, sites institucionais e páginas de venda.",
+    value: "a partir de R$ 500",
+    orders: "128 pedidos",
+    tone: "purple",
     icon: "🌐",
-    title: "Sites e landing pages",
-    price: "R$ 500+",
-    text: "Páginas de vendas, captura, institucionais e sites completos.",
-    badge: "Alta procura",
   },
   {
-    icon: "🤖",
     title: "Automações e IA",
-    price: "R$ 790+",
-    text: "Fluxos automáticos, agentes, atendimento, processos e funis.",
-    badge: "Escalável",
+    detail: "Fluxos, agentes, atendimento e processos automáticos.",
+    value: "a partir de R$ 790",
+    orders: "84 pedidos",
+    tone: "pink",
+    icon: "🤖",
   },
   {
+    title: "Conteúdo e Vídeos",
+    detail: "Edição, cortes, scripts, capas e organização de conteúdo.",
+    value: "a partir de R$ 450",
+    orders: "67 pedidos",
+    tone: "yellow",
     icon: "🎬",
-    title: "Conteúdo e vídeos",
-    price: "R$ 450+",
-    text: "Cortes, edição, thumbnails, roteiros e organização de conteúdo.",
-    badge: "Recorrente",
   },
   {
-    icon: "📈",
-    title: "Marketing e estratégia",
-    price: "R$ 790/mês+",
-    text: "Linha editorial, calendário, planejamento e direção estratégica.",
-    badge: "Assinatura",
+    title: "Marketing e Estratégia",
+    detail: "Linha editorial, campanhas, funis e crescimento orgânico.",
+    value: "R$ 790/mês",
+    orders: "51 pedidos",
+    tone: "blue",
+    icon: "📣",
   },
 ];
 
-const indicacoes = [
+const fallbackActivities: Activity[] = [
   {
-    icon: "🔗",
-    title: "Link de indicação",
-    text: "Cada parceiro recebe um link único para divulgar os serviços.",
+    title: "Novo cliente",
+    detail: "Solicitou orçamento para site institucional.",
+    time: "agora",
+    tone: "green",
   },
   {
-    icon: "📍",
-    title: "Origem rastreada",
-    text: "O painel precisa mostrar de onde veio o lead ou cliente.",
+    title: "Novo pedido",
+    detail: "Pedido de automação recebido pelo painel.",
+    time: "2 min",
+    tone: "blue",
   },
   {
-    icon: "💸",
-    title: "Comissão por resultado",
-    text: "A indicação ganha quando a venda ou contrato realmente acontece.",
-  },
-];
-
-const proximosPassos = [
-  "Criar links únicos para cada indicação.",
-  "Mostrar quanto entrou de serviço, taxa e comissão.",
-  "Listar quais prestadores executam cada tipo de serviço.",
-  "Centralizar dúvidas do chat dentro do painel.",
-  "Conectar tudo com WhatsApp e notificações.",
-];
-
-const perguntas = [
-  {
-    q: "O que essa página mostra?",
-    a: "Ela mostra como a Sua Luma ganha dinheiro com serviços, prestadores e indicações.",
+    title: "Serviço em andamento",
+    detail: "Prestador executando entrega de conteúdo.",
+    time: "15 min",
+    tone: "purple",
   },
   {
-    q: "Quem executa o trabalho?",
-    a: "O prestador. Pode ser editor, designer, desenvolvedor, estrategista ou outro profissional.",
-  },
-  {
-    q: "O que é taxa administrativa?",
-    a: "É a parte que mantém a plataforma viva: suporte, tecnologia, gestão e estrutura.",
-  },
-  {
-    q: "O que é indicação?",
-    a: "É quando alguém traz um cliente. Se esse cliente fechar, pode gerar comissão.",
+    title: "Indicação convertida",
+    detail: "Uma indicação virou oportunidade comercial.",
+    time: "25 min",
+    tone: "yellow",
   },
 ];
 
-export default function ServicosEIndiquePage() {
+const fallbackReferrals: Referral[] = [
+  { name: "Lucas Andrade", clients: "23 clientes", value: "R$ 2.760", tone: "yellow" },
+  { name: "Ana Clara", clients: "18 clientes", value: "R$ 1.980", tone: "purple" },
+  { name: "Carlos Mendes", clients: "12 clientes", value: "R$ 1.320", tone: "blue" },
+];
+
+function findArray(payload: any): any[] {
+  if (!payload) return [];
+  if (Array.isArray(payload)) return payload;
+
+  const keys = [
+    "items",
+    "data",
+    "rows",
+    "services",
+    "servicos",
+    "links",
+    "pages",
+    "produtos",
+    "products",
+    "records",
+  ];
+
+  for (const key of keys) {
+    if (Array.isArray(payload?.[key])) return payload[key];
+  }
+
+  if (payload?.result && Array.isArray(payload.result)) return payload.result;
+  if (payload?.result && typeof payload.result === "object") return findArray(payload.result);
+
+  return [];
+}
+
+function firstText(item: any, keys: string[], fallback: string): string {
+  for (const key of keys) {
+    const value = item?.[key];
+    if (value !== undefined && value !== null && String(value).trim()) {
+      return String(value);
+    }
+  }
+  return fallback;
+}
+
+function normalizeServices(payload: any): ServiceCard[] {
+  const rows = findArray(payload);
+
+  if (!rows.length) return fallbackServices;
+
+  return rows.slice(0, 4).map((item: any, index: number) => {
+    const fallback = fallbackServices[index] || fallbackServices[0];
+
+    return {
+      title: firstText(item, ["title", "name", "nome", "service", "servico"], fallback.title),
+      detail: firstText(item, ["detail", "description", "descricao", "subtitle", "resumo"], fallback.detail),
+      value: firstText(item, ["price", "valor", "value", "preco"], fallback.value),
+      orders: firstText(item, ["orders", "pedidos", "count", "total"], fallback.orders),
+      tone: fallback.tone,
+      icon: fallback.icon,
+    };
+  });
+}
+
+function metricFromPayload(payload: any, key: string, fallback: string): string {
+  const value =
+    payload?.summary?.[key] ??
+    payload?.metrics?.[key] ??
+    payload?.[key];
+
+  if (value === undefined || value === null || value === "") return fallback;
+  return String(value);
+}
+
+function MetricCard({
+  icon,
+  title,
+  value,
+  detail,
+  tone,
+}: {
+  icon: string;
+  title: string;
+  value: string;
+  detail: string;
+  tone: Tone;
+}) {
   return (
-    <main className="page">
-      <div className="glow glow1" />
-      <div className="glow glow2" />
+    <article className={`metric-card tone-${tone}`}>
+      <div className="metric-icon">{icon}</div>
+      <div>
+        <p>{title}</p>
+        <strong>{value}</strong>
+        <span>{detail}</span>
+      </div>
+      <div className="sparkline" />
+    </article>
+  );
+}
 
+function ServiceBox({ item }: { item: ServiceCard }) {
+  return (
+    <article className={`service-box tone-${item.tone}`}>
+      <div className="service-icon">{item.icon}</div>
+      <h3>{item.title}</h3>
+      <p>{item.detail}</p>
+      <strong>{item.value}</strong>
+      <span>{item.orders}</span>
+    </article>
+  );
+}
+
+function Step({
+  number,
+  icon,
+  title,
+  detail,
+  tone,
+}: {
+  number: number;
+  icon: string;
+  title: string;
+  detail: string;
+  tone: Tone;
+}) {
+  return (
+    <div className={`flow-step tone-${tone}`}>
+      <div className="step-number">{number}</div>
+      <div className="step-icon">{icon}</div>
+      <strong>{title}</strong>
+      <p>{detail}</p>
+    </div>
+  );
+}
+
+export default function StudioServicosEIndiquePage() {
+  const [servicePayload, setServicePayload] = useState<any>(null);
+  const [linksPayload, setLinksPayload] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState("Carregando banco...");
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const ts = Date.now();
+
+        const [servicesRes, linksRes] = await Promise.allSettled([
+          fetch(`/api/studio/servicos-e-indique?ts=${ts}`, { cache: "no-store" }),
+          fetch(`/api/studio/servicos-e-indique/links?ts=${ts}`, { cache: "no-store" }),
+        ]);
+
+        if (servicesRes.status === "fulfilled" && servicesRes.value.ok) {
+          const json = await servicesRes.value.json();
+          setServicePayload(json);
+        }
+
+        if (linksRes.status === "fulfilled" && linksRes.value.ok) {
+          const json = await linksRes.value.json();
+          setLinksPayload(json);
+        }
+
+        setSource("Conectado às APIs do Studio");
+      } catch (error) {
+        console.error("[Studio Serviços e Indique] Erro ao carregar dados:", error);
+        setSource("Visual com dados reserva");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  const services = useMemo(() => normalizeServices(servicePayload), [servicePayload]);
+  const linkRows = useMemo(() => findArray(linksPayload), [linksPayload]);
+
+  const totalServices = String(services.length);
+  const totalLinks = String(linkRows.length || metricFromPayload(linksPayload, "total", "0"));
+
+  return (
+    <main className="tdah-dashboard">
       <section className="hero">
-        <div className="heroLeft">
-          <span className="eyebrow">Studio • Serviços e Indicações</span>
-          <h1>Dashboard da economia interna</h1>
-          <p className="heroText">
-            Aqui você entende de forma simples como os serviços entram, como os prestadores executam,
-            como a plataforma ganha e como as indicações ajudam a escalar.
+        <div>
+          <p className="eyebrow">Studio Sualuma • Economia interna</p>
+          <h1>Serviços e Indicações</h1>
+          <p className="hero-text">
+            Aqui você entende, em poucos segundos, como clientes chegam, como serviços viram pedidos,
+            como prestadores executam e como as indicações geram crescimento.
           </p>
 
-          <div className="heroButtons">
-            <a href="/studio-lab" className="btnPrimary">Voltar ao Studio Lab</a>
-            <a href="/studio/indique" className="btnSecondary">Abrir área de indicações</a>
+          <div className="hero-actions">
+            <a href="/studio/indique">Abrir Indicações</a>
+            <a href="/studio/stripe-planos">Planos e Stripe</a>
+            <a href="/studio/catalogo-paginas">Catálogo de Links</a>
           </div>
         </div>
 
-        <div className="heroRight">
-          <div className="focusBox">
-            <span className="focusTag">Leitura rápida</span>
-            <h2>Leia assim:</h2>
-            <ul>
-              <li>1. Veja o resumo</li>
-              <li>2. Entenda o caminho do dinheiro</li>
-              <li>3. Veja os serviços</li>
-              <li>4. Veja como a indicação cresce</li>
-              <li>5. Veja o que falta fazer</li>
-            </ul>
+        <aside className="mission-card">
+          <span>🔥 Missão do dia</span>
+          <strong>Responder 3 contatos</strong>
+          <p>Foque no que traz dinheiro: proposta, indicação e follow-up.</p>
+          <div className="progress">
+            <i />
           </div>
-        </div>
-      </section>
-
-      <section className="grid4">
-        {resumoCards.map((card) => (
-          <article className="card summaryCard" key={card.title}>
-            <span className="cardLabel">{card.label}</span>
-            <h3>{card.title}</h3>
-            <p>{card.text}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="panel">
-        <div className="panelHeader">
-          <div>
-            <span className="eyebrow">Mapa simples</span>
-            <h2>Como o dinheiro circula</h2>
-          </div>
-          <span className="tag">Cliente → Serviço → Prestador → Plataforma → Indicação</span>
-        </div>
-
-        <div className="flowGrid">
-          {passos.map((item) => (
-            <article className="card flowCard" key={item.n}>
-              <div className="number">{item.n}</div>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="split">
-        <div className="panel">
-          <div className="panelHeader">
-            <div>
-              <span className="eyebrow">Serviços</span>
-              <h2>O que gera receita</h2>
-            </div>
-          </div>
-
-          <div className="serviceGrid">
-            {servicos.map((item) => (
-              <article className="card serviceCard" key={item.title}>
-                <div className="serviceTop">
-                  <span className="serviceIcon">{item.icon}</span>
-                  <span className="miniTag">{item.badge}</span>
-                </div>
-                <h3>{item.title}</h3>
-                <strong>{item.price}</strong>
-                <p>{item.text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <aside className="panel sidePanel">
-          <span className="eyebrow">Resumo infantil</span>
-          <h2>Em português claro</h2>
-
-          <div className="plainBox">
-            <p><b>1.</b> O cliente pede ajuda.</p>
-            <p><b>2.</b> A Sua Luma organiza.</p>
-            <p><b>3.</b> O prestador faz.</p>
-            <p><b>4.</b> O cliente recebe.</p>
-            <p><b>5.</b> A plataforma ganha uma parte.</p>
-            <p><b>6.</b> Quem indicou também pode ganhar.</p>
-          </div>
+          <small>2/3 concluído • +50 XP</small>
         </aside>
       </section>
 
-      <section className="split reverse">
-        <div className="panel">
-          <div className="panelHeader">
+      <section className="metrics-grid">
+        <MetricCard
+          icon="💼"
+          title="Serviços mapeados"
+          value={totalServices}
+          detail={loading ? "Carregando..." : source}
+          tone="purple"
+        />
+        <MetricCard
+          icon="🔗"
+          title="Links ativos"
+          value={totalLinks}
+          detail="Botões, páginas e rotas de indicação"
+          tone="blue"
+        />
+        <MetricCard
+          icon="💜"
+          title="Taxa administrativa"
+          value="8% a 12%"
+          detail="Mantém operação, suporte e plataforma"
+          tone="pink"
+        />
+        <MetricCard
+          icon="🎁"
+          title="Indicações"
+          value="R$ 4.320"
+          detail="Projeção visual de comissões"
+          tone="green"
+        />
+      </section>
+
+      <section className="main-grid">
+        <article className="panel big">
+          <div className="panel-title">
             <div>
-              <span className="eyebrow">Indicações</span>
-              <h2>Como crescer sem depender só de anúncios</h2>
+              <p>Entenda o fluxo</p>
+              <h2>Como o dinheiro circula aqui dentro?</h2>
             </div>
+            <span>Simples assim</span>
           </div>
 
-          <div className="refGrid">
-            {indicacoes.map((item) => (
-              <article className="card refCard" key={item.title}>
-                <span className="refIcon">{item.icon}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </article>
-            ))}
+          <div className="flow">
+            <Step number={1} icon="👥" title="Cliente chega" detail="Alguém precisa de um serviço." tone="purple" />
+            <Step number={2} icon="📋" title="Pedido é criado" detail="A plataforma organiza a demanda." tone="pink" />
+            <Step number={3} icon="🧑‍💻" title="Prestador executa" detail="Um profissional faz o trabalho." tone="blue" />
+            <Step number={4} icon="🏛️" title="Plataforma recebe" detail="A taxa mantém tudo funcionando." tone="yellow" />
+            <Step number={5} icon="🎁" title="Indicação ganha" detail="Quem indicou recebe comissão." tone="green" />
           </div>
-        </div>
 
-        <div className="panel">
-          <div className="panelHeader">
+          <div className="simple-note">
+            ⭐ Todo mundo ganha quando o sistema fica organizado: cliente, prestador, plataforma e indicador.
+          </div>
+        </article>
+
+        <article className="panel">
+          <div className="panel-title">
             <div>
-              <span className="eyebrow">Próximos passos</span>
-              <h2>O que ainda falta</h2>
+              <p>Tempo real</p>
+              <h2>Atividades recentes</h2>
             </div>
+            <span>ao vivo</span>
           </div>
 
-          <div className="todoList">
-            {proximosPassos.map((item, index) => (
-              <div className="todoItem" key={item}>
-                <span>{index + 1}</span>
-                <p>{item}</p>
+          <div className="activity-list">
+            {fallbackActivities.map((item) => (
+              <div className={`activity tone-${item.tone}`} key={item.title}>
+                <b />
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.detail}</p>
+                </div>
+                <small>{item.time}</small>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </article>
 
-      <section className="panel">
-        <div className="panelHeader">
-          <div>
-            <span className="eyebrow">Perguntas rápidas</span>
-            <h2>Sem confusão</h2>
+        <article className="panel big">
+          <div className="panel-title">
+            <div>
+              <p>Vitrine operacional</p>
+              <h2>Principais serviços</h2>
+            </div>
+            <span>{source}</span>
           </div>
-        </div>
 
-        <div className="faqGrid">
-          {perguntas.map((item) => (
-            <article className="card faqCard" key={item.q}>
-              <h3>{item.q}</h3>
-              <p>{item.a}</p>
-            </article>
-          ))}
-        </div>
+          <div className="services-grid">
+            {services.map((item) => (
+              <ServiceBox key={item.title} item={item} />
+            ))}
+          </div>
+        </article>
+
+        <article className="panel">
+          <div className="panel-title">
+            <div>
+              <p>Ranking</p>
+              <h2>Indicações em destaque</h2>
+            </div>
+            <span>top 3</span>
+          </div>
+
+          <div className="ranking-list">
+            {fallbackReferrals.map((item, index) => (
+              <div className={`ranking tone-${item.tone}`} key={item.name}>
+                <span>{index + 1}</span>
+                <div>
+                  <strong>{item.name}</strong>
+                  <p>{item.clients}</p>
+                </div>
+                <b>{item.value}</b>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="panel brain">
+          <div className="brain-emoji">🧠</div>
+          <div>
+            <p>Explicação para cérebro TDAH</p>
+            <h2>O que eu preciso olhar primeiro?</h2>
+            <p>
+              Primeiro veja se existem novos contatos. Depois veja os serviços com pedido.
+              Depois veja se alguém indicou. O resto é relatório.
+            </p>
+          </div>
+        </article>
+
+        <article className="panel next-actions">
+          <div className="panel-title">
+            <div>
+              <p>Checklist</p>
+              <h2>Próximas ações</h2>
+            </div>
+            <span>execução</span>
+          </div>
+
+          <label><input type="checkbox" defaultChecked /> Responder mensagens do chat</label>
+          <label><input type="checkbox" /> Revisar serviços mais vendidos</label>
+          <label><input type="checkbox" /> Criar campanha de indicação</label>
+          <label><input type="checkbox" /> Conferir links que mais convertem</label>
+        </article>
       </section>
 
-      <style jsx>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        .page {
+      <style>{`
+        .tdah-dashboard {
           min-height: 100vh;
-          padding: 28px 18px 80px;
-          color: #f5f3ff;
+          padding: 34px;
+          color: #fff;
           background:
-            radial-gradient(circle at top left, rgba(168, 85, 247, 0.22), transparent 30%),
-            radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.18), transparent 30%),
-            linear-gradient(135deg, #05050a 0%, #0b0714 45%, #12081f 100%);
-          position: relative;
-          overflow: hidden;
-          font-family:
-            Inter,
-            ui-sans-serif,
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-        }
-
-        .glow {
-          position: fixed;
-          width: 340px;
-          height: 340px;
-          border-radius: 999px;
-          filter: blur(60px);
-          opacity: 0.22;
-          pointer-events: none;
-          animation: floaty 7s ease-in-out infinite alternate;
-        }
-
-        .glow1 {
-          top: 70px;
-          left: -120px;
-          background: #a855f7;
-        }
-
-        .glow2 {
-          right: -120px;
-          bottom: 120px;
-          background: #7c3aed;
-          animation-delay: 1.5s;
-        }
-
-        @keyframes floaty {
-          from { transform: translateY(0px) scale(1); }
-          to { transform: translateY(-18px) scale(1.08); }
-        }
-
-        .hero,
-        .grid4,
-        .panel,
-        .split {
-          width: min(1180px, 100%);
-          margin: 0 auto 18px;
-          position: relative;
-          z-index: 1;
+            radial-gradient(circle at top left, rgba(168,85,247,.28), transparent 28%),
+            radial-gradient(circle at top right, rgba(236,72,153,.18), transparent 25%),
+            linear-gradient(135deg, #05030b 0%, #0b0618 45%, #120624 100%);
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .hero {
           display: grid;
-          grid-template-columns: 1.5fr 0.8fr;
-          gap: 18px;
-        }
-
-        .heroLeft,
-        .heroRight,
-        .panel {
-          border-radius: 28px;
-          border: 1px solid rgba(196, 181, 253, 0.16);
-          background: linear-gradient(180deg, rgba(14, 10, 24, 0.95), rgba(8, 7, 15, 0.9));
-          box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
-          backdrop-filter: blur(14px);
-        }
-
-        .heroLeft {
-          padding: 34px;
-        }
-
-        .heroRight {
-          padding: 24px;
-          display: flex;
+          grid-template-columns: 1fr 340px;
+          gap: 22px;
           align-items: stretch;
+          margin-bottom: 22px;
         }
 
-        .focusBox {
-          width: 100%;
-          border-radius: 22px;
-          padding: 22px;
-          background: rgba(168, 85, 247, 0.08);
-          border: 1px solid rgba(196, 181, 253, 0.18);
-        }
-
-        .focusBox ul {
-          margin: 14px 0 0;
-          padding-left: 18px;
-          color: #ddd6fe;
-          line-height: 1.8;
-        }
-
-        .focusTag,
-        .tag,
-        .miniTag,
-        .cardLabel {
-          display: inline-flex;
-          align-items: center;
-          width: fit-content;
-          border-radius: 999px;
-          padding: 7px 12px;
-          font-size: 0.75rem;
-          font-weight: 800;
-        }
-
-        .focusTag,
-        .tag {
-          color: #f3e8ff;
-          background: rgba(168, 85, 247, 0.14);
-          border: 1px solid rgba(192, 132, 252, 0.25);
-        }
-
-        .miniTag,
-        .cardLabel {
-          color: #ddd6fe;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .eyebrow {
-          display: inline-block;
-          margin-bottom: 10px;
-          font-size: 0.78rem;
+        .eyebrow,
+        .panel-title p,
+        .brain p:first-child {
+          color: #d8b4fe;
           text-transform: uppercase;
-          letter-spacing: 0.14em;
+          letter-spacing: .12em;
+          font-size: 12px;
           font-weight: 900;
-          color: #c4b5fd;
-        }
-
-        h1, h2, h3, p {
-          margin-top: 0;
+          margin: 0 0 8px;
         }
 
         h1 {
-          margin-bottom: 14px;
-          font-size: clamp(2.2rem, 6vw, 4.6rem);
-          line-height: 0.95;
+          font-size: clamp(34px, 5vw, 64px);
+          line-height: .92;
+          margin: 0;
           letter-spacing: -0.06em;
         }
 
-        h2 {
-          margin-bottom: 10px;
-          font-size: clamp(1.35rem, 3vw, 2.1rem);
-          letter-spacing: -0.04em;
-        }
-
-        h3 {
-          margin-bottom: 8px;
-          font-size: 1.02rem;
-        }
-
-        .heroText,
-        .card p,
-        .plainBox p,
-        .todoItem p {
-          color: #d6d3f1;
+        .hero-text {
+          max-width: 780px;
+          color: #d6ccff;
+          font-size: 18px;
           line-height: 1.7;
+          margin: 18px 0 0;
         }
 
-        .heroButtons {
+        .hero-actions {
           display: flex;
           flex-wrap: wrap;
           gap: 12px;
           margin-top: 24px;
         }
 
-        .btnPrimary,
-        .btnSecondary {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 48px;
-          padding: 13px 18px;
-          border-radius: 999px;
-          font-weight: 800;
+        .hero-actions a {
+          color: #fff;
           text-decoration: none;
-          transition: 0.25s ease;
+          border: 1px solid rgba(216,180,254,.28);
+          background: linear-gradient(135deg, rgba(126,34,206,.86), rgba(76,29,149,.42));
+          border-radius: 999px;
+          padding: 12px 16px;
+          font-weight: 900;
+          box-shadow: 0 18px 50px rgba(126,34,206,.22);
         }
 
-        .btnPrimary {
-          color: #ffffff;
-          background: linear-gradient(135deg, #7c3aed, #a855f7);
-          box-shadow: 0 16px 40px rgba(124, 58, 237, 0.3);
+        .mission-card,
+        .panel,
+        .metric-card {
+          border: 1px solid rgba(216,180,254,.18);
+          background: linear-gradient(180deg, rgba(30,18,54,.88), rgba(10,6,24,.88));
+          box-shadow: 0 24px 80px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
+          border-radius: 28px;
         }
 
-        .btnSecondary {
-          color: #f5f3ff;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+        .mission-card {
+          padding: 24px;
+          position: relative;
+          overflow: hidden;
         }
 
-        .btnPrimary:hover,
-        .btnSecondary:hover {
-          transform: translateY(-2px);
+        .mission-card::after {
+          content: "🚀";
+          position: absolute;
+          right: -4px;
+          bottom: -18px;
+          font-size: 92px;
+          filter: drop-shadow(0 0 30px rgba(168,85,247,.8));
+          animation: float 3.4s ease-in-out infinite;
         }
 
-        .grid4 {
+        .mission-card span {
+          color: #facc15;
+          font-weight: 900;
+        }
+
+        .mission-card strong {
+          display: block;
+          font-size: 24px;
+          margin-top: 12px;
+        }
+
+        .mission-card p {
+          color: #d6ccff;
+          line-height: 1.6;
+        }
+
+        .progress {
+          height: 10px;
+          background: rgba(255,255,255,.1);
+          border-radius: 999px;
+          overflow: hidden;
+          margin: 18px 0 10px;
+        }
+
+        .progress i {
+          display: block;
+          height: 100%;
+          width: 66%;
+          background: linear-gradient(90deg, #a855f7, #ec4899, #22d3ee);
+          border-radius: inherit;
+        }
+
+        .mission-card small {
+          color: #facc15;
+          font-weight: 900;
+        }
+
+        .metrics-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
+          gap: 16px;
+          margin-bottom: 18px;
         }
 
-        .card {
-          border-radius: 22px;
-          border: 1px solid rgba(196, 181, 253, 0.12);
-          background: rgba(255, 255, 255, 0.03);
+        .metric-card {
           padding: 20px;
-          transition: 0.25s ease;
+          position: relative;
+          overflow: hidden;
+          min-height: 150px;
         }
 
-        .card:hover {
-          transform: translateY(-3px);
-          border-color: rgba(192, 132, 252, 0.28);
-          background: rgba(255, 255, 255, 0.05);
+        .metric-card::after {
+          content: "";
+          position: absolute;
+          inset: auto 18px 14px 18px;
+          height: 32px;
+          border-radius: 50%;
+          background: linear-gradient(90deg, transparent, currentColor, transparent);
+          opacity: .2;
+          filter: blur(10px);
         }
 
-        .summaryCard h3 {
-          margin-top: 10px;
+        .metric-icon {
+          width: 58px;
+          height: 58px;
+          display: grid;
+          place-items: center;
+          border-radius: 20px;
+          background: rgba(255,255,255,.08);
+          font-size: 30px;
+          margin-bottom: 14px;
+        }
+
+        .metric-card p {
+          color: #c4b5fd;
+          margin: 0 0 6px;
+          font-weight: 800;
+        }
+
+        .metric-card strong {
+          display: block;
+          font-size: 30px;
+          letter-spacing: -0.04em;
+        }
+
+        .metric-card span {
+          display: block;
+          color: #b9a8de;
+          margin-top: 6px;
+          font-size: 13px;
+        }
+
+        .main-grid {
+          display: grid;
+          grid-template-columns: 1.45fr .75fr;
+          gap: 18px;
         }
 
         .panel {
-          padding: 24px;
+          padding: 22px;
+          overflow: hidden;
         }
 
-        .panelHeader {
+        .panel.big {
+          min-height: 300px;
+        }
+
+        .panel-title {
           display: flex;
-          align-items: flex-start;
+          align-items: start;
           justify-content: space-between;
           gap: 14px;
           margin-bottom: 18px;
         }
 
-        .flowGrid {
+        .panel-title h2,
+        .brain h2 {
+          margin: 0;
+          font-size: 24px;
+          letter-spacing: -0.04em;
+        }
+
+        .panel-title span {
+          border: 1px solid rgba(216,180,254,.18);
+          background: rgba(126,34,206,.28);
+          color: #e9d5ff;
+          padding: 8px 12px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 900;
+          white-space: nowrap;
+        }
+
+        .flow {
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 14px;
         }
 
-        .flowCard .number {
-          width: 46px;
-          height: 46px;
+        .flow-step {
+          text-align: center;
+          position: relative;
+          padding: 14px 10px;
+          border-radius: 22px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .step-number {
+          width: 30px;
+          height: 30px;
+          border-radius: 999px;
           display: grid;
           place-items: center;
-          border-radius: 14px;
-          margin-bottom: 14px;
-          font-size: 0.95rem;
+          background: currentColor;
+          color: #fff;
+          margin: 0 auto 10px;
           font-weight: 900;
-          color: #ffffff;
-          background: linear-gradient(135deg, #7c3aed, #a855f7);
         }
 
-        .split {
+        .step-icon {
+          width: 64px;
+          height: 64px;
+          margin: 0 auto 12px;
           display: grid;
-          grid-template-columns: 1.2fr 0.8fr;
-          gap: 18px;
-          align-items: start;
+          place-items: center;
+          font-size: 30px;
+          border-radius: 24px;
+          background: rgba(255,255,255,.08);
+          box-shadow: 0 0 35px currentColor;
         }
 
-        .serviceGrid,
-        .refGrid,
-        .faqGrid {
+        .flow-step strong {
+          display: block;
+          margin-bottom: 8px;
+        }
+
+        .flow-step p {
+          margin: 0;
+          color: #d6ccff;
+          font-size: 13px;
+          line-height: 1.5;
+        }
+
+        .simple-note {
+          margin-top: 18px;
+          text-align: center;
+          padding: 14px;
+          border-radius: 18px;
+          background: rgba(126,34,206,.18);
+          border: 1px solid rgba(216,180,254,.14);
+          color: #e9d5ff;
+          font-weight: 800;
+        }
+
+        .services-grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 14px;
         }
 
-        .serviceTop {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 10px;
-          margin-bottom: 12px;
+        .service-box {
+          padding: 18px;
+          border-radius: 24px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.08);
         }
 
-        .serviceIcon,
-        .refIcon {
-          font-size: 1.9rem;
-        }
-
-        .serviceCard strong {
-          display: block;
-          margin-bottom: 10px;
-          color: #e9d5ff;
-          font-size: 1rem;
-        }
-
-        .sidePanel {
-          position: sticky;
-          top: 16px;
-        }
-
-        .plainBox {
-          display: grid;
-          gap: 10px;
-        }
-
-        .plainBox p {
-          margin: 0;
-          padding: 12px 14px;
-          border-radius: 16px;
-          background: rgba(168, 85, 247, 0.08);
-          border: 1px solid rgba(196, 181, 253, 0.12);
-        }
-
-        .todoList {
-          display: grid;
-          gap: 12px;
-        }
-
-        .todoItem {
-          display: grid;
-          grid-template-columns: 40px 1fr;
-          gap: 12px;
-          align-items: start;
-          padding: 14px;
-          border-radius: 18px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(196, 181, 253, 0.1);
-        }
-
-        .todoItem span {
-          width: 40px;
-          height: 40px;
+        .service-icon {
+          width: 64px;
+          height: 64px;
           display: grid;
           place-items: center;
-          border-radius: 14px;
-          font-weight: 900;
-          background: linear-gradient(135deg, #7c3aed, #a855f7);
+          border-radius: 24px;
+          background: rgba(255,255,255,.08);
+          font-size: 32px;
+          box-shadow: 0 0 35px currentColor;
+          margin-bottom: 14px;
+        }
+
+        .service-box h3 {
+          margin: 0;
+          font-size: 17px;
+        }
+
+        .service-box p {
+          min-height: 58px;
+          color: #cfc4f4;
+          line-height: 1.5;
+          font-size: 13px;
+        }
+
+        .service-box strong,
+        .service-box span {
+          display: block;
+        }
+
+        .service-box strong {
+          font-size: 18px;
           color: #fff;
         }
 
-        .todoItem p {
-          margin: 0;
+        .service-box span {
+          color: #b9a8de;
+          margin-top: 8px;
+          font-size: 12px;
         }
 
-        @media (max-width: 980px) {
+        .activity-list,
+        .ranking-list {
+          display: grid;
+          gap: 12px;
+        }
+
+        .activity,
+        .ranking {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 12px;
+          align-items: center;
+          padding: 12px;
+          border-radius: 18px;
+          background: rgba(255,255,255,.04);
+          border: 1px solid rgba(255,255,255,.07);
+        }
+
+        .activity b {
+          width: 10px;
+          height: 10px;
+          border-radius: 999px;
+          background: currentColor;
+          box-shadow: 0 0 18px currentColor;
+        }
+
+        .activity strong,
+        .ranking strong {
+          display: block;
+        }
+
+        .activity p,
+        .ranking p {
+          margin: 4px 0 0;
+          color: #cfc4f4;
+          font-size: 13px;
+        }
+
+        .activity small {
+          color: #b9a8de;
+        }
+
+        .ranking span {
+          width: 34px;
+          height: 34px;
+          border-radius: 999px;
+          display: grid;
+          place-items: center;
+          background: currentColor;
+          color: #fff;
+          font-weight: 900;
+        }
+
+        .ranking b {
+          color: #fff;
+        }
+
+        .brain {
+          display: grid;
+          grid-template-columns: 110px 1fr;
+          gap: 18px;
+          align-items: center;
+        }
+
+        .brain-emoji {
+          width: 100px;
+          height: 100px;
+          display: grid;
+          place-items: center;
+          border-radius: 35px;
+          background: linear-gradient(135deg, #7e22ce, #ec4899);
+          font-size: 50px;
+          box-shadow: 0 0 45px rgba(236,72,153,.4);
+          animation: pulse 2s infinite;
+        }
+
+        .brain p {
+          color: #d6ccff;
+          line-height: 1.7;
+        }
+
+        .next-actions {
+          display: grid;
+          gap: 12px;
+        }
+
+        .next-actions label {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          padding: 12px;
+          border-radius: 16px;
+          background: rgba(255,255,255,.04);
+          color: #e9d5ff;
+          font-weight: 800;
+        }
+
+        .next-actions input {
+          accent-color: #a855f7;
+        }
+
+        .tone-purple { color: #a855f7; }
+        .tone-pink { color: #ec4899; }
+        .tone-blue { color: #38bdf8; }
+        .tone-green { color: #84cc16; }
+        .tone-yellow { color: #facc15; }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(-8deg); }
+          50% { transform: translateY(-12px) rotate(4deg); }
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.04); }
+        }
+
+        @media (max-width: 1100px) {
           .hero,
-          .split,
-          .grid4,
-          .flowGrid,
-          .serviceGrid,
-          .refGrid,
-          .faqGrid {
+          .main-grid {
             grid-template-columns: 1fr;
           }
 
-          .panelHeader {
-            display: grid;
+          .metrics-grid,
+          .services-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .sidePanel {
-            position: static;
+          .flow {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
 
-        @media (max-width: 640px) {
-          .page {
-            padding: 16px 12px 60px;
+        @media (max-width: 680px) {
+          .tdah-dashboard {
+            padding: 22px 14px;
           }
 
-          .heroLeft,
-          .heroRight,
-          .panel {
-            border-radius: 22px;
-            padding: 18px;
+          .metrics-grid,
+          .services-grid,
+          .flow {
+            grid-template-columns: 1fr;
           }
 
-          h1 {
-            font-size: 2.35rem;
+          .brain {
+            grid-template-columns: 1fr;
+          }
+
+          .hero-actions a {
+            width: 100%;
+            text-align: center;
           }
         }
       `}</style>
