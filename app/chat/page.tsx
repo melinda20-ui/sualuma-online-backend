@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-type Tab = "tudo" | "chats" | "agentes" | "automacoes";
+type Tab = "chats" | "agentes" | "automacoes";
 
 type Thread = {
   id: string;
   title: string;
-  agent_slug?: string;
+  kind?: string;
+  status?: string;
   summary?: string;
   last_message?: string;
   messages_count?: number;
@@ -18,33 +19,37 @@ type Thread = {
 type Message = {
   id: string;
   thread_id: string;
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant" | "system" | string;
   content: string;
   created_at?: string;
 };
 
 type Agent = {
   id: string;
-  slug: string;
+  slug?: string;
   name: string;
   subtitle?: string;
+  description?: string;
+  status?: string;
   badge?: string;
-  is_active?: boolean;
+  metadata?: any;
 };
 
 type Automation = {
   id: string;
-  slug: string;
+  slug?: string;
   name: string;
-  subtitle?: string;
-  badge?: string;
-  is_active?: boolean;
+  title?: string;
+  description?: string;
   status?: string;
+  frequency?: string;
+  metadata?: any;
 };
 
-type DashboardData = {
+type ChatData = {
   ok: boolean;
   source?: string;
+  generated_at?: string;
   selectedThreadId?: string;
   metrics?: {
     threads_total?: number;
@@ -56,421 +61,662 @@ type DashboardData = {
   messages?: Message[];
   agents?: Agent[];
   automations?: Automation[];
-  generated_at?: string;
   error?: string;
 };
 
-function timeAgo(date?: string) {
-  if (!date) return "agora";
-  const diff = Date.now() - new Date(date).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return "agora";
-  if (min < 60) return `${min}min`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `${h}h`;
-  const d = Math.floor(h / 24);
-  return `${d}d`;
-}
-
-function Badge({ children, blue = false }: { children: React.ReactNode; blue?: boolean }) {
-  return <span className={blue ? "badge blue" : "badge"}>{children}</span>;
+function shortTime(value?: string) {
+  if (!value) return "agora";
+  try {
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(value));
+  } catch {
+    return "agora";
+  }
 }
 
 export default function ChatPage() {
-  const [tab, setTab] = useState<Tab>("tudo");
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [selectedThreadId, setSelectedThreadId] = useState("");
-  const [message, setMessage] = useState("");
+  const [data, setData] = useState<ChatData | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>("chats");
+  const [selectedThreadId, setSelectedThreadId] = useState<string>("");
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const threads = data?.threads || [];
   const messages = data?.messages || [];
   const agents = data?.agents || [];
   const automations = data?.automations || [];
+  const metrics = data?.metrics || {};
 
-  const selectedThread = threads.find((thread) => thread.id === selectedThreadId) || threads[0];
+  const selectedThread = useMemo(() => {
+    return threads.find((thread) => thread.id === selectedThreadId) || threads[0];
+  }, [threads, selectedThreadId]);
 
-  const currentTitle = useMemo(() => {
-    return selectedThread?.title ? `Mia Brain — ${selectedThread.title}` : "Mia Brain — Novo chat";
-  }, [selectedThread]);
-
-  async function load(threadId?: string) {
+  async function loadDashboard(threadId?: string) {
     try {
       setLoading(true);
-      const url = threadId
-        ? `/api/studio/chat-dashboard?threadId=${encodeURIComponent(threadId)}`
-        : "/api/studio/chat-dashboard";
-
-      const res = await fetch(url, { cache: "no-store" });
-      const json = await res.json();
-
+      const query = threadId ? `?threadId=${encodeURIComponent(threadId)}&t=${Date.now()}` : `?t=${Date.now()}`;
+      const response = await fetch(`/api/studio/chat-dashboard${query}`, {
+        cache: "no-store",
+      });
+      const json = await response.json();
       setData(json);
 
       if (!selectedThreadId && json?.selectedThreadId) {
         setSelectedThreadId(json.selectedThreadId);
       }
-    } catch (error) {
-      setData({ ok: false, error: "Falha ao carregar chat." });
+    } catch (error: any) {
+      setData({
+        ok: false,
+        error: error?.message || "Erro ao carregar chat.",
+      });
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => {
-    load();
-    const timer = window.setInterval(() => {
-      if (selectedThreadId) load(selectedThreadId);
-    }, 30000);
-
-    return () => window.clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedThreadId]);
-
-  async function selectThread(threadId: string) {
-    setSelectedThreadId(threadId);
-    await load(threadId);
-  }
-
-  async function createThread() {
-    const title = prompt("Nome do novo chat:", "Novo chat");
-    if (!title) return;
-
-    const res = await fetch("/api/studio/chat-dashboard", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "create-thread", title }),
-    });
-
-    const json = await res.json();
-
-    if (json?.ok && json?.thread?.id) {
-      setSelectedThreadId(json.thread.id);
-      await load(json.thread.id);
-    } else {
-      alert(json?.error || "Não consegui criar o chat.");
-    }
-  }
-
   async function sendMessage() {
-    if (!message.trim() || !selectedThreadId || sending) return;
+    const content = input.trim();
+    if (!content || sending) return;
 
-    const content = message.trim();
-    setMessage("");
+    setInput("");
     setSending(true);
 
     try {
-      const res = await fetch("/api/studio/chat-dashboard", {
+      const response = await fetch("/api/studio/chat-dashboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        cache: "no-store",
         body: JSON.stringify({
-          action: "send-message",
-          thread_id: selectedThreadId,
+          threadId: selectedThread?.id || selectedThreadId,
           content,
         }),
       });
 
-      const json = await res.json();
+      const json = await response.json();
 
-      if (!json?.ok) {
-        alert(json?.error || "Não consegui enviar a mensagem.");
+      if (json?.threadId) {
+        setSelectedThreadId(json.threadId);
+        await loadDashboard(json.threadId);
+      } else {
+        await loadDashboard(selectedThread?.id || selectedThreadId);
       }
-
-      await load(selectedThreadId);
+    } catch {
+      await loadDashboard(selectedThread?.id || selectedThreadId);
     } finally {
       setSending(false);
     }
   }
 
-  async function toggleAutomation(auto: Automation) {
-    await fetch("/api/studio/chat-dashboard", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "toggle-automation",
-        slug: auto.slug,
-        is_active: !auto.is_active,
-      }),
-    });
+  useEffect(() => {
+    loadDashboard();
+    const timer = setInterval(() => {
+      loadDashboard(selectedThreadId);
+    }, 15000);
 
-    await load(selectedThreadId);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, sending]);
+
+  function openThread(id: string) {
+    setSelectedThreadId(id);
+    loadDashboard(id);
   }
-
-  const visibleChats = tab === "tudo" || tab === "chats";
-  const visibleAgents = tab === "tudo" || tab === "agentes";
-  const visibleAutomations = tab === "tudo" || tab === "automacoes";
 
   return (
     <main className="chat-shell">
       <aside className="sidebar">
         <div className="brand">
-          <div className="brand-icon">S</div>
+          <div className="logo">✦</div>
           <div>
-            <strong>sualuma</strong>
-            <span>Seu universo de IA</span>
+            <strong>Sualuma Chat</strong>
+            <span>Banco vivo + Mia Brain</span>
           </div>
-          <button className="collapse">‹</button>
         </div>
 
-        <button className="new-chat" onClick={createThread}>
-          <span>＋</span>
-          Novo chat
-          <small>DB</small>
-        </button>
+        <div className="metrics">
+          <div>
+            <strong>{metrics.threads_total ?? threads.length}</strong>
+            <span>Chats</span>
+          </div>
+          <div>
+            <strong>{metrics.agents_active ?? agents.length}</strong>
+            <span>Agentes</span>
+          </div>
+          <div>
+            <strong>{metrics.automations_active ?? automations.length}</strong>
+            <span>Automações</span>
+          </div>
+        </div>
 
         <div className="tabs">
-          <button onClick={() => setTab("tudo")} className={tab === "tudo" ? "active" : ""}>Tudo</button>
-          <button onClick={() => setTab("chats")} className={tab === "chats" ? "active" : ""}>Chats</button>
-          <button onClick={() => setTab("agentes")} className={tab === "agentes" ? "active" : ""}>Agentes</button>
-          <button onClick={() => setTab("automacoes")} className={tab === "automacoes" ? "active" : ""}>Automações</button>
+          <button className={activeTab === "chats" ? "active" : ""} onClick={() => setActiveTab("chats")}>
+            Chats
+          </button>
+          <button className={activeTab === "agentes" ? "active" : ""} onClick={() => setActiveTab("agentes")}>
+            Agentes
+          </button>
+          <button className={activeTab === "automacoes" ? "active" : ""} onClick={() => setActiveTab("automacoes")}>
+            Automações
+          </button>
         </div>
 
-        <div className="sidebar-scroll">
-          {visibleChats && (
-            <section className="side-section">
-              <div className="section-head">
-                <span>Conversas</span>
-                <button>{loading ? "..." : "⌃"}</button>
+        <div className="list">
+          {activeTab === "chats" &&
+            threads.map((thread) => (
+              <button
+                key={thread.id}
+                className={`list-card ${selectedThread?.id === thread.id ? "selected" : ""}`}
+                onClick={() => openThread(thread.id)}
+              >
+                <strong>{thread.title}</strong>
+                <span>{thread.last_message || thread.summary || "Sem mensagens ainda."}</span>
+                <small>{thread.messages_count || 0} mensagens · {shortTime(thread.updated_at || thread.created_at)}</small>
+              </button>
+            ))}
+
+          {activeTab === "agentes" &&
+            agents.map((agent) => (
+              <div key={agent.id} className="list-card static">
+                <strong>{agent.name}</strong>
+                <span>{agent.subtitle || agent.description || agent.slug || "Agente conectado ao sistema."}</span>
+                <small>{agent.status || "ativo"}</small>
               </div>
+            ))}
 
-              {threads.map((thread) => (
-                <button
-                  key={thread.id}
-                  className={selectedThreadId === thread.id ? "side-item selected" : "side-item"}
-                  onClick={() => selectThread(thread.id)}
-                >
-                  <span className="mini-icon">☰</span>
-                  <strong>{thread.title}</strong>
-                  <em>{timeAgo(thread.updated_at)}</em>
-                </button>
-              ))}
-
-              {threads.length === 0 && <p className="empty">Nenhum chat ainda.</p>}
-            </section>
-          )}
-
-          {visibleAgents && (
-            <section className="side-section">
-              <div className="section-head">
-                <span>Agentes</span>
-                <button>＋</button>
+          {activeTab === "automacoes" &&
+            automations.map((automation) => (
+              <div key={automation.id} className="list-card static">
+                <strong>{automation.name || automation.title}</strong>
+                <span>{automation.description || automation.frequency || automation.slug || "Automação do sistema."}</span>
+                <small>{automation.status || "ativa"}</small>
               </div>
+            ))}
 
-              {agents.map((agent) => (
-                <button key={agent.id} className="agent-item">
-                  <span className="avatar">{agent.name.slice(0, 1)}</span>
-                  <span>
-                    <strong>{agent.name}</strong>
-                    <small>{agent.subtitle || "Agente conectado"}</small>
-                  </span>
-                  <Badge blue={agent.badge === "Criado"}>{agent.badge || "Criado"}</Badge>
-                  {agent.is_active && <i />}
-                </button>
-              ))}
-            </section>
-          )}
-
-          {visibleAutomations && (
-            <section className="side-section">
-              <div className="section-head">
-                <span>Automações</span>
-                <button>＋</button>
-              </div>
-
-              {automations.map((auto) => (
-                <button key={auto.id} className="agent-item" onClick={() => toggleAutomation(auto)}>
-                  <span className="auto-icon">✦</span>
-                  <span>
-                    <strong>{auto.name}</strong>
-                    <small>{auto.subtitle || "Automação conectada"}</small>
-                  </span>
-                  <Badge blue={auto.badge === "Criada"}>{auto.badge || "Criada"}</Badge>
-                  {auto.is_active && <i />}
-                </button>
-              ))}
-            </section>
+          {!loading && activeTab === "chats" && !threads.length && (
+            <div className="empty">Nenhuma conversa encontrada no banco.</div>
           )}
         </div>
 
-        <div className="profile">
-          <div className="profile-photo">L</div>
-          <div>
-            <strong>Luma Studio</strong>
-            <span>{data?.ok ? "Banco online" : "Banco offline"}</span>
-          </div>
-          <button>⋮</button>
+        <div className="source">
+          <span>{data?.ok ? "● Online" : "● Erro"}</span>
+          <small>{data?.source || "postgres-direct"} · {shortTime(data?.generated_at)}</small>
         </div>
       </aside>
 
-      <section className="main-chat">
+      <section className="chat-area">
         <header className="topbar">
-          <div className="conversation-title">
-            <div className="robot">◎</div>
-            <h1>{currentTitle}</h1>
-            <span>⌄</span>
+          <div>
+            <span className="eyebrow">Conversa ativa</span>
+            <h1>{selectedThread?.title || "Sualuma Chat"}</h1>
+            <p>{selectedThread?.summary || "Converse com a Mia, seus agentes e automações."}</p>
           </div>
 
-          <div className="top-actions">
-            <button onClick={() => load(selectedThreadId)}>↻ Atualizar</button>
-            <button>📎</button>
-            <button>🎙</button>
-            <button>⚙ Configurações</button>
+          <div className="status-pill">
+            <span>Banco vivo</span>
+            <strong>{data?.ok ? "Conectado" : "Erro"}</strong>
           </div>
         </header>
 
-        <div className="chat-body">
-          <div className="messages">
-            {messages.length === 0 && (
-              <div className="welcome">
-                <h2>💬 Chat conectado ao banco</h2>
-                <p>Crie conversas, envie mensagens e acompanhe tudo salvo no PostgreSQL/Supabase.</p>
-              </div>
-            )}
+        <div className="messages">
+          {loading && <div className="empty-message">Carregando dados do banco...</div>}
 
-            {messages.map((msg) =>
-              msg.role === "user" ? (
-                <div className="user-bubble" key={msg.id}>
-                  <p>{msg.content}</p>
-                  <span>{timeAgo(msg.created_at)} ✓✓</span>
-                </div>
-              ) : (
-                <div className="assistant-row" key={msg.id}>
-                  <div className="bot-avatar">🤖</div>
-                  <div className="assistant-bubble">
-                    <p className="intro">{msg.content}</p>
-                    <div className="message-actions">
-                      <button>⧉</button>
-                      <button>👍</button>
-                      <button>👎</button>
-                      <button>🔖</button>
-                      <span>{timeAgo(msg.created_at)}</span>
-                    </div>
-                  </div>
-                </div>
-              )
-            )}
-          </div>
+          {!loading && data?.error && (
+            <div className="empty-message error">{data.error}</div>
+          )}
 
-          <aside className="context-panel">
-            <div className="context-card">
-              <h3>Banco conectado</h3>
-              <div className="quick-list">
-                <p><span>Fonte</span><b>{data?.source || "postgres"}</b></p>
-                <p><span>Conversas</span><b>{data?.metrics?.threads_total || 0}</b></p>
-                <p><span>Mensagens</span><b>{data?.metrics?.messages_total || 0}</b></p>
-                <p><span>Agentes ativos</span><b>{data?.metrics?.agents_active || 0}</b></p>
-                <p><span>Automações ativas</span><b>{data?.metrics?.automations_active || 0}</b></p>
+          {!loading && !messages.length && !data?.error && (
+            <div className="welcome">
+              <div className="orb">✦</div>
+              <h2>O chat já está conectado ao banco.</h2>
+              <p>As conversas, agentes e automações vêm da API viva. Envie uma mensagem para registrar no banco.</p>
+            </div>
+          )}
+
+          {messages.map((message) => (
+            <div key={message.id} className={`message ${message.role === "user" ? "user" : "assistant"}`}>
+              <div className="bubble">
+                <small>{message.role === "user" ? "Você" : "Mia"}</small>
+                <p>{message.content}</p>
+                <span>{shortTime(message.created_at)}</span>
               </div>
             </div>
+          ))}
 
-            <div className="context-card">
-              <h3>Sobre este agente</h3>
-              <div className="agent-feature">
-                <div className="big-avatar">🤖</div>
-                <div>
-                  <strong>Mia Brain <Badge>Comprado</Badge></strong>
-                  <p>Sua assistente inteligente para estratégia, planejamento e tomada de decisão.</p>
-                </div>
+          {sending && (
+            <div className="message assistant">
+              <div className="bubble typing">
+                <small>Mia</small>
+                <p>Processando pelo painel vivo...</p>
               </div>
-              <button className="outline-btn">Ver detalhes do agente ↗</button>
             </div>
+          )}
 
-            <div className="context-card">
-              <div className="card-head">
-                <h3>Automações relacionadas</h3>
-                <button>Gerenciar</button>
-              </div>
-
-              {automations.slice(0, 4).map((auto) => (
-                <div className="toggle-line" key={auto.id} onClick={() => toggleAutomation(auto)}>
-                  <span>{auto.name}</span>
-                  <b>{auto.is_active ? "Ativa" : "Pausada"}</b>
-                  <i className={auto.is_active ? "on" : ""} />
-                </div>
-              ))}
-            </div>
-
-            <div className="pro-card">
-              <h3>💎 Próximo nível</h3>
-              <p>Agora o chat salva no banco. O próximo passo é ligar a resposta na Mia Brain real, usando Ollama/Gemini/OpenRouter.</p>
-              <button>Conectar IA real ›</button>
-            </div>
-          </aside>
+          <div ref={bottomRef} />
         </div>
 
-        <div className="composer">
-          <div className="input-wrap">
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Mensagem para Mia Brain..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-            />
-            <div className="composer-actions">
-              <button>📎 Anexar</button>
-              <button>🎙 Falar</button>
-            </div>
-            <button className="send" onClick={sendMessage} disabled={sending}>
-              {sending ? "..." : "➤"}
-            </button>
-          </div>
+        <footer className="composer">
+          <textarea
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+              }
+            }}
+            placeholder="Digite para a Mia..."
+          />
 
-          <p>{data?.ok ? "Conectado ao banco vivo." : data?.error || "Carregando banco..."}</p>
-        </div>
+          <button onClick={sendMessage} disabled={!input.trim() || sending}>
+            {sending ? "Enviando..." : "Enviar"}
+          </button>
+        </footer>
       </section>
 
-      <style jsx global>{`
-        *{box-sizing:border-box}
-        body{margin:0;background:#030712;color:#f8fafc;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-        button,textarea{font:inherit}
-        .chat-shell{min-height:100vh;display:grid;grid-template-columns:340px 1fr;background:radial-gradient(circle at 20% 0%,rgba(59,130,246,.2),transparent 32%),radial-gradient(circle at 70% 100%,rgba(147,51,234,.18),transparent 34%),linear-gradient(135deg,#020617,#050816 55%,#020617);padding:14px;gap:14px}
-        .sidebar,.main-chat{border:1px solid rgba(148,163,184,.22);background:rgba(3,7,18,.76);box-shadow:0 24px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.05);backdrop-filter:blur(18px);border-radius:22px;overflow:hidden}
-        .sidebar{display:flex;flex-direction:column;padding:14px}
-        .brand{display:flex;align-items:center;gap:12px;padding:4px 4px 12px}
-        .brand-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,rgba(34,211,238,.25),rgba(124,58,237,.25));color:#67e8f9;font-size:24px;font-weight:900;box-shadow:0 0 28px rgba(34,211,238,.35)}
-        .brand strong{display:block;font-size:24px;letter-spacing:-.04em}.brand span{color:#94a3b8;font-size:12px}
-        .collapse{margin-left:auto;width:30px;height:30px;border:1px solid rgba(148,163,184,.24);background:rgba(15,23,42,.65);color:white;border-radius:10px}
-        .new-chat{height:56px;border:0;color:white;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#2563eb);box-shadow:0 0 28px rgba(37,99,235,.35);display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;cursor:pointer}
-        .new-chat span{font-size:24px}.new-chat small{margin-left:auto;margin-right:12px;color:rgba(255,255,255,.7)}
-        .tabs{margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;background:rgba(15,23,42,.8);border:1px solid rgba(148,163,184,.14);border-radius:12px}
-        .tabs button{border:0;background:transparent;color:#94a3b8;border-radius:9px;padding:8px 4px;cursor:pointer;font-size:12px}.tabs button.active{background:linear-gradient(135deg,rgba(124,58,237,.55),rgba(37,99,235,.35));color:white;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-        .sidebar-scroll{flex:1;overflow:auto;padding-right:2px}.side-section{padding-top:14px;border-bottom:1px solid rgba(148,163,184,.14);padding-bottom:10px}
-        .section-head{display:flex;justify-content:space-between;align-items:center;color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:0 8px 8px}.section-head button{background:transparent;color:#94a3b8;border:0}
-        .side-item,.agent-item{width:100%;min-height:36px;display:flex;align-items:center;gap:9px;border:0;background:transparent;color:#e5e7eb;border-radius:10px;padding:8px;cursor:pointer;text-align:left}
-        .side-item:hover,.agent-item:hover{background:rgba(59,130,246,.08)}.side-item.selected{background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(37,99,235,.18));outline:1px solid rgba(124,58,237,.75);box-shadow:0 0 20px rgba(124,58,237,.18)}
-        .side-item strong{font-size:13px;flex:1}.side-item em{color:#94a3b8;font-size:11px;font-style:normal}.mini-icon{width:20px;color:#c4b5fd}
-        .agent-item .avatar,.auto-icon{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(124,58,237,.55),rgba(34,211,238,.22));box-shadow:0 0 18px rgba(124,58,237,.22)}
-        .auto-icon{background:linear-gradient(135deg,rgba(37,99,235,.65),rgba(16,185,129,.2))}
-        .agent-item span:nth-child(2){min-width:0;flex:1}.agent-item strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.agent-item small{display:block;color:#94a3b8;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .badge{border:1px solid rgba(168,85,247,.5);background:rgba(124,58,237,.18);color:#c4b5fd;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:700;white-space:nowrap}.badge.blue{border-color:rgba(59,130,246,.5);background:rgba(37,99,235,.18);color:#93c5fd}
-        .agent-item i{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 10px rgba(34,197,94,.85)}
-        .empty{color:#64748b;font-size:12px;padding:8px}
-        .profile{margin-top:12px;border:1px solid rgba(148,163,184,.18);background:rgba(15,23,42,.55);border-radius:14px;padding:10px;display:flex;align-items:center;gap:10px}
-        .profile-photo{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f472b6,#60a5fa);font-weight:900}.profile strong{display:block;font-size:13px}.profile span{color:#94a3b8;font-size:11px}.profile button{margin-left:auto;border:0;background:transparent;color:#94a3b8;font-size:20px}
-        .main-chat{display:flex;flex-direction:column}.topbar{height:58px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(148,163,184,.14);background:rgba(2,6,23,.64)}
-        .conversation-title{display:flex;align-items:center;gap:12px}.conversation-title h1{font-size:18px;margin:0;letter-spacing:-.03em}.robot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(34,211,238,.45),rgba(124,58,237,.25));box-shadow:0 0 24px rgba(124,58,237,.45)}
-        .top-actions{display:flex;gap:8px}.top-actions button{height:38px;border-radius:10px;border:1px solid rgba(148,163,184,.22);background:rgba(15,23,42,.62);color:#e5e7eb;padding:0 12px;cursor:pointer}
-        .chat-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:18px;padding:20px 26px 0;overflow:hidden}.messages{overflow:auto;padding:0 10px 18px 0}
-        .welcome{border:1px solid rgba(148,163,184,.2);background:rgba(15,23,42,.72);border-radius:18px;padding:20px;color:#cbd5e1}.welcome h2{margin:0 0 8px;color:white}
-        .user-bubble{width:min(520px,82%);margin:0 0 20px auto;border:1px solid rgba(124,58,237,.65);background:linear-gradient(135deg,rgba(88,28,135,.55),rgba(30,41,59,.72));padding:14px 16px;border-radius:18px;box-shadow:0 0 32px rgba(124,58,237,.18)}.user-bubble p{margin:0 0 8px;line-height:1.5}.user-bubble span{display:block;text-align:right;color:#93c5fd;font-size:12px}
-        .assistant-row{margin:0 0 24px;display:flex;gap:14px;align-items:flex-start}.bot-avatar{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(34,211,238,.45),rgba(124,58,237,.2));border:1px solid rgba(96,165,250,.5);box-shadow:0 0 28px rgba(59,130,246,.35)}
-        .assistant-bubble{width:min(620px,100%);border:1px solid rgba(148,163,184,.2);background:rgba(15,23,42,.72);border-radius:18px;padding:16px;box-shadow:0 22px 60px rgba(0,0,0,.35)}.intro{margin:0;color:#e5e7eb;line-height:1.55}
-        .message-actions{display:flex;align-items:center;gap:8px;margin-top:12px}.message-actions button{border:0;background:transparent;color:#94a3b8;cursor:pointer}.message-actions span{margin-left:auto;color:#94a3b8;font-size:12px}
-        .context-panel{overflow:auto;padding-bottom:18px}.context-card,.pro-card{border:1px solid rgba(148,163,184,.2);background:rgba(15,23,42,.68);border-radius:16px;padding:16px;margin-bottom:14px}.context-card h3,.pro-card h3{margin:0 0 14px;font-size:14px}
-        .agent-feature{display:flex;gap:12px;align-items:center;border-top:1px solid rgba(148,163,184,.12);padding-top:14px}.big-avatar{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,rgba(96,165,250,.42),rgba(124,58,237,.24))}.agent-feature p{color:#94a3b8;font-size:12px;line-height:1.4;margin:6px 0 0}
-        .outline-btn{width:100%;height:38px;margin-top:14px;border:1px solid rgba(148,163,184,.22);background:rgba(2,6,23,.35);color:#c4b5fd;border-radius:10px;cursor:pointer}
-        .quick-list{display:grid;gap:12px}.quick-list p{margin:0;display:flex;justify-content:space-between;gap:10px;color:#94a3b8;font-size:12px}.quick-list b{color:#e5e7eb;font-weight:600;text-align:right}
-        .card-head{display:flex;justify-content:space-between;align-items:center}.card-head button{border:0;background:transparent;color:#c084fc;cursor:pointer;font-size:12px}
-        .toggle-line{display:flex;align-items:center;gap:8px;padding:9px 0;color:#e5e7eb;font-size:13px;cursor:pointer}.toggle-line span{flex:1}.toggle-line b{color:#94a3b8;font-size:11px;font-weight:500}.toggle-line i{width:30px;height:17px;border-radius:999px;background:#334155;position:relative}.toggle-line i:after{content:"";position:absolute;width:13px;height:13px;left:2px;top:2px;border-radius:50%;background:#94a3b8}.toggle-line i.on{background:#2563eb}.toggle-line i.on:after{left:15px;background:white}
-        .pro-card{background:radial-gradient(circle at 90% 40%,rgba(59,130,246,.35),transparent 28%),linear-gradient(135deg,rgba(88,28,135,.7),rgba(15,23,42,.85));border-color:rgba(124,58,237,.7);box-shadow:0 0 32px rgba(124,58,237,.18)}.pro-card p{color:#cbd5e1;font-size:13px;line-height:1.45}.pro-card button{border:1px solid rgba(196,181,253,.45);background:rgba(124,58,237,.32);color:white;border-radius:10px;padding:10px 14px;cursor:pointer}
-        .composer{padding:14px 26px 10px}.input-wrap{min-height:86px;border:1px solid rgba(96,165,250,.7);border-radius:24px;background:rgba(15,23,42,.82);box-shadow:0 0 38px rgba(37,99,235,.18),0 0 34px rgba(124,58,237,.18);display:grid;grid-template-columns:1fr auto;grid-template-rows:1fr auto;gap:8px;padding:14px}.input-wrap textarea{grid-column:1;border:0;outline:none;resize:none;color:white;min-height:34px;background:transparent}.input-wrap textarea::placeholder{color:#64748b}.composer-actions{display:flex;gap:8px}.composer-actions button{border:1px solid rgba(148,163,184,.22);background:rgba(2,6,23,.35);color:#e5e7eb;border-radius:10px;padding:8px 12px;cursor:pointer}.send{grid-column:2;grid-row:1/3;width:54px;height:54px;border-radius:50%;border:0;align-self:center;background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;font-size:22px;cursor:pointer;box-shadow:0 0 28px rgba(37,99,235,.5)}.send:disabled{opacity:.6;cursor:not-allowed}.composer p{margin:6px 0 0;text-align:center;color:#64748b;font-size:11px}
-        @media(max-width:1180px){.chat-shell{grid-template-columns:300px 1fr}.chat-body{grid-template-columns:1fr}.context-panel{display:none}}
-        @media(max-width:820px){.chat-shell{grid-template-columns:1fr;padding:8px}.sidebar{max-height:48vh}.topbar{height:auto;padding:14px;align-items:flex-start;gap:12px;flex-direction:column}.top-actions{flex-wrap:wrap}.chat-body{padding:14px}.composer{padding:10px 14px}}
+      <style jsx>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .chat-shell {
+          min-height: 100vh;
+          display: grid;
+          grid-template-columns: 390px minmax(0, 1fr);
+          background:
+            radial-gradient(circle at 25% 10%, rgba(255, 43, 122, 0.2), transparent 32%),
+            radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.18), transparent 34%),
+            #050711;
+          color: #fff;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          overflow: hidden;
+        }
+
+        .sidebar {
+          height: 100vh;
+          padding: 22px;
+          border-right: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(4, 7, 18, 0.78);
+          backdrop-filter: blur(22px);
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .logo {
+          width: 46px;
+          height: 46px;
+          border-radius: 16px;
+          display: grid;
+          place-items: center;
+          background: linear-gradient(135deg, #ff3478, #8b5cf6);
+          box-shadow: 0 0 35px rgba(255, 52, 120, 0.42);
+          font-size: 22px;
+        }
+
+        .brand strong {
+          display: block;
+          font-size: 17px;
+        }
+
+        .brand span,
+        .source small,
+        .list-card span,
+        .list-card small,
+        .topbar p,
+        .eyebrow {
+          color: rgba(255, 255, 255, 0.58);
+        }
+
+        .metrics {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .metrics div {
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.045);
+          border-radius: 18px;
+          padding: 14px 10px;
+        }
+
+        .metrics strong {
+          display: block;
+          font-size: 22px;
+          color: #ff4f93;
+        }
+
+        .metrics span {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.58);
+        }
+
+        .tabs {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          padding: 5px;
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tabs button {
+          border: 0;
+          border-radius: 14px;
+          padding: 10px 8px;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          font-weight: 700;
+        }
+
+        .tabs button.active {
+          color: #fff;
+          background: linear-gradient(135deg, rgba(255, 52, 120, 0.9), rgba(124, 58, 237, 0.85));
+          box-shadow: 0 10px 30px rgba(255, 52, 120, 0.2);
+        }
+
+        .list {
+          flex: 1;
+          overflow: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          padding-right: 3px;
+        }
+
+        .list-card {
+          width: 100%;
+          text-align: left;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.045);
+          border-radius: 18px;
+          color: #fff;
+          padding: 14px;
+          cursor: pointer;
+        }
+
+        .list-card.selected {
+          border-color: rgba(255, 79, 147, 0.7);
+          background: linear-gradient(135deg, rgba(255, 52, 120, 0.16), rgba(124, 58, 237, 0.12));
+          box-shadow: inset 0 0 24px rgba(255, 52, 120, 0.12);
+        }
+
+        .list-card.static {
+          cursor: default;
+        }
+
+        .list-card strong,
+        .list-card span,
+        .list-card small {
+          display: block;
+        }
+
+        .list-card span {
+          font-size: 13px;
+          margin: 6px 0;
+          line-height: 1.35;
+        }
+
+        .list-card small {
+          font-size: 11px;
+        }
+
+        .source {
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 18px;
+          padding: 13px;
+        }
+
+        .source span {
+          color: #6ee7b7;
+          display: block;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .chat-area {
+          height: 100vh;
+          display: grid;
+          grid-template-rows: auto 1fr auto;
+          position: relative;
+        }
+
+        .topbar {
+          padding: 28px 34px 22px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(5, 7, 17, 0.58);
+          backdrop-filter: blur(16px);
+        }
+
+        .eyebrow {
+          display: block;
+          text-transform: uppercase;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          margin-bottom: 6px;
+        }
+
+        h1 {
+          margin: 0;
+          font-size: clamp(26px, 4vw, 42px);
+          letter-spacing: -0.04em;
+        }
+
+        .topbar p {
+          margin: 7px 0 0;
+          max-width: 680px;
+        }
+
+        .status-pill {
+          min-width: 140px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 18px;
+          padding: 12px 14px;
+        }
+
+        .status-pill span,
+        .status-pill strong {
+          display: block;
+        }
+
+        .status-pill span {
+          color: rgba(255, 255, 255, 0.55);
+          font-size: 12px;
+        }
+
+        .status-pill strong {
+          color: #6ee7b7;
+          margin-top: 3px;
+        }
+
+        .messages {
+          overflow: auto;
+          padding: 28px 34px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .welcome,
+        .empty-message {
+          max-width: 620px;
+          margin: auto;
+          text-align: center;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.045);
+          border-radius: 28px;
+          padding: 34px;
+        }
+
+        .welcome h2 {
+          margin: 12px 0 8px;
+        }
+
+        .welcome p,
+        .empty-message {
+          color: rgba(255, 255, 255, 0.62);
+        }
+
+        .empty-message.error {
+          color: #fecaca;
+          border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        .orb {
+          width: 72px;
+          height: 72px;
+          margin: 0 auto;
+          border-radius: 24px;
+          display: grid;
+          place-items: center;
+          background: radial-gradient(circle, #ff4f93, #7c3aed);
+          box-shadow: 0 0 50px rgba(255, 79, 147, 0.45);
+          font-size: 30px;
+        }
+
+        .message {
+          display: flex;
+        }
+
+        .message.user {
+          justify-content: flex-end;
+        }
+
+        .message.assistant {
+          justify-content: flex-start;
+        }
+
+        .bubble {
+          width: min(720px, 82%);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 24px;
+          padding: 15px 17px;
+          background: rgba(255, 255, 255, 0.055);
+        }
+
+        .message.user .bubble {
+          background: linear-gradient(135deg, rgba(255, 52, 120, 0.82), rgba(124, 58, 237, 0.82));
+          border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .bubble small,
+        .bubble span {
+          display: block;
+          color: rgba(255, 255, 255, 0.55);
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .bubble p {
+          margin: 7px 0;
+          line-height: 1.55;
+          white-space: pre-wrap;
+        }
+
+        .typing p {
+          color: rgba(255, 255, 255, 0.62);
+        }
+
+        .composer {
+          padding: 18px 34px 24px;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(5, 7, 17, 0.72);
+          backdrop-filter: blur(16px);
+        }
+
+        textarea {
+          min-height: 56px;
+          max-height: 150px;
+          resize: vertical;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.06);
+          color: #fff;
+          padding: 17px;
+          outline: none;
+          font: inherit;
+        }
+
+        textarea::placeholder {
+          color: rgba(255, 255, 255, 0.42);
+        }
+
+        .composer button {
+          border: 0;
+          border-radius: 20px;
+          padding: 0 24px;
+          min-width: 120px;
+          color: #fff;
+          font-weight: 900;
+          background: linear-gradient(135deg, #ff3478, #8b5cf6);
+          cursor: pointer;
+          box-shadow: 0 18px 42px rgba(255, 52, 120, 0.25);
+        }
+
+        .composer button:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+
+        .empty {
+          padding: 16px;
+          color: rgba(255, 255, 255, 0.55);
+          text-align: center;
+        }
+
+        @media (max-width: 980px) {
+          .chat-shell {
+            grid-template-columns: 1fr;
+          }
+
+          .sidebar {
+            height: auto;
+            max-height: 48vh;
+          }
+
+          .chat-area {
+            height: auto;
+            min-height: 100vh;
+          }
+
+          .topbar {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 14px;
+          }
+
+          .composer {
+            grid-template-columns: 1fr;
+          }
+
+          .composer button {
+            min-height: 54px;
+          }
+        }
       `}</style>
     </main>
   );

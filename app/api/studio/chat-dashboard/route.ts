@@ -1,67 +1,96 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Pool, type QueryResultRow } from "pg";
+import { Pool } from "pg";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
+export const revalidate = 0;
 
 let pool: Pool | null = null;
 
 function getPool() {
-  if (pool) return pool;
+  if (!pool) {
+    const connectionString =
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.BLOG_DATABASE_URL;
 
-  const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL não encontrada no ambiente.");
+    }
 
-  if (!connectionString) {
-    throw new Error("DATABASE_URL não encontrada.");
+    pool = new Pool({
+      connectionString,
+      ssl: { rejectUnauthorized: false },
+      max: 4,
+    });
   }
-
-  pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-    max: 3,
-  });
 
   return pool;
 }
 
-async function query<T extends QueryResultRow = QueryResultRow>(sql: string, params: unknown[] = []) {
+async function query(sql: string, params: any[] = []) {
   const db = getPool();
-  const result = await db.query<T>(sql, params);
+  const result = await db.query(sql, params);
   return result.rows;
 }
 
-function json(data: unknown, status = 200) {
-  return NextResponse.json(data, { status });
+function json(data: any, status = 200) {
+  return NextResponse.json(data, {
+    status,
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
+  });
 }
 
-export async function GET(req: NextRequest) {
+async function ensureDefaultThread() {
+  const rows = await query(`
+    select id
+    from public.sualuma_chat_threads
+    order by updated_at desc nulls last, created_at desc
+    limit 1
+  `);
+
+  if (rows[0]?.id) return rows[0].id;
+
+  const created = await query(`
+    insert into public.sualuma_chat_threads (title, kind, status, summary, metadata)
+    values ('Nova conversa', 'chat', 'active', 'Conversa criada automaticamente.', '{"created_by":"chat-dashboard"}'::jsonb)
+    returning id
+  `);
+
+  return created[0]?.id;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const threadId = searchParams.get("threadId");
+    const url = new URL(request.url);
+    const selectedThreadId = url.searchParams.get("threadId") || null;
 
     const threads = await query(`
       select
         t.*,
         coalesce((
-          select m.content
+          select content
           from public.sualuma_chat_messages m
           where m.thread_id = t.id
           order by m.created_at desc
           limit 1
-        ), t.summary, '') as last_message,
+        ), t.summary) as last_message,
         coalesce((
           select count(*)
           from public.sualuma_chat_messages m
           where m.thread_id = t.id
         ), 0)::int as messages_count
       from public.sualuma_chat_threads t
-      order by t.updated_at desc
-      limit 50
+      order by t.updated_at desc nulls last, t.created_at desc
+      limit 80
     `);
 
-    const selectedThreadId = threadId || String(threads?.[0]?.id || "");
+    const activeThreadId = selectedThreadId || threads[0]?.id || null;
 
-    const messages = selectedThreadId
+    const messages = activeThreadId
       ? await query(
           `
           select *
@@ -69,46 +98,54 @@ export async function GET(req: NextRequest) {
           where thread_id = $1
           order by created_at asc
           limit 200
-          `,
-          [selectedThreadId]
+        `,
+          [activeThreadId]
         )
       : [];
 
     const agents = await query(`
       select *
       from public.sualuma_chat_agents
-      order by sort_order asc, created_at asc
+      order by status asc, updated_at desc nulls last, created_at desc
+      limit 80
     `);
 
     const automations = await query(`
       select *
       from public.sualuma_chat_automations
-      order by sort_order asc, created_at asc
+      order by status asc, updated_at desc nulls last, created_at desc
+      limit 80
     `);
 
     const metricsRows = await query(`
       select
-        (select count(*)::int from public.sualuma_chat_threads) as threads_total,
-        (select count(*)::int from public.sualuma_chat_messages) as messages_total,
-        (select count(*)::int from public.sualuma_chat_agents where is_active = true) as agents_active,
-        (select count(*)::int from public.sualuma_chat_automations where is_active = true) as automations_active
+        (select count(*) from public.sualuma_chat_threads)::int as threads_total,
+        (select count(*) from public.sualuma_chat_messages)::int as messages_total,
+        (select count(*) from public.sualuma_chat_agents where status = 'active')::int as agents_active,
+        (select count(*) from public.sualuma_chat_automations where status = 'active')::int as automations_active
     `);
 
     return json({
       ok: true,
       source: "postgres-direct",
-      selectedThreadId,
-      metrics: metricsRows[0] || {},
+      generated_at: new Date().toISOString(),
+      selectedThreadId: activeThreadId,
+      metrics: metricsRows[0] || {
+        threads_total: 0,
+        messages_total: 0,
+        agents_active: 0,
+        automations_active: 0,
+      },
       threads,
       messages,
       agents,
       automations,
-      generated_at: new Date().toISOString(),
     });
   } catch (error: any) {
     return json(
       {
         ok: false,
+        source: "postgres-direct",
         error: error?.message || String(error),
       },
       500
@@ -116,92 +153,98 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-    const action = body?.action;
+    const body = await request.json().catch(() => ({}));
+    const content = String(body?.content || "").trim();
+    let threadId = body?.threadId ? String(body.threadId) : "";
 
-    if (action === "create-thread") {
-      const title = String(body?.title || "Novo chat").trim() || "Novo chat";
-      const agentSlug = String(body?.agent_slug || "mia-brain");
-
-      const rows = await query(
-        `
-        insert into public.sualuma_chat_threads (title, agent_slug, summary, metadata)
-        values ($1, $2, $3, $4::jsonb)
-        returning *
-        `,
-        [title, agentSlug, "Nova conversa criada no Chat Sualuma.", JSON.stringify({ created_by: "chat-dashboard" })]
-      );
-
-      return json({ ok: true, thread: rows[0] });
+    if (!content) {
+      return json({ ok: false, error: "Mensagem vazia." }, 400);
     }
 
-    if (action === "send-message") {
-      const threadId = String(body?.thread_id || "");
-      const content = String(body?.content || "").trim();
+    if (!threadId) {
+      threadId = await ensureDefaultThread();
+    }
 
-      if (!threadId || !content) {
-        return json({ ok: false, error: "thread_id e content são obrigatórios." }, 400);
-      }
+    const userMessage = await query(
+      `
+      insert into public.sualuma_chat_messages (thread_id, role, content, metadata)
+      values ($1, 'user', $2, '{"source":"chat-ui"}'::jsonb)
+      returning *
+    `,
+      [threadId, content]
+    );
 
-      const userRows = await query(
-        `
-        insert into public.sualuma_chat_messages (thread_id, role, content, metadata)
-        values ($1, 'user', $2, $3::jsonb)
-        returning *
-        `,
-        [threadId, content, JSON.stringify({ source: "chat-ui" })]
-      );
+    await query(
+      `
+      update public.sualuma_chat_threads
+      set updated_at = now(),
+          summary = left($2, 180)
+      where id = $1
+    `,
+      [threadId, content]
+    );
 
-      const assistantText =
-        "Recebi sua mensagem e salvei esta conversa no banco de dados. No próximo passo, posso conectar essa resposta diretamente à Mia Brain/roteador de IA.";
+    let assistantContent =
+      "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.";
 
-      const assistantRows = await query(
-        `
-        insert into public.sualuma_chat_messages (thread_id, role, content, metadata)
-        values ($1, 'assistant', $2, $3::jsonb)
-        returning *
-        `,
-        [threadId, assistantText, JSON.stringify({ generated_by: "placeholder-db" })]
-      );
+    try {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.SITE_URL ||
+        "http://127.0.0.1:3000";
 
-      await query(
-        `
-        update public.sualuma_chat_threads
-        set updated_at = now(),
-            summary = left($2, 180)
-        where id = $1
-        `,
-        [threadId, content]
-      );
-
-      return json({
-        ok: true,
-        userMessage: userRows[0],
-        assistantMessage: assistantRows[0],
+      const aiResponse = await fetch(`${baseUrl}/api/ai/router`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({
+          message: content,
+          prompt: content,
+          input: content,
+          source: "sualuma-chat",
+          threadId,
+        }),
       });
+
+      if (aiResponse.ok) {
+        const aiJson = await aiResponse.json().catch(() => null);
+        assistantContent =
+          aiJson?.answer ||
+          aiJson?.response ||
+          aiJson?.message ||
+          aiJson?.text ||
+          assistantContent;
+      }
+    } catch {
+      // mantém fallback local sem quebrar o chat
     }
 
-    if (action === "toggle-automation") {
-      const slug = String(body?.slug || "");
-      const isActive = Boolean(body?.is_active);
+    const assistantMessage = await query(
+      `
+      insert into public.sualuma_chat_messages (thread_id, role, content, metadata)
+      values ($1, 'assistant', $2, '{"source":"mia-brain-router-fallback"}'::jsonb)
+      returning *
+    `,
+      [threadId, assistantContent]
+    );
 
-      const rows = await query(
-        `
-        update public.sualuma_chat_automations
-        set is_active = $2,
-            status = case when $2 then 'active' else 'paused' end
-        where slug = $1
-        returning *
-        `,
-        [slug, isActive]
-      );
+    await query(
+      `
+      update public.sualuma_chat_threads
+      set updated_at = now()
+      where id = $1
+    `,
+      [threadId]
+    );
 
-      return json({ ok: true, automation: rows[0] });
-    }
-
-    return json({ ok: false, error: "Ação inválida." }, 400);
+    return json({
+      ok: true,
+      threadId,
+      userMessage: userMessage[0],
+      assistantMessage: assistantMessage[0],
+    });
   } catch (error: any) {
     return json(
       {
