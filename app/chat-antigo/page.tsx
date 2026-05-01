@@ -80,6 +80,62 @@ export default function ChatAntigoPage() {
   const [tab, setTab] = useState<Tab>("tudo");
   const [data, setData] = useState<DashboardData | null>(null);
   const [selectedThreadId, setSelectedThreadId] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadChatAntigoDb() {
+      try {
+        const res = await fetch("/api/chat-antigo", {
+          cache: "no-store",
+        });
+
+        const json = await res.json();
+
+        if (!mounted || !json?.ok) return;
+
+        setData((prev: any) => ({
+          ...(prev || {}),
+          ...json,
+          threads: json.conversations || prev?.threads || [],
+          conversas: json.conversations || prev?.conversas || [],
+          conversations: json.conversations || prev?.conversations || [],
+          messages: json.messages || prev?.messages || [],
+          mensagens: json.messages || prev?.mensagens || [],
+          agents: json.agents || prev?.agents || [],
+          agentes: json.agents || prev?.agentes || [],
+          automations: json.automations || prev?.automations || [],
+          automacoes: json.automations || prev?.automacoes || [],
+          mia: json.mia || prev?.mia || {},
+          metrics: json.metrics || prev?.metrics || {},
+          metricas: json.metrics || prev?.metricas || {},
+          source: json.source || "postgres-direct",
+          generated_at: json.generated_at,
+        }));
+
+        const firstThread =
+          json.conversations?.[0]?.id ||
+          json.conversations?.[0]?.thread_id ||
+          json.conversations?.[0]?.conversation_id ||
+          "";
+
+        if (firstThread) {
+          setSelectedThreadId((current: string) => current || String(firstThread));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar /api/chat-antigo:", error);
+      }
+    }
+
+    loadChatAntigoDb();
+    const timer = setInterval(loadChatAntigoDb, 30000);
+
+    return () => {
+      mounted = false;
+      clearInterval(timer);
+    };
+  }, []);
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
