@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type MiaData = {
+  usage_logs?: any[];
+  costs?: any[];
   source?: string;
   tableNames?: string[];
   ok: boolean;
@@ -281,7 +283,7 @@ export default function MiaBrainPage() {
   const skills = data?.skills || [];
   const prompts = data?.prompts || [];
   const voices = data?.voices || [];
-  const logs = data?.usageLogs || [];
+  const logs = data?.usageLogs || data?.usage_logs || [];
   const transcriptions = data?.transcriptions || [];
   const metrics = data?.metrics || {};
 

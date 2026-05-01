@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Pool, QueryResultRow } from "pg";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+
 
 type ResourceType = "provider" | "model" | "skill" | "prompt" | "voice" | "setting" | "usage_log" | "transcription";
 
