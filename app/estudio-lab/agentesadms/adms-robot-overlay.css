@@ -341,3 +341,71 @@
     transform-origin: center;
   }
 }
+
+.adms-selected-box {
+  margin-bottom: 10px;
+  min-height: 48px;
+  max-height: 92px;
+  overflow: auto;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #ffd8f0;
+  background: rgba(255, 105, 200, 0.08);
+  border: 1px dashed rgba(255, 145, 218, 0.28);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+.adms-selected-box strong {
+  display: block;
+  color: #ffffff;
+  font-size: 11px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.adms-selected-box span {
+  display: block;
+}
+
+.adms-pick-reading .m-bubble,
+.adms-pick-reading .agent-intro {
+  cursor: pointer !important;
+  outline: 2px dashed rgba(255, 120, 220, 0.35);
+  outline-offset: 4px;
+}
+
+.adms-pick-reading .m-bubble:hover,
+.adms-pick-reading .agent-intro:hover {
+  outline-color: rgba(255, 120, 220, 0.9);
+  box-shadow: 0 0 22px rgba(255, 120, 220, 0.24);
+}
+
+.pink-robot.picking .robot-eye {
+  animation: robotBlinkPick 0.9s ease-in-out infinite;
+}
+
+.pink-robot.picking .robot-heart {
+  animation: robotHeartPick 0.75s ease-in-out infinite;
+}
+
+@keyframes robotBlinkPick {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.35);
+  }
+}
+
+@keyframes robotHeartPick {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.75;
+  }
+}
