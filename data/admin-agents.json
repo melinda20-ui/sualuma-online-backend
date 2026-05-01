@@ -213,5 +213,22 @@
     "isAdminAgent": true,
     "installed": true,
     "source": "installed"
+  },
+  {
+    "id": "agente-crescimento-sualuma",
+    "name": "agente-crescimento-sualuma",
+    "role": "Agente administrativo",
+    "initials": "GC",
+    "color": "#ffffff",
+    "bg": "linear-gradient(135deg, #e91e8c, #6b1f5e)",
+    "status": "online",
+    "unread": 0,
+    "skills": [],
+    "systemPrompt": "Você é agente-crescimento-sualuma, agente administrativo do Studio Sualuma.",
+    "behaviorRules": [],
+    "isAdminAgent": true,
+    "installed": true,
+    "source": "manual",
+    "route": "/estudio-lab/crescimento"
   }
 ]
