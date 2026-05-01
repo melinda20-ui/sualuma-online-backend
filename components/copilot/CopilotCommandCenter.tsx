@@ -732,6 +732,183 @@ export default function CopilotCommandCenter() {
           filter: grayscale(0.2);
         }
 
+        
+        /* ==================================================
+           FIX VISUAL: chat do Copiloto mais legível
+        ================================================== */
+
+        .chat-shell,
+        .chat-card,
+        .chat-panel,
+        .chat-box,
+        .memory-panel,
+        [class*="chat" i] {
+          color: #ffffff;
+        }
+
+        .chat-card,
+        .chat-panel,
+        .memory-panel,
+        [class*="chat" i][class*="card" i],
+        [class*="chat" i][class*="panel" i] {
+          background: rgba(5, 10, 30, 0.92) !important;
+          border: 1px solid rgba(125, 211, 252, 0.28) !important;
+          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32) !important;
+        }
+
+        .chat-card h2,
+        .chat-card h3,
+        .chat-panel h2,
+        .chat-panel h3,
+        [class*="chat" i] h2,
+        [class*="chat" i] h3 {
+          font-size: 24px !important;
+          line-height: 1.18 !important;
+          color: #ffffff !important;
+          letter-spacing: -0.03em !important;
+        }
+
+        .chat-card p,
+        .chat-panel p,
+        .memory-panel p,
+        [class*="chat" i] p,
+        [class*="message" i],
+        [class*="bubble" i],
+        [class*="msg" i] {
+          font-size: 15.5px !important;
+          line-height: 1.62 !important;
+          color: rgba(255, 255, 255, 0.94) !important;
+          text-shadow: none !important;
+        }
+
+        [class*="message" i],
+        [class*="bubble" i],
+        [class*="msg" i],
+        [class*="learning" i],
+        [class*="memory" i] {
+          background: rgba(20, 36, 90, 0.82) !important;
+          border: 1px solid rgba(255, 255, 255, 0.16) !important;
+          border-radius: 18px !important;
+        }
+
+        [class*="message" i] strong,
+        [class*="bubble" i] strong,
+        [class*="msg" i] strong,
+        [class*="chat" i] strong {
+          color: #7dd3fc !important;
+          font-size: 13px !important;
+          letter-spacing: 0.08em !important;
+          text-transform: uppercase !important;
+        }
+
+        [class*="messages" i],
+        [class*="conversation" i],
+        [class*="chat-log" i],
+        [class*="history" i] {
+          max-height: 560px !important;
+          overflow-y: auto !important;
+          padding-right: 10px !important;
+          scroll-behavior: smooth !important;
+        }
+
+        [class*="messages" i]::-webkit-scrollbar,
+        [class*="conversation" i]::-webkit-scrollbar,
+        [class*="chat-log" i]::-webkit-scrollbar,
+        [class*="history" i]::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        [class*="messages" i]::-webkit-scrollbar-thumb,
+        [class*="conversation" i]::-webkit-scrollbar-thumb,
+        [class*="chat-log" i]::-webkit-scrollbar-thumb,
+        [class*="history" i]::-webkit-scrollbar-thumb {
+          background: rgba(56, 189, 248, 0.55);
+          border-radius: 999px;
+        }
+
+        textarea,
+        .composer textarea,
+        [class*="chat" i] textarea {
+          min-height: 118px !important;
+          font-size: 16px !important;
+          line-height: 1.55 !important;
+          color: #ffffff !important;
+          background: rgba(3, 7, 18, 0.82) !important;
+          border: 1px solid rgba(125, 211, 252, 0.38) !important;
+          border-radius: 18px !important;
+          padding: 18px !important;
+          outline: none !important;
+        }
+
+        textarea::placeholder,
+        [class*="chat" i] textarea::placeholder {
+          color: rgba(255, 255, 255, 0.68) !important;
+        }
+
+        .send-main-button {
+          min-height: 58px !important;
+          font-size: 16px !important;
+          font-weight: 950 !important;
+          letter-spacing: -0.01em !important;
+          color: #ffffff !important;
+          opacity: 1 !important;
+        }
+
+        .send-main-button:disabled {
+          opacity: 0.52 !important;
+          color: rgba(255,255,255,0.9) !important;
+        }
+
+        @media (max-width: 1280px) {
+          [class*="grid" i],
+          [class*="layout" i],
+          [class*="workspace" i] {
+            grid-template-columns: 1fr !important;
+          }
+
+          .chat-card,
+          .chat-panel,
+          .memory-panel,
+          [class*="chat" i][class*="card" i],
+          [class*="chat" i][class*="panel" i] {
+            width: 100% !important;
+            max-width: none !important;
+          }
+
+          [class*="messages" i],
+          [class*="conversation" i],
+          [class*="chat-log" i],
+          [class*="history" i] {
+            max-height: 620px !important;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .chat-card h2,
+          .chat-card h3,
+          .chat-panel h2,
+          .chat-panel h3,
+          [class*="chat" i] h2,
+          [class*="chat" i] h3 {
+            font-size: 21px !important;
+          }
+
+          .chat-card p,
+          .chat-panel p,
+          [class*="chat" i] p,
+          [class*="message" i],
+          [class*="bubble" i],
+          [class*="msg" i] {
+            font-size: 15px !important;
+          }
+
+          textarea,
+          .composer textarea,
+          [class*="chat" i] textarea {
+            min-height: 105px !important;
+          }
+        }
+
         @media (max-width: 1180px) {
           .layout {
             grid-template-columns: 1fr;
