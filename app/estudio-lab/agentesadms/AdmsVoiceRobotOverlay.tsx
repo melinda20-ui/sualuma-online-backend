@@ -66,6 +66,7 @@ function pickVoice(voices: SpeechSynthesisVoice[], selectedVoiceURI: string) {
 }
 
 export default function AdmsVoiceRobotOverlay() {
+  const [isMinimized, setIsMinimized] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [mood, setMood] = useState<Mood>("idle");
   const [speaking, setSpeaking] = useState(false);
@@ -83,6 +84,21 @@ export default function AdmsVoiceRobotOverlay() {
 
   const lastSeenRef = useRef("");
   const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const saved = localStorage.getItem("adms_voice_minimized");
+    if (saved === "1") {
+      setIsMinimized(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem("adms_voice_minimized", isMinimized ? "1" : "0");
+  }, [isMinimized]);
+
 
   const moodLabel = useMemo(() => {
     if (pickMode) return "Escolha um balão";
@@ -356,6 +372,23 @@ export default function AdmsVoiceRobotOverlay() {
     return () => observer.disconnect();
   }, [voiceEnabled, supported, speak, setMoodForAWhile]);
 
+  if (isMinimized) {
+    return (
+      <div className="adms-voice-mini-shell">
+        <button
+          type="button"
+          className={`adms-voice-mini ${speaking ? "speaking" : ""} ${voiceEnabled ? "on" : "off"}`}
+          onClick={() => setIsMinimized(false)}
+          title="Abrir assistente de voz"
+        >
+          <span className="adms-mini-robot">🤖</span>
+          <span className="adms-mini-text">Voz</span>
+          <span className="adms-mini-status">{speaking ? "falando" : voiceEnabled ? "ligada" : "off"}</span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="adms-voice-shell">
       <div className="adms-voice-card">
@@ -365,7 +398,18 @@ export default function AdmsVoiceRobotOverlay() {
             <div className="adms-voice-subtitle">{moodLabel} · {selectedVoiceName}</div>
           </div>
 
-          <div className={`adms-voice-dot ${voiceEnabled ? "on" : "off"}`} />
+          <div className="adms-voice-head-actions">
+            <button
+              type="button"
+              className="adms-voice-min-btn"
+              onClick={() => setIsMinimized(true)}
+              title="Minimizar assistente de voz"
+            >
+              —
+            </button>
+
+            <div className={`adms-voice-dot ${voiceEnabled ? "on" : "off"}`} />
+          </div>
         </div>
 
         <div className={`pink-robot ${mood} ${speaking ? "speaking" : ""} ${pickMode ? "picking" : ""}`}>

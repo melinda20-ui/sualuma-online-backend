@@ -459,3 +459,113 @@
 .adms-voice-config input[type="range"] {
   accent-color: #ff65c8;
 }
+
+/* Minimizar assistente de voz */
+.adms-voice-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adms-voice-min-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 145, 218, 0.28);
+  background: rgba(255, 105, 200, 0.08);
+  color: #fff6fb;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.adms-voice-min-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 105, 200, 0.16);
+  box-shadow: 0 10px 22px rgba(255, 101, 200, 0.14);
+}
+
+.adms-voice-mini-shell {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9999;
+}
+
+.adms-voice-mini {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid rgba(255, 120, 200, 0.32);
+  background:
+    radial-gradient(circle at top left, rgba(255, 120, 200, 0.22), transparent 45%),
+    linear-gradient(135deg, rgba(24, 11, 38, 0.96), rgba(12, 7, 20, 0.96));
+  color: #fff4fb;
+  border-radius: 999px;
+  padding: 10px 14px 10px 10px;
+  cursor: pointer;
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.44),
+    0 0 26px rgba(255, 102, 196, 0.18);
+  backdrop-filter: blur(12px);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.adms-voice-mini:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.5),
+    0 0 34px rgba(255, 102, 196, 0.28);
+}
+
+.adms-mini-robot {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ff9fe0, #ff59bd);
+  box-shadow: 0 0 18px rgba(255, 105, 200, 0.42);
+  font-size: 18px;
+}
+
+.adms-mini-text {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.adms-mini-status {
+  font-size: 10px;
+  color: #f6b8df;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+}
+
+.adms-voice-mini.speaking .adms-mini-robot {
+  animation: admsMiniRobotTalk 0.36s ease-in-out infinite;
+}
+
+.adms-voice-mini.off {
+  opacity: 0.76;
+}
+
+@keyframes admsMiniRobotTalk {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
+}
+
+@media (max-width: 768px) {
+  .adms-voice-mini-shell {
+    right: 12px;
+    bottom: 12px;
+  }
+}
