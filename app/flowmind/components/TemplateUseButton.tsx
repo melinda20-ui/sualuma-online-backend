@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export default function TemplateUseButton({
@@ -48,10 +49,14 @@ export default function TemplateUseButton({
       </button>
 
       {status === "success" && (
-        <p>
-          Pronto. O uso foi registrado. No próximo passo, isso vai criar tarefas,
-          hábitos e plano dentro do painel.
-        </p>
+        <div className="fm-template-success">
+          <p>
+            Pronto. O template virou plano, tarefas, hábitos e check-ins.
+          </p>
+          <Link href="/flowmind/meus-templates">
+            Ver meus templates ativados →
+          </Link>
+        </div>
       )}
 
       {status === "error" && (
