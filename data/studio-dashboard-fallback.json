@@ -1,0 +1,52 @@
+{
+  "cards": [
+    {
+      "id": "launch-readiness",
+      "title": "Prontidão de lançamento",
+      "value": "Fallback ativo",
+      "subtitle": "O painel está funcionando mesmo se o banco não responder.",
+      "status": "warning",
+      "sort_order": 1,
+      "metadata": { "area": "launch" }
+    },
+    {
+      "id": "agents-admin",
+      "title": "Agentes ADMs",
+      "value": "Ativos",
+      "subtitle": "Central de agentes com voz, skills e cérebro configurável.",
+      "status": "success",
+      "sort_order": 2,
+      "metadata": { "area": "agents" }
+    },
+    {
+      "id": "database-status",
+      "title": "Banco de dados",
+      "value": "Aguardando conexão",
+      "subtitle": "Configure DATABASE_URL ou Supabase para ativar leitura real.",
+      "status": "neutral",
+      "sort_order": 3,
+      "metadata": { "area": "database" }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "validar-fluxo-lancamento",
+      "title": "Validar fluxo principal antes do lançamento",
+      "area": "Lançamento",
+      "priority": "alta",
+      "status": "todo",
+      "lane_id": "urgent",
+      "plain_explanation": "Testar cadastro, login, painel, checkout e mensagens principais.",
+      "source": "fallback"
+    }
+  ],
+  "events": [
+    {
+      "id": "fallback-active",
+      "title": "Fallback local ativo",
+      "description": "O Studio Luma está funcionando com dados locais enquanto o banco não responde.",
+      "type": "warning",
+      "source": "fallback"
+    }
+  ]
+}
