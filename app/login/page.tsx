@@ -301,7 +301,14 @@ export default function LoginPage() {
           return;
         }
 
-        router.push(new URLSearchParams(window.location.search).get("next") || "/portal");
+        const adminEmails = new Set([
+            "lumabusiness1.0@gmail.com",
+            "milakadosh.ceo@sualuma.online",
+            "adm@sualuma.online",
+          ]);
+
+          const loginEmail = String(form.email || "").trim().toLowerCase();
+          router.push(adminEmails.has(loginEmail) ? "/studio-lab" : "/portal");
         router.refresh();
       }
     } catch (err: any) {
