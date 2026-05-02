@@ -1,3 +1,4 @@
+import HideLegacySupportButton from "./HideLegacySupportButton";
 import MiaStudioChat from "./MiaStudioChat";
 
 export default function StudioLabLayout({
@@ -8,6 +9,7 @@ export default function StudioLabLayout({
   return (
     <>
       {children}
+      <HideLegacySupportButton />
       <MiaStudioChat />
     </>
   );
