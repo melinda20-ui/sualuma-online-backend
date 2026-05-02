@@ -1,88 +1,5 @@
 import Link from "next/link";
-
-const templates = [
-  {
-    icon: "🗺️",
-    name: "1 Ano, 12 Semanas",
-    category: "Planejamento",
-    price: "Incluso no Solo CEO",
-    tag: "Principal",
-    desc: "Transforma uma meta anual em trimestres, semanas e tarefas diárias.",
-    includes: ["Onboarding guiado", "Plano anual", "Semana ideal", "Check-ins"],
-  },
-  {
-    icon: "🧠",
-    name: "Organiza Minha Cabeça",
-    category: "Mente",
-    price: "Grátis",
-    tag: "Entrada",
-    desc: "Captura pensamentos soltos e transforma bagunça mental em 3 prioridades.",
-    includes: ["Dump mental", "Triagem", "Lista do dia", "Modo TDAH-friendly"],
-  },
-  {
-    icon: "💸",
-    name: "Saída Financeira",
-    category: "Dinheiro",
-    price: "R$ 29",
-    tag: "Independência",
-    desc: "Plano de 90 dias para quem quer começar a criar renda própria.",
-    includes: ["Mapa financeiro", "Meta de renda", "Plano de ação", "Checkpoints"],
-  },
-  {
-    icon: "👩‍👧",
-    name: "Mãe Empreendedora",
-    category: "Rotina",
-    price: "R$ 29",
-    tag: "Vida real",
-    desc: "Organiza blocos de trabalho em uma rotina com filhos, casa e imprevistos.",
-    includes: ["Blocos de foco", "Rotina flexível", "Plano 1h/dia", "Agenda leve"],
-  },
-  {
-    icon: "🚀",
-    name: "Lançamento em 30 Dias",
-    category: "Vendas",
-    price: "R$ 39",
-    tag: "Rica Turbo",
-    desc: "Cronograma reverso para vender uma oferta específica em um mês.",
-    includes: ["Checklist diário", "Oferta", "Conteúdo", "Follow-up"],
-  },
-  {
-    icon: "🏠",
-    name: "Casa Sem Caos",
-    category: "Casa",
-    price: "R$ 19",
-    tag: "Leveza",
-    desc: "Sistema simples para manter a casa funcionando sem tentar fazer tudo.",
-    includes: ["Rotina mínima", "Tarefas por energia", "Lista semanal", "Sem culpa"],
-  },
-  {
-    icon: "💬",
-    name: "Prospecção Sem Vergonha",
-    category: "Vendas",
-    price: "R$ 29",
-    tag: "Conversas",
-    desc: "Mensagens, follow-ups e rotina de venda para quem trava na abordagem.",
-    includes: ["Scripts", "CRM simples", "Follow-up", "Métrica semanal"],
-  },
-  {
-    icon: "🌱",
-    name: "Recomeço Gentil",
-    category: "Mente",
-    price: "R$ 19",
-    tag: "Calma",
-    desc: "Para semanas em que a pessoa sumiu, travou ou perdeu o ritmo.",
-    includes: ["Reset de rotina", "Plano de 3 dias", "Autocuidado", "Revisão leve"],
-  },
-  {
-    icon: "📊",
-    name: "Bússola Semanal",
-    category: "Análise",
-    price: "R$ 19",
-    tag: "Relatório",
-    desc: "Mostra evolução, hábitos, vendas e pontos de ajuste da semana.",
-    includes: ["Resumo visual", "Pontuação", "Vitórias", "Próximos ajustes"],
-  },
-];
+import { getAllTemplates } from "../lib/templates";
 
 const bundles = [
   {
@@ -103,6 +20,8 @@ const bundles = [
 ];
 
 export default function Page() {
+  const templates = getAllTemplates();
+
   return (
     <main className="fm-commerce">
       <header className="fm-commerce-hero template-hero">
@@ -117,8 +36,8 @@ export default function Page() {
         <div className="fm-commerce-kicker">LOJA DE TEMPLATES</div>
         <h1>Templates prontos para organizar vida, casa, mente e dinheiro.</h1>
         <p>
-          Cada template vira uma estrutura prática dentro do Flowmatic, com tarefas,
-          check-ins, agentes recomendados e acompanhamento.
+          Cada template agora tem página própria, conteúdo em Markdown e botão para
+          registrar uso dentro do Flowmatic.
         </p>
 
         <div className="fm-commerce-hero-actions">
@@ -140,14 +59,17 @@ export default function Page() {
             em trimestre, semana, dia e check-in.
           </p>
         </div>
-        <Link href="/flowmind/planos" className="fm-commerce-btn primary">
-          Ver plano que libera
+        <Link
+          href="/flowmind/templates/1-ano-12-semanas"
+          className="fm-commerce-btn primary"
+        >
+          Abrir template
         </Link>
       </section>
 
       <section className="fm-template-shop" id="templates">
         {templates.map((template) => (
-          <article className="fm-template-product" key={template.name}>
+          <article className="fm-template-product" key={template.slug}>
             <div className="fm-template-product-top">
               <div className="fm-template-icon">{template.icon}</div>
               <div>
@@ -167,7 +89,9 @@ export default function Page() {
 
             <div className="fm-template-bottom">
               <strong>{template.price}</strong>
-              <button>Usar template</button>
+              <Link href={`/flowmind/templates/${template.slug}`}>
+                Ver template
+              </Link>
             </div>
           </article>
         ))}
