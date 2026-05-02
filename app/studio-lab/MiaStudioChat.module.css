@@ -324,3 +324,38 @@
     max-height: calc(100vh - 300px);
   }
 }
+
+/* Correção: evita conflito com botão de suporte e área de links */
+.floatingButton {
+  right: auto !important;
+  left: 22px !important;
+  bottom: 26px !important;
+  z-index: 10020 !important;
+  max-width: 190px;
+}
+
+.chatShell {
+  right: auto !important;
+  left: 22px !important;
+  bottom: 86px !important;
+  z-index: 10021 !important;
+}
+
+/* Em telas menores, mantém a Mia visível sem cobrir botões importantes */
+@media (max-width: 720px) {
+  .floatingButton {
+    left: 12px !important;
+    right: auto !important;
+    bottom: 18px !important;
+    max-width: 165px;
+    padding: 9px 12px 9px 9px;
+    font-size: 12px;
+  }
+
+  .chatShell {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 76px !important;
+    width: calc(100vw - 20px) !important;
+  }
+}
