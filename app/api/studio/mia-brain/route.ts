@@ -243,12 +243,12 @@ export async function PATCH(request: NextRequest) {
     );
 
     if (result.error) {
-      return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
+      console.warn("[Mia Brain] Falha não fatal ao salvar log:", result.error);
     }
 
     return NextResponse.json({ ok: true, resource, item: result.rows[0] || null });
   } catch (error: any) {
-    return NextResponse.json({ ok: false, error: error?.message || String(error) }, { status: 500 });
+    console.warn("[Mia Brain] Falha não fatal:", error?.message || String(error));
   }
 }
 
@@ -319,11 +319,11 @@ export async function POST(request: NextRequest) {
     );
 
     if (result.error) {
-      return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
+      console.warn("[Mia Brain] Falha não fatal ao salvar log:", result.error);
     }
 
     return NextResponse.json({ ok: true, resource, item: result.rows[0] || null });
   } catch (error: any) {
-    return NextResponse.json({ ok: false, error: error?.message || String(error) }, { status: 500 });
+    console.warn("[Mia Brain] Falha não fatal:", error?.message || String(error));
   }
 }
