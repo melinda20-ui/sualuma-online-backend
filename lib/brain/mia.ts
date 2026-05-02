@@ -287,7 +287,7 @@ async function callOpenRouter(prompt: string) {
 
 async function callOllama(prompt: string) {
   const baseUrl = process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434";
-  const model = process.env.OLLAMA_MODEL || "llama3.2:1b";
+  const model = process.env.OLLAMA_MODEL || "qwen2.5:7b-instruct";
 
   const res = await fetch(`${baseUrl.replace(/\/$/, "")}/api/generate`, {
     method: "POST",
@@ -396,7 +396,7 @@ export function getBrainStatus() {
       ollama: {
         configured: !!process.env.OLLAMA_BASE_URL,
         baseUrl: process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434",
-        model: process.env.OLLAMA_MODEL || "llama3.2:1b",
+        model: process.env.OLLAMA_MODEL || "qwen2.5:7b-instruct",
       },
     },
   };

@@ -75,7 +75,7 @@ Formato obrigatório:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama3.2:3b",
+          model: "qwen2.5:7b-instruct:3b",
           prompt: `${automationSystemPrompt}\n\nPedido do usuário:\n${originalPrompt}`,
           stream: false,
         }),
@@ -137,7 +137,7 @@ Formato obrigatório:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama3.2:3b",
+        model: "qwen2.5:7b-instruct:3b",
         prompt: originalPrompt,
         stream: false,
       }),

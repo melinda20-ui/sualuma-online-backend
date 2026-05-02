@@ -1,5 +1,5 @@
 export const AI_MODELS = {
-  chat: process.env.OLLAMA_MODEL_CHAT || "llama3.2:3b",
+  chat: process.env.OLLAMA_MODEL_CHAT || "qwen2.5:7b-instruct:3b",
   code: process.env.OLLAMA_MODEL_CODE || "qwen2.5-coder:7b",
   vision: process.env.OLLAMA_MODEL_VISION || "llava:7b",
   automation: process.env.OLLAMA_MODEL_AUTOMATION || "qwen2.5:7b-instruct",
