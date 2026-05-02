@@ -154,7 +154,7 @@ export default async function Page({ params }: PageProps) {
               </div>
             </div>
 
-            <TemplateUseButton slug={template.slug} name={template.name} />
+            <TemplateUseButton slug={template.slug} name={template.name} price={template.price} />
           </aside>
         </div>
       </header>

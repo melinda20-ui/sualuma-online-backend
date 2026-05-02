@@ -2,13 +2,29 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import FlowmaticCheckoutButton from "./FlowmaticCheckoutButton";
+
+function isFree(price: string) {
+  const normalized = price
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  return normalized.includes("gratis");
+}
+
+function isIncluded(price: string) {
+  return price.toLowerCase().includes("incluso");
+}
 
 export default function TemplateUseButton({
   slug,
   name,
+  price = "",
 }: {
   slug: string;
   name: string;
+  price?: string;
 }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
@@ -32,6 +48,21 @@ export default function TemplateUseButton({
     } catch {
       setStatus("error");
     }
+  }
+
+  if (!isFree(price)) {
+    return (
+      <div className="fm-use-template-box">
+        <FlowmaticCheckoutButton kind="template" slug={slug}>
+          {isIncluded(price) ? "Liberar pelo plano" : "Comprar template"}
+        </FlowmaticCheckoutButton>
+
+        <p>
+          Depois do checkout, vamos liberar este template para instalação no seu
+          workspace.
+        </p>
+      </div>
+    );
   }
 
   return (

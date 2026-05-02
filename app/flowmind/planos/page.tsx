@@ -1,7 +1,9 @@
 import Link from "next/link";
+import FlowmaticCheckoutButton from "../components/FlowmaticCheckoutButton";
 
 const plans = [
   {
+    slug: "comecar",
     name: "Começar",
     price: "R$ 0",
     period: "/mês",
@@ -18,6 +20,7 @@ const plans = [
     ],
   },
   {
+    slug: "rotina-pro",
     name: "Rotina Pro",
     price: "R$ 29",
     period: "/mês",
@@ -35,6 +38,7 @@ const plans = [
     ],
   },
   {
+    slug: "solo-ceo",
     name: "Solo CEO",
     price: "R$ 59",
     period: "/mês",
@@ -53,6 +57,7 @@ const plans = [
     ],
   },
   {
+    slug: "imperio-solo",
     name: "Império Solo",
     price: "R$ 97",
     period: "/mês",
@@ -126,9 +131,9 @@ export default function Page() {
               <span>{plan.period}</span>
             </div>
 
-            <Link href="/flowmind/templates" className="fm-commerce-btn primary full">
+            <FlowmaticCheckoutButton kind="plan" slug={plan.slug}>
               {plan.cta}
-            </Link>
+            </FlowmaticCheckoutButton>
 
             <ul>
               {plan.features.map((feature) => (
