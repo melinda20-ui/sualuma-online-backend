@@ -1,0 +1,326 @@
+.floatingButton {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9998;
+  border: 1px solid rgba(244, 114, 182, 0.45);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255,255,255,0.20), transparent 28%),
+    linear-gradient(135deg, rgba(224,64,160,0.98), rgba(126,34,206,0.98));
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 14px 10px 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: 0 20px 60px rgba(224, 64, 160, 0.35);
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.robotFace {
+  width: 34px;
+  height: 28px;
+  border-radius: 13px;
+  background: rgba(255,255,255,0.95);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: inset 0 -4px 10px rgba(224,64,160,0.20);
+  animation: robotFloat 2.2s ease-in-out infinite;
+}
+
+.eye {
+  width: 6px;
+  height: 6px;
+  background: #e040a0;
+  border-radius: 999px;
+  animation: blink 3.5s infinite;
+}
+
+.chatShell {
+  position: fixed;
+  right: 22px;
+  bottom: 82px;
+  z-index: 9999;
+  width: min(410px, calc(100vw - 28px));
+  max-height: min(680px, calc(100vh - 105px));
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(244, 114, 182, 0.35);
+  background:
+    radial-gradient(circle at top left, rgba(244, 114, 182, 0.22), transparent 38%),
+    linear-gradient(180deg, rgba(20, 10, 25, 0.98), rgba(10, 7, 14, 0.98));
+  color: #fff;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(18px);
+}
+
+.minimized {
+  max-height: 72px;
+}
+
+.header {
+  padding: 14px;
+  border-bottom: 1px solid rgba(244, 114, 182, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.identity strong {
+  display: block;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+}
+
+.identity small {
+  display: block;
+  color: rgba(255,255,255,0.62);
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.avatar {
+  width: 46px;
+  height: 42px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f9a8d4, #e040a0 58%, #a855f7);
+  position: relative;
+  box-shadow: 0 10px 35px rgba(224,64,160,0.38);
+  animation: robotFloat 2.6s ease-in-out infinite;
+  flex: 0 0 auto;
+}
+
+.avatar::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -8px;
+  width: 2px;
+  height: 9px;
+  background: #f9a8d4;
+  transform: translateX(-50%);
+}
+
+.avatar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -13px;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  box-shadow: 0 0 18px #f472b6;
+}
+
+.avatarEye {
+  position: absolute;
+  top: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #fff;
+  animation: blink 3.2s infinite;
+}
+
+.avatarEye:first-child {
+  left: 13px;
+}
+
+.avatarEye:nth-child(2) {
+  right: 13px;
+}
+
+.avatarMouth {
+  position: absolute;
+  left: 50%;
+  bottom: 11px;
+  width: 15px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.85);
+  transform: translateX(-50%);
+}
+
+.actions {
+  display: flex;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+
+.actions button {
+  width: 29px;
+  height: 29px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  cursor: pointer;
+}
+
+.actions button:hover {
+  background: rgba(244,114,182,0.20);
+}
+
+.quickActions {
+  display: flex;
+  gap: 7px;
+  padding: 11px 12px 0;
+  overflow-x: auto;
+}
+
+.quickActions button {
+  white-space: nowrap;
+  border: 1px solid rgba(244,114,182,0.28);
+  background: rgba(244,114,182,0.10);
+  color: rgba(255,255,255,0.88);
+  border-radius: 999px;
+  padding: 8px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.quickActions button:hover {
+  background: rgba(244,114,182,0.18);
+}
+
+.messages {
+  padding: 12px;
+  overflow-y: auto;
+  max-height: min(430px, calc(100vh - 295px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 92%;
+  border-radius: 17px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  white-space: pre-wrap;
+}
+
+.message span {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.52);
+  margin-bottom: 5px;
+}
+
+.message p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.48;
+  color: rgba(255,255,255,0.90);
+}
+
+.mia {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.07);
+}
+
+.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, rgba(224,64,160,0.35), rgba(168,85,247,0.30));
+  border-color: rgba(244,114,182,0.30);
+}
+
+.system {
+  align-self: center;
+  background: rgba(251,191,36,0.12);
+  border-color: rgba(251,191,36,0.25);
+}
+
+.form {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid rgba(244,114,182,0.18);
+}
+
+.form textarea {
+  flex: 1;
+  resize: none;
+  min-height: 44px;
+  max-height: 92px;
+  border-radius: 15px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  padding: 11px 12px;
+  outline: none;
+  font-size: 13px;
+}
+
+.form textarea::placeholder {
+  color: rgba(255,255,255,0.42);
+}
+
+.form button {
+  border: 0;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #e040a0, #a855f7);
+  color: #fff;
+  font-weight: 800;
+  padding: 0 15px;
+  cursor: pointer;
+}
+
+.form button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@keyframes robotFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes blink {
+  0%, 92%, 100% {
+    transform: scaleY(1);
+  }
+
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@media (max-width: 720px) {
+  .floatingButton {
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .chatShell {
+    right: 10px;
+    bottom: 74px;
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 90px);
+  }
+
+  .messages {
+    max-height: calc(100vh - 300px);
+  }
+}
