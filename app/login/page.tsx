@@ -100,6 +100,34 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  function normalizeLoginError(message?: string) {
+    const raw = String(message || "").trim();
+    const lower = raw.toLowerCase();
+
+    if (
+      lower.includes("request rate limit") ||
+      lower.includes("rate limit") ||
+      lower.includes("too many requests") ||
+      lower.includes("429")
+    ) {
+      return "Por segurança, pausamos novas tentativas por alguns instantes. Aguarde um pouco e tente novamente.";
+    }
+
+    if (
+      lower.includes("invalid login credentials") ||
+      lower.includes("invalid credentials") ||
+      lower.includes("email not confirmed")
+    ) {
+      return "E-mail ou senha incorretos. Confira os dados e tente novamente.";
+    }
+
+    if (lower.includes("captcha")) {
+      return "Confirme o reCAPTCHA antes de continuar.";
+    }
+
+    return raw || "Não foi possível entrar agora. Tente novamente em alguns instantes.";
+  }
+
   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 
   const [form, setForm] = useState({
@@ -143,13 +171,15 @@ export default function LoginPage() {
 
     supabase.auth.getSession().then(({ data }) => {
       if (data?.session && window.location.pathname === "/login") {
-        window.location.replace("/portal");
+        const nextUrl = new URLSearchParams(window.location.search).get("next") || "/portal";
+        window.location.replace(nextUrl);
       }
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN" && window.location.pathname === "/login") {
-        window.location.replace("/portal");
+        const nextUrl = new URLSearchParams(window.location.search).get("next") || "/portal";
+        window.location.replace(nextUrl);
       }
     });
 
@@ -166,15 +196,15 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/portal`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get("next") || "/portal")}`,
         },
       });
 
       if (error) {
-        setError(error.message);
+        setError(normalizeLoginError(error.message));
       }
     } catch (err: any) {
-      setError(err?.message || "Erro ao iniciar login social.");
+      setError(normalizeLoginError(err?.message || "Erro ao iniciar login social."));
     }
   }
 
@@ -239,7 +269,7 @@ export default function LoginPage() {
           email: form.email,
           password: form.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/portal`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get("next") || "/portal")}`,
             data: {
               full_name: form.name,
             },
@@ -253,7 +283,7 @@ export default function LoginPage() {
 
 
         if (error) {
-          setError(error.message);
+          setError(normalizeLoginError(error.message));
           return;
         }
 
@@ -267,15 +297,15 @@ export default function LoginPage() {
         });
 
         if (error) {
-          setError(error.message);
+          setError(normalizeLoginError(error.message));
           return;
         }
 
-        router.push("/portal");
+        router.push(new URLSearchParams(window.location.search).get("next") || "/portal");
         router.refresh();
       }
     } catch (err: any) {
-      setError(err?.message || "Erro inesperado ao autenticar.");
+      setError(normalizeLoginError(err?.message || "Erro inesperado ao autenticar."));
     } finally {
       setLoading(false);
     }

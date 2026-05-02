@@ -1,0 +1,32 @@
+{
+  "checklist": [
+    {
+      "code": "access_model_defined",
+      "group": "Modelo de acesso",
+      "title": "Modelo real de usuários definido",
+      "description": "Cliente comum, Cliente IA, Prestador, Admin, comunidade, agentes, automações, skills e Mia foram separados corretamente.",
+      "status": "done",
+      "completedAt": "AUTO",
+      "source": "chat"
+    },
+    {
+      "code": "global_cookie_domain_done",
+      "group": "Sessão",
+      "title": "Cookie global configurado",
+      "description": "Cookie configurado com Domain=.sualuma.online para funcionar nos subdomínios que passam pelo app.",
+      "status": "done",
+      "completedAt": "AUTO",
+      "source": "terminal"
+    },
+    {
+      "code": "admin_access_locked",
+      "group": "Admin",
+      "title": "Admin e Studio bloqueados para administradores",
+      "description": "Áreas /admin, /studio e Studio Lab protegidas para administradores autorizados.",
+      "status": "done",
+      "completedAt": "AUTO",
+      "source": "terminal"
+    }
+  ],
+  "events": []
+}

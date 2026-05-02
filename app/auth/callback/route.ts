@@ -1,88 +1,50 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getLoginDestination } from "@/lib/auth/login-destination";
 
-function getPublicBaseUrl() {
-  return (
-    process.env.SITE_URL ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://sualuma.online"
-  ).replace(/\/$/, "");
-}
+export const dynamic = "force-dynamic";
 
-function safeRedirectUrl(path: string) {
-  const baseUrl = getPublicBaseUrl();
-
-  if (!path || path === "null" || path === "undefined") {
-    return new URL("/bem-vindo", baseUrl);
-  }
-
-  if (path.startsWith("http")) {
-    try {
-      const url = new URL(path);
-      const allowedHosts = [
-        "sualuma.online",
-        "www.sualuma.online",
-        "app.sualuma.online",
-        "chat.sualuma.online",
-        "blog.sualuma.online",
-        "studio.sualuma.online",
-      ];
-
-      if (allowedHosts.includes(url.hostname)) {
-        return url;
-      }
-    } catch {}
-  }
-
-  if (!path.startsWith("/")) {
-    path = `/${path}`;
-  }
-
-  return new URL(path, baseUrl);
-}
-
-export async function GET(request: Request) {
-  const requestUrl = new URL(request.url);
-
-  const code = requestUrl.searchParams.get("code");
-  const token_hash = requestUrl.searchParams.get("token_hash");
-  const type = requestUrl.searchParams.get("type");
-  const next = requestUrl.searchParams.get("next") || "/bem-vindo";
-
-  const successRedirect = safeRedirectUrl(next);
-  const errorRedirect = safeRedirectUrl("/login?erro=confirmacao");
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const code = url.searchParams.get("code");
+  const tokenHash = url.searchParams.get("token_hash");
+  const type = url.searchParams.get("type") as any;
 
   try {
     const supabase = await createClient();
 
     if (code) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (!error) {
-        return NextResponse.redirect(successRedirect);
+      if (error) {
+        return NextResponse.redirect(
+          new URL(`/login?error=${encodeURIComponent("Não consegui confirmar seu login. Tente entrar novamente.")}`, request.url)
+        );
       }
-
-      console.error("[auth/callback] exchangeCodeForSession error:", error.message);
-      return NextResponse.redirect(errorRedirect);
     }
 
-    if (token_hash && type) {
+    if (tokenHash && type) {
       const { error } = await supabase.auth.verifyOtp({
-        token_hash,
-        type: type as any,
+        token_hash: tokenHash,
+        type,
       });
 
-      if (!error) {
-        return NextResponse.redirect(successRedirect);
+      if (error) {
+        return NextResponse.redirect(
+          new URL(`/login?error=${encodeURIComponent("Link expirado ou inválido. Tente entrar novamente.")}`, request.url)
+        );
       }
-
-      console.error("[auth/callback] verifyOtp error:", error.message);
-      return NextResponse.redirect(errorRedirect);
     }
 
-    return NextResponse.redirect(errorRedirect);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const destination = getLoginDestination(user?.email);
+
+    return NextResponse.redirect(new URL(destination, request.url));
   } catch (error) {
-    console.error("[auth/callback] erro inesperado:", error);
-    return NextResponse.redirect(errorRedirect);
+    return NextResponse.redirect(
+      new URL(`/login?error=${encodeURIComponent("Erro ao autenticar. Tente novamente.")}`, request.url)
+    );
   }
 }

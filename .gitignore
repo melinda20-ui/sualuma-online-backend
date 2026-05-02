@@ -7,21 +7,17 @@ dist/
 .env.local
 .env.*
 !.env.example
-
 backups/
 *.bak
 *.backup
 *.backup-*
 *.backup*
-
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .DS_Store
-
 data/login-rate-limit-alerts.json
-
 # tarefas locais do executor Mia
 data/brain-executor-tasks.json
 data/prestador-chat-publico.json
@@ -30,3 +26,12 @@ reports/copilot/
 reports/*.txt
 storage/
 *.sh
+# Sualuma - arquivos sensíveis e locais
+# Build/cache
+build/
+.cache/
+# Logs e backups locais
+*.log
+reports/
+root/
+luma-os-backups/
