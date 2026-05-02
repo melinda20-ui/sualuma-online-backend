@@ -208,6 +208,60 @@ async function tryOllama(system: string, messages: ChatMessage[]) {
   return data.message?.content || data.response || "";
 }
 
+
+async function tryGemini(system: string, messages: ChatMessage[]) {
+  const apiKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+
+  const model = process.env.GEMINI_MODEL || "gemini-1.5-flash";
+
+  if (!apiKey) return "";
+
+  const contents = messages.map((message) => ({
+    role: message.role === "assistant" ? "model" : "user",
+    parts: [{ text: message.content }],
+  }));
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: system }],
+        },
+        contents,
+        generationConfig: {
+          temperature: Number(process.env.OLLAMA_TEMPERATURE || 0.2),
+          maxOutputTokens: 1400,
+        },
+      }),
+    }
+  );
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    console.error(
+      "[agentesadms-chat] Gemini falhou:",
+      data?.error?.message || response.status
+    );
+    return "";
+  }
+
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+
+  return parts
+    .map((part: any) => (typeof part?.text === "string" ? part.text : ""))
+    .join("")
+    .trim();
+}
+
 async function tryAnthropic(system: string, messages: ChatMessage[]) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -323,23 +377,38 @@ export async function POST(request: NextRequest) {
     try {
       reply = await tryOllama(system, messages);
       if (reply.trim()) {
-        return NextResponse.json({ reply, provider: "ollama" });
+        return NextResponse.json({ reply, provider: "ollama-qwen" });
       }
-    } catch {}
+    } catch (error: any) {
+      console.error("[agentesadms-chat] Qwen/Ollama falhou:", error?.message || error);
+    }
 
     try {
-      reply = await tryAnthropic(system, messages);
+      reply = await tryGemini(system, messages);
       if (reply.trim()) {
-        return NextResponse.json({ reply, provider: "anthropic" });
+        return NextResponse.json({ reply, provider: "gemini" });
       }
-    } catch {}
+    } catch (error: any) {
+      console.error("[agentesadms-chat] Gemini falhou:", error?.message || error);
+    }
 
     try {
       reply = await tryOpenRouter(system, messages);
       if (reply.trim()) {
         return NextResponse.json({ reply, provider: "openrouter" });
       }
-    } catch {}
+    } catch (error: any) {
+      console.error("[agentesadms-chat] OpenRouter falhou:", error?.message || error);
+    }
+
+    try {
+      reply = await tryAnthropic(system, messages);
+      if (reply.trim()) {
+        return NextResponse.json({ reply, provider: "anthropic" });
+      }
+    } catch (error: any) {
+      console.error("[agentesadms-chat] Anthropic falhou:", error?.message || error);
+    }
 
     return NextResponse.json({
       reply: fallbackReply({
