@@ -4,11 +4,10 @@ export const ADMIN_EMAILS = new Set([
   "adm@sualuma.online",
 ]);
 
-export function isSualumaAdmin(email?: string | null) {
-  return Boolean(email && ADMIN_EMAILS.has(email.toLowerCase().trim()));
+export function isAdminEmail(email?: string | null) {
+  return ADMIN_EMAILS.has(String(email || "").trim().toLowerCase());
 }
 
 export function getLoginDestination(email?: string | null) {
-  if (isSualumaAdmin(email)) return "/studio-lab";
-  return "/portal";
+  return isAdminEmail(email) ? "/studio-lab" : "/portal";
 }
