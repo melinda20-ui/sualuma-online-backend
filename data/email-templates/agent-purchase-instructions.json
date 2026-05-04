@@ -1,0 +1,11 @@
+{
+  "id": "agent-purchase-instructions",
+  "subject": "Seu agente Sualuma foi comprado — veja como acessar",
+  "preview": "Após a confirmação do pagamento, seu agente fica disponível dentro da Mia.",
+  "body_text": "Olá! Sua compra na Loja de Agentes Sualuma foi recebida. Após a confirmação do pagamento, acesse https://chat.sualuma.online, abra a Mia e entre em Meus Agentes. Lá você verá o agente comprado, instruções de uso e próximos passos. Se comprou um agente sob encomenda, responda ao briefing para que possamos preparar a configuração personalizada.",
+  "access_location": "https://chat.sualuma.online → Mia → Meus Agentes",
+  "notes": [
+    "Este template será usado pelo webhook do Stripe na próxima etapa.",
+    "Não inserir chaves ou dados sensíveis neste arquivo."
+  ]
+}

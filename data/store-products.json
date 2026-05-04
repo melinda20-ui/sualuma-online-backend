@@ -1,0 +1,145 @@
+{
+  "store_name": "Loja de Agentes Sualuma",
+  "access_rule": "Após a compra, o agente é liberado no Painel de Agentes dentro do chat da Mia em https://chat.sualuma.online",
+  "currency": "BRL",
+  "products": [
+    {
+      "id": "diagnostico-microssaas",
+      "name": "Agente de Diagnóstico para MicroSaaS",
+      "category": "Diagnóstico sob encomenda",
+      "price_brl": 150,
+      "type": "custom_agent",
+      "badge": "Sob encomenda",
+      "description": "Agente personalizado para analisar um MicroSaaS, encontrar falhas, riscos de lançamento, melhorias de UX, pontos de segurança e oportunidades de venda.",
+      "delivery": "Liberado no Painel de Agentes da Mia após confirmação do pagamento e briefing.",
+      "access_location": "chat.sualuma.online → Mia → Meus Agentes",
+      "order_bump": {
+        "id": "bump-relatorio-prioridades",
+        "name": "Relatório de prioridades em PDF",
+        "price_brl": 29,
+        "description": "Receba um resumo organizado com os principais problemas, riscos e próximos passos."
+      },
+      "upsell": {
+        "id": "pacote-5-diagnosticos",
+        "name": "Pacote com 5 Agentes de Diagnóstico",
+        "price_brl": 600,
+        "description": "Leve 5 agentes sob encomenda por um valor menor que comprar separado."
+      },
+      "downsell": {
+        "id": "diagnostico-simples",
+        "name": "Diagnóstico simples",
+        "price_brl": 97,
+        "description": "Versão menor com análise básica e checklist inicial."
+      }
+    },
+    {
+      "id": "diagnostico-vps",
+      "name": "Agente de Diagnóstico para VPS",
+      "category": "Diagnóstico sob encomenda",
+      "price_brl": 150,
+      "type": "custom_agent",
+      "badge": "Infraestrutura",
+      "description": "Agente personalizado para analisar VPS, PM2, Nginx, processos, riscos de queda, configuração, segurança e estabilidade.",
+      "delivery": "Liberado no Painel de Agentes da Mia após confirmação do pagamento e briefing.",
+      "access_location": "chat.sualuma.online → Mia → Meus Agentes",
+      "order_bump": {
+        "id": "bump-checklist-seguranca-vps",
+        "name": "Checklist de segurança VPS",
+        "price_brl": 29,
+        "description": "Lista prática de pontos críticos para revisar no servidor."
+      },
+      "upsell": {
+        "id": "pacote-5-diagnosticos",
+        "name": "Pacote com 5 Agentes de Diagnóstico",
+        "price_brl": 600,
+        "description": "Leve 5 agentes sob encomenda por um valor menor que comprar separado."
+      },
+      "downsell": {
+        "id": "diagnostico-simples-vps",
+        "name": "Diagnóstico VPS simples",
+        "price_brl": 97,
+        "description": "Análise básica da VPS com checklist de estabilidade."
+      }
+    },
+    {
+      "id": "pacote-5-diagnosticos",
+      "name": "Pacote com 5 Agentes de Diagnóstico",
+      "category": "Pacotes",
+      "price_brl": 600,
+      "type": "bundle",
+      "badge": "Melhor oferta",
+      "description": "Pacote com 5 agentes personalizados de diagnóstico para MicroSaaS, VPS, UX, lançamento, usuários ou vendas.",
+      "delivery": "Os 5 agentes ficam organizados no Painel de Agentes da Mia.",
+      "access_location": "chat.sualuma.online → Mia → Meus Agentes",
+      "order_bump": {
+        "id": "bump-suporte-prioritario",
+        "name": "Suporte prioritário de ativação",
+        "price_brl": 79,
+        "description": "Ajuda extra para organizar os briefings e ativar os agentes corretamente."
+      },
+      "upsell": {
+        "id": "pacote-10-diagnosticos",
+        "name": "Pacote com 10 Agentes",
+        "price_brl": 1100,
+        "description": "Para quem quer montar uma central completa de agentes sob encomenda."
+      },
+      "downsell": {
+        "id": "pacote-3-diagnosticos",
+        "name": "Pacote com 3 Agentes",
+        "price_brl": 390,
+        "description": "Opção menor para começar com 3 agentes personalizados."
+      }
+    },
+    {
+      "id": "cnpj-investigator",
+      "name": "Investigador de CNPJ",
+      "category": "Negócios e regularização",
+      "price_brl": 39,
+      "type": "agent",
+      "badge": "Novo",
+      "description": "Agente que ajuda a acompanhar saúde fiscal, pendências, obrigações, riscos e próximos passos ligados ao CNPJ.",
+      "delivery": "Liberado automaticamente no Painel de Agentes da Mia.",
+      "access_location": "chat.sualuma.online → Mia → Meus Agentes",
+      "order_bump": {
+        "id": "bump-plano-regularizacao",
+        "name": "Plano de regularização organizado",
+        "price_brl": 19,
+        "description": "Checklist organizado para resolver pendências com contador."
+      }
+    },
+    {
+      "id": "demand-radar",
+      "name": "Radar de Demandas Online",
+      "category": "Vendas e oportunidades",
+      "price_brl": 79,
+      "type": "agent",
+      "badge": "Oportunidades",
+      "description": "Agente para monitorar sinais públicos de pessoas procurando sites, no-code, automações, programadores e vagas home office.",
+      "delivery": "Liberado automaticamente no Painel de Agentes da Mia.",
+      "access_location": "chat.sualuma.online → Mia → Meus Agentes",
+      "order_bump": {
+        "id": "bump-modelos-abordagem",
+        "name": "Modelos de abordagem ética",
+        "price_brl": 29,
+        "description": "Mensagens prontas para abordar oportunidades sem spam."
+      }
+    },
+    {
+      "id": "workana-closer",
+      "name": "Fechador Workana e Home Office",
+      "category": "Vendas e propostas",
+      "price_brl": 69,
+      "type": "agent",
+      "badge": "Fechar negócios",
+      "description": "Agente para analisar projetos, montar propostas melhores, responder clientes e aumentar chance de fechar trabalhos em plataformas remotas.",
+      "delivery": "Liberado automaticamente no Painel de Agentes da Mia.",
+      "access_location": "chat.sualuma.online → Mia → Meus Agentes",
+      "order_bump": {
+        "id": "bump-kit-propostas",
+        "name": "Kit de propostas profissionais",
+        "price_brl": 29,
+        "description": "Templates de proposta, follow-up e negociação."
+      }
+    }
+  ]
+}
