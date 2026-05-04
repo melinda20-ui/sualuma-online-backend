@@ -1,5 +1,7 @@
 "use client";
 
+import MiaPanelTruthCard from "@/components/studio/MiaPanelTruthCard";
+
 import SualumaPublicChat from "@/components/SualumaPublicChat";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
@@ -2731,6 +2733,8 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
               </div>
 
               <div className="side-stack">
+                <MiaPanelTruthCard />
+
                 <div className="panel compact">
                   <PanelTitle eyebrow="Status" title="Saúde geral" />
                   <div className="health-ring">
