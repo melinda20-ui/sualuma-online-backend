@@ -2272,6 +2272,7 @@ const defaultStudioShortcuts: StudioShortcut[] = [
   { id: "default-diagnostico", title: "Diagnóstico de usuários", url: "/studio/usuarios-diagnostico", createdAt: "default" },
   { id: "default-prospector", title: "Prospector de Leads", url: "/leads-prospector", createdAt: "default" },
   { id: "default-agentes-admins", title: "Agentes Admins", url: "/studio/agentesadms", createdAt: "default" },
+  { id: "default-funil-sualuma", title: "Funil Sualuma", url: "/studio/funil-sualuma", createdAt: "default" },
   { id: "default-hostinger", title: "Hostinger", url: "https://hpanel.hostinger.com", createdAt: "default" },
 ];
 
@@ -2696,6 +2697,10 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
           </div>
         </header>
 
+        <div className="mia-inline-truth-slot">
+          <MiaPanelTruthCard panelKey={activeView} />
+        </div>
+
         {activeView === "visao" && (
           <>
 
@@ -2733,8 +2738,6 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
               </div>
 
               <div className="side-stack">
-                <MiaPanelTruthCard />
-
                 <div className="panel compact">
                   <PanelTitle eyebrow="Status" title="Saúde geral" />
                   <div className="health-ring">
@@ -3829,6 +3832,19 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
         .right-3 { right: 17%; bottom: 10%; }
 
         .side-stack { display: grid; gap: 18px; }
+
+        .mia-inline-truth-slot {
+          float: right;
+          width: min(370px, 34vw);
+          margin: 0 0 18px 18px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .mia-inline-truth-slot :global(.miaTruthCard) {
+          position: relative !important;
+          top: auto !important;
+        }
         .compact { min-height: 240px; }
 
         .health-ring {
@@ -4957,6 +4973,12 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
         }
 
         @media (max-width: 1280px) {
+          .mia-inline-truth-slot {
+            float: none;
+            width: 100%;
+            margin: 0 0 18px 0;
+          }
+
           .hero-grid,
           .health-hero,
           .stripe-hero,
