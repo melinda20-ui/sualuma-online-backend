@@ -2273,6 +2273,7 @@ const defaultStudioShortcuts: StudioShortcut[] = [
   { id: "default-prospector", title: "Prospector de Leads", url: "/leads-prospector", createdAt: "default" },
   { id: "default-agentes-admins", title: "Agentes Admins", url: "/studio/agentesadms", createdAt: "default" },
   { id: "default-funil-sualuma", title: "Funil Sualuma", url: "/studio/funil-sualuma", createdAt: "default" },
+  { id: "default-metas-financeiras", title: "Metas Financeiras", url: "/studio/metas-financeiras", createdAt: "default" },
   { id: "default-hostinger", title: "Hostinger", url: "https://hpanel.hostinger.com", createdAt: "default" },
 ];
 
