@@ -1,10 +1,5 @@
-import { requireAdmin } from "@/lib/auth/admin-access";
+import type { ReactNode } from "react";
 
-export default async function EstudioLabAgentesProtectedTemplate({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  await requireAdmin("/estudio-lab/agentesadms");
+export default function Template({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }

@@ -1,13 +1,5 @@
-import "./agentesadms.css";
-import "./adms-robot-overlay.css";
-import AgentesAdmsClient from "./AgentesAdmsClient";
-import AdmsVoiceRobotOverlay from "./AdmsVoiceRobotOverlay";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-  return (
-    <>
-      <AgentesAdmsClient />
-      <AdmsVoiceRobotOverlay />
-    </>
-  );
+export default function OldAgentesAdmsRedirectPage() {
+  redirect("/studio/agentesadms");
 }

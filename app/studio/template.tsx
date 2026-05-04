@@ -6,6 +6,6 @@ export default async function StudioProtectedTemplate({
 }: {
   children: ReactNode;
 }) {
-  await requireAdmin("/studio/usuarios-diagnostico");
+  await requireAdmin("/studio");
   return <>{children}</>;
 }
