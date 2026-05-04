@@ -7,6 +7,9 @@ export const dynamic = "force-dynamic";
 
 type CampaignState = {
   active: boolean;
+  launchOpen?: boolean;
+  launchOpenedAt?: string;
+  launchClosedAt?: string;
   offerName: string;
   targetSegment: string;
   target: number;
@@ -37,6 +40,7 @@ const FUNIS_FILE = path.join(ROOT, "data", "funis.json");
 
 const defaultState: CampaignState = {
   active: false,
+  launchOpen: false,
   offerName: "Sualuma Online",
   targetSegment: "microempreendedores, prestadores e pequenos negócios",
   target: 1000,
@@ -381,7 +385,20 @@ async function runBatch() {
   const logs = await readJson<any[]>(LOG_FILE, []);
 
   if (!state.active) {
-    return { ok: true, message: "Agente pausado.", added: 0, ready: 0, sent: 0, total: queue.length };
+    return { ok: true, message: "Agente pausado.", added: 0, ready: 0, sent: 0, total: queue.length, state };
+  }
+
+  if (!state.launchOpen) {
+    return {
+      ok: true,
+      message: "Lançamento fechado. Nenhum e-mail inicial será preparado ou enviado.",
+      added: 0,
+      ready: 0,
+      sent: 0,
+      blockedNoConsent: 0,
+      total: queue.length,
+      state,
+    };
   }
 
   const leads = await loadLeads();
@@ -513,6 +530,38 @@ export async function POST(req: NextRequest) {
     await writeJson(STATE_FILE, state);
     const adminEmailDraft = await syncCampaignDraftToAdminEmails(state);
     return NextResponse.json({ ok: true, state, adminEmailDraft });
+  }
+
+  if (action === "open-launch") {
+    const current = await readJson<CampaignState>(STATE_FILE, defaultState);
+    const now = new Date().toISOString();
+
+    const state = {
+      ...current,
+      active: true,
+      launchOpen: true,
+      launchOpenedAt: now,
+      lastMessage: "Lançamento aberto. Agora o Campaign Agent pode preparar e-mails apenas para leads com opt-in.",
+    };
+
+    await writeJson(STATE_FILE, state);
+    return NextResponse.json({ ok: true, state });
+  }
+
+  if (action === "close-launch") {
+    const current = await readJson<CampaignState>(STATE_FILE, defaultState);
+    const now = new Date().toISOString();
+
+    const state = {
+      ...current,
+      active: false,
+      launchOpen: false,
+      launchClosedAt: now,
+      lastMessage: "Lançamento fechado. Nenhum e-mail inicial será preparado ou enviado.",
+    };
+
+    await writeJson(STATE_FILE, state);
+    return NextResponse.json({ ok: true, state });
   }
 
   if (action === "pause") {
