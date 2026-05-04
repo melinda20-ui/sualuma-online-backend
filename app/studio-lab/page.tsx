@@ -2274,6 +2274,7 @@ const defaultStudioShortcuts: StudioShortcut[] = [
   { id: "default-agentes-admins", title: "Agentes Admins", url: "/studio/agentesadms", createdAt: "default" },
   { id: "default-funil-sualuma", title: "Funil Sualuma", url: "/studio/funil-sualuma", createdAt: "default" },
   { id: "default-metas-financeiras", title: "Metas Financeiras", url: "/studio/metas-financeiras", createdAt: "default" },
+  { id: "default-blog-agent", title: "Agente de Blog", url: "/studio/blog-agent", createdAt: "default" },
   { id: "default-hostinger", title: "Hostinger", url: "https://hpanel.hostinger.com", createdAt: "default" },
 ];
 
