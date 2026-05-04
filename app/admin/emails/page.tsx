@@ -58,7 +58,7 @@ function TabButton({
 
 export default function AdminEmailsPage() {
   const [tab, setTab] = useState<"leads" | "campanha" | "automatico" | "funis">("funis");
-  const [funis, setFunis] = useState<Funil[]>([]);
+  const [funis, setFunis de e-mail] = useState<Funil[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -96,7 +96,7 @@ export default function AdminEmailsPage() {
 
       if (funisRes.status === "fulfilled" && funisRes.value.ok) {
         const data = await funisRes.value.json();
-        setFunis(Array.isArray(data) ? data : []);
+        setFunis de e-mail(Array.isArray(data) ? data : []);
       }
 
       if (leadsRes.status === "fulfilled" && leadsRes.value.ok) {
@@ -134,7 +134,21 @@ export default function AdminEmailsPage() {
     setSteps(Array.isArray(funil.steps) && funil.steps.length > 0 ? funil.steps : [{ ...emptyStep }]);
     setEditingIndex(0);
     setTab("funis");
-    setNotice(`Funil "${funil.name}" carregado para edição.`);
+    setNotice(`
+        <div style={{
+          marginTop: 12,
+          padding: "14px 16px",
+          borderRadius: 18,
+          border: "1px solid rgba(34,211,238,.35)",
+          background: "rgba(8,47,73,.42)",
+          color: "#cffafe",
+          fontWeight: 700,
+          lineHeight: 1.5
+        }}>
+          💡 Os cards acima mostram os leads do painel. O funil selecionado abaixo tem seus próprios e-mails.
+          Para editar os e-mails, clique no funil salvo à direita e role até a lista de e-mails da sequência.
+        </div>
+Funil "${funil.name}" carregado para edição.`);
   }
 
   function updateCurrentStep(field: keyof Step, value: string | number) {
@@ -306,15 +320,15 @@ export default function AdminEmailsPage() {
     <main className="page">
       <section className="top-grid">
         <div className="stat-card">
-          <span>Total Leads</span>
+          <span>Leads totais</span>
           <strong>{loading ? "..." : totalLeads}</strong>
         </div>
         <div className="stat-card">
-          <span>Novos</span>
+          <span>Leads novos</span>
           <strong>{loading ? "..." : newLeads}</strong>
         </div>
         <div className="stat-card">
-          <span>Funis</span>
+          <span>Funis de e-mail</span>
           <strong>{loading ? "..." : funis.length}</strong>
         </div>
       </section>
@@ -330,7 +344,7 @@ export default function AdminEmailsPage() {
           Email Automático
         </TabButton>
         <TabButton active={tab === "funis"} onClick={() => setTab("funis")}>
-          Funis de Email
+          Funis de e-mail de Email
         </TabButton>
       </section>
 
@@ -386,7 +400,7 @@ export default function AdminEmailsPage() {
           <h1>Email automático</h1>
           <p>
             O Campaign Agent já está criando um funil rascunho automático. Para revisar,
-            abrir e editar, entre na aba <strong>Funis de Email</strong>.
+            abrir e editar, entre na aba <strong>Funis de e-mail de Email</strong>.
           </p>
         </section>
       )}
@@ -398,7 +412,7 @@ export default function AdminEmailsPage() {
               <div>
                 <h1>Construtor de funil de e-mails</h1>
                 <p>
-                  Clique em um funil salvo, escolha um e-mail da sequência, edite e salve.
+                  Clique em um funil salvo, veja cada e-mail da sequência, edite assunto, conteúdo, delay e salve.
                 </p>
               </div>
 
@@ -492,8 +506,8 @@ export default function AdminEmailsPage() {
           </div>
 
           <aside className="panel saved-panel">
-            <h2>Funis salvos</h2>
-            <p className="small">Clique em um funil para abrir e editar.</p>
+            <h2>Funis de e-mail salvos</h2>
+            <p className="small">Clique em um funil para abrir, ver os e-mails um por um e editar.</p>
 
             <div className="saved-list">
               {funis.length === 0 ? (
@@ -512,7 +526,7 @@ export default function AdminEmailsPage() {
                       Criado em {safeDate(funil.createdAt)}
                       {funil.source ? ` · ${funil.source}` : ""}
                     </small>
-                    <em>Ver / editar e-mails</em>
+                    <em>Abrir e editar os 13 e-mails</em>
                   </button>
                 ))
               )}
