@@ -1,5 +1,7 @@
 "use client";
 
+import MiaTrainerMiniPanel from "@/components/studio/MiaTrainerMiniPanel";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type MiaData = {
@@ -691,6 +693,7 @@ export default function MiaBrainPage() {
         <div className="single-grid">
           <div className="glass brain-big">
             <SectionTitle title="Cérebro da Mia" subtitle="Núcleo visual de orquestração das IAs, skills e APIs" />
+            <MiaTrainerMiniPanel />
             <HolographicBrain />
           </div>
           <div className="glass">
