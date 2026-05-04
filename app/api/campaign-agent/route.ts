@@ -33,6 +33,7 @@ const DATA_DIR = path.join(ROOT, "data", "campaign-agent");
 const STATE_FILE = path.join(DATA_DIR, "state.json");
 const QUEUE_FILE = path.join(DATA_DIR, "queue.json");
 const LOG_FILE = path.join(DATA_DIR, "logs.json");
+const FUNIS_FILE = path.join(ROOT, "data", "funis.json");
 
 const defaultState: CampaignState = {
   active: false,
@@ -57,6 +58,187 @@ async function readJson<T>(file: string, fallback: T): Promise<T> {
 async function writeJson(file: string, data: unknown) {
   await ensureDir();
   await fs.writeFile(file, JSON.stringify(data, null, 2));
+}
+
+type AdminFunilStep = {
+  delayDays: number;
+  subject: string;
+  html: string;
+};
+
+type AdminFunil = {
+  id: string;
+  name: string;
+  status: "rascunho" | "ativo";
+  steps: AdminFunilStep[];
+  createdAt: string;
+  updatedAt: string;
+  source?: string;
+};
+
+function escapeHtml(input: string) {
+  return input
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function textToHtml(body: string) {
+  return body
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replaceAll("\n", "<br />")}</p>`)
+    .join("\n");
+}
+
+function getAdminDraftSteps(): AdminFunilStep[] {
+  const name = "{{nome}}";
+
+  const templates = [
+    [0, "Você já viu como o Sualuma pode simplificar seu negócio?", `Oi ${name},
+
+Vi que você teve contato com a proposta do Sualuma Online.
+
+A ideia é simples: ajudar pequenos negócios a vender melhor, organizar atendimento, criar presença online e economizar tempo usando automações e IA.
+
+Nos próximos dias vou te mostrar como isso pode funcionar na prática.
+
+Abraços,
+Equipe Sualuma`],
+    [0, "O maior erro dos pequenos negócios no digital", `Oi ${name},
+
+Muitos negócios perdem clientes não por falta de qualidade, mas por falta de processo: atendimento perdido, catálogo bagunçado, site desatualizado e falta de follow-up.
+
+O Sualuma nasceu para atacar exatamente esse problema.
+
+Se fizer sentido, responda este e-mail com: QUERO ENTENDER.
+
+Equipe Sualuma`],
+    [1, "Como transformar atendimento em venda", `Oi ${name},
+
+Um cliente que pergunta preço hoje pode comprar amanhã, mas só se o atendimento não morrer no caminho.
+
+Com agentes, automações e páginas certas, o negócio deixa de depender só da memória do empreendedor.
+
+Esse é o tipo de estrutura que queremos entregar com o Sualuma.
+
+Equipe Sualuma`],
+    [1, "Seu negócio precisa parecer maior do que é", `Oi ${name},
+
+Pequenos negócios podem competir melhor quando parecem organizados: página clara, respostas rápidas, proposta bem apresentada e acompanhamento.
+
+O Sualuma ajuda nisso sem exigir uma equipe grande.
+
+Equipe Sualuma`],
+    [2, "3 coisas que o Sualuma pode tirar das suas costas", `Oi ${name},
+
+O Sualuma pode ajudar com:
+1. Organização do atendimento.
+2. Presença digital mais profissional.
+3. Automação de tarefas repetitivas.
+
+A meta é simples: você vender mais sem enlouquecer.
+
+Equipe Sualuma`],
+    [2, "Você não precisa fazer tudo manualmente", `Oi ${name},
+
+Responder, lembrar, postar, organizar, cobrar, acompanhar cliente... tudo isso consome energia.
+
+A proposta do Sualuma é colocar tecnologia para trabalhar a favor do pequeno negócio.
+
+Equipe Sualuma`],
+    [3, "Último dia da sequência inicial", `Oi ${name},
+
+Essa é a reta final da nossa sequência inicial.
+
+Se você quer organizar seu negócio com IA, automação e uma estrutura mais profissional, agora é um bom momento para conhecer o Sualuma.
+
+Equipe Sualuma`],
+    [3, "Quer que a gente te mostre o melhor caminho?", `Oi ${name},
+
+Se você ainda está em dúvida, responda este e-mail contando qual é o seu tipo de negócio.
+
+A gente pode te orientar sobre qual estrutura faz mais sentido para começar.
+
+Equipe Sualuma`],
+    [5, "Conteúdo: como organizar seu funil simples", `Oi ${name},
+
+Um funil simples tem: atração, conversa, proposta, acompanhamento e fechamento.
+
+A maioria dos pequenos negócios perde dinheiro no acompanhamento.
+
+Equipe Sualuma`],
+    [7, "Conteúdo + oferta: automação sem complicar", `Oi ${name},
+
+Automação não precisa ser coisa de empresa grande.
+
+Começa com pequenas tarefas: salvar lead, lembrar retorno, responder dúvidas comuns e organizar pedidos.
+
+O Sualuma quer facilitar isso.
+
+Equipe Sualuma`],
+    [10, "Conteúdo: presença digital que passa confiança", `Oi ${name},
+
+Uma página simples, clara e bem escrita já muda a percepção do cliente.
+
+Confiança vende.
+
+Equipe Sualuma`],
+    [12, "Conteúdo + oferta: o próximo passo", `Oi ${name},
+
+Se você quer tirar seu negócio do improviso, o próximo passo é criar uma estrutura mínima: página, atendimento e rotina de follow-up.
+
+É nisso que o Sualuma pode ajudar.
+
+Equipe Sualuma`],
+    [14, "Oferta especial para começar com o Sualuma", `Oi ${name},
+
+Essa é nossa mensagem de cheque-mate.
+
+Se você quer começar agora, podemos preparar uma condição especial de entrada para estruturar seu negócio com o Sualuma.
+
+Responda este e-mail com: COMEÇAR.
+
+Equipe Sualuma`],
+  ] as const;
+
+  return templates.map(([delayDays, subject, body]) => ({
+    delayDays,
+    subject,
+    html: textToHtml(body),
+  }));
+}
+
+async function syncCampaignDraftToAdminEmails(state: CampaignState) {
+  const now = new Date().toISOString();
+  const funis = await readJson<AdminFunil[]>(FUNIS_FILE, []);
+  const safeFunis = Array.isArray(funis) ? funis : [];
+
+  const id = "campaign-agent-sualuma-online";
+  const existing = safeFunis.find((funil) => funil.id === id);
+
+  const draft: AdminFunil = {
+    id,
+    name: `Agente de Campanha - ${state.offerName || "Sualuma Online"}`,
+    status: existing?.status === "ativo" ? "ativo" : "rascunho",
+    steps: getAdminDraftSteps(),
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    source: "campaign-agent",
+  };
+
+  const next = [draft, ...safeFunis.filter((funil) => funil.id !== id)];
+
+  await fs.mkdir(path.dirname(FUNIS_FILE), { recursive: true });
+  await fs.writeFile(FUNIS_FILE, JSON.stringify(next, null, 2), "utf8");
+
+  return {
+    id: draft.id,
+    name: draft.name,
+    steps: draft.steps.length,
+    status: draft.status,
+  };
 }
 
 function makeId(input: string) {
@@ -267,7 +449,9 @@ async function runBatch() {
   await writeJson(QUEUE_FILE, queue);
   await writeJson(LOG_FILE, logs.slice(0, 200));
 
-  return { ok: true, added: addedContacts, ready, sent, errors, blockedNoConsent, total: queue.length, state };
+  const adminEmailDraft = await syncCampaignDraftToAdminEmails(state);
+
+  return { ok: true, added: addedContacts, ready, sent, errors, blockedNoConsent, total: queue.length, state, adminEmailDraft };
 }
 
 export async function GET(req: NextRequest) {
@@ -293,6 +477,11 @@ export async function GET(req: NextRequest) {
     stats,
     recent: queue.slice(0, 10),
     logs: logs.slice(0, 10),
+    adminEmailDraft: {
+      connected: true,
+      funnelId: "campaign-agent-sualuma-online",
+      adminPath: "/admin/emails",
+    },
     sendRealEmailsEnabled: process.env.CAMPAIGN_AGENT_SEND_ENABLED === "true",
   });
 }
@@ -322,7 +511,8 @@ export async function POST(req: NextRequest) {
     };
 
     await writeJson(STATE_FILE, state);
-    return NextResponse.json({ ok: true, state });
+    const adminEmailDraft = await syncCampaignDraftToAdminEmails(state);
+    return NextResponse.json({ ok: true, state, adminEmailDraft });
   }
 
   if (action === "pause") {

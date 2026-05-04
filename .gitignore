@@ -42,3 +42,6 @@ luma-os-backups/
 
 # Central local de tarefas dos agentes
 /data/agent-tasks/*.json
+
+# Dados locais do Admin de E-mails
+/data/funis.json
