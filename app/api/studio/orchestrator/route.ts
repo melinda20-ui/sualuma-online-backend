@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type BlueSkill =
+type Skill =
   | "vps-doctor"
   | "business-agent"
   | "ux-doctor"
@@ -28,7 +28,7 @@ type BlueSkill =
   | "demand-radar"
   | "workana-closer";
 
-const skillLabels: Record<BlueSkill, string> = {
+const SKILL_LABELS: Record<Skill, string> = {
   "vps-doctor": "Diagnóstico de VPS, Nginx, PM2 e estabilidade",
   "business-agent": "Diagnóstico de negócio",
   "ux-doctor": "Diagnóstico de UX e interface",
@@ -54,39 +54,94 @@ const skillLabels: Record<BlueSkill, string> = {
   "workana-closer": "Propostas e fechamento de serviços"
 };
 
-function pickSkill(text: string, forced?: string): BlueSkill {
-  const raw = `${forced || ""} ${text || ""}`.toLowerCase();
+function normalize(input: unknown) {
+  return String(input || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
 
-  if (raw.includes("vps") || raw.includes("nginx") || raw.includes("pm2") || raw.includes("servidor") || raw.includes("502") || raw.includes("deploy")) return "vps-doctor";
-  if (raw.includes("usuário") || raw.includes("usuario") || raw.includes("login") || raw.includes("acesso") || raw.includes("permiss") || raw.includes("auth") || raw.includes("cliente")) return "user-doctor";
-  if (raw.includes("ux") || raw.includes("interface") || raw.includes("layout") || raw.includes("design") || raw.includes("botão") || raw.includes("botao")) return "ux-doctor";
-  if (raw.includes("lançamento") || raw.includes("lancamento") || raw.includes("lançar") || raw.includes("lancar") || raw.includes("checkout") || raw.includes("conversão") || raw.includes("conversao")) return "launch-doctor";
-  if (raw.includes("loja") || raw.includes("stripe") || raw.includes("produto") || raw.includes("plano") || raw.includes("preço") || raw.includes("preco") || raw.includes("agente comprado")) return "store-manager";
-  if (raw.includes("google") || raw.includes("seo") || raw.includes("rank") || raw.includes("blog") || raw.includes("ads")) return "google-seo";
-  if (raw.includes("cnpj") || raw.includes("mei") || raw.includes("dívida") || raw.includes("divida") || raw.includes("receita federal")) return "cnpj-investigator";
-  if (raw.includes("comunidade") || raw.includes("moderação") || raw.includes("moderacao") || raw.includes("denúncia") || raw.includes("denuncia")) return "community-guardian";
-  if (raw.includes("n8n") || raw.includes("automação") || raw.includes("automacao") || raw.includes("workflow") || raw.includes("fluxo")) return "n8n-builder";
-  if (raw.includes("lead") || raw.includes("prospect") || raw.includes("crm")) return "ethical-prospector";
-  if (raw.includes("site") || raw.includes("página") || raw.includes("pagina") || raw.includes("landing")) return "site-builder";
-  if (raw.includes("crescimento") || raw.includes("vendas") || raw.includes("marketing") || raw.includes("conteúdo") || raw.includes("conteudo")) return "growth-agent";
-  if (raw.includes("email") || raw.includes("campanha") || raw.includes("funil")) return "email-marketing";
-  if (raw.includes("repo") || raw.includes("git") || raw.includes("código") || raw.includes("codigo")) return "repo-radar";
-  if (raw.includes("mia") || raw.includes("orquestr")) return "mia-trainer";
+function pickSkill(areaRaw: unknown, messageRaw: unknown, explicitSkill?: unknown): Skill {
+  const explicit = String(explicitSkill || "") as Skill;
+  if (explicit && SKILL_LABELS[explicit]) return explicit;
+
+  const area = normalize(areaRaw);
+  const text = normalize(messageRaw);
+  const combined = `${area} ${text}`;
+
+  const areaMap: Record<string, Skill> = {
+    usuarios: "user-doctor",
+    usuario: "user-doctor",
+    users: "user-doctor",
+    login: "user-doctor",
+    permissoes: "user-doctor",
+
+    google: "google-seo",
+    seo: "google-seo",
+    trafego: "google-seo",
+
+    cnpj: "cnpj-investigator",
+    mei: "cnpj-investigator",
+    fiscal: "cnpj-investigator",
+
+    loja: "store-manager",
+    store: "store-manager",
+    stripe: "store-manager",
+    checkout: "store-manager",
+    produtos: "store-manager",
+    ofertas: "store-manager",
+
+    saude: "vps-doctor",
+    vps: "vps-doctor",
+    nginx: "vps-doctor",
+    pm2: "vps-doctor",
+    servidor: "vps-doctor",
+
+    crescimento: "growth-agent",
+    vendas: "growth-agent",
+    lancamento: "growth-agent",
+    aquisicao: "growth-agent",
+    clientes: "growth-agent",
+
+    comunidade: "community-guardian",
+    moderacao: "community-guardian",
+
+    automacoes: "n8n-builder",
+    automacao: "n8n-builder",
+    n8n: "n8n-builder",
+
+    codigo: "repo-radar",
+    repo: "repo-radar",
+    github: "repo-radar",
+
+    mia: "mia-trainer",
+    treinamento: "mia-trainer",
+
+    dashboard: "dashboard-admin",
+    studio: "dashboard-admin"
+  };
+
+  if (area && areaMap[area]) return areaMap[area];
+
+  if (combined.includes("loja") || combined.includes("stripe") || combined.includes("checkout") || combined.includes("produto") || combined.includes("oferta")) return "store-manager";
+  if (combined.includes("crescimento") || combined.includes("venda") || combined.includes("lancamento") || combined.includes("aquisicao") || combined.includes("cliente")) return "growth-agent";
+  if (combined.includes("google") || combined.includes("seo") || combined.includes("ranking") || combined.includes("trafego")) return "google-seo";
+  if (combined.includes("cnpj") || combined.includes("mei") || combined.includes("fiscal") || combined.includes("receita")) return "cnpj-investigator";
+  if (combined.includes("usuario") || combined.includes("login") || combined.includes("permiss")) return "user-doctor";
+  if (combined.includes("vps") || combined.includes("nginx") || combined.includes("pm2") || combined.includes("servidor") || combined.includes("saude")) return "vps-doctor";
 
   return "dashboard-admin";
 }
 
-function extractGoal(body: any) {
+function extractAnswer(data: any) {
   return String(
-    body?.goal ||
-    body?.message ||
-    body?.prompt ||
-    body?.text ||
-    body?.content ||
-    body?.question ||
-    body?.input ||
-    "Analise o Studio Sualuma e diga o próximo passo mais importante."
-  ).trim();
+    data?.answer ||
+    data?.content ||
+    data?.summary ||
+    data?.message ||
+    data?.result ||
+    "A Mia recebeu a resposta do Cérebro Azul, mas não encontrou um resumo textual claro."
+  );
 }
 
 export async function GET() {
@@ -94,96 +149,82 @@ export async function GET() {
     ok: true,
     name: "Mia Studio Orchestrator",
     blue_brain_url: process.env.BLUE_BRAIN_URL || "http://127.0.0.1:4117",
-    skills: skillLabels
+    skills: SKILL_LABELS
   });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => ({}));
+
+  const message = String(body.message || body.goal || "").trim();
+  const area = body.area;
+  const skill = pickSkill(area, message, body.skill);
+  const goal = message || `Analise a área ${String(area || "Studio")} e gere um diagnóstico prático.`;
+
+  const blueUrl = String(process.env.BLUE_BRAIN_URL || "http://127.0.0.1:4117").replace(/\/$/, "");
+  const brainKey = process.env.BRAIN_API_KEY || "";
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json"
+  };
+
+  if (brainKey) {
+    headers["x-brain-key"] = brainKey;
+    headers["x-api-key"] = brainKey;
+    headers["Authorization"] = `Bearer ${brainKey}`;
+  }
+
   try {
-    const body = await req.json().catch(() => ({}));
-    const goal = extractGoal(body);
-
-    if (!goal || goal.length < 3) {
-      return NextResponse.json(
-        { ok: false, error: "Mensagem vazia. Envie goal, message, prompt ou text." },
-        { status: 400 }
-      );
-    }
-
-    const skill = pickSkill(goal, body?.skill || body?.agent || body?.area || body?.tab);
-    const blueUrl = (process.env.BLUE_BRAIN_URL || "http://127.0.0.1:4117").replace(/\/$/, "");
-    const brainKey = process.env.BRAIN_API_KEY;
-
-    if (!brainKey) {
-      return NextResponse.json(
-        { ok: false, error: "BRAIN_API_KEY não configurado no .env.local do luma-os." },
-        { status: 500 }
-      );
-    }
-
-    const blueResponse = await fetch(`${blueUrl}/v1/tasks`, {
+    const response = await fetch(`${blueUrl}/v1/panel/task`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-brain-key": brainKey
-      },
+      headers,
       body: JSON.stringify({
         goal,
         skill,
-        mode: body?.mode || "assist"
-      }),
-      cache: "no-store"
+        mode: body.mode || "assist"
+      })
     });
 
-    const text = await blueResponse.text();
-    let data: any = null;
+    const data = await response.json().catch(async () => ({
+      raw: await response.text().catch(() => "")
+    }));
 
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = { raw: text };
-    }
-
-    if (!blueResponse.ok) {
+    if (!response.ok) {
       return NextResponse.json(
         {
           ok: false,
+          orchestrator: "Mia",
           source: "blue-brain",
           skill,
-          skill_label: skillLabels[skill],
-          status: blueResponse.status,
-          error: data?.error || "Erro no Cérebro Azul.",
+          skill_label: SKILL_LABELS[skill],
+          goal,
+          error: "Cérebro Azul não conseguiu executar a skill.",
           details: data
         },
-        { status: blueResponse.status }
+        { status: 502 }
       );
     }
-
-    const answer =
-      data?.answer ||
-      data?.response ||
-      data?.result ||
-      data?.content ||
-      data?.summary ||
-      data?.raw ||
-      data;
 
     return NextResponse.json({
       ok: true,
       orchestrator: "Mia",
       source: "blue-brain",
       skill,
-      skill_label: skillLabels[skill],
+      skill_label: SKILL_LABELS[skill],
       goal,
-      answer,
+      answer: extractAnswer(data),
       data
     });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
       {
         ok: false,
-        error: "Falha na orquestração da Mia.",
-        details: error?.message || String(error)
+        orchestrator: "Mia",
+        source: "studio-fallback",
+        skill,
+        skill_label: SKILL_LABELS[skill],
+        goal,
+        error: error instanceof Error ? error.message : "Erro desconhecido ao conectar no Cérebro Azul."
       },
       { status: 500 }
     );
