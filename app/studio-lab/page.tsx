@@ -2257,6 +2257,22 @@ type StudioShortcut = {
   createdAt: string;
 };
 
+const defaultStudioShortcuts: StudioShortcut[] = [
+  { id: "default-studio-lab", title: "Studio Lab", url: "/studio-lab", createdAt: "default" },
+  { id: "default-admin", title: "Admin", url: "/admin", createdAt: "default" },
+  { id: "default-leads", title: "Leads", url: "/admin/leads", createdAt: "default" },
+  { id: "default-emails", title: "Emails", url: "/admin/emails", createdAt: "default" },
+  { id: "default-catalogo", title: "Catálogo de páginas", url: "/studio/catalogo-paginas", createdAt: "default" },
+  { id: "default-stripe", title: "Stripe Planos", url: "/studio/stripe-planos", createdAt: "default" },
+  { id: "default-mia-brain", title: "Mia Brain", url: "/studio/mia-brain", createdAt: "default" },
+  { id: "default-copilot", title: "Copilot", url: "/estudio-lab/copilot", createdAt: "default" },
+  { id: "default-usuarios", title: "Usuários", url: "/studio/usuarios", createdAt: "default" },
+  { id: "default-diagnostico", title: "Diagnóstico de usuários", url: "/studio/usuarios-diagnostico", createdAt: "default" },
+  { id: "default-prospector", title: "Prospector de Leads", url: "/leads-prospector", createdAt: "default" },
+  { id: "default-agentes-admins", title: "Agentes Admins", url: "/studio/agentesadms", createdAt: "default" },
+  { id: "default-hostinger", title: "Hostinger", url: "https://hpanel.hostinger.com", createdAt: "default" },
+];
+
 function normalizeStudioShortcutUrl(rawUrl: string) {
   const cleanUrl = rawUrl.trim();
 
@@ -2276,13 +2292,15 @@ function StudioQuickShortcutsPanel() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("studio_quick_shortcuts");
-      const parsed = saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : null;
 
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         setShortcuts(parsed);
+      } else {
+        setShortcuts(defaultStudioShortcuts);
       }
     } catch {
-      setShortcuts([]);
+      setShortcuts(defaultStudioShortcuts);
     } finally {
       setReady(true);
     }
