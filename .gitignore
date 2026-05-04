@@ -35,3 +35,7 @@ build/
 reports/
 root/
 luma-os-backups/
+
+# Dados locais dos agentes / CRM
+/data/leads-prospector/*.json
+/data/campaign-agent/*.json
