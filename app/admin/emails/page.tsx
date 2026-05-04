@@ -58,7 +58,7 @@ function TabButton({
 
 export default function AdminEmailsPage() {
   const [tab, setTab] = useState<"leads" | "campanha" | "automatico" | "funis">("funis");
-  const [funis, setFunis de e-mail] = useState<Funil[]>([]);
+  const [funis, setFunis] = useState<Funil[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -96,7 +96,7 @@ export default function AdminEmailsPage() {
 
       if (funisRes.status === "fulfilled" && funisRes.value.ok) {
         const data = await funisRes.value.json();
-        setFunis de e-mail(Array.isArray(data) ? data : []);
+        setFunis(Array.isArray(data) ? data : []);
       }
 
       if (leadsRes.status === "fulfilled" && leadsRes.value.ok) {
