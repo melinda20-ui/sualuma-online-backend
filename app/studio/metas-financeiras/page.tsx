@@ -25,6 +25,11 @@ type Metrics = {
   ipoReadiness: number;
 };
 
+type AgentMessage = {
+  role: "user" | "agent";
+  text: string;
+};
+
 const STORAGE_KEY = "sualuma:metas-financeiras:v2";
 
 const DEFAULT_METRICS: Metrics = {
@@ -82,6 +87,14 @@ export default function MetasFinanceirasPage() {
   const [metrics, setMetrics] = useState<Metrics>(DEFAULT_METRICS);
   const [loaded, setLoaded] = useState(false);
   const [toast, setToast] = useState("");
+  const [agentInput, setAgentInput] = useState("");
+  const [agentMessages, setAgentMessages] = useState<AgentMessage[]>([
+    {
+      role: "agent",
+      text:
+        "Sou a Mia Financeira. Me diga o que mudou no seu funil, faturamento, custos, imposto, meta, equity ou investimento que eu atualizo o painel para você."
+    }
+  ]);
 
   useEffect(() => {
     try {
@@ -108,6 +121,303 @@ export default function MetasFinanceirasPage() {
   function notify(message: string) {
     setToast(message);
     setTimeout(() => setToast(""), 2800);
+  }
+
+
+  function normalizeAgentText(text: string) {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function parseAgentNumber(token: string) {
+    let raw = token.toLowerCase().replace(/r\$/g, "").replace(/\s/g, "");
+    const multiplier = raw.includes("mil") || raw.includes("k") ? 1000 : 1;
+
+    raw = raw.replace(/mil|k/g, "");
+
+    if (raw.includes(",") && raw.includes(".")) {
+      raw = raw.replace(/\./g, "").replace(",", ".");
+    } else if (raw.includes(".") && !raw.includes(",") && /\.\d{3}/.test(raw)) {
+      raw = raw.replace(/\./g, "");
+    } else {
+      raw = raw.replace(",", ".");
+    }
+
+    raw = raw.replace(/[^\d.]/g, "");
+    const parsed = Number(raw);
+
+    if (!Number.isFinite(parsed)) return null;
+    return parsed * multiplier;
+  }
+
+  function getNumberNear(text: string, patterns: string[]) {
+    const normalized = normalizeAgentText(text);
+
+    for (const pattern of patterns) {
+      const normalizedPattern = normalizeAgentText(pattern);
+      const index = normalized.indexOf(normalizedPattern);
+
+      if (index === -1) continue;
+
+      const start = Math.max(0, index - 38);
+      const end = Math.min(text.length, index + normalizedPattern.length + 90);
+      const windowText = text.slice(start, end);
+
+      const matches = windowText.match(/(?:r\$\s*)?\d+(?:[.,]\d{1,3})?(?:\s*(?:mil|k))?/gi);
+
+      if (!matches?.length) continue;
+
+      const parsed = matches
+        .map(parseAgentNumber)
+        .find((value): value is number => typeof value === "number" && Number.isFinite(value));
+
+      if (typeof parsed === "number") return parsed;
+    }
+
+    return null;
+  }
+
+  function formatAgentChange(key: keyof Metrics, value: number) {
+    const moneyFields: Array<keyof Metrics> = [
+      "ticket",
+      "monthlyFee",
+      "investment",
+      "fixedCosts",
+      "monthlyGoal",
+      "realRevenue",
+      "realInvestment",
+      "investmentAsk"
+    ];
+
+    const percentFields: Array<keyof Metrics> = [
+      "responseRate",
+      "optinRate",
+      "conversionRate",
+      "variableCostRate",
+      "taxRate",
+      "equityOffered",
+      "ipoReadiness"
+    ];
+
+    if (moneyFields.includes(key)) return money(value);
+    if (percentFields.includes(key)) return `${value}%`;
+    return int.format(value);
+  }
+
+  function runFinancialAgent() {
+    const text = agentInput.trim();
+    if (!text) return;
+
+    const normalized = normalizeAgentText(text);
+
+    setAgentMessages((current) => [...current, { role: "user", text }]);
+    setAgentInput("");
+
+    if (
+      normalized.includes("resetar") ||
+      normalized.includes("reset") ||
+      normalized.includes("voltar padrao") ||
+      normalized.includes("valores padrao")
+    ) {
+      setMetrics(DEFAULT_METRICS);
+      setAgentMessages((current) => [
+        ...current,
+        {
+          role: "agent",
+          text:
+            "Pronto. Voltei o painel para os valores padrão e recalculei a projeção inteira."
+        }
+      ]);
+      notify("Painel resetado pela Mia Financeira.");
+      return;
+    }
+
+    const updates: Partial<Metrics> = {};
+    const changes: string[] = [];
+
+    function apply(key: keyof Metrics, label: string, patterns: string[]) {
+      const value = getNumberNear(text, patterns);
+      if (value === null) return;
+
+      updates[key] = value;
+      changes.push(`${label}: ${formatAgentChange(key, value)}`);
+    }
+
+    apply("coldLeads", "Contatos frios", [
+      "contatos frios",
+      "leads frios",
+      "leads no topo",
+      "topo do funil",
+      "prospectos",
+      "contatos no topo"
+    ]);
+
+    apply("responseRate", "Taxa de resposta", [
+      "taxa de resposta",
+      "resposta",
+      "responderam",
+      "respostas",
+      "sinais de interesse"
+    ]);
+
+    apply("optinRate", "Opt-in confirmado", [
+      "opt-in",
+      "optin",
+      "opt in",
+      "confirmaram",
+      "confirmados",
+      "consentimento"
+    ]);
+
+    apply("conversionRate", "Conversão", [
+      "conversao",
+      "converter",
+      "viraram cliente",
+      "clientes convertidos",
+      "taxa de cliente"
+    ]);
+
+    apply("ticket", "Ticket inicial", [
+      "ticket",
+      "preco inicial",
+      "valor inicial",
+      "entrada",
+      "setup"
+    ]);
+
+    apply("monthlyFee", "Mensalidade média", [
+      "mensalidade",
+      "mrr",
+      "recorrencia",
+      "recorrente",
+      "plano mensal"
+    ]);
+
+    apply("retentionMonths", "Retenção média", [
+      "retencao",
+      "ficam por",
+      "meses de retencao",
+      "tempo medio",
+      "permanencia"
+    ]);
+
+    apply("investment", "Investimento previsto", [
+      "investimento previsto",
+      "verba de campanha",
+      "orcamento de campanha",
+      "vou colocar na campanha",
+      "campanha vai custar"
+    ]);
+
+    apply("fixedCosts", "Custos fixos", [
+      "custo fixo",
+      "custos fixos",
+      "despesa fixa",
+      "despesas fixas"
+    ]);
+
+    apply("variableCostRate", "Custo variável", [
+      "custo variavel",
+      "custos variaveis",
+      "taxa variavel",
+      "comissao"
+    ]);
+
+    apply("taxRate", "Imposto estimado", [
+      "imposto",
+      "impostos",
+      "tributo",
+      "taxa de imposto",
+      "simples nacional"
+    ]);
+
+    apply("monthlyGoal", "Meta mensal", [
+      "meta mensal",
+      "meta do mes",
+      "quero faturar",
+      "objetivo mensal",
+      "alvo mensal"
+    ]);
+
+    apply("realRevenue", "Faturamento real", [
+      "faturei",
+      "faturamento real",
+      "receita real",
+      "entrou no caixa",
+      "vendi em reais",
+      "recebemos"
+    ]);
+
+    apply("realSales", "Vendas reais", [
+      "vendas reais",
+      "fiz vendas",
+      "fiz venda",
+      "vendi",
+      "clientes reais",
+      "compraram"
+    ]);
+
+    apply("realInvestment", "Investimento real", [
+      "investi",
+      "gastei",
+      "investimento real",
+      "gasto real",
+      "desembolso real"
+    ]);
+
+    apply("investmentAsk", "Investimento pedido", [
+      "investimento pedido",
+      "pedir para investidor",
+      "investidor colocar",
+      "aporte",
+      "captar",
+      "captacao"
+    ]);
+
+    apply("equityOffered", "Equity oferecido", [
+      "equity",
+      "participacao",
+      "sociedade",
+      "por cento da empresa",
+      "percentual da empresa"
+    ]);
+
+    apply("ipoReadiness", "Maturidade para bolsa", [
+      "ipo",
+      "bolsa",
+      "abrir capital",
+      "maturidade para bolsa",
+      "pronta para bolsa"
+    ]);
+
+    if (!changes.length) {
+      setAgentMessages((current) => [
+        ...current,
+        {
+          role: "agent",
+          text:
+            "Entendi sua mensagem, mas não encontrei um número ligado a uma métrica. Tente algo como: “faturei R$ 1200”, “muda a meta mensal para R$ 15000”, “simula 5000 contatos frios” ou “investidor: R$ 50000 por 10% de equity”."
+        }
+      ]);
+      return;
+    }
+
+    setMetrics((current) => ({
+      ...current,
+      ...updates
+    }));
+
+    setAgentMessages((current) => [
+      ...current,
+      {
+        role: "agent",
+        text: `Atualizei o painel: ${changes.join(" · ")}. A projeção, lucro, imposto, CAQ, LTV e equity já foram recalculados.`
+      }
+    ]);
+
+    notify("Mia Financeira atualizou as métricas.");
   }
 
   const result = useMemo(() => {
@@ -333,6 +643,73 @@ export default function MetasFinanceirasPage() {
             </button>
             <a href="/studio/blog-agent">Ver Agente de Blog</a>
             <a href="/admin/conteudo">Criar artigos das siglas</a>
+          </div>
+        </section>
+
+
+        <section className="agentPanel">
+          <div className="agentIntro">
+            <p className="eyebrow">Mia Financeira</p>
+            <h2>Atualize o painel conversando</h2>
+            <p>
+              Escreva como se estivesse falando comigo. Eu leio sua frase,
+              encontro as métricas e atualizo a página automaticamente.
+            </p>
+          </div>
+
+          <div className="agentChat">
+            {agentMessages.slice(-6).map((message, index) => (
+              <div className={`agentBubble ${message.role}`} key={`${message.role}-${index}`}>
+                <b>{message.role === "agent" ? "Mia" : "Você"}</b>
+                <span>{message.text}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="agentInputRow">
+            <textarea
+              value={agentInput}
+              onChange={(event) => setAgentInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  runFinancialAgent();
+                }
+              }}
+              placeholder="Ex: Faturei R$ 1200, fiz 8 vendas reais e investi R$ 300."
+            />
+            <button onClick={runFinancialAgent}>Atualizar painel</button>
+          </div>
+
+          <div className="quickPrompts">
+            <button
+              onClick={() =>
+                setAgentInput("Simula 5000 contatos frios, 10% resposta, 5% opt-in e 1% conversão.")
+              }
+            >
+              Simular funil
+            </button>
+            <button
+              onClick={() =>
+                setAgentInput("Faturei R$ 1200 esse mês, fiz 8 vendas reais e investi R$ 300.")
+              }
+            >
+              Atualizar realidade
+            </button>
+            <button
+              onClick={() =>
+                setAgentInput("Muda a meta mensal para R$ 15000 e imposto para 6%.")
+              }
+            >
+              Ajustar meta/imposto
+            </button>
+            <button
+              onClick={() =>
+                setAgentInput("Investidor: pedir R$ 50000 por 10% de equity.")
+              }
+            >
+              Simular investidor
+            </button>
           </div>
         </section>
 
@@ -747,6 +1124,119 @@ export default function MetasFinanceirasPage() {
           background: linear-gradient(135deg, #ff2d78, #b014ff);
           border-color: transparent;
           box-shadow: 0 0 24px rgba(255,45,120,0.28);
+        }
+
+
+        .agentPanel {
+          display: grid;
+          grid-template-columns: 0.8fr 1.2fr;
+          gap: 18px;
+          background:
+            linear-gradient(135deg, rgba(255,45,120,0.12), rgba(176,20,255,0.08)),
+            rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,45,120,0.22);
+          border-radius: 26px;
+          padding: 22px;
+          margin: 10px 0 24px;
+          backdrop-filter: blur(16px);
+          box-shadow: 0 20px 70px rgba(0,0,0,0.22);
+        }
+
+        .agentIntro h2 {
+          margin: 0 0 8px;
+          font-size: 1.45rem;
+          letter-spacing: -0.04em;
+        }
+
+        .agentIntro p:not(.eyebrow) {
+          color: rgba(255,255,255,0.62);
+          line-height: 1.65;
+          margin: 0;
+        }
+
+        .agentChat {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          max-height: 260px;
+          overflow: auto;
+          padding-right: 4px;
+        }
+
+        .agentBubble {
+          border-radius: 18px;
+          padding: 12px 14px;
+          border: 1px solid rgba(255,255,255,0.09);
+          background: rgba(0,0,0,0.22);
+        }
+
+        .agentBubble.user {
+          background: rgba(255,45,120,0.13);
+          border-color: rgba(255,45,120,0.25);
+        }
+
+        .agentBubble b {
+          display: block;
+          color: #ffd600;
+          font-size: 0.72rem;
+          text-transform: uppercase;
+          letter-spacing: 0.12em;
+          margin-bottom: 5px;
+        }
+
+        .agentBubble span {
+          color: rgba(255,255,255,0.78);
+          line-height: 1.55;
+          font-size: 0.88rem;
+        }
+
+        .agentInputRow {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 10px;
+        }
+
+        .agentInputRow textarea {
+          min-height: 58px;
+          resize: vertical;
+          border: 1px solid rgba(255,255,255,0.10);
+          border-radius: 16px;
+          outline: none;
+          background: rgba(0,0,0,0.24);
+          color: #fff;
+          padding: 14px;
+          font-family: inherit;
+          line-height: 1.45;
+        }
+
+        .agentInputRow button {
+          border: 0;
+          border-radius: 16px;
+          padding: 0 20px;
+          background: linear-gradient(135deg, #ff2d78, #b014ff);
+          box-shadow: 0 0 24px rgba(255,45,120,0.28);
+          white-space: nowrap;
+        }
+
+        .quickPrompts {
+          grid-column: 1 / -1;
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .quickPrompts button {
+          border: 1px solid rgba(255,45,120,0.22);
+          background: rgba(255,45,120,0.08);
+          color: #fff;
+          border-radius: 999px;
+          padding: 8px 12px;
+          font-size: 0.78rem;
+        }
+
+        .quickPrompts button:hover {
+          background: rgba(255,45,120,0.16);
         }
 
         .globalBar {
@@ -1299,7 +1789,9 @@ export default function MetasFinanceirasPage() {
           .statsRow,
           .inputGrid,
           .missionsGrid,
-          .glossaryGrid {
+          .glossaryGrid,
+          .agentPanel,
+          .agentInputRow {
             grid-template-columns: 1fr;
           }
 
