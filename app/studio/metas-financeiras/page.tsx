@@ -14,659 +14,1313 @@ type Metrics = {
   fixedCosts: number;
   variableCostRate: number;
   taxRate: number;
+  monthlyGoal: number;
 
   realRevenue: number;
   realSales: number;
   realInvestment: number;
-  realCosts: number;
 
-  investorCheck: number;
-  equityPercent: number;
-  futureValuation: number;
-
-  contentAssets: number;
-  visitsPerAsset: number;
-  organicConversionRate: number;
-
-  ipoAnnualRevenueGoal: number;
-  governanceScore: number;
+  investmentAsk: number;
+  equityOffered: number;
+  ipoReadiness: number;
 };
 
-const DEFAULTS: Metrics = {
+const STORAGE_KEY = "sualuma:metas-financeiras:v2";
+
+const DEFAULT_METRICS: Metrics = {
   coldLeads: 5000,
   responseRate: 10,
   optinRate: 5,
   conversionRate: 1,
-  ticket: 197,
-  monthlyFee: 97,
-  retentionMonths: 12,
-  investment: 1000,
-  fixedCosts: 800,
+  ticket: 97,
+  monthlyFee: 47,
+  retentionMonths: 8,
+  investment: 2500,
+  fixedCosts: 1800,
   variableCostRate: 12,
-  taxRate: 8,
+  taxRate: 6,
+  monthlyGoal: 10000,
 
   realRevenue: 0,
   realSales: 0,
   realInvestment: 0,
-  realCosts: 0,
 
-  investorCheck: 50000,
-  equityPercent: 10,
-  futureValuation: 1000000,
-
-  contentAssets: 30,
-  visitsPerAsset: 80,
-  organicConversionRate: 1,
-
-  ipoAnnualRevenueGoal: 12000000,
-  governanceScore: 5
+  investmentAsk: 50000,
+  equityOffered: 10,
+  ipoReadiness: 8
 };
 
-const dictionary = [
-  ["CAC / CAQ", "Quanto custa para conquistar um cliente.", "/blog/o-que-e-cac-caq"],
-  ["LTV", "Quanto um cliente pode gerar durante todo o relacionamento.", "/blog/o-que-e-ltv"],
-  ["Break-even", "O ponto em que a empresa para de perder dinheiro.", "/blog/o-que-e-break-even"],
-  ["Equity", "Participação que um investidor recebe na empresa.", "/blog/o-que-e-equity"],
-  ["Lucro", "O que sobra depois de custos, investimento e impostos.", "/blog/o-que-e-lucro"],
-  ["Cauda longa", "Receita futura gerada por conteúdo, SEO e ativos digitais.", "/blog/o-que-e-cauda-longa"],
-  ["Impostos", "Parte estimada que precisa ser reservada para tributos.", "/blog/impostos-para-micronegocios"],
-  ["IPO / Bolsa", "O caminho de maturidade para abrir capital no futuro.", "/blog/o-que-e-ipo"]
-];
+const brl = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0
+});
 
-function money(value: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    maximumFractionDigits: 0
-  }).format(Number.isFinite(value) ? value : 0);
-}
+const int = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: 0
+});
 
-function pct(value: number) {
-  return `${Number.isFinite(value) ? value.toFixed(1) : "0.0"}%`;
+function clamp(value: number, min = 0, max = 100) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function safeDiv(a: number, b: number) {
-  return b > 0 ? a / b : 0;
+  return b === 0 ? 0 : a / b;
+}
+
+function money(value: number) {
+  if (!Number.isFinite(value)) return brl.format(0);
+  return brl.format(value);
+}
+
+function percent(value: number) {
+  if (!Number.isFinite(value)) return "0%";
+  return `${value.toFixed(value >= 10 ? 0 : 1)}%`;
 }
 
 export default function MetasFinanceirasPage() {
-  const [metrics, setMetrics] = useState<Metrics>(DEFAULTS);
+  const [metrics, setMetrics] = useState<Metrics>(DEFAULT_METRICS);
+  const [loaded, setLoaded] = useState(false);
+  const [toast, setToast] = useState("");
 
   useEffect(() => {
-    const saved = localStorage.getItem("sualuma-metas-financeiras");
-    if (saved) {
-      try {
-        setMetrics({ ...DEFAULTS, ...JSON.parse(saved) });
-      } catch {}
-    }
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setMetrics({ ...DEFAULT_METRICS, ...JSON.parse(saved) });
+      }
+    } catch {}
+    setLoaded(true);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("sualuma-metas-financeiras", JSON.stringify(metrics));
-  }, [metrics]);
+    if (!loaded) return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(metrics));
+  }, [metrics, loaded]);
 
   function update(key: keyof Metrics, value: string) {
     setMetrics((current) => ({
       ...current,
-      [key]: Number(value || 0)
+      [key]: Number(value) || 0
     }));
   }
 
-  const calc = useMemo(() => {
+  function notify(message: string) {
+    setToast(message);
+    setTimeout(() => setToast(""), 2800);
+  }
+
+  const result = useMemo(() => {
     const responses = metrics.coldLeads * (metrics.responseRate / 100);
     const optins = metrics.coldLeads * (metrics.optinRate / 100);
-    const projectedSales = metrics.coldLeads * (metrics.conversionRate / 100);
+    const clients = metrics.coldLeads * (metrics.conversionRate / 100);
 
-    const projectedRevenue = projectedSales * metrics.ticket;
-    const projectedMonthlyRecurring = projectedSales * metrics.monthlyFee;
-    const variableCosts = projectedRevenue * (metrics.variableCostRate / 100);
-    const taxes = projectedRevenue * (metrics.taxRate / 100);
-    const projectedProfit =
-      projectedRevenue - metrics.investment - metrics.fixedCosts - variableCosts - taxes;
+    const projectedSetupRevenue = clients * metrics.ticket;
+    const projectedMRR = clients * metrics.monthlyFee;
+    const projectedMonthRevenue = projectedSetupRevenue + projectedMRR;
 
-    const cac = safeDiv(metrics.investment, projectedSales);
-    const grossMarginRate = 1 - metrics.variableCostRate / 100 - metrics.taxRate / 100;
-    const ltv =
-      metrics.ticket + metrics.monthlyFee * metrics.retentionMonths * Math.max(grossMarginRate, 0);
+    const ltv = metrics.ticket + metrics.monthlyFee * metrics.retentionMonths;
+    const projectedLtvRevenue = clients * ltv;
 
-    const profitPerClient =
-      metrics.ticket * Math.max(grossMarginRate, 0) - safeDiv(metrics.investment, projectedSales);
+    const variableCosts = projectedMonthRevenue * (metrics.variableCostRate / 100);
+    const tax = projectedMonthRevenue * (metrics.taxRate / 100);
+    const totalCost = metrics.investment + metrics.fixedCosts + variableCosts + tax;
+    const profit = projectedMonthRevenue - totalCost;
+    const margin = safeDiv(profit, projectedMonthRevenue) * 100;
+    const caq = safeDiv(metrics.investment, clients);
 
-    const breakEvenClients = safeDiv(metrics.fixedCosts + metrics.investment, Math.max(profitPerClient, 1));
+    const contributionPerClient =
+      metrics.ticket +
+      metrics.monthlyFee -
+      (metrics.ticket + metrics.monthlyFee) * ((metrics.variableCostRate + metrics.taxRate) / 100);
 
-    const realTaxes = metrics.realRevenue * (metrics.taxRate / 100);
-    const realProfit = metrics.realRevenue - metrics.realInvestment - metrics.realCosts - realTaxes;
-    const realCac = safeDiv(metrics.realInvestment, metrics.realSales);
+    const breakEvenClients = Math.max(
+      0,
+      Math.ceil(safeDiv(metrics.investment + metrics.fixedCosts, contributionPerClient))
+    );
 
-    const equityValueToday = safeDiv(metrics.investorCheck, metrics.equityPercent / 100);
-    const investorFutureStakeValue = metrics.futureValuation * (metrics.equityPercent / 100);
-    const investorGain = investorFutureStakeValue - metrics.investorCheck;
+    const roi = safeDiv(profit, metrics.investment) * 100;
+    const longTail = Math.max(0, projectedLtvRevenue - projectedMonthRevenue);
 
-    const longTailVisits = metrics.contentAssets * metrics.visitsPerAsset;
-    const longTailSales = longTailVisits * (metrics.organicConversionRate / 100);
-    const longTailRevenue = longTailSales * metrics.ticket;
+    const realProfitEstimate =
+      metrics.realRevenue -
+      metrics.realInvestment -
+      metrics.fixedCosts -
+      metrics.realRevenue * (metrics.variableCostRate / 100) -
+      metrics.realRevenue * (metrics.taxRate / 100);
 
-    const annualRevenueNow = metrics.realRevenue * 12;
-    const ipoRevenueProgress = Math.min(100, safeDiv(annualRevenueNow, metrics.ipoAnnualRevenueGoal) * 100);
-    const ipoReadiness = Math.min(100, (ipoRevenueProgress * 0.6) + (metrics.governanceScore * 10 * 0.4));
-    const missingToIpoGoal = Math.max(metrics.ipoAnnualRevenueGoal - annualRevenueNow, 0);
+    const monthlyProgress = clamp(safeDiv(metrics.realRevenue, metrics.monthlyGoal) * 100);
+    const projectedProgress = clamp(safeDiv(projectedMonthRevenue, metrics.monthlyGoal) * 100);
+
+    const postMoney = metrics.equityOffered > 0
+      ? metrics.investmentAsk / (metrics.equityOffered / 100)
+      : 0;
+
+    const preMoney = Math.max(0, postMoney - metrics.investmentAsk);
+
+    const investorShareProjectedLtv = projectedLtvRevenue * (metrics.equityOffered / 100);
 
     return {
       responses,
       optins,
-      projectedSales,
-      projectedRevenue,
-      projectedMonthlyRecurring,
-      variableCosts,
-      taxes,
-      projectedProfit,
-      cac,
+      clients,
+      projectedSetupRevenue,
+      projectedMRR,
+      projectedMonthRevenue,
       ltv,
+      projectedLtvRevenue,
+      variableCosts,
+      tax,
+      totalCost,
+      profit,
+      margin,
+      caq,
       breakEvenClients,
-      realTaxes,
-      realProfit,
-      realCac,
-      equityValueToday,
-      investorFutureStakeValue,
-      investorGain,
-      longTailVisits,
-      longTailSales,
-      longTailRevenue,
-      ipoReadiness,
-      missingToIpoGoal
+      roi,
+      longTail,
+      realProfitEstimate,
+      monthlyProgress,
+      projectedProgress,
+      postMoney,
+      preMoney,
+      investorShareProjectedLtv
     };
   }, [metrics]);
 
-  const fields: { key: keyof Metrics; label: string; suffix?: string; group: string }[] = [
-    { key: "coldLeads", label: "Contatos frios planejados", group: "Projeção" },
-    { key: "responseRate", label: "Taxa esperada de resposta", suffix: "%", group: "Projeção" },
-    { key: "optinRate", label: "Taxa esperada de opt-in", suffix: "%", group: "Projeção" },
-    { key: "conversionRate", label: "Taxa esperada de venda", suffix: "%", group: "Projeção" },
-    { key: "ticket", label: "Ticket médio inicial", group: "Oferta" },
-    { key: "monthlyFee", label: "Mensalidade média esperada", group: "Oferta" },
-    { key: "retentionMonths", label: "Meses médios de permanência", group: "Oferta" },
-    { key: "investment", label: "Investimento planejado no mês", group: "Custos" },
-    { key: "fixedCosts", label: "Custos fixos do mês", group: "Custos" },
-    { key: "variableCostRate", label: "Custo variável estimado", suffix: "%", group: "Custos" },
-    { key: "taxRate", label: "Imposto estimado", suffix: "%", group: "Custos" },
-    { key: "realRevenue", label: "Faturamento real do mês", group: "Realidade" },
-    { key: "realSales", label: "Vendas reais do mês", group: "Realidade" },
-    { key: "realInvestment", label: "Investimento real do mês", group: "Realidade" },
-    { key: "realCosts", label: "Custos reais do mês", group: "Realidade" },
-    { key: "investorCheck", label: "Aporte simulado do investidor", group: "Investidor" },
-    { key: "equityPercent", label: "Equity oferecido", suffix: "%", group: "Investidor" },
-    { key: "futureValuation", label: "Valor futuro simulado da empresa", group: "Investidor" },
-    { key: "contentAssets", label: "Artigos/páginas ativos", group: "Cauda longa" },
-    { key: "visitsPerAsset", label: "Visitas mensais por ativo", group: "Cauda longa" },
-    { key: "organicConversionRate", label: "Conversão orgânica esperada", suffix: "%", group: "Cauda longa" },
-    { key: "ipoAnnualRevenueGoal", label: "Meta anual simbólica para maturidade de bolsa", group: "Bolsa" },
-    { key: "governanceScore", label: "Nota de governança atual de 0 a 10", group: "Bolsa" }
+  const missionCards = [
+    {
+      tone: "pink",
+      icon: "🚀",
+      badge: "Funil",
+      title: "Projeção do lançamento",
+      desc: "Mostra a jornada do topo do funil até clientes, usando suas taxas atuais.",
+      current: `${int.format(result.clients)} clientes`,
+      target: `${int.format(metrics.coldLeads)} contatos`,
+      pct: result.projectedProgress,
+      footer: `${int.format(result.responses)} respostas · ${int.format(result.optins)} opt-ins`
+    },
+    {
+      tone: "yellow",
+      icon: "💰",
+      badge: "Receita",
+      title: "Faturamento esperado",
+      desc: "Quanto o mês pode gerar se a projeção de conversão acontecer.",
+      current: money(result.projectedMonthRevenue),
+      target: `meta ${money(metrics.monthlyGoal)}`,
+      pct: result.projectedProgress,
+      footer: `MRR esperado: ${money(result.projectedMRR)}`
+    },
+    {
+      tone: "mint",
+      icon: "📈",
+      badge: "Lucro",
+      title: "Lucro estimado",
+      desc: "Receita menos investimento, custo fixo, custo variável e imposto estimado.",
+      current: money(result.profit),
+      target: `${percent(result.margin)} margem`,
+      pct: clamp(result.margin),
+      footer: `ROI: ${percent(result.roi)}`
+    },
+    {
+      tone: "purple",
+      icon: "🧲",
+      badge: "CAQ",
+      title: "Custo por aquisição",
+      desc: "Quanto custa, em média, conquistar cada cliente dentro desta campanha.",
+      current: money(result.caq),
+      target: `${int.format(result.breakEvenClients)} clientes para breakeven`,
+      pct: clamp(100 - safeDiv(result.caq, metrics.ticket + metrics.monthlyFee) * 100),
+      footer: `Breakeven: ${int.format(result.breakEvenClients)} vendas`
+    },
+    {
+      tone: "pink",
+      icon: "💎",
+      badge: "LTV",
+      title: "Cauda longa e LTV",
+      desc: "Mostra quanto cada cliente pode render ao longo dos meses, não só na primeira compra.",
+      current: money(result.ltv),
+      target: `${metrics.retentionMonths} meses`,
+      pct: clamp(safeDiv(result.longTail, result.projectedLtvRevenue) * 100),
+      footer: `Cauda longa: ${money(result.longTail)}`
+    },
+    {
+      tone: "mint",
+      icon: "🤝",
+      badge: "Equity",
+      title: "Simulação para investidor",
+      desc: "Mostra valuation simples baseado em quanto você pediria e quanto de participação ofereceria.",
+      current: money(result.postMoney),
+      target: `${metrics.equityOffered}% equity`,
+      pct: clamp(metrics.equityOffered * 5),
+      footer: `Pré-money: ${money(result.preMoney)}`
+    }
   ];
 
-  const groups = Array.from(new Set(fields.map((field) => field.group)));
+  const glossary = [
+    ["LTV", "Valor que um cliente pode gerar ao longo do tempo.", "/blog/glossario/ltv"],
+    ["CAQ/CAC", "Quanto custa conquistar um cliente.", "/blog/glossario/caq-cac"],
+    ["Break-even", "Ponto onde para de perder e começa a lucrar.", "/blog/glossario/breakeven"],
+    ["ROI", "Retorno sobre o investimento.", "/blog/glossario/roi"],
+    ["Equity", "Participação societária oferecida a investidor.", "/blog/glossario/equity"],
+    ["MRR", "Receita recorrente mensal.", "/blog/glossario/mrr"],
+    ["Margem", "Quanto sobra depois dos custos.", "/blog/glossario/margem"],
+    ["IPO/Bolsa", "Etapa futura de abertura de capital.", "/blog/glossario/ipo"]
+  ];
+
+  function Field({
+    label,
+    valueKey,
+    suffix,
+    prefix
+  }: {
+    label: string;
+    valueKey: keyof Metrics;
+    suffix?: string;
+    prefix?: string;
+  }) {
+    return (
+      <label className="field">
+        <span>{label}</span>
+        <div className="inputWrap">
+          {prefix ? <b>{prefix}</b> : null}
+          <input
+            type="number"
+            value={metrics[valueKey]}
+            onChange={(event) => update(valueKey, event.target.value)}
+          />
+          {suffix ? <b>{suffix}</b> : null}
+        </div>
+      </label>
+    );
+  }
 
   return (
     <main className="page">
-      <section className="hero">
-        <p className="eyebrow">Studio Sualuma · Privado</p>
-        <h1>Painel de Metas, Faturamento e Investidor</h1>
-        <p>
-          Simule metas, projeções, lucro, impostos, LTV, CAC/CAQ, break-even,
-          equity, cauda longa e distância simbólica até maturidade de bolsa.
-          Seus números ficam apenas nesta área privada.
-        </p>
-      </section>
-
-      <section className="summaryGrid">
-        <Card title="Faturamento projetado" value={money(calc.projectedRevenue)} note={`${calc.projectedSales.toFixed(0)} vendas esperadas`} />
-        <Card title="Faturamento real" value={money(metrics.realRevenue)} note={`${metrics.realSales} vendas realizadas`} />
-        <Card title="Lucro projetado" value={money(calc.projectedProfit)} note={`Impostos estimados: ${money(calc.taxes)}`} />
-        <Card title="Lucro real" value={money(calc.realProfit)} note={`Impostos reais estimados: ${money(calc.realTaxes)}`} />
-      </section>
-
-      <section className="comparison">
-        <div>
-          <h2>Projeção do lançamento</h2>
-          <div className="bubbles">
-            <Bubble label="Contatos frios" value={metrics.coldLeads.toFixed(0)} />
-            <Bubble label="Respostas/sinais" value={calc.responses.toFixed(0)} />
-            <Bubble label="Opt-ins" value={calc.optins.toFixed(0)} />
-            <Bubble label="Vendas esperadas" value={calc.projectedSales.toFixed(0)} />
-            <Bubble label="Recorrência mensal" value={money(calc.projectedMonthlyRecurring)} />
-          </div>
-        </div>
-
-        <div>
-          <h2>Realidade do mês</h2>
-          <div className="bubbles">
-            <Bubble label="Faturamento real" value={money(metrics.realRevenue)} />
-            <Bubble label="Vendas reais" value={String(metrics.realSales)} />
-            <Bubble label="CAC real" value={money(calc.realCac)} />
-            <Bubble label="Lucro real" value={money(calc.realProfit)} />
-            <Bubble label="Impostos estimados" value={money(calc.realTaxes)} />
-          </div>
-        </div>
-      </section>
-
-      <section className="summaryGrid">
-        <Card title="CAC / CAQ projetado" value={money(calc.cac)} note="custo para conquistar cada cliente" />
-        <Card title="LTV projetado" value={money(calc.ltv)} note="valor estimado por cliente ao longo do tempo" />
-        <Card title="Break-even" value={`${calc.breakEvenClients.toFixed(0)} clientes`} note="quantos clientes para empatar custos" />
-        <Card title="Cauda longa mensal" value={money(calc.longTailRevenue)} note={`${calc.longTailVisits.toFixed(0)} visitas orgânicas estimadas`} />
-      </section>
-
-      <section className="investor">
-        <div>
-          <p className="eyebrow">Simulação para investidor anjo</p>
-          <h2>O que ele ganha ou deixa de ganhar</h2>
-          <p>
-            Com um aporte de <b>{money(metrics.investorCheck)}</b> por{" "}
-            <b>{pct(metrics.equityPercent)}</b> de equity, a empresa estaria sendo
-            avaliada simbolicamente em <b>{money(calc.equityValueToday)}</b>.
-          </p>
-          <p>
-            Se no futuro a empresa valer <b>{money(metrics.futureValuation)}</b>,
-            essa participação poderia valer <b>{money(calc.investorFutureStakeValue)}</b>,
-            com ganho potencial de <b>{money(calc.investorGain)}</b>.
-          </p>
-        </div>
-
-        <div className="ctaBox">
-          <h3>CTA para projeto</h3>
-          <p>
-            A Sualuma está criando uma infraestrutura de agentes, automações,
-            CRM, produtividade e presença digital para pequenos negócios.
-          </p>
-          <button onClick={() => navigator.clipboard.writeText("A Sualuma está criando uma infraestrutura de agentes, automações, CRM, produtividade e presença digital para pequenos negócios. O objetivo é reduzir a sobrecarga operacional de microempreendedores e transformar IA em crescimento real.")}>
-            Copiar resumo para investidor
-          </button>
-        </div>
-      </section>
-
-      <section className="ipo">
-        <h2>Distância simbólica até maturidade para bolsa</h2>
-        <p>
-          Esta não é uma análise jurídica. É um termômetro interno de maturidade:
-          receita anualizada, governança, previsibilidade, controle financeiro,
-          compliance e histórico.
-        </p>
-
-        <div className="progress">
-          <div style={{ width: `${calc.ipoReadiness}%` }} />
-        </div>
-
-        <div className="ipoStats">
-          <span>Maturidade estimada: <b>{pct(calc.ipoReadiness)}</b></span>
-          <span>Falta para a meta anual simbólica: <b>{money(calc.missingToIpoGoal)}</b></span>
-        </div>
-      </section>
-
-      <section className="formGrid">
-        {groups.map((group) => (
-          <div className="formCard" key={group}>
-            <h3>{group}</h3>
-            {fields.filter((field) => field.group === group).map((field) => (
-              <label key={field.key}>
-                <span>{field.label}</span>
-                <div className="inputWrap">
-                  <input
-                    type="number"
-                    value={metrics[field.key]}
-                    onChange={(event) => update(field.key, event.target.value)}
-                  />
-                  {field.suffix && <em>{field.suffix}</em>}
-                </div>
-              </label>
-            ))}
-          </div>
+      <div className="particles" aria-hidden="true">
+        {Array.from({ length: 28 }).map((_, index) => (
+          <i key={index} style={{ ["--i" as string]: index }} />
         ))}
-      </section>
+      </div>
 
-      <section className="dictionary">
-        <h2>Dicionário leigo das métricas</h2>
-        <p>
-          Cada sigla deve puxar para um artigo público do blog. O artigo explica
-          o conceito, mas não mostra seus números internos.
-        </p>
+      {toast ? (
+        <div className="toast">
+          <span>✨</span>
+          <b>{toast}</b>
+        </div>
+      ) : null}
 
-        <div className="dictGrid">
-          {dictionary.map(([term, desc, href]) => (
-            <a href={href} key={term}>
-              <strong>{term}</strong>
+      <div className="wrapper">
+        <nav className="topbar">
+          <div className="brand">💸 Sualuma Finance OS</div>
+          <div className="topActions">
+            <div className="pill">🔒 Privado no Studio</div>
+            <div className="level">✨ NÍVEL: INVESTIDORA</div>
+          </div>
+        </nav>
+
+        <section className="hero">
+          <span className="heroEmoji">🎯</span>
+          <h1>Metas Financeiras e Projeção de Crescimento</h1>
+          <p>
+            Um painel privado para entender o que o Sualuma pode faturar, quanto
+            já faturou, onde está o lucro, quanto custa vender, quanto vale um
+            cliente e como explicar isso para uma investidora ou investidor anjo.
+          </p>
+
+          <div className="heroBadges">
+            <button onClick={() => notify("Projeção recalculada com suas premissas atuais.")}>
+              Recalcular cenário
+            </button>
+            <a href="/studio/blog-agent">Ver Agente de Blog</a>
+            <a href="/admin/conteudo">Criar artigos das siglas</a>
+          </div>
+        </section>
+
+        <section className="globalBar">
+          <div className="barHead">
+            <div>
+              <strong>🌟 Progresso real da meta mensal</strong>
+              <small>
+                Realizado: {money(metrics.realRevenue)} · Meta: {money(metrics.monthlyGoal)}
+              </small>
+            </div>
+            <b>{percent(result.monthlyProgress)}</b>
+          </div>
+
+          <div className="barTrack">
+            <div className="barFill" style={{ width: `${result.monthlyProgress}%` }} />
+          </div>
+
+          <div className="milestones">
+            <span>🥚 início</span>
+            <span>25% 🌱</span>
+            <span>50% 🌿</span>
+            <span>75% 🌳</span>
+            <span>100% 👑</span>
+          </div>
+        </section>
+
+        <section className="statsRow">
+          <article className="statCard">
+            <span>💰</span>
+            <b>{money(result.projectedMonthRevenue)}</b>
+            <small>faturamento projetado</small>
+          </article>
+
+          <article className="statCard">
+            <span>✅</span>
+            <b>{money(metrics.realRevenue)}</b>
+            <small>faturamento real</small>
+          </article>
+
+          <article className="statCard">
+            <span>📉</span>
+            <b>{money(Math.max(0, metrics.monthlyGoal - metrics.realRevenue))}</b>
+            <small>falta para meta</small>
+          </article>
+
+          <article className="statCard">
+            <span>📈</span>
+            <b>{money(result.profit)}</b>
+            <small>lucro projetado</small>
+          </article>
+
+          <article className="statCard">
+            <span>🧲</span>
+            <b>{money(result.caq)}</b>
+            <small>CAQ estimado</small>
+          </article>
+
+          <article className="statCard">
+            <span>🧾</span>
+            <b>{money(result.tax)}</b>
+            <small>imposto estimado</small>
+          </article>
+        </section>
+
+        <div className="secTitle">🧮 <span>Premissas</span> editáveis</div>
+
+        <section className="inputGrid">
+          <div className="inputPanel">
+            <h2>Topo do funil</h2>
+            <Field label="Contatos frios" valueKey="coldLeads" />
+            <Field label="Taxa de resposta" valueKey="responseRate" suffix="%" />
+            <Field label="Opt-in confirmado" valueKey="optinRate" suffix="%" />
+            <Field label="Conversão em cliente" valueKey="conversionRate" suffix="%" />
+          </div>
+
+          <div className="inputPanel">
+            <h2>Receita por cliente</h2>
+            <Field label="Ticket inicial" valueKey="ticket" prefix="R$" />
+            <Field label="Mensalidade média" valueKey="monthlyFee" prefix="R$" />
+            <Field label="Retenção média" valueKey="retentionMonths" suffix="meses" />
+            <Field label="Meta mensal" valueKey="monthlyGoal" prefix="R$" />
+          </div>
+
+          <div className="inputPanel">
+            <h2>Custos e impostos</h2>
+            <Field label="Investimento previsto" valueKey="investment" prefix="R$" />
+            <Field label="Custos fixos" valueKey="fixedCosts" prefix="R$" />
+            <Field label="Custo variável" valueKey="variableCostRate" suffix="%" />
+            <Field label="Imposto estimado" valueKey="taxRate" suffix="%" />
+          </div>
+
+          <div className="inputPanel">
+            <h2>Realidade do mês</h2>
+            <Field label="Faturamento real" valueKey="realRevenue" prefix="R$" />
+            <Field label="Vendas reais" valueKey="realSales" />
+            <Field label="Investimento real" valueKey="realInvestment" prefix="R$" />
+            <Field label="Maturidade para bolsa" valueKey="ipoReadiness" suffix="%" />
+          </div>
+        </section>
+
+        <div className="secTitle">🗺️ <span>Missões</span> de crescimento</div>
+
+        <section className="missionsGrid">
+          {missionCards.map((card) => (
+            <article className={`mission ${card.tone}`} key={card.title}>
+              <div className="missionTop">
+                <div className="missionIcon">{card.icon}</div>
+                <div className="badge">{card.badge}</div>
+              </div>
+
+              <h2>{card.title}</h2>
+              <p>{card.desc}</p>
+
+              <div className="missionLabel">
+                <span>{card.current}</span>
+                <small>{card.target}</small>
+              </div>
+
+              <div className="miniBar">
+                <div style={{ width: `${clamp(card.pct)}%` }} />
+              </div>
+
+              <footer>
+                <span>⭐ métrica-chave</span>
+                <b>{card.footer}</b>
+              </footer>
+            </article>
+          ))}
+        </section>
+
+        <button
+          className="addButton"
+          onClick={() => notify("Depois conectaremos esta tela com CRM, Stripe, Blog Agent e Search Console.")}
+        >
+          <span>+</span>
+          Criar novo cenário de metas
+        </button>
+
+        <section className="investorPanel">
+          <div>
+            <p className="eyebrow">Investidor anjo</p>
+            <h2>O que ele ganha ou deixa de ganhar se entrar agora?</h2>
+            <p>
+              Se alguém investir {money(metrics.investmentAsk)} por {metrics.equityOffered}%,
+              o valuation pós-money simulado fica em {money(result.postMoney)}. Pela projeção
+              de LTV, a participação proporcional sobre o potencial da base seria de{" "}
+              {money(result.investorShareProjectedLtv)}.
+            </p>
+          </div>
+
+          <div className="investorInputs">
+            <Field label="Investimento pedido" valueKey="investmentAsk" prefix="R$" />
+            <Field label="Equity oferecido" valueKey="equityOffered" suffix="%" />
+          </div>
+        </section>
+
+        <section className="ipoPanel">
+          <div>
+            <p className="eyebrow">Bolsa de valores / IPO</p>
+            <h2>Distância até abrir capital</h2>
+            <p>
+              Esta parte é uma régua didática, não uma promessa. Para pensar em bolsa,
+              ainda precisa histórico financeiro, receita recorrente forte, governança,
+              auditoria, jurídico, contabilidade robusta, conselho, compliance e escala.
+            </p>
+          </div>
+
+          <div className="ipoScore">
+            <strong>{metrics.ipoReadiness}%</strong>
+            <span>maturidade estimada</span>
+            <div className="barTrack small">
+              <div className="barFill" style={{ width: `${clamp(metrics.ipoReadiness)}%` }} />
+            </div>
+          </div>
+        </section>
+
+        <div className="secTitle">📚 <span>Glossário</span> para blog e investidores</div>
+
+        <section className="glossaryGrid">
+          {glossary.map(([term, desc, href]) => (
+            <a className="glossaryCard" href={href} key={term}>
+              <b>{term}</b>
               <span>{desc}</span>
+              <small>Artigo didático →</small>
             </a>
           ))}
-        </div>
-      </section>
+        </section>
 
-      <p className="warning">
-        Observação: imposto, abertura de capital e valuation precisam ser validados
-        com contador, advogado e especialista financeiro. Aqui é um painel de simulação
-        estratégica, não uma promessa legal ou contábil.
-      </p>
+        <section className="tips">
+          <article>
+            <h3>💡 Próximo passo de conteúdo</h3>
+            <p>
+              Como o Blog Agent encontrou 4 posts, 0 publicados, 0 com imagem e saúde de 25%,
+              a prioridade é transformar este glossário em artigos simples e indexáveis.
+            </p>
+          </article>
+
+          <article>
+            <h3>🔒 Segurança estratégica</h3>
+            <p>
+              Esta página continua privada dentro do Studio. Os números não aparecem para
+              o público. Para investidor, depois criamos uma versão pitch sem dados sensíveis.
+            </p>
+          </article>
+
+          <article>
+            <h3>🎯 Regra de ouro</h3>
+            <p>
+              O painel não serve para adivinhar o futuro. Ele serve para testar cenários:
+              “se eu investir X, converter Y e reter Z meses, quanto posso crescer?”
+            </p>
+          </article>
+        </section>
+      </div>
 
       <style jsx>{`
-        .page {
-          min-height: 100vh;
-          padding: 48px 22px 80px;
-          background:
-            radial-gradient(circle at top left, rgba(168, 85, 247, 0.22), transparent 34%),
-            radial-gradient(circle at top right, rgba(34, 211, 238, 0.16), transparent 30%),
-            #020617;
-          color: #e5e7eb;
+        :global(*) {
+          box-sizing: border-box;
         }
 
-        .hero,
-        .summaryGrid,
-        .comparison,
-        .investor,
-        .ipo,
-        .formGrid,
-        .dictionary,
-        .warning {
+        .page {
+          min-height: 100vh;
+          background:
+            radial-gradient(ellipse 60% 40% at 10% 20%, rgba(255,45,120,0.22) 0%, transparent 70%),
+            radial-gradient(ellipse 50% 50% at 90% 70%, rgba(176,20,255,0.18) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 30% at 50% 100%, rgba(0,245,196,0.10) 0%, transparent 70%),
+            #0d0014;
+          color: #fff;
+          overflow-x: hidden;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          position: relative;
+          padding-bottom: 80px;
+        }
+
+        .wrapper {
+          position: relative;
+          z-index: 1;
           max-width: 1180px;
-          margin-left: auto;
-          margin-right: auto;
+          margin: 0 auto;
+          padding: 0 20px;
+        }
+
+        .particles {
+          position: fixed;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .particles i {
+          position: absolute;
+          width: calc(3px + (var(--i) % 5) * 1px);
+          height: calc(3px + (var(--i) % 5) * 1px);
+          left: calc((var(--i) * 37) % 100 * 1%);
+          bottom: -10vh;
+          border-radius: 999px;
+          background: #ff2d78;
+          opacity: 0;
+          animation: floatUp calc(8s + (var(--i) % 8) * 1s) linear infinite;
+          animation-delay: calc((var(--i) % 10) * -1s);
+        }
+
+        .particles i:nth-child(3n) {
+          background: #ffd600;
+        }
+
+        .particles i:nth-child(4n) {
+          background: #00f5c4;
+        }
+
+        .particles i:nth-child(5n) {
+          background: #b014ff;
+        }
+
+        @keyframes floatUp {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.75;
+          }
+          90% {
+            opacity: 0.45;
+          }
+          100% {
+            transform: translateY(-115vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+
+        .topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          flex-wrap: wrap;
+          padding: 22px 0 8px;
+        }
+
+        .brand {
+          font-size: 1.05rem;
+          font-weight: 950;
+          color: #ff2d78;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .topActions {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+
+        .pill {
+          background: rgba(255,45,120,0.10);
+          border: 1px solid rgba(255,45,120,0.22);
+          border-radius: 999px;
+          padding: 7px 15px;
+          font-size: 0.84rem;
+          font-weight: 850;
+        }
+
+        .level {
+          background: linear-gradient(135deg, #ff2d78, #b014ff);
+          border-radius: 999px;
+          padding: 8px 16px;
+          font-size: 0.78rem;
+          font-weight: 950;
+          box-shadow: 0 0 22px rgba(255,45,120,0.35);
+          animation: pulseBadge 2.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseBadge {
+          0%, 100% {
+            box-shadow: 0 0 18px rgba(255,45,120,0.35);
+          }
+          50% {
+            box-shadow: 0 0 36px rgba(255,45,120,0.45), 0 0 60px rgba(176,20,255,0.25);
+          }
         }
 
         .hero {
-          margin-bottom: 26px;
+          text-align: center;
+          padding: 42px 0 26px;
         }
 
-        .eyebrow {
-          color: #67e8f9;
-          text-transform: uppercase;
-          letter-spacing: 0.18em;
-          font-size: 12px;
-          font-weight: 900;
+        .heroEmoji {
+          display: block;
+          font-size: 3.4rem;
+          animation: bounce 1.6s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
         }
 
         h1 {
-          max-width: 880px;
-          margin: 12px 0;
-          font-size: clamp(34px, 5vw, 72px);
-          line-height: 0.92;
-          letter-spacing: -0.06em;
-          color: white;
+          margin: 14px auto 10px;
+          max-width: 860px;
+          font-size: clamp(2.1rem, 6vw, 4.3rem);
+          line-height: 0.96;
+          letter-spacing: -0.07em;
+          font-weight: 950;
+          background: linear-gradient(135deg, #fff 0%, #ff6ea8 50%, #ffd600 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .hero p {
-          max-width: 820px;
-          color: #94a3b8;
-          font-size: 16px;
+          max-width: 680px;
+          margin: 0 auto;
+          color: rgba(255,255,255,0.62);
           line-height: 1.7;
         }
 
-        .summaryGrid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
+        .heroBadges {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          flex-wrap: wrap;
           margin-top: 22px;
         }
 
-        .card,
-        .comparison,
-        .investor,
-        .ipo,
-        .formCard,
-        .dictionary {
-          border: 1px solid rgba(148, 163, 184, 0.18);
-          background: rgba(15, 23, 42, 0.78);
-          border-radius: 24px;
-          box-shadow: 0 20px 70px rgba(0, 0, 0, 0.28);
-        }
-
-        .card {
-          padding: 18px;
-        }
-
-        .card span,
-        .bubble span {
-          display: block;
-          color: #94a3b8;
-          font-size: 12px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-        }
-
-        .card strong {
-          display: block;
-          margin-top: 10px;
-          font-size: 28px;
+        button,
+        a {
           color: #fff;
-          letter-spacing: -0.04em;
+          text-decoration: none;
+          cursor: pointer;
+          font-weight: 900;
+          font-family: inherit;
         }
 
-        .card small {
-          display: block;
-          margin-top: 8px;
-          color: #64748b;
+        .heroBadges button,
+        .heroBadges a {
+          border: 1px solid rgba(255,45,120,0.28);
+          border-radius: 999px;
+          background: rgba(255,45,120,0.10);
+          padding: 10px 15px;
         }
 
-        .comparison {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 18px;
-          padding: 20px;
-          margin-top: 18px;
+        .heroBadges button:first-child {
+          background: linear-gradient(135deg, #ff2d78, #b014ff);
+          border-color: transparent;
+          box-shadow: 0 0 24px rgba(255,45,120,0.28);
         }
 
-        h2 {
-          margin: 0 0 14px;
-          color: white;
-          letter-spacing: -0.03em;
+        .globalBar {
+          margin: 14px 0 30px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,45,120,0.18);
+          border-radius: 22px;
+          padding: 23px 26px;
+          backdrop-filter: blur(14px);
         }
 
-        .bubbles {
-          display: grid;
-          grid-template-columns: repeat(5, minmax(0, 1fr));
-          gap: 10px;
-        }
-
-        .bubble {
-          min-height: 96px;
-          padding: 14px;
-          border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(2, 6, 23, 0.55);
+        .barHead {
           display: flex;
-          flex-direction: column;
           justify-content: space-between;
+          gap: 14px;
+          align-items: center;
+          margin-bottom: 14px;
         }
 
-        .bubble strong {
-          color: #fff;
-          font-size: 22px;
-          letter-spacing: -0.05em;
+        .barHead strong {
+          display: block;
+          font-size: 1rem;
         }
 
-        .investor {
+        .barHead small {
+          display: block;
+          color: rgba(255,255,255,0.54);
+          margin-top: 4px;
+        }
+
+        .barHead b {
+          color: #ff2d78;
+          font-size: 1.35rem;
+        }
+
+        .barTrack {
+          background: rgba(255,255,255,0.07);
+          border-radius: 999px;
+          height: 14px;
+          overflow: hidden;
+        }
+
+        .barTrack.small {
+          height: 10px;
+          margin-top: 12px;
+        }
+
+        .barFill {
+          height: 100%;
+          border-radius: 999px;
+          background: linear-gradient(90deg, #ff2d78, #b014ff, #ff6ea8);
+          background-size: 200% 100%;
+          animation: shine 2s linear infinite;
+          transition: width 0.6s ease;
+        }
+
+        @keyframes shine {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+
+        .milestones {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          margin-top: 9px;
+          font-size: 0.75rem;
+          color: rgba(255,255,255,0.52);
+        }
+
+        .statsRow {
           display: grid;
-          grid-template-columns: 1.3fr 0.7fr;
-          gap: 20px;
-          padding: 24px;
-          margin-top: 18px;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 14px;
+          margin-bottom: 32px;
         }
 
-        .investor p,
-        .ipo p,
-        .dictionary p,
-        .warning {
-          color: #94a3b8;
-          line-height: 1.7;
+        .statCard {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,45,120,0.18);
+          border-radius: 18px;
+          padding: 16px;
+          text-align: center;
+          backdrop-filter: blur(12px);
+          transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .ctaBox {
+        .statCard:hover {
+          transform: translateY(-4px) scale(1.02);
+          box-shadow: 0 12px 40px rgba(255,45,120,0.24);
+        }
+
+        .statCard span {
+          display: block;
+          font-size: 1.5rem;
+          margin-bottom: 7px;
+        }
+
+        .statCard b {
+          display: block;
+          font-size: clamp(1rem, 2vw, 1.35rem);
+          font-weight: 950;
+          letter-spacing: -0.04em;
+          background: linear-gradient(135deg, #ff2d78, #ffd600);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .statCard small {
+          display: block;
+          color: rgba(255,255,255,0.55);
+          margin-top: 5px;
+          font-size: 0.73rem;
+        }
+
+        .secTitle {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 30px 0 15px;
+          font-size: 1.15rem;
+          font-weight: 950;
+        }
+
+        .secTitle span {
+          color: #ff2d78;
+        }
+
+        .inputGrid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 36px;
+        }
+
+        .inputPanel {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,45,120,0.18);
           border-radius: 20px;
           padding: 18px;
-          background: linear-gradient(135deg, rgba(236, 72, 153, 0.16), rgba(59, 130, 246, 0.12));
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          backdrop-filter: blur(12px);
         }
 
-        button {
-          width: 100%;
-          margin-top: 12px;
-          border: 0;
-          border-radius: 999px;
-          padding: 13px 16px;
-          background: linear-gradient(135deg, #a855f7, #22d3ee);
-          color: white;
-          font-weight: 950;
-          cursor: pointer;
-        }
-
-        .ipo {
-          padding: 24px;
-          margin-top: 18px;
-        }
-
-        .progress {
-          height: 14px;
-          border-radius: 999px;
-          background: rgba(15, 23, 42, 0.9);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          overflow: hidden;
-          margin-top: 18px;
-        }
-
-        .progress div {
-          height: 100%;
-          background: linear-gradient(90deg, #22c55e, #22d3ee, #a855f7);
-        }
-
-        .ipoStats {
-          display: flex;
-          justify-content: space-between;
-          gap: 14px;
-          flex-wrap: wrap;
-          margin-top: 14px;
-          color: #cbd5e1;
-        }
-
-        .formGrid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
-          margin-top: 18px;
-        }
-
-        .formCard {
-          padding: 18px;
-        }
-
-        .formCard h3 {
+        .inputPanel h2 {
           margin: 0 0 14px;
-          color: white;
+          font-size: 1rem;
         }
 
-        label {
+        .field {
           display: block;
           margin-bottom: 12px;
         }
 
-        label span {
+        .field span {
           display: block;
-          margin-bottom: 6px;
-          color: #cbd5e1;
-          font-size: 13px;
+          color: rgba(255,255,255,0.60);
+          font-size: 0.78rem;
+          margin-bottom: 5px;
         }
 
         .inputWrap {
           display: flex;
           align-items: center;
-          gap: 8px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 14px;
-          background: rgba(2, 6, 23, 0.55);
-          padding: 0 10px;
+          gap: 7px;
+          border: 1px solid rgba(255,255,255,0.10);
+          background: rgba(0,0,0,0.22);
+          border-radius: 12px;
+          padding: 9px 10px;
+        }
+
+        .inputWrap b {
+          color: #ffd600;
+          font-size: 0.78rem;
         }
 
         input {
           width: 100%;
-          padding: 12px 4px;
-          background: transparent;
           border: 0;
-          color: white;
           outline: none;
-          font-size: 15px;
+          background: transparent;
+          color: #fff;
+          font-size: 0.95rem;
+          font-weight: 800;
         }
 
-        em {
-          color: #94a3b8;
-          font-style: normal;
+        .missionsGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 18px;
+          margin-bottom: 26px;
         }
 
-        .dictionary {
+        .mission {
+          --accent: #ff2d78;
+          position: relative;
+          overflow: hidden;
+          background: rgba(255,255,255,0.04);
+          border: 1.5px solid rgba(255,45,120,0.18);
+          border-radius: 22px;
+          padding: 22px;
+          backdrop-filter: blur(14px);
+          transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .mission::before {
+          content: "";
+          position: absolute;
+          inset: 0 0 auto 0;
+          height: 3px;
+          background: linear-gradient(90deg, transparent, var(--accent), transparent);
+          opacity: 0;
+          transition: opacity 0.25s;
+        }
+
+        .mission:hover {
+          transform: translateY(-6px);
+          border-color: var(--accent);
+          box-shadow: 0 16px 48px rgba(0,0,0,0.40), 0 0 0 1px var(--accent);
+        }
+
+        .mission:hover::before {
+          opacity: 1;
+        }
+
+        .mission.pink {
+          --accent: #ff2d78;
+        }
+
+        .mission.yellow {
+          --accent: #ffd600;
+        }
+
+        .mission.mint {
+          --accent: #00f5c4;
+        }
+
+        .mission.purple {
+          --accent: #b014ff;
+        }
+
+        .missionTop {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+
+        .missionIcon {
+          width: 50px;
+          height: 50px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(255,255,255,0.10);
+        }
+
+        .badge {
+          border: 1px solid color-mix(in srgb, var(--accent), transparent 65%);
+          background: color-mix(in srgb, var(--accent), transparent 86%);
+          color: var(--accent);
+          border-radius: 999px;
+          padding: 5px 10px;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
+          font-size: 0.68rem;
+          font-weight: 950;
+        }
+
+        .mission h2 {
+          margin: 0 0 6px;
+          font-size: 1.08rem;
+        }
+
+        .mission p {
+          min-height: 62px;
+          color: rgba(255,255,255,0.56);
+          line-height: 1.5;
+          font-size: 0.84rem;
+          margin: 0 0 15px;
+        }
+
+        .missionLabel {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          margin-bottom: 7px;
+          font-size: 0.78rem;
+        }
+
+        .missionLabel span {
+          color: var(--accent);
+          font-weight: 950;
+        }
+
+        .missionLabel small {
+          color: rgba(255,255,255,0.52);
+        }
+
+        .miniBar {
+          background: rgba(255,255,255,0.07);
+          border-radius: 999px;
+          height: 8px;
+          overflow: hidden;
+        }
+
+        .miniBar div {
+          height: 100%;
+          border-radius: 999px;
+          background: linear-gradient(90deg, var(--accent), rgba(255,255,255,0.7));
+          transition: width 0.6s ease;
+        }
+
+        .mission footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin-top: 14px;
+          padding-top: 12px;
+          border-top: 1px solid rgba(255,255,255,0.07);
+          font-size: 0.74rem;
+          color: rgba(255,255,255,0.54);
+        }
+
+        .mission footer b {
+          color: #ffd600;
+          text-align: right;
+        }
+
+        .addButton {
+          width: 100%;
+          border: 2px dashed rgba(255,45,120,0.32);
+          border-radius: 22px;
           padding: 24px;
-          margin-top: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          background: transparent;
+          color: #ff2d78;
+          font-size: 0.95rem;
+          transition: all 0.25s;
+          margin-bottom: 32px;
         }
 
-        .dictGrid {
+        .addButton:hover {
+          background: rgba(255,45,120,0.07);
+          border-color: #ff2d78;
+          box-shadow: 0 0 30px rgba(255,45,120,0.30);
+        }
+
+        .addButton span {
+          width: 36px;
+          height: 36px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, #ff2d78, #b014ff);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          box-shadow: 0 0 18px rgba(255,45,120,0.35);
+        }
+
+        .investorPanel,
+        .ipoPanel {
+          display: grid;
+          grid-template-columns: 1.2fr 0.8fr;
+          gap: 20px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,45,120,0.18);
+          border-radius: 24px;
+          padding: 24px;
+          margin-bottom: 20px;
+          backdrop-filter: blur(14px);
+        }
+
+        .eyebrow {
+          margin: 0 0 8px;
+          color: #ff6ea8;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          font-size: 0.72rem;
+          font-weight: 950;
+        }
+
+        .investorPanel h2,
+        .ipoPanel h2 {
+          margin: 0 0 10px;
+          font-size: 1.4rem;
+        }
+
+        .investorPanel p,
+        .ipoPanel p {
+          color: rgba(255,255,255,0.60);
+          line-height: 1.7;
+          margin: 0;
+        }
+
+        .investorInputs {
+          display: grid;
+          gap: 8px;
+          align-content: center;
+        }
+
+        .ipoScore {
+          border-radius: 20px;
+          background: rgba(0,0,0,0.22);
+          border: 1px solid rgba(255,255,255,0.08);
+          padding: 20px;
+          align-self: center;
+        }
+
+        .ipoScore strong {
+          display: block;
+          font-size: 3rem;
+          color: #ffd600;
+          letter-spacing: -0.08em;
+        }
+
+        .ipoScore span {
+          color: rgba(255,255,255,0.58);
+        }
+
+        .glossaryGrid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 12px;
-          margin-top: 16px;
+          gap: 14px;
+          margin-bottom: 32px;
         }
 
-        .dictGrid a {
-          text-decoration: none;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+        .glossaryCard {
+          background: linear-gradient(135deg, rgba(255,45,120,0.10), rgba(176,20,255,0.07));
+          border: 1px solid rgba(255,45,120,0.16);
           border-radius: 18px;
-          padding: 14px;
-          background: rgba(2, 6, 23, 0.55);
+          padding: 16px;
+          transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .dictGrid strong {
+        .glossaryCard:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 10px 34px rgba(255,45,120,0.18);
+        }
+
+        .glossaryCard b {
           display: block;
-          color: #67e8f9;
-          margin-bottom: 8px;
+          color: #fff;
+          margin-bottom: 7px;
+          font-size: 1.05rem;
         }
 
-        .dictGrid span {
-          color: #94a3b8;
-          font-size: 13px;
-          line-height: 1.5;
+        .glossaryCard span {
+          display: block;
+          color: rgba(255,255,255,0.58);
+          line-height: 1.45;
+          font-size: 0.82rem;
+          min-height: 48px;
         }
 
-        .warning {
-          margin-top: 20px;
-          font-size: 12px;
+        .glossaryCard small {
+          display: block;
+          margin-top: 12px;
+          color: #ffd600;
+          font-weight: 900;
         }
 
-        @media (max-width: 980px) {
-          .summaryGrid,
-          .comparison,
-          .investor,
-          .formGrid,
-          .dictGrid {
+        .tips {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .tips article {
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,45,120,0.15);
+          border-radius: 18px;
+          padding: 18px;
+        }
+
+        .tips h3 {
+          margin: 0 0 8px;
+        }
+
+        .tips p {
+          margin: 0;
+          color: rgba(255,255,255,0.58);
+          line-height: 1.6;
+          font-size: 0.88rem;
+        }
+
+        .toast {
+          position: fixed;
+          bottom: 28px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 50;
+          background: linear-gradient(135deg, #1a0030, #0d0014);
+          border: 1.5px solid #ff2d78;
+          border-radius: 16px;
+          padding: 14px 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 8px 40px rgba(0,0,0,0.50), 0 0 30px rgba(255,45,120,0.35);
+          animation: toastIn 0.35s ease;
+        }
+
+        @keyframes toastIn {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+
+        @media (max-width: 1000px) {
+          .statsRow {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+
+          .inputGrid,
+          .missionsGrid,
+          .glossaryGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .investorPanel,
+          .ipoPanel,
+          .tips {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 620px) {
+          .wrapper {
+            padding: 0 14px;
+          }
+
+          .statsRow,
+          .inputGrid,
+          .missionsGrid,
+          .glossaryGrid {
             grid-template-columns: 1fr;
           }
 
-          .bubbles {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+          .hero {
+            padding-top: 30px;
+          }
+
+          h1 {
+            font-size: 2.25rem;
+          }
+
+          .milestones {
+            font-size: 0.64rem;
+          }
+
+          .barHead {
+            align-items: flex-start;
+            flex-direction: column;
           }
         }
       `}</style>
     </main>
-  );
-}
-
-function Card({ title, value, note }: { title: string; value: string; note: string }) {
-  return (
-    <div className="card">
-      <span>{title}</span>
-      <strong>{value}</strong>
-      <small>{note}</small>
-    </div>
-  );
-}
-
-function Bubble({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="bubble">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
   );
 }
