@@ -115,7 +115,7 @@ export default function MiaStudioChat() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/studio/mia-brain", {
+      const res = await fetch("/api/studio/orchestrator", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export default function MiaStudioChat() {
           id: uid(),
           role: "system",
           content:
-            "Não consegui conectar com a Mia agora. A janela abriu, mas a API da Mia não respondeu. Verifique /api/studio/mia-brain.",
+            "Não consegui conectar com a Mia agora. A janela abriu, mas a API da Mia não respondeu. Verifique /api/studio/orchestrator.",
         },
       ]);
     } finally {
