@@ -1,0 +1,12 @@
+[
+  { "name": "Home principal", "url": "http://127.0.0.1:3000/" },
+  { "name": "Studio", "url": "http://127.0.0.1:3000/studio" },
+  { "name": "Studio Lab", "url": "http://127.0.0.1:3000/studio-lab" },
+  { "name": "Loja de Agentes", "url": "http://127.0.0.1:3000/loja-agentes" },
+  { "name": "Metas Financeiras", "url": "http://127.0.0.1:3000/studio/metas-financeiras" },
+  { "name": "Agente de Blog", "url": "http://127.0.0.1:3000/studio/blog-agent" },
+  { "name": "API Blog Latest", "url": "http://127.0.0.1:3000/api/blog/latest" },
+  { "name": "API Blog Agent", "url": "http://127.0.0.1:3000/api/studio/blog-agent" },
+  { "name": "API Central de Tarefas", "url": "http://127.0.0.1:3000/api/agent-tasks" },
+  { "name": "API Studio Dashboard", "url": "http://127.0.0.1:3000/api/studio/dashboard" }
+]

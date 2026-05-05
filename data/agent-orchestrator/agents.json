@@ -1,0 +1,22 @@
+[
+  { "id": "mia", "name": "Mia", "area": "orquestração", "talksToTasks": true, "auto": true },
+  { "id": "tarefas", "name": "Agente de Tarefas", "area": "gestão", "talksToTasks": true, "auto": true },
+  { "id": "diagnostico-sistema", "name": "Agente de Diagnóstico do Sistema", "area": "saúde do sistema", "talksToTasks": true, "auto": true, "intervalMinutes": 20 },
+  { "id": "blog", "name": "Nova · Agente de Blog", "area": "conteúdo", "talksToTasks": true, "auto": true },
+  { "id": "google-seo", "name": "Agente Google/SEO", "area": "SEO e indexação", "talksToTasks": true, "auto": false },
+  { "id": "lancamento", "name": "Agente de Lançamento", "area": "campanhas", "talksToTasks": true, "auto": false },
+  { "id": "growth", "name": "Agente de Growth", "area": "crescimento", "talksToTasks": true, "auto": true },
+  { "id": "prospector", "name": "Agente Prospector Ético", "area": "leads", "talksToTasks": true, "auto": false },
+  { "id": "campaign-agent", "name": "Campaign Agent", "area": "campanhas", "talksToTasks": true, "auto": false },
+  { "id": "usuarios", "name": "Agente de Usuários", "area": "usuários", "talksToTasks": true, "auto": true },
+  { "id": "financeiro", "name": "Mia Financeira", "area": "metas e métricas", "talksToTasks": true, "auto": false },
+  { "id": "loja", "name": "Agente Loja de Agentes", "area": "produtos", "talksToTasks": true, "auto": false },
+  { "id": "stripe", "name": "Agente Stripe/Planos", "area": "pagamentos", "talksToTasks": true, "auto": false },
+  { "id": "comunidade", "name": "Agente Comunidade", "area": "moderação", "talksToTasks": true, "auto": true },
+  { "id": "sitemap", "name": "Agente Sitemap", "area": "rotas e páginas", "talksToTasks": true, "auto": true },
+  { "id": "cliente", "name": "Agente Cliente", "area": "dashboard cliente", "talksToTasks": true, "auto": false },
+  { "id": "prestador", "name": "Agente Prestador", "area": "dashboard prestador", "talksToTasks": true, "auto": false },
+  { "id": "indique", "name": "Agente Indique", "area": "indicações", "talksToTasks": true, "auto": false },
+  { "id": "orquestrador", "name": "Orquestrador Sualuma", "area": "operações", "talksToTasks": true, "auto": true },
+  { "id": "copilot", "name": "Copilot do Studio", "area": "execução", "talksToTasks": true, "auto": true }
+]
