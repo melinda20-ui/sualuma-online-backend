@@ -1,0 +1,7 @@
+{
+  "active": true,
+  "name": "Squad de Onboarding e Opt-in",
+  "intervalMinutes": 20,
+  "agents": ["Growth", "UX", "Lançamento", "Programação", "Tarefas"],
+  "mission": "Supervisionar a criação da Jornada Sualuma, gerar ideias de onboarding, sincronizar tarefas e avisar no Discord o que precisa ser aprovado amanhã."
+}

@@ -1,0 +1,157 @@
+{
+  "name": "One Board de Onboarding Sualuma",
+  "version": "1.0",
+  "updatedAt": "2026-05-05T00:00:00.000Z",
+  "mission": "Criar uma primeira experiência interativa, com jogo de cor empreendedora, caminhos personalizados, robôs animados, funil claro e tarefas automáticas para facilitar a vida do usuário.",
+  "publicPage": "/jornada-sualuma",
+  "studioPage": "/studio/onboarding-board",
+  "supervisors": [
+    {
+      "agent": "Agente de Growth",
+      "role": "Gerar ideias de gatilhos mentais, ofertas, chamadas e caminhos de conversão para cada perfil de usuário."
+    },
+    {
+      "agent": "Agente de UX",
+      "role": "Melhorar clareza, experiência mobile, emoção, animações e reduzir confusão na primeira visita."
+    },
+    {
+      "agent": "Agente de Lançamento",
+      "role": "Transformar o onboarding em funil de venda e priorizar o que precisa ficar pronto primeiro."
+    },
+    {
+      "agent": "Skill de Programação",
+      "role": "Montar os protótipos de onboarding em páginas/pastas para aprovação antes da implementação final."
+    }
+  ],
+  "paths": [
+    {
+      "id": "vendas-sem-time",
+      "color": "Dourado",
+      "title": "Quero mais dinheiro e vendas, mas não tenho time pra me ajudar",
+      "offer": "Site profissional, landing page, funil, microSaaS sob medida ou serviço de lançamento.",
+      "goal": "Levar para compra de site, sistema personalizado ou proposta rápida."
+    },
+    {
+      "id": "empreender-sozinha",
+      "color": "Azul",
+      "title": "Quero empreender sozinha, mas não sei o que fazer para conseguir",
+      "offer": "Sistema IA Sualuma, Mia, agentes, automações, templates e rotina guiada.",
+      "goal": "Levar para plano de IA, agentes e automações."
+    },
+    {
+      "id": "rotina-confusa",
+      "color": "Roxo",
+      "title": "Tenho tudo, mas minha rotina está confusa na hora de trabalhar",
+      "offer": "FlowMind, automações, painel de tarefas, organização de rotina e copiloto.",
+      "goal": "Levar para organização operacional e ferramentas de produtividade."
+    },
+    {
+      "id": "comecando-agora",
+      "color": "Verde",
+      "title": "Estou começando agora a empreender",
+      "offer": "Cursos profissionalizantes, trilhas de começo, templates, plano inicial e diagnóstico.",
+      "goal": "Levar para cursos, templates e primeira estrutura digital."
+    },
+    {
+      "id": "preciso-de-time",
+      "color": "Laranja",
+      "title": "Preciso de gente para me ajudar, mas não quero ou não consigo contratar CLT",
+      "offer": "Marketplace de prestadores, time sob demanda, serviços por projeto e SOS Publicidade.",
+      "goal": "Levar para contratação de prestadores e serviços internos."
+    }
+  ],
+  "folders": [
+    {
+      "name": "01 - Página inicial do jogo",
+      "owner": "UX + Programação",
+      "status": "rascunho pronto para aprovar",
+      "items": [
+        "Criar tela de entrada com robô animado",
+        "Mostrar pergunta: Qual caminho vamos seguir hoje?",
+        "Criar escolhas grandes, simples e emocionais",
+        "Deixar mobile-first e sem poluição visual"
+      ]
+    },
+    {
+      "name": "02 - Onboarding por cor",
+      "owner": "UX + Growth",
+      "status": "rascunho pronto para aprovar",
+      "items": [
+        "Dourado: vendas, site, funil, microSaaS",
+        "Azul: IA, Mia, agentes, automações",
+        "Roxo: rotina, organização, FlowMind",
+        "Verde: começo, cursos, templates",
+        "Laranja: time sob demanda e prestadores"
+      ]
+    },
+    {
+      "name": "03 - Oferta recomendada",
+      "owner": "Growth + Lançamento",
+      "status": "em estratégia",
+      "items": [
+        "Cada cor precisa levar para uma oferta principal",
+        "Evitar mostrar todos os produtos ao mesmo tempo",
+        "Criar botão principal e botão secundário por perfil",
+        "Criar copy de transição sem parecer venda forçada"
+      ]
+    },
+    {
+      "name": "04 - One Board do usuário",
+      "owner": "UX + Programação",
+      "status": "planejado",
+      "items": [
+        "Guardar caminho escolhido",
+        "Guardar cor descoberta",
+        "Mostrar progresso do usuário",
+        "Mostrar próximos passos",
+        "Mostrar tudo que o usuário mexeu dentro da jornada"
+      ]
+    },
+    {
+      "name": "05 - Analytics, CRM e tarefas",
+      "owner": "Growth + Tarefas",
+      "status": "prioridade alta",
+      "items": [
+        "Registrar evento de início do jogo",
+        "Registrar escolha do caminho",
+        "Registrar resultado de cor",
+        "Enviar lead para CRM/admin",
+        "Criar tarefa automática quando houver gargalo"
+      ]
+    },
+    {
+      "name": "06 - Tarefas para amanhã",
+      "owner": "Agente de Tarefas",
+      "status": "sincronizar agora",
+      "items": [
+        "Aprovar visual da página /jornada-sualuma",
+        "Aprovar estrutura do /studio/onboarding-board",
+        "Decidir nome final do jogo",
+        "Conectar captura real de lead",
+        "Conectar Google Analytics",
+        "Conectar resultado ao funil de produtos"
+      ]
+    }
+  ],
+  "growthIdeas": [
+    "Transformar o opt-in em descoberta de identidade: 'Descubra sua cor empreendedora'.",
+    "Usar recompensa no final: diagnóstico + caminho recomendado.",
+    "Reduzir confusão vendendo uma oferta principal por cor.",
+    "Usar robô guia como personagem emocional da jornada.",
+    "Criar senso de progresso com etapas curtas e visual de jogo.",
+    "Depois do resultado, pedir nome/e-mail/WhatsApp para liberar plano detalhado."
+  ],
+  "uxIdeas": [
+    "Botões grandes e emocionais no início.",
+    "Pouco texto por tela.",
+    "Animação leve de robô acompanhando a escolha.",
+    "Resultado visual com cor dominante.",
+    "Mobile como prioridade.",
+    "One Board mostrando histórico, próximos passos e oferta recomendada."
+  ],
+  "lastSupervisorRunAt": "2026-05-05T06:10:49.568Z",
+  "taskSync": {
+    "created": 0,
+    "total": 45
+  }
+}
