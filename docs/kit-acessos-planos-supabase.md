@@ -116,3 +116,14 @@ Ainda falta:
 - webhook Stripe gravar compra/assinatura em `user_subscriptions`
 - Studio/Admin bloquear usuário comum
 - dashboards usarem `/api/platform/me` para liberar/bloquear recursos
+
+## Atualização — visualização do que cada plano libera
+
+A Central de Usuários agora mostra, dentro de cada plano:
+
+- permissões liberadas
+- limites configurados
+- recursos bloqueados
+- agentes incluídos no plano
+
+Isso ajuda a enxergar o que o usuário recebe em cada plano antes de validar o fluxo automático de compra/liberação.

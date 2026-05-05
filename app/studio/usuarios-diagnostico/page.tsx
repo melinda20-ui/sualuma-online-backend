@@ -69,6 +69,116 @@ function billingLabel(plan: PlanReport["expected"]) {
   return "grátis";
 }
 
+const ACCESS_LABELS: Record<string, string> = {
+  mini_company: "Mini Empresa",
+  mia_chat_access: "Acesso à Mia",
+  basic_courses_access: "Cursos básicos",
+  service_area_limit: "Limite de áreas de serviço",
+  studio_access: "Acesso ao Studio",
+  admin_access: "Acesso Admin",
+  mini_company_complete: "Mini Empresa completa",
+  initial_automations_access: "Automações iniciais",
+  courses_services_access: "Cursos e serviços",
+  advanced_user_area: "Área avançada do usuário",
+  support_priority_medium: "Suporte prioridade média",
+  more_automations_access: "Mais automações",
+  more_member_areas: "Mais áreas de membros",
+  advanced_resources: "Recursos avançados",
+  expanded_operational_dashboard: "Dashboard operacional expandido",
+  support_priority_high: "Suporte prioridade alta",
+  premium_everything: "Tudo do Premium",
+  expanded_agent_access: "Mais agentes",
+  advanced_orchestration: "Orquestração avançada",
+  team_resources: "Recursos para equipe",
+  priority_support: "Suporte prioritário",
+
+  provider_public_profile: "Perfil público de prestador",
+  open_opportunities_access: "Acesso a oportunidades",
+  proposals_per_month: "Propostas por mês",
+  admin_fee_percent: "Taxa administrativa",
+  standard_visibility: "Visibilidade padrão",
+  extra_proposals: "Propostas extras",
+  one_time_payment: "Pagamento único",
+  no_monthly_subscription: "Sem mensalidade",
+  release_after_confirmation: "Liberação após confirmação",
+  listing_priority_high: "Prioridade alta na listagem",
+  verified_provider_badge: "Selo de prestador verificado",
+  reduced_admin_fee_percent: "Taxa administrativa reduzida",
+  provider_priority_support: "Suporte prioritário prestador",
+  proposals_per_month_120: "120 propostas por mês",
+  priority_maximum: "Prioridade máxima",
+  team_profile: "Perfil de equipe",
+  admin_fee_percent_8: "Taxa administrativa 8%",
+  reduced_contract_fee: "Taxa de contrato reduzida",
+
+  painel_hoje: "Painel Hoje",
+  three_daily_tasks: "3 tarefas diárias",
+  template_organiza_minha_cabeca: "Template Organiza Minha Cabeça",
+  dona_limited_access: "Dona limitada",
+  simple_habit_history: "Histórico simples de hábitos",
+  everything_flowmatic_start: "Tudo do Flowmatic Começar",
+  dona_full_agent: "Dona completa",
+  calma_agent: "Agente Calma",
+  home_routine_templates: "Templates de rotina da casa",
+  daily_night_checkin: "Check-in diário e noturno",
+  simple_weekly_report: "Relatório semanal simples",
+  everything_rotina_pro: "Tudo do Rotina Pro",
+  vera_annual_plan_agent: "Vera — plano anual",
+  rica_sales_agent: "Rica — vendas",
+  template_1_ano_12_semanas: "Template 1 ano em 12 semanas",
+  template_lancamento_30_dias: "Template Lançamento 30 dias",
+  smart_weekly_agenda: "Agenda semanal inteligente",
+  simple_business_finance: "Financeiro simples do negócio",
+  mvp_recommended: "Recomendado para MVP",
+  everything_solo_ceo: "Tudo do Solo CEO",
+  advanced_business_dashboard: "Dashboard avançado do negócio",
+  advanced_financial_routine: "Rotina financeira avançada",
+  complete_agent_access: "Acesso completo aos agentes",
+  priority_flowmatic_support: "Suporte prioritário Flowmatic",
+  reports_visual_advanced: "Relatórios visuais avançados",
+  goals_area_12_months: "Área de metas 12 meses",
+
+  mapa_financeiro: "Mapa financeiro",
+  meta_de_renda: "Meta de renda",
+  plano_de_acao: "Plano de ação",
+  checkpoints: "Checkpoints",
+  template_access: "Acesso ao template",
+  blocos_de_foco: "Blocos de foco",
+  rotina_flexivel: "Rotina flexível",
+  plano_1h_dia: "Plano de 1h por dia",
+  agenda_leve: "Agenda leve",
+
+  trial_30_days: "Teste grátis de 30 dias",
+  card_required_for_activation: "Cartão obrigatório para ativação",
+  cancel_anytime: "Cancelar quando quiser",
+  initial_platform_access: "Acesso inicial à plataforma",
+  trial_before_subscription: "Teste antes da assinatura",
+};
+
+function prettyAccessKey(key: string) {
+  return ACCESS_LABELS[key] || key.replace(/_/g, " ");
+}
+
+function prettyAccessValue(value: any) {
+  if (value === true) return "Liberado";
+  if (value === false) return "Bloqueado";
+  if (value === null || value === undefined) return "Configurado";
+  if (typeof value === "number") return String(value);
+
+  if (typeof value === "string") {
+    if (value === "essential") return "Essencial";
+    if (value === "active") return "Ativo";
+    return value;
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+
 export default function UsuariosDiagnosticoPage() {
   const [data, setData] = useState<Diagnosis | null>(null);
   const [loading, setLoading] = useState(true);
@@ -298,6 +408,59 @@ export default function UsuariosDiagnosticoPage() {
                   <code>{plan.matchedPlan.name || "sem nome"}</code>
                 </div>
               )}
+
+
+              <div className="unlockedBox">
+                <h4>O que está liberado neste plano</h4>
+
+                <div className="unlockedColumns">
+                  <div>
+                    <strong>Permissões e limites</strong>
+
+                    {plan.entitlements.length > 0 ? (
+                      <div className="accessPills">
+                        {plan.entitlements.map((item) => (
+                          <span
+                            className={`accessPill ${
+                              item.value === false ? "blocked" : ""
+                            }`}
+                            key={`${plan.expected.id}-${item.key}`}
+                          >
+                            <b>{prettyAccessKey(item.key)}</b>
+                            <small>{prettyAccessValue(item.value)}</small>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="emptySmall">
+                        Nenhuma permissão encontrada para este plano.
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <strong>Agentes incluídos</strong>
+
+                    {plan.agents.length > 0 ? (
+                      <div className="accessPills">
+                        {plan.agents.map((agent) => (
+                          <span
+                            className="accessPill agent"
+                            key={`${plan.expected.id}-${agent.agent_key}`}
+                          >
+                            <b>{agent.agent_name || agent.agent_key}</b>
+                            <small>{agent.active ? "Ativo" : "Inativo"}</small>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="emptySmall">
+                        Nenhum agente incluído neste plano.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <div className="missingBox">
                 <h4>Faltando configurar</h4>
@@ -733,6 +896,93 @@ export default function UsuariosDiagnosticoPage() {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+        }
+
+
+        .unlockedBox {
+          border: 1px solid rgba(104, 244, 255, .18);
+          border-radius: 22px;
+          padding: 16px;
+          margin-bottom: 16px;
+          background: rgba(0, 231, 255, .055);
+        }
+
+        .unlockedBox h4 {
+          margin-bottom: 14px;
+          color: #67e8f9;
+        }
+
+        .unlockedColumns {
+          display: grid;
+          grid-template-columns: 1.15fr .85fr;
+          gap: 14px;
+        }
+
+        .unlockedColumns > div {
+          border: 1px solid rgba(255,255,255,.08);
+          border-radius: 18px;
+          padding: 14px;
+          background: rgba(0,0,0,.14);
+        }
+
+        .unlockedColumns > div > strong {
+          display: block;
+          margin-bottom: 10px;
+          color: rgba(255,255,255,.86);
+          font-size: 13px;
+          letter-spacing: .06em;
+          text-transform: uppercase;
+        }
+
+        .accessPills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .accessPill {
+          display: grid;
+          gap: 3px;
+          max-width: 100%;
+          border: 1px solid rgba(134, 239, 172, .22);
+          border-radius: 14px;
+          padding: 9px 10px;
+          background: rgba(34, 197, 94, .08);
+        }
+
+        .accessPill.blocked {
+          border-color: rgba(248, 113, 113, .25);
+          background: rgba(127, 29, 29, .16);
+        }
+
+        .accessPill.agent {
+          border-color: rgba(168, 85, 247, .25);
+          background: rgba(88, 28, 135, .18);
+        }
+
+        .accessPill b {
+          color: rgba(255,255,255,.9);
+          font-size: 12px;
+          line-height: 1.25;
+        }
+
+        .accessPill small {
+          color: rgba(255,255,255,.6);
+          font-size: 11px;
+          line-height: 1.25;
+        }
+
+        .emptySmall {
+          margin-bottom: 0;
+          color: rgba(255,255,255,.5);
+          font-size: 13px;
+          line-height: 1.5;
+        }
+
+        @media (max-width: 1100px) {
+          .unlockedColumns {
+            grid-template-columns: 1fr;
+          }
         }
 
         .missingBox h4 {
