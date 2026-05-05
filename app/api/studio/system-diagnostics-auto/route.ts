@@ -9,6 +9,8 @@ export const dynamic = "force-dynamic";
 type Target = {
   name: string;
   url: string;
+  auth?: "secret";
+  expectedStatus?: number[];
 };
 
 type CheckResult = {
@@ -55,25 +57,68 @@ async function writeJson(file: string, data: unknown) {
   await fs.writeFile(file, JSON.stringify(data, null, 2), "utf8");
 }
 
+function hasFatalContent(text: string) {
+  const lower = text.toLowerCase();
+
+  const fatalPhrases = [
+    "internal server error",
+    "application error",
+    "runtime error",
+    "prismaclientinitializationerror",
+    "prismaclientknownrequesterror",
+    "can't reach database",
+    "could not connect",
+    "connection refused",
+    "failed to fetch",
+    "unexpected token",
+    "erro interno"
+  ];
+
+  return fatalPhrases.some((phrase) => lower.includes(phrase));
+}
+
 async function checkTarget(target: Target): Promise<CheckResult> {
   const started = Date.now();
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 9000);
 
   try {
-    const res = await fetch(target.url, {
+    let url = target.url;
+
+    if (target.auth === "secret") {
+      const secret = process.env.DISCORD_NOTIFY_SECRET || "";
+      if (secret) {
+        const separator = url.includes("?") ? "&" : "?";
+        url = `${url}${separator}secret=${encodeURIComponent(secret)}`;
+      }
+    }
+
+    const res = await fetch(url, {
       cache: "no-store",
       signal: controller.signal
     });
 
     const ms = Date.now() - started;
 
+    let text = "";
+    try {
+      text = await res.clone().text();
+    } catch {
+      text = "";
+    }
+
+    const expected = target.expectedStatus || [];
+    const statusOk = expected.length ? expected.includes(res.status) : res.status >= 200 && res.status < 400;
+    const fatal = hasFatalContent(text);
+    const ok = statusOk && !fatal;
+
     return {
       name: target.name,
       url: target.url,
-      ok: res.status >= 200 && res.status < 400,
+      ok,
       status: res.status,
       ms,
+      error: ok ? undefined : fatal ? "Conteúdo com erro real detectado" : `HTTP ${res.status}`,
       checkedAt: new Date().toISOString()
     };
   } catch (error: any) {
@@ -100,8 +145,9 @@ export async function GET(req: NextRequest) {
   const targets = await readJson<Target[]>(TARGETS_FILE, []);
   const previous = await readJson<State>(STATE_FILE, { targets: {} });
 
-  const results = await Promise.all(targets.map((target: Target) => checkTarget(target)));
-  const down = results.filter((item: CheckResult) => !item.ok);
+  const results = await Promise.all(targets.map((target) => checkTarget(target)));
+  const down = results.filter((item) => !item.ok);
+
   const health = targets.length
     ? Math.round(((targets.length - down.length) / targets.length) * 100)
     : 100;
@@ -141,7 +187,7 @@ export async function GET(req: NextRequest) {
   const nextState: State = {
     lastSummaryAt: shouldSummary ? new Date().toISOString() : previous.lastSummaryAt,
     targets: Object.fromEntries(
-      results.map((item: CheckResult) => [
+      results.map((item) => [
         item.name,
         { ok: item.ok, status: item.status, error: item.error }
       ])

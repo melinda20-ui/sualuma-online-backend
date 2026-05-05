@@ -1,12 +1,18 @@
 [
   { "name": "Home principal", "url": "http://127.0.0.1:3000/" },
-  { "name": "Studio", "url": "http://127.0.0.1:3000/studio" },
-  { "name": "Studio Lab", "url": "http://127.0.0.1:3000/studio-lab" },
+  { "name": "Login", "url": "http://127.0.0.1:3000/login" },
+  { "name": "Entrar", "url": "http://127.0.0.1:3000/entrar" },
+  { "name": "Cadastro", "url": "http://127.0.0.1:3000/cadastro" },
+  { "name": "Planos", "url": "http://127.0.0.1:3000/planos" },
+  { "name": "Marketplace", "url": "http://127.0.0.1:3000/marketplace" },
   { "name": "Loja de Agentes", "url": "http://127.0.0.1:3000/loja-agentes" },
-  { "name": "Metas Financeiras", "url": "http://127.0.0.1:3000/studio/metas-financeiras" },
-  { "name": "Agente de Blog", "url": "http://127.0.0.1:3000/studio/blog-agent" },
+  { "name": "Studio", "url": "http://127.0.0.1:3000/studio", "expectedStatus": [200, 307] },
+  { "name": "Studio Lab", "url": "http://127.0.0.1:3000/studio-lab", "expectedStatus": [200, 307] },
+  { "name": "Metas Financeiras", "url": "http://127.0.0.1:3000/studio/metas-financeiras", "expectedStatus": [200, 307] },
+  { "name": "Agente de Blog", "url": "http://127.0.0.1:3000/studio/blog-agent", "expectedStatus": [200, 307] },
   { "name": "API Blog Latest", "url": "http://127.0.0.1:3000/api/blog/latest" },
   { "name": "API Blog Agent", "url": "http://127.0.0.1:3000/api/studio/blog-agent" },
+  { "name": "API Blog Agent Auto", "url": "http://127.0.0.1:3000/api/studio/blog-agent-auto", "auth": "secret" },
   { "name": "API Central de Tarefas", "url": "http://127.0.0.1:3000/api/agent-tasks" },
-  { "name": "API Studio Dashboard", "url": "http://127.0.0.1:3000/api/studio/dashboard" }
+  { "name": "API Studio Dashboard", "url": "http://127.0.0.1:3000/api/studio/dashboard", "expectedStatus": [200, 401, 307] }
 ]
