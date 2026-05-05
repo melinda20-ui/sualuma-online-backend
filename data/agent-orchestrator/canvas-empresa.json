@@ -1,0 +1,13 @@
+{
+  "name": "Canvas da Empresa",
+  "status": "active",
+  "cadence": "20 minutos",
+  "supervisors": ["growth", "launch", "ux", "tasks"],
+  "rules": [
+    "Ler canvas da empresa",
+    "Gerar SWOT automática",
+    "Gerar 5W2H",
+    "Enviar tarefas para o agente de tarefas",
+    "Ajudar Luma a tomar decisões sem misturar produtos"
+  ]
+}

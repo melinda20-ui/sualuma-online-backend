@@ -1,352 +1,415 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 
-type Tone = "danger" | "warn" | "ok" | "info";
+type DetectorType = "Real" | "Misto/Ilustrativo" | "Risco";
 
-type PanelTruth = {
-  title: string;
-  tone: Tone;
-  truth: string;
-  suggestion: string;
-  next: string;
-  source: string;
-};
-
-function normalizeText(value: string) {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+interface PanelSuggestion {
+  detector: DetectorType;
+  percebi: string;
+  proxPassos: string;
+  linkTarefas?: string;
 }
 
-function detectCurrentPanel(pathname: string, pageText: string): PanelTruth {
-  const text = normalizeText(pageText);
-
-  if (pathname.includes("/studio/agentesadms") || text.includes("central de agentes")) {
-    return {
-      title: "Agentes Admin",
-      tone: "ok",
-      truth:
-        "Este painel já lê tarefas reais do arquivo local de tarefas dos agentes. Ainda precisa ganhar filtros, Kanban e avisos automáticos mais claros.",
-      suggestion:
-        "Use esta central como o lugar onde a Mia despeja tudo que precisa virar tarefa, alerta, bug ou checklist.",
-      next: "Criar filtros por painel, prioridade e tipo de agente.",
-      source: "Página atual: Agentes Admin",
-    };
-  }
-
-  if (pathname.includes("/studio/mia-brain") || text.includes("mia brain") || text.includes("cerebro da mia")) {
-    return {
-      title: "Mia Brain",
-      tone: "warn",
-      truth:
-        "Este painel precisa separar claramente memória real, prompt salvo, log real e conteúdo visual. Se um card não mostra fonte, pode estar misturando real com demonstrativo.",
-      suggestion:
-        "Colocar etiqueta em cada bloco: banco, JSON local, fallback ou visual.",
-      next: "Auditar prompts, logs, cards e conexões reais do cérebro da Mia.",
-      source: "Página atual: Mia Brain",
-    };
-  }
-
-  if (pathname.includes("/studio/usuarios") || text.includes("usuarios") || text.includes("usuários")) {
-    return {
-      title: "Usuários",
-      tone: "danger",
-      truth:
-        "Área crítica. Login, sessão, plano, permissões e acesso por subdomínio precisam ser 100% reais. Qualquer dado ilustrativo aqui pode causar decisão errada no lançamento.",
-      suggestion:
-        "Testar usuário comum, cliente IA, prestador e admin separadamente.",
-      next: "Conferir se cada papel vê apenas o que o plano permite.",
-      source: "Página atual: Usuários",
-    };
-  }
-
-  if (pathname.includes("/studio/campaign-agent") || text.includes("campanha")) {
-    return {
-      title: "Campanhas",
-      tone: "warn",
-      truth:
-        "Campanhas precisam diferenciar rascunho, fila real, enviado, erro e bloqueado por consentimento. Métrica sem log não deve ser tratada como verdade.",
-      suggestion:
-        "Mostrar fonte da fila: banco, JSON local ou provedor de e-mail.",
-      next: "Garantir LGPD, opt-in, descadastro e revisão manual antes dos disparos.",
-      source: "Página atual: Campanhas",
-    };
-  }
-
-  if (text.includes("flowmind")) {
-    return {
-      title: "FlowMind",
-      tone: "warn",
-      truth:
-        "FlowMind mistura produto, templates e vitrine. Precisa separar o que já funciona depois do checkout do que ainda é apresentação visual.",
-      suggestion:
-        "Deixar claro o que o usuário realmente recebe após comprar ou usar um template.",
-      next: "Auditar checkout, templates, workspace, Minha Casa e Minha Empresa.",
-      source: "Página atual: FlowMind",
-    };
-  }
-
-  if (text.includes("cliente") || pathname.includes("/member-user")) {
-    return {
-      title: "Dashboard Cliente",
-      tone: "danger",
-      truth:
-        "O dashboard do cliente não pode mostrar agentes, serviços, reuniões ou entregas que não existem no banco ou que o usuário não comprou.",
-      suggestion:
-        "Cada card precisa respeitar plano, compras extras e histórico real do usuário.",
-      next: "Testar cadastro grátis, compra de plano e acesso pelo chat da Mia.",
-      source: "Página atual: Cliente",
-    };
-  }
-
-  if (text.includes("prestador") || pathname.includes("/provider")) {
-    return {
-      title: "Dashboard Prestador",
-      tone: "danger",
-      truth:
-        "A área de prestador precisa bloquear divulgação, anúncios e serviços para quem não tem plano de prestador. Dados visuais aqui podem liberar coisa errada.",
-      suggestion:
-        "Separar usuário comum, cliente IA e prestador pago com regras reais.",
-      next: "Testar oportunidades, Kanban, reuniões, portfólio e permissões.",
-      source: "Página atual: Prestador",
-    };
-  }
-
-  if (text.includes("comunidade")) {
-    return {
-      title: "Comunidade",
-      tone: "warn",
-      truth:
-        "A comunidade precisa ter moderação, denúncias, regras contra WhatsApp/link externo e limites para quem não tem plano de prestador.",
-      suggestion:
-        "Mostrar alertas claros quando um post violar regras comerciais.",
-      next: "Auditar posts, comentários, denúncias e bloqueio de links externos.",
-      source: "Página atual: Comunidade",
-    };
-  }
-
-  if (text.includes("cerebro operacional") || text.includes("seu imperio em tempo real") || text.includes("seu império em tempo real")) {
-    return {
-      title: "Visão Geral",
-      tone: "warn",
-      truth:
-        "Essa visão ainda tem vários números que parecem ilustrativos: 24 tarefas, 5 áreas, 3 alertas, +18% financeiro e saúde geral. Ela é bonita para navegação, mas nem tudo é banco real.",
-      suggestion:
-        "Use como mapa visual. Para decisão real, confirme se cada card tem API ou banco conectado.",
-      next: "Marcar cards visuais como ilustrativos ou conectar aos dados reais.",
-      source: "Aba atual: Visão Geral",
-    };
-  }
-
-  return {
-    title: "Painel atual",
-    tone: "info",
-    truth:
-      "A Mia está analisando esta página. Ainda precisa confirmar se os dados vêm de banco/API ou se são apenas visuais.",
-    suggestion:
-      "Números fixos, listas mockadas e textos genéricos devem ser marcados como ilustrativos.",
-    next: "Se houver dado falso ou incompleto, enviar para o Agente de Tarefas.",
-    source: "Página atual",
-  };
-}
-
-const toneStyle: Record<Tone, { label: string; bg: string; border: string; color: string }> = {
-  danger: {
-    label: "Risco alto",
-    bg: "rgba(127,29,29,.88)",
-    border: "rgba(248,113,113,.42)",
-    color: "#fecaca",
+const suggestions: Record<string, PanelSuggestion> = {
+  visao: {
+    detector: "Misto/Ilustrativo",
+    percebi:
+      "Alguns indicadores desta tela podem ser ilustrativos. Confirme se estão conectados a dados reais antes de tomar decisões.",
+    proxPassos:
+      "Verifique quais métricas têm fonte real e marque as demais como estimativas.",
+    linkTarefas: "/studio/agentesadms",
   },
-  warn: {
-    label: "Misto/Ilustrativo",
-    bg: "rgba(120,53,15,.88)",
-    border: "rgba(251,191,36,.42)",
-    color: "#fde68a",
+  usuarios: {
+    detector: "Risco",
+    percebi:
+      "Permissões e acessos de usuários precisam ser validados com dados reais. Evite exibir dados sensíveis sem autenticação confirmada.",
+    proxPassos:
+      "Revise as regras de acesso e garanta que cada papel tenha apenas as permissões necessárias.",
+    linkTarefas: "/studio/agentesadms",
   },
-  ok: {
-    label: "Mais real",
-    bg: "rgba(20,83,45,.88)",
-    border: "rgba(74,222,128,.38)",
-    color: "#bbf7d0",
+  google: {
+    detector: "Misto/Ilustrativo",
+    percebi:
+      "Diferencie dados vindos do Search Console/API real de sugestões visuais geradas automaticamente.",
+    proxPassos:
+      "Conecte a integração real com Google Search Console e valide os tokens de acesso.",
+    linkTarefas: "/studio/agentesadms",
   },
-  info: {
-    label: "Analisar",
-    bg: "rgba(30,64,175,.88)",
-    border: "rgba(96,165,250,.38)",
-    color: "#bfdbfe",
+  comunidade: {
+    detector: "Risco",
+    percebi:
+      "Regras de moderação, links externos e conteúdo da comunidade precisam de revisão manual periódica.",
+    proxPassos:
+      "Configure alertas de moderação e documente as regras da comunidade de forma visível.",
+    linkTarefas: "/studio/agentesadms",
+  },
+  tarefas: {
+    detector: "Real",
+    percebi:
+      "Suas tarefas estão visíveis. Priorize as pendentes com maior risco para o lançamento.",
+    proxPassos:
+      "Abra a primeira tarefa crítica e marque o próximo passo como em andamento.",
+    linkTarefas: "/studio/agentesadms",
+  },
+  mia: {
+    detector: "Misto/Ilustrativo",
+    percebi:
+      "A memória da Mia depende de logs, prompts reais e contexto salvo. Respostas sem histórico podem ficar genéricas.",
+    proxPassos:
+      "Verifique se o chat da Mia está salvando conversas e se o cérebro está lendo o histórico.",
+    linkTarefas: "/studio/agentesadms",
+  },
+  stripe: {
+    detector: "Risco",
+    percebi:
+      "Checkout, webhooks e liberação de acesso precisam estar conectados ao Stripe antes de vender.",
+    proxPassos:
+      "Teste compra, webhook e liberação do plano antes de produção.",
+    linkTarefas: "/studio/agentesadms",
   },
 };
 
-export default function MiaPanelTruthCard() {
-  const pathname = usePathname() || "/";
-  const [pageText, setPageText] = useState("");
+const fallbackSuggestion: PanelSuggestion = {
+  detector: "Misto/Ilustrativo",
+  percebi:
+    "Esta seção pode conter dados ilustrativos. Revise antes de usar como base para decisões.",
+  proxPassos: "Identifique quais informações precisam de fonte real.",
+  linkTarefas: "/studio/agentesadms",
+};
 
-  useEffect(() => {
-    let timer: number | undefined;
+const detectorStyles: Record<
+  DetectorType,
+  { bg: string; text: string; dot: string }
+> = {
+  Real: {
+    bg: "rgba(16,185,129,0.15)",
+    text: "#6ee7b7",
+    dot: "#10b981",
+  },
+  "Misto/Ilustrativo": {
+    bg: "rgba(245,158,11,0.15)",
+    text: "#fcd34d",
+    dot: "#f59e0b",
+  },
+  Risco: {
+    bg: "rgba(239,68,68,0.15)",
+    text: "#fca5a5",
+    dot: "#ef4444",
+  },
+};
 
-    function readPage() {
-      const bodyText = document.body?.innerText || "";
-      setPageText(bodyText.slice(0, 12000));
-    }
+interface MiaPanelTruthCardProps {
+  panelKey?: string;
+}
 
-    readPage();
+export default function MiaPanelTruthCard({
+  panelKey = "visao",
+}: MiaPanelTruthCardProps) {
+  const [open, setOpen] = useState(false);
 
-    const observer = new MutationObserver(() => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(readPage, 250);
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-
-    const interval = window.setInterval(readPage, 1800);
-
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(timer);
-      window.clearInterval(interval);
-    };
-  }, [pathname]);
-
-  const panel = useMemo(() => detectCurrentPanel(pathname, pageText), [pathname, pageText]);
-  const tone = toneStyle[panel.tone];
+  const suggestion = suggestions[panelKey] ?? fallbackSuggestion;
+  const style = detectorStyles[suggestion.detector];
 
   return (
-    <aside className="miaTruthCard">
-      <div className="miaTruthHeader">
-        <div className="miaTruthEyebrow">💌 Sugestões da Mia</div>
-        <strong>{panel.title}</strong>
-      </div>
+    <div style={{ position: "relative", display: "inline-block" }}>
+      {!open && (
+        <>
+          <style>{`
+            @keyframes miaGlow {
+              0%, 100% {
+                box-shadow:
+                  0 0 6px 1px rgba(139,92,246,0.5),
+                  0 0 14px 2px rgba(99,102,241,0.3);
+              }
+              50% {
+                box-shadow:
+                  0 0 14px 4px rgba(167,139,250,0.85),
+                  0 0 28px 6px rgba(99,102,241,0.5);
+              }
+            }
 
-      <div className="miaTruthBody">
-        <div className="truthBadge">Detector de verdade: {tone.label}</div>
+            @keyframes miaRingPulse {
+              0%, 100% { opacity: 0.55; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.08); }
+            }
 
-        <section>
-          <strong>O que está acontecendo aqui</strong>
-          <p>{panel.truth}</p>
-        </section>
+            .mia-pill-btn:hover {
+              transform: scale(1.04) !important;
+              filter: brightness(1.15);
+            }
 
-        <section>
-          <strong>Sugestão prática</strong>
-          <p>{panel.suggestion}</p>
-        </section>
+            .mia-pill-btn:active {
+              transform: scale(0.97) !important;
+            }
+          `}</style>
 
-        <section className="nextBox">
-          <strong>Próximo passo único</strong>
-          <p>{panel.next}</p>
-        </section>
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="Ver sugestão da Mia"
+            className="mia-pill-btn"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "5px 16px 5px 5px",
+              borderRadius: "999px",
+              background: "rgba(15, 10, 40, 0.82)",
+              border: "1.5px solid rgba(139,92,246,0.6)",
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: 600,
+              color: "#ddd6fe",
+              letterSpacing: "0.02em",
+              animation: "miaGlow 2.4s ease-in-out infinite",
+              transition: "transform 0.15s ease, filter 0.15s ease",
+              whiteSpace: "nowrap",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+            }}
+          >
+            <span
+              style={{
+                position: "relative",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  inset: "-3px",
+                  borderRadius: "50%",
+                  border: "1.5px solid rgba(167,139,250,0.7)",
+                  animation: "miaRingPulse 2.4s ease-in-out infinite",
+                  pointerEvents: "none",
+                }}
+              />
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "26px",
+                  height: "26px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  color: "#fff",
+                  letterSpacing: "0.5px",
+                  userSelect: "none",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.2)",
+                }}
+              >
+                M
+              </span>
+            </span>
 
-        <a href="/studio/agentesadms">Ver no Agente de Tarefas →</a>
+            Que tal isso?
+          </button>
+        </>
+      )}
 
-        <small>Fonte: {panel.source}. Este card muda conforme a página/aba aberta.</small>
-      </div>
+      {open && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            zIndex: 50,
+            width: "min(320px, 90vw)",
+            borderRadius: "14px",
+            background: "linear-gradient(145deg, #1e1b4b 0%, #1a1035 100%)",
+            border: "1px solid rgba(139,92,246,0.35)",
+            boxShadow:
+              "0 8px 32px rgba(109,40,217,0.4), 0 2px 8px rgba(0,0,0,0.5)",
+            padding: "14px 16px 12px",
+            animation: "miaPop 0.18s ease-out",
+          }}
+        >
+          <style>{`
+            @keyframes miaPop {
+              from { opacity: 0; transform: scale(0.92) translateY(-6px); }
+              to { opacity: 1; transform: scale(1) translateY(0); }
+            }
+          `}</style>
 
-      <style jsx>{`
-        .miaTruthCard {
-          width: 100%;
-          min-width: 0;
-          position: sticky;
-          top: 18px;
-          overflow: hidden;
-          border-radius: 26px;
-          border: 1px solid ${tone.border};
-          background: linear-gradient(145deg, rgba(15,23,42,.96), rgba(30,27,75,.92));
-          color: #f8fafc;
-          box-shadow: 0 28px 90px rgba(0,0,0,.32);
-          backdrop-filter: blur(18px);
-        }
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "10px",
+              marginBottom: "10px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "7px" }}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "26px",
+                  height: "26px",
+                  borderRadius: "50%",
+                  background: "linear-gradient(135deg,#6d28d9,#2563eb)",
+                  flexShrink: 0,
+                  color: "#fff",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                }}
+              >
+                M
+              </span>
 
-        .miaTruthHeader {
-          padding: 14px 16px;
-          background: ${tone.bg};
-          border-bottom: 1px solid ${tone.border};
-        }
+              <span
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: "#c4b5fd",
+                  letterSpacing: "0.04em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Sugestão da Mia
+              </span>
+            </div>
 
-        .miaTruthEyebrow {
-          font-size: 10px;
-          font-weight: 950;
-          letter-spacing: .16em;
-          text-transform: uppercase;
-          color: ${tone.color};
-        }
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                padding: "2px 8px",
+                borderRadius: "999px",
+                background: style.bg,
+                fontSize: "11px",
+                fontWeight: 600,
+                color: style.text,
+                border: `1px solid ${style.dot}44`,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <span
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: style.dot,
+                  flexShrink: 0,
+                }}
+              />
+              {suggestion.detector}
+            </span>
+          </div>
 
-        .miaTruthHeader strong {
-          display: block;
-          margin-top: 4px;
-          font-size: 17px;
-        }
+          <div
+            style={{
+              height: "1px",
+              background: "rgba(139,92,246,0.2)",
+              marginBottom: "10px",
+            }}
+          />
 
-        .miaTruthBody {
-          padding: 16px;
-          display: grid;
-          gap: 12px;
-        }
+          <div style={{ marginBottom: "8px" }}>
+            <p
+              style={{
+                fontSize: "10px",
+                fontWeight: 700,
+                color: "#a78bfa",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                margin: "0 0 3px",
+              }}
+            >
+              O que percebi
+            </p>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#ddd6fe",
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
+              {suggestion.percebi}
+            </p>
+          </div>
 
-        .truthBadge {
-          width: fit-content;
-          padding: 7px 10px;
-          border-radius: 999px;
-          background: rgba(255,255,255,.08);
-          border: 1px solid ${tone.border};
-          color: ${tone.color};
-          font-size: 12px;
-          font-weight: 950;
-        }
+          <div style={{ marginBottom: "12px" }}>
+            <p
+              style={{
+                fontSize: "10px",
+                fontWeight: 700,
+                color: "#60a5fa",
+                textTransform: "uppercase",
+                letterSpacing: "0.06em",
+                margin: "0 0 3px",
+              }}
+            >
+              Próximo passo
+            </p>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#bfdbfe",
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
+              {suggestion.proxPassos}
+            </p>
+          </div>
 
-        section strong {
-          font-size: 13px;
-          color: #e0f2fe;
-        }
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={() => setOpen(false)}
+              style={{
+                padding: "5px 14px",
+                borderRadius: "999px",
+                background: "rgba(139,92,246,0.15)",
+                border: "1px solid rgba(139,92,246,0.35)",
+                color: "#c4b5fd",
+                fontSize: "12px",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Fechar
+            </button>
 
-        section p {
-          margin: 6px 0 0;
-          color: #cbd5e1;
-          font-size: 13px;
-          line-height: 1.5;
-        }
-
-        .nextBox {
-          padding: 12px;
-          border-radius: 18px;
-          background: rgba(6,182,212,.10);
-          border: 1px solid rgba(103,232,249,.18);
-        }
-
-        .nextBox strong {
-          color: #67e8f9;
-        }
-
-        a {
-          display: inline-flex;
-          justify-content: center;
-          text-align: center;
-          padding: 11px 13px;
-          border-radius: 16px;
-          text-decoration: none;
-          color: #fff;
-          font-weight: 950;
-          background: linear-gradient(135deg, #7c3aed, #06b6d4);
-          box-shadow: 0 16px 34px rgba(124,58,237,.25);
-        }
-
-        small {
-          color: #94a3b8;
-          line-height: 1.45;
-        }
-
-        @media (max-width: 980px) {
-          .miaTruthCard {
-            position: relative;
-            top: auto;
-          }
-        }
-      `}</style>
-    </aside>
+            {suggestion.linkTarefas && (
+              <a
+                href={suggestion.linkTarefas}
+                style={{
+                  padding: "5px 14px",
+                  borderRadius: "999px",
+                  background: "linear-gradient(135deg,#6d28d9,#2563eb)",
+                  color: "#e9d5ff",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  textDecoration: "none",
+                  display: "inline-block",
+                  boxShadow: "0 0 10px rgba(109,40,217,0.4)",
+                }}
+              >
+                Ver tarefas →
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

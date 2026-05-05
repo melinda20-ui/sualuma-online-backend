@@ -1,0 +1,142 @@
+{
+  "name": "Canvas da Empresa Sualuma",
+  "version": "1.0",
+  "updatedAt": "2026-05-05T00:00:00.000Z",
+  "mission": "Organizar o ecossistema Sualuma para vender serviços, planos, agentes, templates, automações e sistemas sem confundir o cliente.",
+  "northStar": "Transformar pequenos negócios, MEIs, autônomos e prestadores em empresas mais organizadas, digitais e vendáveis com ajuda de sites, IA e automações.",
+  "mainDecision": "O serviço de criação de sites é a oferta de caixa rápido. O microSaaS é a plataforma que retém, entrega, expande e vende novos produtos.",
+  "funnelThinking": [
+    {
+      "stage": "1. Atenção",
+      "goal": "Atrair MEIs, autônomos, pequenos negócios e prestadores com dores simples.",
+      "assets": ["Home", "Blog", "Indique", "Marketplace", "SOS Publicidade"]
+    },
+    {
+      "stage": "2. Diagnóstico interativo",
+      "goal": "Entender a dor antes de vender.",
+      "assets": ["/site-demo-request", "briefing", "perguntas guiadas", "Mia"]
+    },
+    {
+      "stage": "3. Oferta certa",
+      "goal": "Não jogar todos os produtos na mesma pessoa. Mostrar a oferta com base no perfil.",
+      "assets": ["site sob medida", "plano IA", "plano prestador", "template", "automação", "SOS Transfer"]
+    },
+    {
+      "stage": "4. Conversão",
+      "goal": "Levar para checkout, proposta ou contato sem fricção.",
+      "assets": ["Stripe", "formulário", "WhatsApp", "e-mail", "admin leads"]
+    },
+    {
+      "stage": "5. Entrega",
+      "goal": "Transformar venda em projeto acompanhado.",
+      "assets": ["dashboard cliente", "dashboard prestador", "tarefas", "mensagens", "entregas"]
+    },
+    {
+      "stage": "6. Retenção e upsell",
+      "goal": "Depois da primeira compra, vender agentes, automações, skills, planos e serviços extras.",
+      "assets": ["Mia", "loja de agentes", "FlowMind", "comunidade", "automations"]
+    }
+  ],
+  "productFunnel": [
+    {
+      "pillar": "Serviço de Sites",
+      "offer": "Site personalizado sob medida",
+      "mainAudience": "MEI, autônomo, prestador local, loja pequena, negócio que precisa vender melhor online",
+      "entryPage": "/site-service",
+      "interactivePage": "/site-demo-request",
+      "successPage": "/site-demo-success",
+      "objective": "Gerar caixa rápido e validar demanda real.",
+      "cta": "Quero meu site",
+      "ownerAgents": ["Agente de Lançamento", "Agente Growth", "Agente de UX"],
+      "status": "Prioridade máxima"
+    },
+    {
+      "pillar": "MicroSaaS Sualuma",
+      "offer": "Plataforma com Mia, agentes, automações, painéis e histórico",
+      "mainAudience": "Clientes que querem continuar usando IA e organização depois da primeira compra",
+      "entryPage": "/planos",
+      "interactivePage": "/chat",
+      "successPage": "/member-user",
+      "objective": "Recorrência, retenção e expansão.",
+      "cta": "Entrar na Sualuma",
+      "ownerAgents": ["Mia", "Cérebro Azul", "Agente Growth"],
+      "status": "Em estruturação"
+    },
+    {
+      "pillar": "Loja de Agentes",
+      "offer": "Agentes extras, pacotes, habilidades e automações",
+      "mainAudience": "Usuários que já entenderam valor da IA e querem resolver tarefas específicas",
+      "entryPage": "/loja-agentes",
+      "interactivePage": "/chat",
+      "successPage": "/loja-agentes/sucesso",
+      "objective": "Aumentar ticket médio sem confundir a oferta principal.",
+      "cta": "Adicionar agente à Mia",
+      "ownerAgents": ["Mia", "Agente Growth", "Agente de Lançamento"],
+      "status": "Precisa melhorar layout e clareza"
+    },
+    {
+      "pillar": "Prestadores",
+      "offer": "Plano para vender serviços dentro da plataforma",
+      "mainAudience": "Designers, social medias, criadores de site, freelancers e prestadores digitais",
+      "entryPage": "/prestador/planos",
+      "interactivePage": "/provider-services",
+      "successPage": "/prestador/checkout/sucesso",
+      "objective": "Criar marketplace e oferta de mão de obra para entregar serviços.",
+      "cta": "Quero vender meus serviços",
+      "ownerAgents": ["Agente User", "Agente Growth", "Agente de Tarefas"],
+      "status": "Precisa conectar melhor aos painéis"
+    },
+    {
+      "pillar": "FlowMind",
+      "offer": "Templates, workspace e organização pessoal/empresa",
+      "mainAudience": "Empreendedoras solo, mães empreendedoras, pessoas com caos mental e financeiro",
+      "entryPage": "/flowmind",
+      "interactivePage": "/flowmind/templates",
+      "successPage": "/flowmind/meus-templates",
+      "objective": "Produto digital de entrada e expansão.",
+      "cta": "Usar template",
+      "ownerAgents": ["Agente Growth", "Agente de Lançamento"],
+      "status": "Produto paralelo com potencial"
+    },
+    {
+      "pillar": "SOS Publicidade",
+      "offer": "Portfólio, publicidade, criativos e SOS Transfer em breve",
+      "mainAudience": "Clientes que precisam de presença digital, criativos, mídia e transferência/entrega de materiais",
+      "entryPage": "sospublicidade.online",
+      "interactivePage": "sospublicidade.online/portfolio",
+      "successPage": "sospublicidade.online/sos-transfer",
+      "objective": "Organizar vitrine de serviços e preparar novo sistema em breve.",
+      "cta": "Ver portfólio",
+      "ownerAgents": ["Agente UX", "Agente Growth", "Agente de Lançamento"],
+      "status": "Criar portfólio e página em breve"
+    }
+  ],
+  "decisionRules": [
+    "Cada página deve vender uma coisa principal por vez.",
+    "O site sob medida é oferta de caixa rápido.",
+    "O microSaaS é a estrutura de recorrência e retenção.",
+    "A Mia deve ser o centro de acesso aos agentes comprados.",
+    "A loja de agentes deve ser upsell, não a primeira explicação para cliente frio.",
+    "Prestador não é automaticamente cliente IA; cliente IA não é automaticamente prestador.",
+    "Todo produto precisa ter: público, dor, promessa, CTA, página, checkout ou próxima ação.",
+    "Toda estratégia nova deve virar SWOT, 5W2H e tarefa."
+  ],
+  "supervisors": [
+    {
+      "name": "Agente Growth",
+      "role": "Olhar crescimento, clareza da oferta, conversão, SEO, aquisição e oportunidades."
+    },
+    {
+      "name": "Agente de Lançamento",
+      "role": "Olhar urgência, ordem de execução, campanha, narrativa e próximos passos de venda."
+    },
+    {
+      "name": "Agente de UX",
+      "role": "Olhar confusão, mobile, telas, botões, fluxo e experiência do usuário."
+    },
+    {
+      "name": "Agente de Tarefas",
+      "role": "Transformar decisões em tarefas rastreáveis para execução."
+    }
+  ]
+}

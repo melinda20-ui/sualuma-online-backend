@@ -92,9 +92,5 @@
   {
     "name": "Studio Onboarding Board",
     "url": "http://127.0.0.1:3000/studio/onboarding-board"
-  },
-  {
-    "name": "API Onboarding Board",
-    "url": "http://127.0.0.1:3000/api/studio/onboarding-board"
   }
 ]
