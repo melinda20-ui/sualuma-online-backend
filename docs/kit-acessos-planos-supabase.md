@@ -94,3 +94,25 @@ Status correto:
 ## Observação de segurança
 
 Não salvar `.env`, `.env.local`, chaves Stripe, chaves Supabase, tokens ou secrets no Git.
+
+## Atualização — /api/platform/me
+
+A rota `/api/platform/me` foi atualizada para funcionar como a carteirinha real do usuário.
+
+Agora ela busca:
+
+- usuário autenticado
+- assinatura em `user_subscriptions`
+- plano em `plans`
+- permissões em `plan_entitlements`
+- agentes em `plan_agents`
+
+A Central de Usuários passou a marcar:
+
+- `/api/platform/me devolve plano e permissões reais`: OK
+
+Ainda falta:
+
+- webhook Stripe gravar compra/assinatura em `user_subscriptions`
+- Studio/Admin bloquear usuário comum
+- dashboards usarem `/api/platform/me` para liberar/bloquear recursos
