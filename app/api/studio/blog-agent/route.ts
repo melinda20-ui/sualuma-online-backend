@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
+import { safeUpsertAgentTask } from "@/lib/agent-tasks-safe";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -191,12 +192,7 @@ function buildRecommendations(metrics: any) {
 }
 
 async function updateTask(status: any) {
-  const raw = await readJson<any>(TASKS_FILE, []);
-  const tasks = Array.isArray(raw) ? raw : Array.isArray(raw?.tasks) ? raw.tasks : [];
-
-  const now = new Date().toISOString();
-
-  const task = {
+  return safeUpsertAgentTask({
     id: "blog-agent-status",
     source: "blog-agent",
     type: "monitoramento",
@@ -208,22 +204,8 @@ async function updateTask(status: any) {
       `${status.metrics.published} publicados, ${status.metrics.drafts} rascunhos, ` +
       `${status.metrics.withImage} com imagem, ${status.metrics.withSeo} com SEO, ` +
       `${status.metrics.indexed} com indexação marcada e ${status.metrics.indexUnknown} sem confirmação real de indexação.`,
-    link: "/studio/blog-agent",
-    createdAt: now,
-    updatedAt: now
-  };
-
-  const index = tasks.findIndex((item: any) => item.id === task.id);
-
-  if (index >= 0) {
-    task.createdAt = tasks[index].createdAt || now;
-    tasks[index] = { ...tasks[index], ...task };
-  } else {
-    tasks.unshift(task);
-  }
-
-  const output = Array.isArray(raw) ? tasks : { ...raw, tasks };
-  await writeJson(TASKS_FILE, output);
+    link: "/studio/blog-agent"
+  });
 }
 
 async function refreshStatus() {
