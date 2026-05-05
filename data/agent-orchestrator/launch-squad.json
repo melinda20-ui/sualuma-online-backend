@@ -1,0 +1,28 @@
+{
+  "enabled": true,
+  "intervalMinutes": 20,
+  "mode": "night_launch_squad",
+  "mission": "Trabalhar em equipe durante a noite para dizer o que ainda falta para o lançamento do Sualuma.",
+  "team": [
+    {
+      "id": "launch-agent",
+      "name": "Agente de Lançamento",
+      "focus": "Checklist final, bloqueios, páginas quebradas, pagamentos, login, cadastro e prontidão geral."
+    },
+    {
+      "id": "user-agent",
+      "name": "Agente de Usuários",
+      "focus": "Cadastro, login, onboarding, área do cliente, prestador, permissões e jornada do usuário."
+    },
+    {
+      "id": "ux-agent",
+      "name": "Agente de UX",
+      "focus": "Mobile, responsividade, clareza visual, loja, navegação, textos confusos e fricções."
+    },
+    {
+      "id": "growth-agent",
+      "name": "Agente de Growth",
+      "focus": "Conversão, planos, Stripe, funil, blog, leads, campanha, SEO e aquisição."
+    }
+  ]
+}
