@@ -1,0 +1,13 @@
+{
+  "updatedAt": "2026-05-06",
+  "ideas": [
+    { "id": "blog-ainda-vale-pena-2026", "title": "O blog ainda vale a pena em 2026?", "category": "Marketing", "priority": "high", "stage": "ideia" },
+    { "id": "5-tarefas-automatizar-hoje", "title": "5 tarefas que você deveria automatizar hoje", "category": "Automação", "priority": "high", "stage": "ideia" },
+    { "id": "ia-vender-mais-sem-equipe", "title": "Como usar IA para vender mais sem contratar uma equipe grande", "category": "IA", "priority": "urgent", "stage": "ideia" },
+    { "id": "site-profissional-percepcao-cliente", "title": "O que um site profissional muda na percepção do cliente", "category": "Sites & SEO", "priority": "urgent", "stage": "ideia" },
+    { "id": "linha-editorial-inteligente", "title": "Como montar uma linha editorial inteligente", "category": "Marketing", "priority": "medium", "stage": "ideia" },
+    { "id": "estrutura-artigo-google-leitura", "title": "Estrutura de artigo que ajuda no Google e na leitura", "category": "Sites & SEO", "priority": "high", "stage": "ideia" },
+    { "id": "roi-o-que-e", "title": "O que é ROI e como calcular retorno sobre investimento?", "category": "Negócios", "priority": "medium", "stage": "ideia" },
+    { "id": "mrr-o-que-e", "title": "O que é MRR e por que receita recorrente muda um negócio?", "category": "Negócios", "priority": "medium", "stage": "ideia" }
+  ]
+}

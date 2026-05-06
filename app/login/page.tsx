@@ -4,7 +4,7 @@ import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/clie
 import Script from "next/script";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+import ForgotPasswordInline from "@/components/auth/ForgotPasswordInline";
 
 declare global {
   interface Window {
@@ -88,10 +88,7 @@ export default function LoginPage() {
 
 
   const supabase = useMemo(() => {
-    return createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    return createBrowserSupabaseClient();
   }, []);
 
   const [mode, setMode] = useState<Mode>("login");
@@ -188,6 +185,26 @@ export default function LoginPage() {
     };
   }, []);
 
+  function getSafeNextPath() {
+    const fallback = "/portal";
+
+    if (typeof window === "undefined") {
+      return fallback;
+    }
+
+    const next = new URLSearchParams(window.location.search).get("next") || fallback;
+
+    if (!next.startsWith("/") || next.startsWith("//")) {
+      return fallback;
+    }
+
+    return next;
+  }
+
+  function getAuthRedirectUrl() {
+    return "https://sualuma.online/auth/callback?next=" + encodeURIComponent(getSafeNextPath());
+  }
+
   async function handleOAuth(provider: "google" | "apple") {
     try {
       setError("");
@@ -196,7 +213,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get("next") || "/portal")}`,
+          redirectTo: getAuthRedirectUrl(),
         },
       });
 
@@ -269,7 +286,7 @@ export default function LoginPage() {
           email: form.email,
           password: form.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(new URLSearchParams(window.location.search).get("next") || "/portal")}`,
+            emailRedirectTo: getAuthRedirectUrl(),
             data: {
               full_name: form.name,
             },
@@ -581,6 +598,8 @@ export default function LoginPage() {
               <div className="bottom-text">
                 {mode === "login" ? (
                   <>
+              <ForgotPasswordInline />
+
                     Ainda não tem conta?{" "}
                     <button
                       type="button"

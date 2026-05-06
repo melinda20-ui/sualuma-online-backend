@@ -1,0 +1,200 @@
+[
+  {
+    "id": "r001",
+    "productId": "mia-core",
+    "name": "Carla Mendes",
+    "rating": 5,
+    "comment": "A Mia transformou meu atendimento. Responde perguntas que eu respondia manualmente 20 vezes por dia. Economizo pelo menos 3 horas diárias.",
+    "createdAt": "2025-03-10T14:23:00Z",
+    "approved": true
+  },
+  {
+    "id": "r002",
+    "productId": "mia-core",
+    "name": "Rafael Souza",
+    "rating": 5,
+    "comment": "Melhor investimento que fiz pra minha loja. Clientes adoram a rapidez.",
+    "createdAt": "2025-03-15T09:11:00Z",
+    "approved": true
+  },
+  {
+    "id": "r003",
+    "productId": "mia-core",
+    "name": "Ana Beatriz",
+    "rating": 4,
+    "comment": "Muito bom, mas demorei um pouco pra configurar o tom de voz. Depois que entendeu meu negócio ficou ótimo.",
+    "createdAt": "2025-04-02T16:45:00Z",
+    "approved": true
+  },
+  {
+    "id": "r004",
+    "productId": "agente-diagnostico",
+    "name": "Marcos Oliveira",
+    "rating": 5,
+    "comment": "Em 10 minutos o diagnóstico me mostrou um gargalo que eu não via há meses. Impressionante.",
+    "createdAt": "2025-02-28T11:00:00Z",
+    "approved": true
+  },
+  {
+    "id": "r005",
+    "productId": "agente-diagnostico",
+    "name": "Juliana Costa",
+    "rating": 5,
+    "comment": "Relatório claro e com ações práticas. Não é só diagnóstico, é um plano de ação completo.",
+    "createdAt": "2025-03-05T08:30:00Z",
+    "approved": true
+  },
+  {
+    "id": "r006",
+    "productId": "agente-seo",
+    "name": "Pedro Lima",
+    "rating": 5,
+    "comment": "Meu site subiu 3 posições em 2 semanas seguindo as recomendações. Vale muito.",
+    "createdAt": "2025-03-20T15:00:00Z",
+    "approved": true
+  },
+  {
+    "id": "r007",
+    "productId": "agente-seo",
+    "name": "Fernanda Rocha",
+    "rating": 5,
+    "comment": "Finalmente entendi o que era SEO na prática. O agente explica tudo de forma simples.",
+    "createdAt": "2025-04-01T10:20:00Z",
+    "approved": true
+  },
+  {
+    "id": "r008",
+    "productId": "agente-n8n",
+    "name": "Lucas Ferreira",
+    "rating": 5,
+    "comment": "Automatizei meu processo de proposta inteiro. O que levava 30 minutos agora é instantâneo.",
+    "createdAt": "2025-03-12T13:45:00Z",
+    "approved": true
+  },
+  {
+    "id": "r009",
+    "productId": "agente-n8n",
+    "name": "Camila Torres",
+    "rating": 5,
+    "comment": "Conectei 5 ferramentas diferentes sem escrever uma linha de código. Incrível.",
+    "createdAt": "2025-03-25T16:10:00Z",
+    "approved": true
+  },
+  {
+    "id": "r010",
+    "productId": "mia-financeira",
+    "name": "Roberto Alves",
+    "rating": 5,
+    "comment": "Agora eu sei exatamente onde meu dinheiro vai. O alerta de despesas repetidas me salvou várias vezes.",
+    "createdAt": "2025-02-20T09:00:00Z",
+    "approved": true
+  },
+  {
+    "id": "r011",
+    "productId": "mia-financeira",
+    "name": "Patrícia Nunes",
+    "rating": 5,
+    "comment": "A projeção mensal é muito precisa. Planejo melhor meus investimentos com ela.",
+    "createdAt": "2025-03-08T14:30:00Z",
+    "approved": true
+  },
+  {
+    "id": "r012",
+    "productId": "agente-crm-leads",
+    "name": "Thiago Martins",
+    "rating": 5,
+    "comment": "O alerta de 'lead pronto para comprar' é ouro. Fechei 3 negócios que provavelmente perderia.",
+    "createdAt": "2025-03-18T11:15:00Z",
+    "approved": true
+  },
+  {
+    "id": "r013",
+    "productId": "agente-blog",
+    "name": "Giovana Santos",
+    "rating": 5,
+    "comment": "Meu blog saiu do zero para 8 artigos em uma semana. O SEO embutido fez diferença.",
+    "createdAt": "2025-04-05T10:00:00Z",
+    "approved": true
+  },
+  {
+    "id": "r014",
+    "productId": "agente-conteudo",
+    "name": "Diego Carvalho",
+    "rating": 5,
+    "comment": "Parei de ficar em branco na hora de postar. O agente sempre tem uma sugestão relevante.",
+    "createdAt": "2025-03-30T15:40:00Z",
+    "approved": true
+  },
+  {
+    "id": "r015",
+    "productId": "central-tarefas",
+    "name": "Marina Lopes",
+    "rating": 5,
+    "comment": "Organizo clientes, projetos e pendências numa só tela. Não consigo mais trabalhar sem.",
+    "createdAt": "2025-02-15T08:50:00Z",
+    "approved": true
+  },
+  {
+    "id": "r016",
+    "productId": "agente-flowmind",
+    "name": "Eduardo Pinto",
+    "rating": 5,
+    "comment": "A interface visual é muito intuitiva. Criei meu primeiro fluxo em menos de 10 minutos.",
+    "createdAt": "2025-03-22T14:00:00Z",
+    "approved": true
+  },
+  {
+    "id": "r017",
+    "productId": "agente-reunioes",
+    "name": "Isabela Freitas",
+    "rating": 5,
+    "comment": "Os resumos automáticos são precisos e as listas de ação pós-reunião funcionam.",
+    "createdAt": "2025-04-08T09:30:00Z",
+    "approved": true
+  },
+  {
+    "id": "r018",
+    "productId": "agente-projetos",
+    "name": "Vinícius Gomes",
+    "rating": 5,
+    "comment": "Nunca mais atrasei uma entrega. O alerta de risco me avisa com antecedência.",
+    "createdAt": "2025-03-14T16:20:00Z",
+    "approved": true
+  },
+  {
+    "id": "r019",
+    "productId": "leads-prospector",
+    "name": "Aline Barbosa",
+    "rating": 4,
+    "comment": "A lista de leads é boa, mas às vezes pega contatos desatualizados. No geral vale muito.",
+    "createdAt": "2025-03-28T13:00:00Z",
+    "approved": true
+  },
+  {
+    "id": "r020",
+    "productId": "agente-cliente",
+    "name": "Renato Nascimento",
+    "rating": 5,
+    "comment": "A sugestão de upsell do agente me ajudou a aumentar o ticket médio em 35%.",
+    "createdAt": "2025-04-03T11:45:00Z",
+    "approved": true
+  },
+  {
+    "id": "r021",
+    "productId": "agente-sualuma-chat",
+    "name": "Larissa Moreira",
+    "rating": 5,
+    "comment": "O chat é muito mais fluido do que eu esperava. A IA entende o contexto muito bem.",
+    "createdAt": "2025-03-07T10:10:00Z",
+    "approved": true
+  },
+  {
+    "id": "r022",
+    "productId": "agente-lancamento",
+    "name": "Henrique Teixeira",
+    "rating": 5,
+    "comment": "Fiz meu primeiro lançamento digital com esse agente. As sequências prontas economizaram semanas.",
+    "createdAt": "2025-04-10T14:30:00Z",
+    "approved": true
+  }
+]

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { USER_ACCESS_AGENT } from "@/lib/agents/user-access-agent";
 import { getCurrentAdminAccess } from "@/lib/auth/admin-access";
+import { readOfficialSualumaContext } from "@/lib/sualuma/official-context";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -70,6 +71,7 @@ function buildSystemPrompt() {
   };
 
   const contextText = JSON.stringify(officialContext, null, 2).slice(0, 10000);
+  const dynamicContextText = JSON.stringify(readOfficialSualumaContext(), null, 2).slice(0, 12000);
 
   return [
     "IDENTIDADE FIXA",
@@ -83,13 +85,17 @@ function buildSystemPrompt() {
     "- Quando a Luma perguntar o que fazer, responda com checklist executável.",
     "- Quando ela pedir diagnóstico, diga: o que está certo, o que falta, risco e próximo passo.",
     "- Quando falar de acessos, use os IDs oficiais.",
-    "- Não use free_client como ID oficial novo.",
+    "- Não usar regras antigas de plano. Os planos oficiais atuais são Free, Básico, Prime, Premium e Pro/IA Pro.",
     "- O primeiro acesso gratuito oficial é empresa_contratante_servicos_free.",
-    "- Plano Prime não existe.",
+    "- Plano Prime existe e é um dos planos oficiais atuais.",
     "- Cliente IA não vira prestador automaticamente.",
     "- Prestador não vira Cliente IA automaticamente.",
     "- Admin acessa tudo, mas admin não é plano público e não pode ser comprado.",
     "- Comunidade é aberta para logados, mas sem WhatsApp, venda externa, spam ou tentativa de tirar cliente da plataforma.",
+    "",
+    "CONTEXTO DINÂMICO ATUAL DA SUALUMA",
+    "Sempre leia este bloco como fonte mais recente antes de responder sobre planos, tarefas e status.",
+    dynamicContextText,
     "",
     "MODELO OFICIAL APRENDIDO",
     contextText,
@@ -186,14 +192,18 @@ function localFallback(lastUserMessage: string) {
   return [
     "Estou ativo como User Guard, mas o Qwen/Ollama demorou ou não respondeu agora.",
     "",
-    "Meu foco atual é configurar os acessos para lançamento:",
-    "- `empresa_contratante_servicos_free`",
-    "- `ia_client_basic`",
-    "- `ia_client_pro`",
-    "- `ia_client_premium`",
-    "- `provider_free`",
-    "- `service_provider`",
-    "- `admin`",
+    "Meu foco atual é auditar os acessos oficiais de lançamento:",
+    "- Plano Free",
+    "- Plano Básico",
+    "- Plano Prime",
+    "- Plano Premium",
+    "- Plano Pro / IA Pro",
+    "- Prestador Free",
+    "- Dashboard de cliente",
+    "- Dashboard de prestador",
+    "- Loja de agentes",
+    "- Mia",
+    "- Studio/Admin",
     "",
     "Próximo passo recomendado: configurar primeiro `empresa_contratante_servicos_free` nas regras reais de acesso e depois testar bloqueios de prestador, IA, Studio e Admin.",
   ].join("\n");

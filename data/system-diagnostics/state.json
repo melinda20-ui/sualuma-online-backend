@@ -1,0 +1,77 @@
+{
+  "lastSummaryAt": "2026-05-06T22:34:44.821Z",
+  "targets": {
+    "Home principal": {
+      "ok": true,
+      "status": 200
+    },
+    "Login": {
+      "ok": true,
+      "status": 200
+    },
+    "Entrar": {
+      "ok": true,
+      "status": 200
+    },
+    "Cadastro": {
+      "ok": true,
+      "status": 200
+    },
+    "Planos": {
+      "ok": true,
+      "status": 200
+    },
+    "Marketplace": {
+      "ok": true,
+      "status": 200
+    },
+    "Loja de Agentes": {
+      "ok": true,
+      "status": 200
+    },
+    "Studio": {
+      "ok": true,
+      "status": 200
+    },
+    "Studio Lab": {
+      "ok": true,
+      "status": 200
+    },
+    "Metas Financeiras": {
+      "ok": true,
+      "status": 200
+    },
+    "Agente de Blog": {
+      "ok": true,
+      "status": 200
+    },
+    "API Blog Latest": {
+      "ok": true,
+      "status": 200
+    },
+    "API Blog Agent": {
+      "ok": true,
+      "status": 200
+    },
+    "API Blog Agent Auto": {
+      "ok": true,
+      "status": 200
+    },
+    "API Central de Tarefas": {
+      "ok": true,
+      "status": 200
+    },
+    "API Studio Dashboard": {
+      "ok": true,
+      "status": 200
+    },
+    "Jornada Sualuma Opt-in": {
+      "ok": true,
+      "status": 200
+    },
+    "Studio Onboarding Board": {
+      "ok": true,
+      "status": 200
+    }
+  }
+}

@@ -4,18 +4,21 @@ import Stripe from "stripe";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type PlanKey = "basico" | "pro" | "premium";
+type PlanKey = "basico" | "prime" | "premium" | "ia_pro";
 
 function normalizePlan(value: unknown): PlanKey | null {
   const raw = String(value || "")
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 
   if (["basico", "basic", "starter"].includes(raw)) return "basico";
-  if (["pro", "prime"].includes(raw)) return "pro";
+  if (["prime"].includes(raw)) return "prime";
   if (["premium", "max"].includes(raw)) return "premium";
+  if (["ia_pro", "iapro", "pro"].includes(raw)) return "ia_pro";
 
   return null;
 }
@@ -28,25 +31,43 @@ function getOrigin(req: NextRequest) {
 
   if (envOrigin) return envOrigin.replace(/\/$/, "");
 
-  const host =
-    req.headers.get("x-forwarded-host") ||
-    req.headers.get("host");
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+  const protocol = req.headers.get("x-forwarded-proto") || "https";
 
-  const protocol =
-    req.headers.get("x-forwarded-proto") ||
-    "https";
-
-  if (host) return `${protocol}://${host}`;
+  if (host && !host.includes("localhost")) return `${protocol}://${host}`;
 
   return "https://sualuma.online";
 }
 
 function getPriceMap() {
   return {
-    basico: process.env.STRIPE_PRICE_BASICO || "price_1TPrgTJWAf8yuE3K4xneCcWS",
-    pro: process.env.STRIPE_PRICE_PRO || "price_1TPrk4JWAf8yuE3KuDrJMtFm",
-    premium: process.env.STRIPE_PRICE_PREMIUM || "price_1TPrlhJWAf8yuE3KXoHw2Asa",
+    basico: process.env.STRIPE_PRICE_BASICO || "",
+    prime: process.env.STRIPE_PRICE_PRIME || process.env.STRIPE_PRICE_PRO || "",
+    premium: process.env.STRIPE_PRICE_PREMIUM || "",
+    ia_pro: process.env.STRIPE_PRICE_IA_PRO || process.env.STRIPE_PRICE_PRO || "",
   };
+}
+
+function getPublicPlanName(plan: PlanKey) {
+  const names: Record<PlanKey, string> = {
+    basico: "Básico",
+    prime: "Prime",
+    premium: "Premium",
+    ia_pro: "IA Pro",
+  };
+
+  return names[plan];
+}
+
+function getAccessPlanKey(plan: PlanKey) {
+  if (plan === "basico") return "basic";
+  if (plan === "ia_pro") return "pro";
+  return plan;
+}
+
+function getTrialDays(plan: PlanKey) {
+  if (plan === "ia_pro") return 30;
+  return 7;
 }
 
 export async function POST(req: NextRequest) {
@@ -55,77 +76,80 @@ export async function POST(req: NextRequest) {
 
     if (!secretKey) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "STRIPE_SECRET_KEY não configurada no servidor.",
-        },
+        { ok: false, error: "STRIPE_SECRET_KEY não configurada no servidor." },
         { status: 500 }
       );
     }
 
     const body = await req.json().catch(() => ({}));
-
     const plan = normalizePlan(body.plan);
-    const priceMap = getPriceMap();
 
     if (!plan) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: "Plano inválido. Use: basico, pro ou premium.",
-        },
+        { ok: false, error: "Plano inválido." },
         { status: 400 }
       );
     }
 
-    const priceId = priceMap[plan];
+    const priceId = getPriceMap()[plan];
 
     if (!priceId) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: `Price ID não configurado para o plano ${plan}.`,
-        },
+        { ok: false, error: `Price ID não configurado para o plano ${plan}.` },
         { status: 500 }
       );
     }
 
     const stripe = new Stripe(secretKey);
-
     const origin = getOrigin(req);
-    const trialDays = Number(process.env.STRIPE_TRIAL_DAYS || "0");
+
+    const userId =
+      typeof body.userId === "string" && body.userId
+        ? body.userId
+        : typeof body.user_id === "string" && body.user_id
+          ? body.user_id
+          : "";
+
+    const email =
+      typeof body.email === "string" && body.email.includes("@")
+        ? body.email
+        : undefined;
+
+    const trialDays = getTrialDays(plan);
+
+    const metadata = {
+      plan,
+      plan_name: getPublicPlanName(plan),
+      plan_key: getAccessPlanKey(plan),
+      user_id: userId,
+      source: "sualuma-os",
+      trial_days: String(trialDays),
+    };
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_collection: "always",
       allow_promotion_codes: true,
+      customer_email: email,
+      client_reference_id: userId || undefined,
       line_items: [
         {
           price: priceId,
           quantity: 1,
         },
       ],
-      customer_email:
-        typeof body.email === "string" && body.email.includes("@")
-          ? body.email
-          : undefined,
-      client_reference_id:
-        typeof body.userId === "string" && body.userId
-          ? body.userId
-          : undefined,
       subscription_data: {
-        ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
-        metadata: {
-          plan,
-          source: "sualuma-os",
+        trial_period_days: trialDays,
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: "cancel",
+          },
         },
+        metadata,
       },
-      metadata: {
-        plan,
-        source: "sualuma-os",
-      },
-      success_url: `${origin}/bem-vindo?checkout=sucesso&plan=${plan}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/planos?checkout=cancelado&plan=${plan}`,
+      metadata,
+      success_url: `${origin}/api/stripe/activate-session?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/plans?checkout=cancelado&plan=${plan}`,
     });
 
     return NextResponse.json(
@@ -135,6 +159,7 @@ export async function POST(req: NextRequest) {
         priceId,
         checkoutUrl: session.url,
         sessionId: session.id,
+        trialDays,
       },
       {
         headers: {

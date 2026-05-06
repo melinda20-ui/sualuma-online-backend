@@ -355,7 +355,7 @@ export const USER_ACCESS_AGENT = {
     "Skills extras podem ser compradas na loja de skills.",
     "Templates extras podem ser comprados na loja de templates.",
     "Mia é a chefe/orquestradora do sistema; o limite de créditos muda por plano.",
-    "Plano Prime não existe e não deve ser usado nas regras.",
+    "Plano Prime existe e deve ser usado nas regras oficiais atuais.",
     "Stripe deve atualizar somente o acesso correspondente ao produto comprado.",
     "Supabase/banco deve guardar acessos separados, não misturados.",
   ],

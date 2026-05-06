@@ -1,4 +1,5 @@
 import { readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
+import { getClienteTenant } from '@/lib/client-tenant-auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -206,7 +207,10 @@ export async function GET(req: Request) {
       `)
     }
 
-    const data = await readClientDashboard() as any
+    const auth = await getClienteTenant()
+    if (!auth.ok) return auth.response
+
+    const data = await readClientDashboard(auth.tenantId) as any
     const meeting = data.meetings.find((item: any) => item.id === meetingId)
 
     if (!meeting) {
@@ -273,7 +277,10 @@ export async function POST(req: Request) {
       `)
     }
 
-    const data = await readClientDashboard() as any
+    const auth = await getClienteTenant()
+    if (!auth.ok) return auth.response
+
+    const data = await readClientDashboard(auth.tenantId) as any
     const meeting = data.meetings.find((item: any) => item.id === meetingId)
 
     if (!meeting) {
@@ -290,7 +297,7 @@ export async function POST(req: Request) {
     meeting.providerRefusalReason = reason
     meeting.updatedAt = new Date().toISOString()
 
-    await saveClientDashboard(data)
+    await saveClientDashboard(data, auth.tenantId)
 
     const acceptUrl = `${PUBLIC_BASE_URL}/api/cliente/reunioes/responder-proposta?meetingId=${encodeURIComponent(meetingId)}&action=aceitar`
     const denyUrl = `${PUBLIC_BASE_URL}/api/cliente/reunioes/responder-proposta?meetingId=${encodeURIComponent(meetingId)}&action=negar`

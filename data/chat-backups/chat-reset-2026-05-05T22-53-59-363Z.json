@@ -1,0 +1,520 @@
+{
+  "sualuma_chat_messages": [
+    {
+      "id": "0fb5525d-ee1b-4ae4-b10e-b3a288efff1b",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi oque vc pode fazer pelo meu negocio hoje?",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-01T02:07:08.785Z"
+    },
+    {
+      "id": "747acaf3-676e-4839-aea3-ee63d7700aac",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem e salvei esta conversa no banco de dados. No próximo passo, posso conectar essa resposta diretamente à Mia Brain/roteador de IA.",
+      "metadata": {
+        "generated_by": "placeholder-db"
+      },
+      "created_at": "2026-05-01T02:07:08.787Z"
+    },
+    {
+      "id": "b34715b1-4dac-4b19-9d13-084c454d98f5",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-01T03:33:15.292Z"
+    },
+    {
+      "id": "73ffaf58-b782-4a63-8c90-06b576fdb684",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-01T03:33:23.847Z"
+    },
+    {
+      "id": "6e41bf0b-d4a4-49bc-a85d-57e4e2cffc18",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-01T04:02:58.419Z"
+    },
+    {
+      "id": "5a2ffbc3-d651-43cb-9144-e2870a33e277",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-01T04:03:05.848Z"
+    },
+    {
+      "id": "ed78e7c5-d143-4baf-a317-58b06ee5c784",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-01T04:03:28.989Z"
+    },
+    {
+      "id": "31759d9c-ba09-4fb3-b00f-655f0d781ba1",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-01T04:03:30.583Z"
+    },
+    {
+      "id": "02881bb2-53dd-416b-8a2f-a4b02b026001",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-02T00:18:43.502Z"
+    },
+    {
+      "id": "56db3888-4094-413d-bec1-b7edc733bd9b",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-02T00:18:49.727Z"
+    },
+    {
+      "id": "73e395a9-0aef-4ea3-9416-34ba5c771e63",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-02T00:19:50.691Z"
+    },
+    {
+      "id": "593f08c7-994f-4269-b5c7-3d3948394dbb",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-02T00:19:51.719Z"
+    },
+    {
+      "id": "1c98c657-26cd-4a76-a272-ce7af441ac6c",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-04T18:13:08.869Z"
+    },
+    {
+      "id": "5ca49b15-024f-41d7-816d-13e33e88fd11",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-04T18:13:08.938Z"
+    },
+    {
+      "id": "e0d1683c-75e6-47fc-a3e1-1487f2e6b740",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-05T21:36:48.648Z"
+    },
+    {
+      "id": "ba241854-95b7-43a1-883f-f5d7e51dd928",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Recebi sua mensagem. No próximo passo eu vou conectar essa conversa diretamente ao cérebro da Mia para responder usando o roteador de IA.",
+      "metadata": {
+        "source": "mia-brain-router-fallback"
+      },
+      "created_at": "2026-05-05T21:36:48.670Z"
+    },
+    {
+      "id": "4f17dc72-6755-4e71-9edc-8e2cf45b5cf6",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "mode": "truth",
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:32:05.774Z"
+    },
+    {
+      "id": "881a4212-58c1-4941-ad05-bbe011c85921",
+      "thread_id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "role": "assistant",
+      "content": "Oi! Sou a Mia, sua assistente da Sualuma. Como posso te ajudar hoje? Se precisar de dicas, organização ou ajuda com vendas, é só falar!",
+      "metadata": {
+        "ok": true,
+        "mode": "truth",
+        "source": "cerebro-blue-real",
+        "status": 200
+      },
+      "created_at": "2026-05-05T22:32:07.325Z"
+    },
+    {
+      "id": "1a40958d-ca55-4d5d-b26a-989e5c97b495",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "user",
+      "content": "ooi  teste",
+      "metadata": {
+        "mode": "truth",
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:34:37.160Z"
+    },
+    {
+      "id": "99bee693-8333-499a-b53e-ff00201e3510",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "assistant",
+      "content": "Oi! 😊 Como posso te ajudar hoje? Se tiver dúvidas sobre como usar a IA para vender mais ou organizar seu negócio, é só falar!",
+      "metadata": {
+        "ok": true,
+        "mode": "truth",
+        "source": "cerebro-blue-real",
+        "status": 200
+      },
+      "created_at": "2026-05-05T22:34:38.598Z"
+    },
+    {
+      "id": "65b95192-b5b3-474f-8dc0-c2a569ab1df6",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "user",
+      "content": "vc me entende ?",
+      "metadata": {
+        "mode": "truth",
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:34:54.387Z"
+    },
+    {
+      "id": "7d295a7c-9090-4d07-8f10-47548b25a0ba",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "assistant",
+      "content": "Entendi! Sou a Mia, sua assistente da Sualuma. Como posso te ajudar hoje?",
+      "metadata": {
+        "ok": true,
+        "mode": "truth",
+        "source": "cerebro-blue-real",
+        "status": 200
+      },
+      "created_at": "2026-05-05T22:34:55.523Z"
+    },
+    {
+      "id": "a39f4662-79de-4a7b-b7a8-a21ba4f7eb2c",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "user",
+      "content": "oi",
+      "metadata": {
+        "mode": "truth",
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:49:32.087Z"
+    },
+    {
+      "id": "6c2539b3-88d6-438a-823a-455641c4da4d",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "assistant",
+      "content": "Oi! 😊 Sou a Mia, da Sualuma. Como posso te ajudar hoje? Se precisar de dicas para vender mais, organizar o negócio ou qualquer outra coisa, é só falar!",
+      "metadata": {
+        "ok": true,
+        "mode": "truth",
+        "source": "cerebro-blue-real",
+        "status": 200
+      },
+      "created_at": "2026-05-05T22:49:33.218Z"
+    },
+    {
+      "id": "0e68b329-0a18-45b3-aa3b-089b197b08a8",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "user",
+      "content": "vc consegue chamar um agente? oque tu faz?",
+      "metadata": {
+        "mode": "truth",
+        "source": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:49:54.999Z"
+    },
+    {
+      "id": "76f228e8-a69f-43a2-afc5-2c89ceb6eb0d",
+      "thread_id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "role": "assistant",
+      "content": "Sou o agente Store-Manager do Cérebro Blue. Ajudo a configurar lojas, organizar produtos, definir preços, categorias e permissões. Para chamar outros agentes, use os recursos do marketplace ou entre em contato com o suporte.",
+      "metadata": {
+        "ok": true,
+        "mode": "truth",
+        "source": "cerebro-blue-real",
+        "status": 200
+      },
+      "created_at": "2026-05-05T22:49:56.415Z"
+    }
+  ],
+  "sualuma_chat_threads": [
+    {
+      "id": "e47ab0cd-e073-4b54-855e-9c06d2b81a0a",
+      "title": "Planejamento 12 semanas",
+      "kind": "chat",
+      "status": "active",
+      "agent_slug": "mia-brain",
+      "summary": "Plano estratégico para lançamento e execução.",
+      "metadata": {
+        "seed": true
+      },
+      "created_at": "2026-05-01T01:46:46.989Z",
+      "updated_at": "2026-05-01T01:46:46.989Z"
+    },
+    {
+      "id": "f6bccab6-12f4-4bbf-9490-3f4db5c0e8ca",
+      "title": "Campanha de e-mail",
+      "kind": "chat",
+      "status": "active",
+      "agent_slug": "conteudo",
+      "summary": "Campanhas e relacionamento com leads.",
+      "metadata": {
+        "seed": true
+      },
+      "created_at": "2026-05-01T01:46:46.990Z",
+      "updated_at": "2026-05-01T01:46:46.990Z"
+    },
+    {
+      "id": "1ca09a15-943a-4094-90dc-73275d281317",
+      "title": "Atendimento clientes",
+      "kind": "chat",
+      "status": "active",
+      "agent_slug": "atendimento",
+      "summary": "Conversas e suporte comercial.",
+      "metadata": {
+        "seed": true
+      },
+      "created_at": "2026-05-01T01:46:46.990Z",
+      "updated_at": "2026-05-01T01:46:46.990Z"
+    },
+    {
+      "id": "1534319c-db68-49b9-b15a-c28648422085",
+      "title": "teste terminal",
+      "kind": "chat",
+      "status": "active",
+      "agent_slug": "mia-brain",
+      "summary": "",
+      "metadata": {
+        "mode": "truth",
+        "created_by": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:31:42.345Z",
+      "updated_at": "2026-05-05T22:31:42.345Z"
+    },
+    {
+      "id": "ab3718dc-cbeb-4bd4-9bf4-a11e288621ae",
+      "title": "Novo chat",
+      "kind": "chat",
+      "status": "active",
+      "agent_slug": "mia-brain",
+      "summary": "oi",
+      "metadata": {
+        "created_by": "chat-dashboard"
+      },
+      "created_at": "2026-05-01T02:06:41.110Z",
+      "updated_at": "2026-05-05T22:32:07.326Z"
+    },
+    {
+      "id": "dae2c252-b65a-4bec-a013-63484a1b70b7",
+      "title": "Novo chat",
+      "kind": "chat",
+      "status": "active",
+      "agent_slug": "mia-brain",
+      "summary": "vc consegue chamar um agente? oque tu faz?",
+      "metadata": {
+        "mode": "truth",
+        "created_by": "chat-ui"
+      },
+      "created_at": "2026-05-05T22:32:25.070Z",
+      "updated_at": "2026-05-05T22:49:56.416Z"
+    }
+  ],
+  "sualuma_chat_agents": [
+    {
+      "id": "88a0d324-3f71-4085-bb62-d9ed6caa4c38",
+      "slug": "mia-brain",
+      "name": "Mia Brain",
+      "subtitle": "Seu assistente principal",
+      "badge": "Comprado",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 1,
+      "metadata": {
+        "role": "orquestradora principal"
+      },
+      "created_at": "2026-05-01T01:46:46.988Z",
+      "updated_at": "2026-05-01T01:46:46.988Z"
+    },
+    {
+      "id": "2211f402-8641-498d-b032-f91e977eda8b",
+      "slug": "financeiro",
+      "name": "Agente Financeiro",
+      "subtitle": "Análises, custos e relatórios",
+      "badge": "Comprado",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 2,
+      "metadata": {
+        "role": "financeiro"
+      },
+      "created_at": "2026-05-01T01:46:46.988Z",
+      "updated_at": "2026-05-01T01:46:46.988Z"
+    },
+    {
+      "id": "cbb721ae-2d37-414d-9682-61f5b2fc4b6b",
+      "slug": "conteudo",
+      "name": "Agente de Conteúdo",
+      "subtitle": "Posts, scripts e campanhas",
+      "badge": "Criado",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 3,
+      "metadata": {
+        "role": "marketing"
+      },
+      "created_at": "2026-05-01T01:46:46.988Z",
+      "updated_at": "2026-05-01T01:46:46.988Z"
+    },
+    {
+      "id": "24291783-0a4d-4c86-a8d2-a8ba8bc0c80e",
+      "slug": "atendimento",
+      "name": "Agente de Atendimento",
+      "subtitle": "Suporte e atendimento inteligente",
+      "badge": "Comprado",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 4,
+      "metadata": {
+        "role": "suporte"
+      },
+      "created_at": "2026-05-01T01:46:46.988Z",
+      "updated_at": "2026-05-01T01:46:46.988Z"
+    },
+    {
+      "id": "0d1e2fb3-b577-4123-ac1a-09d3d11f5782",
+      "slug": "painel-da-vida",
+      "name": "Painel da Vida",
+      "subtitle": "Rotina, tarefas e decisões",
+      "badge": "Criado",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 5,
+      "metadata": {
+        "role": "produtividade"
+      },
+      "created_at": "2026-05-01T01:46:46.988Z",
+      "updated_at": "2026-05-01T01:46:46.988Z"
+    }
+  ],
+  "sualuma_chat_automations": [
+    {
+      "id": "a4a2d21a-83ae-4d61-b8d9-a0ca6cd9a912",
+      "slug": "resumo-diario",
+      "name": "Resumo diário",
+      "subtitle": "Envia resumo todos os dias",
+      "badge": "Comprada",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 1,
+      "metadata": {
+        "trigger": "daily"
+      },
+      "created_at": "2026-05-01T01:46:46.989Z",
+      "updated_at": "2026-05-01T01:46:46.989Z"
+    },
+    {
+      "id": "bb213364-4a01-4148-9c8d-1e46e415f880",
+      "slug": "postagem-automatica",
+      "name": "Postagem automática",
+      "subtitle": "Agenda e publica conteúdos",
+      "badge": "Criada",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 2,
+      "metadata": {
+        "trigger": "content"
+      },
+      "created_at": "2026-05-01T01:46:46.989Z",
+      "updated_at": "2026-05-01T01:46:46.989Z"
+    },
+    {
+      "id": "989c5fb0-0da8-4777-9df9-c2adde2ee529",
+      "slug": "follow-up-leads",
+      "name": "Follow-up de leads",
+      "subtitle": "Acompanha novos leads",
+      "badge": "Comprada",
+      "status": "paused",
+      "is_active": false,
+      "sort_order": 3,
+      "metadata": {
+        "trigger": "lead"
+      },
+      "created_at": "2026-05-01T01:46:46.989Z",
+      "updated_at": "2026-05-01T01:46:46.989Z"
+    },
+    {
+      "id": "ab63f5a7-6a79-476e-ad96-583c937a2354",
+      "slug": "organizacao-tarefas",
+      "name": "Organização de tarefas",
+      "subtitle": "Prioriza tarefas e próximos passos",
+      "badge": "Criada",
+      "status": "active",
+      "is_active": true,
+      "sort_order": 4,
+      "metadata": {
+        "trigger": "task"
+      },
+      "created_at": "2026-05-01T01:46:46.989Z",
+      "updated_at": "2026-05-01T01:46:46.989Z"
+    },
+    {
+      "id": "b66378b4-1a59-4d88-8efe-e7f15c1df3f9",
+      "slug": "alertas-financeiros",
+      "name": "Alertas financeiros",
+      "subtitle": "Avisa sobre custos e movimentações",
+      "badge": "Comprada",
+      "status": "paused",
+      "is_active": false,
+      "sort_order": 5,
+      "metadata": {
+        "trigger": "finance"
+      },
+      "created_at": "2026-05-01T01:46:46.989Z",
+      "updated_at": "2026-05-01T01:46:46.989Z"
+    }
+  ]
+}

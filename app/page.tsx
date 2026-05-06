@@ -11,6 +11,8 @@ export default function HomePage() {
           <span>Sualuma Online</span>
         </Link>
 
+        <a href="/login" className="mobileTopLogin">Login</a>
+
         <div className="navLinks">
           <a href="#solucao">Solução</a>
           <a href="#ecossistema">Ecossistema</a>
@@ -19,7 +21,7 @@ export default function HomePage() {
           <a href="https://dev.sualuma.online">Agentes</a>
           <a href="https://chat.sualuma.online">Chats</a>
           <a href="#lista" className="navCta">Entrar na lista</a>
-          <a href="https://cliente.sualuma.online" className="loginBtn">Login</a>
+          <a href="/login" className="loginBtn">Login</a>
         </div>
       </nav>
 
@@ -903,6 +905,38 @@ export default function HomePage() {
             align-items: flex-start;
           }
         }
+
+        .mobileTopLogin {
+          display: none;
+        }
+
+        @media (max-width: 760px) {
+          .mobileTopLogin {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 99999;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 15px;
+            border-radius: 999px;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: -0.01em;
+            border: 1px solid rgba(125, 211, 252, 0.55);
+            background:
+              linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(147, 51, 234, 0.92), rgba(236, 72, 153, 0.88)),
+              rgba(15, 23, 42, 0.92);
+            box-shadow:
+              0 16px 36px rgba(37, 99, 235, 0.30),
+              0 0 24px rgba(236, 72, 153, 0.22);
+            backdrop-filter: blur(14px);
+          }
+        }
+
       `}</style>
           <SualumaPublicChat sourcePage="Home Sua Luma" />
     </main>

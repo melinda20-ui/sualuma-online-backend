@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getClienteTenant, syncClientCustomer } from '@/lib/client-tenant-auth'
 import { readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
 
 export const runtime = 'nodejs'
@@ -149,11 +150,15 @@ function buildMeetingNotifications(data: any): NotificationItem[] {
 }
 
 export async function GET(req: Request) {
+  const auth = await getClienteTenant()
+  if (!auth.ok) return auth.response
+
   try {
     const url = new URL(req.url)
     const audience = String(url.searchParams.get('audience') || 'client') as NotificationAudience
 
-    const data = await readClientDashboard() as any
+    const data = await readClientDashboard(auth.tenantId) as any
+  syncClientCustomer(data, auth.user)
 
     const manualNotifications = Array.isArray(data.internalNotifications)
       ? data.internalNotifications
@@ -188,10 +193,14 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const auth = await getClienteTenant()
+  if (!auth.ok) return auth.response
+
   try {
     const body = await req.json()
 
-    const data = await readClientDashboard() as any
+    const data = await readClientDashboard(auth.tenantId) as any
+  syncClientCustomer(data, auth.user)
 
     data.internalNotifications = Array.isArray(data.internalNotifications)
       ? data.internalNotifications
@@ -213,7 +222,7 @@ export async function POST(req: Request) {
 
     data.internalNotifications.unshift(notification)
 
-    await saveClientDashboard(data)
+    await saveClientDashboard(data, auth.tenantId)
 
     return NextResponse.json({
       ok: true,

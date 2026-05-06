@@ -1,81 +1,107 @@
 import SualumaPublicChat from "@/components/SualumaPublicChat";
 import Link from "next/link";
+import PlanCheckoutButton, { type PlanKey } from "@/components/plans/PlanCheckoutButton";
 
-const plans = [
+const plans: Array<{
+  key: PlanKey;
+  name: string;
+  price: string;
+  trial: string;
+  highlight: boolean;
+  description: string;
+  features: string[];
+  cta: string;
+  note: string;
+}> = [
   {
-    name: "Teste grátis",
-    price: "30 dias",
+    key: "free",
+    name: "Free",
+    price: "R$0",
+    trial: "Grátis para sempre",
     highlight: false,
-    description:
-      "Teste completo da plataforma por 30 dias para validar a experiência real no seu negócio.",
+    description: "Para entrar na Sualuma, explorar a comunidade, vender serviços e conhecer a Mia com créditos limitados.",
     features: [
-      "Teste por 30 dias",
-      "Cadastro com cartão para ativação",
-      "Cancelamento a qualquer momento",
-      "Acesso inicial à experiência da plataforma",
-      "Validação prática antes de assinar",
+      "Portal Sualuma liberado",
+      "Comunidade e blog",
+      "Loja de agentes",
+      "Chat Mia com limite de créditos",
+      "Dashboard de prestador liberado",
+      "Divulgação básica de serviços",
+      "FlowMind Free",
     ],
-    cta: "Começar teste de 30 dias",
-    note: "Você pode cancelar antes do fim do período de teste.",
+    cta: "Entrar no Free",
+    note: "Não libera dashboard de cliente. O uso de IA funciona por créditos.",
   },
   {
+    key: "basico",
     name: "Básico",
-    price: "R$ 49/mês",
+    price: "R$49/mês",
+    trial: "7 dias grátis",
     highlight: false,
-    description: "Ideal para quem está começando a estruturar a operação.",
+    description: "Para quem quer organizar a rotina, a empresa e começar a usar IA com painel de cliente.",
     features: [
-      "Mini Empresa essencial",
-      "Acesso ao chat",
-      "Cursos básicos",
-      "1 área de serviço ativa",
+      "Tudo do Free",
+      "FlowMind para produtividade pessoal e da empresa",
+      "Dashboard de cliente",
+      "Chat e créditos diários de IA",
+      "Divulgar serviços e contratar prestadores",
+      "3 agentes: criação de sites, prospecção e automações",
+      "Comunidade e FlowMind Free",
     ],
-    cta: "Assinar Básico",
-    note: "Plano inicial para pequenos testes operacionais.",
+    cta: "Testar Básico por 7 dias",
+    note: "Após o teste, a cobrança mensal do Básico começa automaticamente pela Stripe.",
   },
   {
+    key: "prime",
     name: "Prime",
-    price: "R$ 97/mês",
+    price: "R$97/mês",
+    trial: "7 dias grátis",
     highlight: true,
-    description: "Mais recomendado para pequenos negócios em crescimento.",
+    description: "Para quem quer mais agentes, mais créditos e uma estrutura melhor para crescer.",
     features: [
-      "Mini Empresa completa",
-      "Automações iniciais",
-      "Cursos e serviços liberados",
-      "Área do usuário avançada",
-      "Prioridade média no suporte",
+      "Tudo do Free e do Básico",
+      "Mais 2 agentes extras",
+      "Mais créditos de IA por dia",
+      "FlowMind Free/Básico",
+      "Mais recursos para organizar operação e crescimento",
     ],
-    cta: "Assinar Prime",
-    note: "Melhor equilíbrio entre estrutura, automação e custo.",
+    cta: "Testar Prime por 7 dias",
+    note: "Mais indicado para quem quer crescer com IA sem começar pelo plano mais alto.",
   },
   {
+    key: "premium",
     name: "Premium",
-    price: "R$ 197/mês",
+    price: "R$197/mês",
+    trial: "7 dias grátis",
     highlight: false,
-    description: "Para empresas que querem operar com automação e escala.",
+    description: "Para quem quer automação, rotina e produtividade mais avançada dentro do ecossistema.",
     features: [
-      "Mais automações liberadas",
-      "Mais áreas de membros",
-      "Recursos avançados",
-      "Dashboard operacional ampliado",
-      "Prioridade alta no suporte",
+      "Tudo do Free, Básico e Prime",
+      "Flowmatic Rotina Pro incluso",
+      "Mais créditos de IA",
+      "Recursos avançados para rotina e operação",
+      "Mais suporte para crescer com consistência",
     ],
-    cta: "Assinar Premium",
-    note: "Ideal para empresas em fase de expansão.",
+    cta: "Testar Premium por 7 dias",
+    note: "Ideal para quem quer transformar rotina em operação com automações.",
   },
   {
-    name: "Pro",
-    price: "R$ 397/mês",
+    key: "ia_pro",
+    name: "IA Pro",
+    price: "R$397/mês",
+    trial: "30 dias grátis",
     highlight: false,
-    description: "Para operações robustas e times que querem controle total.",
+    description: "Para quem quer usar a Sualuma como uma operação completa com IA, agentes e prioridade.",
     features: [
-      "Tudo do Premium",
-      "Acesso ampliado aos agentes",
-      "Orquestração avançada",
-      "Recursos de equipe",
-      "Suporte prioritário",
+      "Tudo do Free, Básico, Prime e Premium",
+      "Mais 4 agentes gratuitos disponíveis",
+      "Mais créditos de IA",
+      "Flowmatic Solo CEO incluso",
+      "Prestador prioritário incluso",
+      "Add-on Agência Time por +R$42,50",
     ],
-    cta: "Assinar Pro",
-    note: "Pensado para estruturas mais completas e profissionais.",
+    cta: "Testar IA Pro por 30 dias",
+    note: "Plano mais completo para quem quer escalar com agentes, IA e prioridade.",
   },
 ];
 
@@ -85,52 +111,53 @@ export default function PlansPage() {
       <div className="mx-auto w-full max-w-7xl px-4 py-10 md:px-6">
         <header className="mb-10 text-center">
           <div className="mb-4 inline-flex rounded-full border border-[#7A00FF]/25 bg-[#7A00FF]/10 px-3 py-1 text-xs text-[#d7b8ff]">
-            Planos do Luma OS
+            Planos da Sualuma
           </div>
 
           <h1 className="text-4xl font-semibold md:text-6xl">
-            Escolha o plano ideal para o momento da sua empresa
+            Escolha como você quer começar
           </h1>
 
           <p className="mx-auto mt-4 max-w-3xl text-sm leading-7 text-white/55 md:text-base">
-            Comece com um teste de 30 dias, valide a plataforma com calma e,
-            depois disso, escolha o plano que mais combina com a fase da sua operação.
+            Entre gratuitamente, teste os planos pagos com segurança e evolua conforme sua operação crescer.
           </p>
         </header>
 
         <section className="mb-8 rounded-[30px] border border-[#00F0FF]/20 bg-[#00F0FF]/10 p-5 text-center">
           <p className="text-sm font-semibold text-[#00F0FF]">
-            Teste grátis de 30 dias com cartão para ativação
+            O plano Free é gratuito para sempre. Planos pagos têm teste antes da cobrança.
           </p>
           <p className="mt-2 text-sm leading-6 text-white/70">
-            Você poderá cancelar quando quiser durante o período de teste.
-            Depois a gente conecta tudo isso ao Stripe para a cobrança e a gestão automática.
+            Básico, Prime e Premium têm 7 dias grátis. IA Pro tem 30 dias grátis. Você pode cancelar antes da cobrança.
           </p>
         </section>
 
         <section className="grid grid-cols-1 gap-5 xl:grid-cols-5">
           {plans.map((plan) => (
             <article
-              key={plan.name}
-              className={`rounded-[30px] border p-6 ${
+              id={plan.key}
+              key={plan.key}
+              className={`flex flex-col rounded-[30px] border p-6 ${
                 plan.highlight
                   ? "border-[#7A00FF]/40 bg-[#7A00FF]/10 shadow-[0_0_40px_rgba(122,0,255,0.18)]"
                   : "border-white/10 bg-white/[0.04]"
               }`}
             >
               {plan.highlight && (
-                <div className="mb-4 inline-flex rounded-full border border-[#00F0FF]/20 bg-[#00F0FF]/10 px-3 py-1 text-xs text-[#00F0FF]">
+                <div className="mb-4 inline-flex w-fit rounded-full border border-[#00F0FF]/20 bg-[#00F0FF]/10 px-3 py-1 text-xs text-[#00F0FF]">
                   Mais recomendado
                 </div>
               )}
 
               <h2 className="text-2xl font-semibold">{plan.name}</h2>
               <p className="mt-2 text-2xl font-bold text-[#00F0FF]">{plan.price}</p>
+              <p className="mt-1 text-xs font-semibold text-[#d7b8ff]">{plan.trial}</p>
+
               <p className="mt-3 text-sm leading-6 text-white/55">
                 {plan.description}
               </p>
 
-              <ul className="mt-6 space-y-3 text-sm text-white/75">
+              <ul className="mt-6 flex-1 space-y-3 text-sm text-white/75">
                 {plan.features.map((feature) => (
                   <li key={feature}>• {feature}</li>
                 ))}
@@ -138,15 +165,17 @@ export default function PlansPage() {
 
               <p className="mt-6 text-xs leading-5 text-white/40">{plan.note}</p>
 
+              <PlanCheckoutButton
+                plan={plan.key}
+                label={plan.cta}
+                highlight={plan.highlight}
+              />
+
               <Link
-                href="/login"
-                className={`mt-8 inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold ${
-                  plan.highlight
-                    ? "bg-[#7A00FF] text-white"
-                    : "border border-white/10 bg-white/[0.05] text-white/85"
-                }`}
+                href={`/plans/detalhes#${plan.key}`}
+                className="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-white/10 px-4 py-3 text-sm text-white/70 hover:bg-white/[0.05]"
               >
-                {plan.cta}
+                Ver detalhes
               </Link>
             </article>
           ))}
@@ -161,7 +190,8 @@ export default function PlansPage() {
           </Link>
         </div>
       </div>
-          <SualumaPublicChat sourcePage="Plans Sua Luma" />
+
+      <SualumaPublicChat sourcePage="Plans Sua Luma" />
     </main>
   );
 }

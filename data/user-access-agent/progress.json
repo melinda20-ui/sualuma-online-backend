@@ -1,6 +1,60 @@
 {
   "checklist": [
     {
+      "code": "user_guard_ollama_qwen_enabled",
+      "group": "Modelo de IA",
+      "title": "User Guard configurado para usar Qwen/Ollama",
+      "description": "A API /api/studio/user-agent/chat usa OLLAMA_MODEL ou qwen2.5:7b-instruct como modelo principal.",
+      "status": "done",
+      "completedAt": "2026-05-03T01:42:02.934866+00:00",
+      "source": "terminal"
+    },
+    {
+      "code": "user_guard_qwen_chat_created",
+      "group": "Agente Usuários",
+      "title": "Chat do User Guard criado na página de usuários",
+      "description": "O painel de usuários agora tem um chat direto com o User Guard usando Qwen pelo Ollama.",
+      "status": "done",
+      "completedAt": "2026-05-03T01:42:02.934866+00:00",
+      "source": "terminal"
+    },
+    {
+      "code": "realtime_tracking_enabled",
+      "group": "Monitoramento",
+      "title": "Acompanhamento em tempo real preparado",
+      "description": "O agente foi instruído a registrar etapa iniciada, etapa concluída, rota revisada, regra aplicada, teste pendente, teste aprovado, risco encontrado e ação pendente.",
+      "status": "done",
+      "completedAt": "2026-05-03T01:37:37.178226+00:00",
+      "source": "terminal"
+    },
+    {
+      "code": "launch_plan_routes_registered",
+      "group": "Rotas de lançamento",
+      "title": "Rotas de planos e checkout registradas",
+      "description": "O agente agora acompanha /plans, /planos, /services/plans, /servicos/planos, /prestador/planos, /flowmind/planos, /studio/stripe-planos e APIs Stripe.",
+      "status": "done",
+      "completedAt": "2026-05-03T01:37:37.178226+00:00",
+      "source": "terminal"
+    },
+    {
+      "code": "empresa_contratante_servicos_free_defined",
+      "group": "Empresa Contratante",
+      "title": "Empresa Contratante de Serviços definida",
+      "description": "O antigo conceito de cliente comum/free_client foi substituído pelo acesso empresa_contratante_servicos_free, focado em quem contrata prestadores, sem liberar venda de serviços.",
+      "status": "done",
+      "completedAt": "2026-05-03T01:37:37.178226+00:00",
+      "source": "terminal"
+    },
+    {
+      "code": "official_access_ids_updated",
+      "group": "Modelo de acesso",
+      "title": "IDs oficiais de acesso atualizados",
+      "description": "O agente agora reconhece empresa_contratante_servicos_free, ia_client_basic, ia_client_pro, ia_client_premium, provider_free, service_provider e admin como IDs oficiais.",
+      "status": "done",
+      "completedAt": "2026-05-03T01:37:37.178226+00:00",
+      "source": "terminal"
+    },
+    {
       "code": "access_model_defined",
       "group": "Modelo de acesso",
       "title": "Modelo real de usuários definido",
@@ -28,5 +82,34 @@
       "source": "terminal"
     }
   ],
-  "events": []
+  "events": [
+    {
+      "id": "evt_1777772522",
+      "type": "user_guard_chat_created",
+      "code": "user_guard_qwen_chat_created",
+      "group": "Agente Usuários",
+      "title": "Chat Qwen do User Guard instalado",
+      "description": "A página de usuários agora tem chat interno do User Guard para orientar configuração de acessos em tempo real.",
+      "source": "terminal",
+      "createdAt": "2026-05-03T01:42:02.934866+00:00",
+      "whatsapp": {
+        "status": "não enviado nesta etapa",
+        "sent": false
+      }
+    },
+    {
+      "id": "evt_1777772257",
+      "type": "access_model_updated",
+      "code": "user_guard_access_model_updated",
+      "group": "Modelo de acesso",
+      "title": "User Guard aprendeu o novo modelo oficial de acessos",
+      "description": "Agora o agente sabe que o primeiro acesso a configurar é empresa_contratante_servicos_free e que os acessos de IA, prestador e admin são separados.",
+      "source": "terminal",
+      "createdAt": "2026-05-03T01:37:37.178226+00:00",
+      "whatsapp": {
+        "status": "não enviado nesta etapa",
+        "sent": false
+      }
+    }
+  ]
 }

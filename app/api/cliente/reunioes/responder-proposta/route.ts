@@ -1,4 +1,5 @@
 import { readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
+import { getClienteTenant } from '@/lib/client-tenant-auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -158,7 +159,10 @@ export async function GET(req: Request) {
       `)
     }
 
-    const data = await readClientDashboard() as any
+    const auth = await getClienteTenant()
+    if (!auth.ok) return auth.response
+
+    const data = await readClientDashboard(auth.tenantId) as any
     const meeting = data.meetings.find((item: any) => item.id === meetingId)
 
     if (!meeting) {
@@ -183,7 +187,7 @@ export async function GET(req: Request) {
       meeting.clientAcceptedAt = new Date().toISOString()
       meeting.updatedAt = new Date().toISOString()
 
-      await saveClientDashboard(data)
+      await saveClientDashboard(data, auth.tenantId)
 
       const confirmUrl = `${PUBLIC_BASE_URL}/api/cliente/reunioes/confirmar?meetingId=${encodeURIComponent(meetingId)}`
 
@@ -239,7 +243,7 @@ export async function GET(req: Request) {
         createdAt: new Date().toISOString(),
       })
 
-      await saveClientDashboard(data)
+      await saveClientDashboard(data, auth.tenantId)
 
       const chatUrl = `${PUBLIC_BASE_URL}/?draft=${encodeURIComponent(draft)}&meetingId=${encodeURIComponent(meetingId)}#mensagens`
 

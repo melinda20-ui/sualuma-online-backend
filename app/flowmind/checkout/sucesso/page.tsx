@@ -29,7 +29,7 @@ export default async function Page({ searchParams }: PageProps) {
         <p>
           A Stripe redirecionou você de volta para o Flowmatic. O próximo passo
           técnico será validar webhooks para liberar automaticamente planos e
-          templates por usuário.
+          templates por usuário. O FlowMind já está preparado para separar os dados por conta.
         </p>
 
         {sessionId && (
@@ -43,7 +43,7 @@ export default async function Page({ searchParams }: PageProps) {
             <h2>Ativar template comprado</h2>
             <p>
               Enquanto o webhook definitivo não está ligado, este botão ativa o
-              template no workspace demo.
+              template apenas no workspace da sua conta.
             </p>
             <TemplateUseButton
               slug={template.slug}

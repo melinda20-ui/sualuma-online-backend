@@ -1,15 +1,23 @@
 import { NextResponse } from 'next/server'
+import { getClienteTenant, syncClientCustomer } from '@/lib/client-tenant-auth'
 import { makeId, readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const data = await readClientDashboard()
+  const auth = await getClienteTenant()
+  if (!auth.ok) return auth.response
+
+  const data = await readClientDashboard(auth.tenantId)
+  syncClientCustomer(data, auth.user)
   return NextResponse.json(data.agents)
 }
 
 export async function POST(req: Request) {
+  const auth = await getClienteTenant()
+  if (!auth.ok) return auth.response
+
   try {
     const body = (await req.json()) as Record<string, unknown>
     const name = String(body.name ?? '').trim()
@@ -29,10 +37,11 @@ export async function POST(req: Request) {
       category: String(body.category ?? 'geral'),
     }
 
-    const data = await readClientDashboard()
+    const data = await readClientDashboard(auth.tenantId)
+  syncClientCustomer(data, auth.user)
     data.agents.unshift(agent)
 
-    await saveClientDashboard(data)
+    await saveClientDashboard(data, auth.tenantId)
 
     return NextResponse.json(agent, { status: 201 })
   } catch (error) {

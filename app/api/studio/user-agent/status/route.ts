@@ -1,72 +1,61 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { USER_ACCESS_AGENT } from "@/lib/agents/user-access-agent";
-import { getCurrentAdminAccess } from "@/lib/auth/admin-access";
-import { isWhatsAppCloudConfigured } from "@/lib/whatsapp/cloud-api";
+import { buildLiveAgentReport } from "@/lib/sualuma/live-agent-report";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const DATA_FILE = path.join(process.cwd(), "data/user-access-agent/progress.json");
+const PROGRESS_FILE = path.join(process.cwd(), "data/user-access-agent/progress.json");
 
 function readProgress() {
   try {
-    if (!fs.existsSync(DATA_FILE)) {
-      return { checklist: [], events: [] };
-    }
-
-    return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
+    return JSON.parse(fs.readFileSync(PROGRESS_FILE, "utf8"));
   } catch {
-    return { checklist: [], events: [] };
+    return {};
   }
 }
 
-async function isAuthorized(request: NextRequest) {
-  const token = process.env.SUALUMA_INTERNAL_AGENT_TOKEN;
-  const auth = request.headers.get("authorization") || "";
-
-  if (token && auth === `Bearer ${token}`) {
-    return true;
-  }
-
-  const admin = await getCurrentAdminAccess();
-  return Boolean(admin.isAdmin);
-}
-
-export async function GET(request: NextRequest) {
-  const authorized = await isAuthorized(request);
-
-  if (!authorized) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: "Acesso restrito ao admin ou token interno.",
-      },
-      { status: 401 }
+function onlyUserTasks(tasks: any[]) {
+  return tasks.filter((task) => {
+    const text = String(`${task.title || ""} ${task.message || ""} ${task.link || ""}`).toLowerCase();
+    return (
+      text.includes("usuário") ||
+      text.includes("usuario") ||
+      text.includes("acesso") ||
+      text.includes("plano") ||
+      text.includes("dashboard") ||
+      text.includes("prestador") ||
+      text.includes("banco de dados")
     );
-  }
+  });
+}
 
-  const progress = readProgress();
-
-  const whatsappWebhook =
-    process.env.SUALUMA_WHATSAPP_WEBHOOK_URL ||
-    process.env.N8N_WHATSAPP_WEBHOOK_URL ||
-    process.env.WHATSAPP_WEBHOOK_URL ||
-    "";
-  const whatsappCloudReady = isWhatsAppCloudConfigured();
-
+export async function GET() {
+  const report = buildLiveAgentReport();
+  const userTasks = onlyUserTasks([
+    ...(report.byAgent?.usuarios || []),
+    ...(report.topPriorities || [])
+  ]);
 
   return NextResponse.json({
     ok: true,
-    agent: USER_ACCESS_AGENT,
-    automaticMode: true,
-    whatsapp: {
-      connected: Boolean(whatsappWebhook || whatsappCloudReady),
-      status: (whatsappWebhook || whatsappCloudReady) ? "connected" : "not_configured",
-    },
-    checklist: progress.checklist || [],
-    events: progress.events || [],
     updatedAt: new Date().toISOString(),
+    name: "User Guard / Agente de Usuários",
+    sourceOfTruth: {
+      planos: "data/sualuma/official-plans.json",
+      tarefas: "data/agent-tasks/tasks.json",
+      kanban: "/studio/agentesadms"
+    },
+    progress: readProgress(),
+    plans: report.plans,
+    summary: report.summary,
+    userTasks,
+    rules: [
+      "Os planos oficiais atuais são Free, Básico, Prime, Premium e Pro/IA Pro.",
+      "Prime existe e deve ser considerado nas regras atuais.",
+      "O Agente de Usuários deve ler o Kanban e as tarefas reais antes de responder.",
+      "Quando uma tarefa for movida no Kanban, o status dela vira a fonte oficial."
+    ]
   });
 }

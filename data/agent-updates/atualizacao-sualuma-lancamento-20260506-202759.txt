@@ -1,0 +1,123 @@
+ATUALIZAÇÃO MESTRA — SUALUMA OS / LANÇAMENTO
+
+Avisar todos os agentes responsáveis e atualizar o agente de tarefas.
+
+1. SAÚDE DO SISTEMA
+Status: OK.
+Manter monitoramento ativo.
+
+2. AGENTE DE TAREFAS / RELATÓRIOS
+Status: OK.
+Manter relatórios no Discord.
+
+3. FUNIL MESTRE DOS PRODUTOS SUALUMA
+Status: CONCLUÍDO.
+Os planos oficiais agora são:
+- Free
+- Básico
+- Prime
+- Premium
+- Pro / IA Pro
+
+Não usar mais estrutura antiga de vários planos separados.
+Próxima tarefa:
+CRIAR PAINEL VISUAL DO FUNIL MESTRE SUALUMA.
+Esse painel deve mostrar entrada do usuário, plano inicial, upgrades, loja de agentes, Mia, dashboards, serviços e jornada completa.
+Status: EM ANDAMENTO.
+
+4. FUNIL DE VENDA DE SITES COM OPT-IN
+Status: EM ANDAMENTO / QUASE PRONTO.
+Já funciona parcialmente.
+Falta:
+- corrigir botão de redirecionamento para dentro da plataforma;
+- revisar e-mail de entrada;
+- confirmar que o lead entra no fluxo correto.
+
+5. FUNIL DE ENTRADA POR LISTA DE ESPERA
+Status: EM ANDAMENTO.
+Revisar lista de espera, opt-in, e-mail e entrada no CRM.
+
+6. COMUNIDADE
+Status: NÃO FEITO.
+Criar agente automático para auditar comunidade antes do lançamento.
+O agente deve verificar:
+- posts problemáticos;
+- spam;
+- links suspeitos;
+- denúncias;
+- usuários problemáticos;
+- riscos antes do lançamento.
+
+7. AGENTE DE USUÁRIOS
+Renomear tarefa antiga “checklist de acesso de usuários” para:
+AUDITORIA DE ACESSO POR PLANO.
+
+Objetivo:
+Verificar se cada usuário acessa somente o que seu plano permite.
+Checar:
+- Free
+- Básico
+- Prime
+- Premium
+- Pro / IA Pro
+- prestador Free
+- dashboard de cliente
+- dashboard de prestador
+- créditos
+- Mia
+- loja de agentes
+
+IMPORTANTE:
+O agente de usuários precisa ser avisado que os planos oficiais mudaram.
+
+8. DASHBOARD DO CLIENTE
+Status: NÃO FEITO.
+Trocar tarefa antiga “auditar dashboard do cliente” por:
+CONECTAR DASHBOARD DO CLIENTE AO BANCO DE DADOS REAL.
+Hoje existem dados fallback/mock.
+Precisamos mostrar dados verdadeiros por usuário e plano.
+
+9. DASHBOARD DE SERVIÇOS / PRESTADOR
+Status: NÃO FEITO.
+Trocar tarefa antiga “auditar dashboard de serviço” por:
+CONECTAR DASHBOARD DE SERVIÇOS/PRESTADOR AO BANCO DE DADOS REAL.
+Hoje existem dados fallback/mock.
+Precisamos mostrar propostas, ganhos, serviços, portfólio e reuniões reais.
+
+10. GOOGLE ANALYTICS / SEARCH CONSOLE
+Renomear tarefa para:
+CONECTAR SUALUMA AO GOOGLE ANALYTICS E SEARCH CONSOLE.
+Objetivo:
+Medir visitas, cliques nos planos, opt-in, checkout, CRM, funil de site e conversões.
+Também verificar indexação do blog e páginas no Google.
+Prioridade: média.
+
+11. BLOG
+Status: PARCIALMENTE EM ANDAMENTO.
+Monitoramento existe.
+Ainda precisa confirmar se a indexação no Google está sendo verificada de verdade.
+
+Criar tarefa:
+MELHORAR AGENTE DE BLOG PARA EDITAR RASCUNHOS, ADICIONAR IMAGENS E REVISAR SEO.
+O agente precisa preparar posts para publicação, não apenas contar posts.
+
+12. FUNIL SUALUMA NO CRM
+Status: EM ANDAMENTO.
+Definição:
+Todo lead que entrar por plano, lista de espera, funil de site ou formulário precisa ir para o CRM com:
+- origem;
+- interesse;
+- status;
+- próxima ação.
+
+13. MOBILE
+Status: AGUARDANDO.
+Não priorizar agora.
+
+14. MIA + CÉREBRO AZUL
+Status: PARCIALMENTE CONCLUÍDO.
+Já funciona no chat principal do cliente:
+chat.sualuma.online
+
+Ainda falta:
+conectar Mia e Cérebro Azul aos painéis do Studio.

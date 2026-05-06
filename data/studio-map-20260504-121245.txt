@@ -1,0 +1,561 @@
+==============================
+MAPA DO STUDIO LUMA
+Gerado em: Mon May  4 12:12:45 UTC 2026
+==============================
+
+### 1) PÁGINAS E ROTAS DO STUDIO
+app/api/estudio-lab/copilot-action/route.ts
+app/api/estudio-lab/copilot-chat/route.ts
+app/api/estudio-lab/copilot/route.ts
+app/api/estudio/agentesadms/agents/route.ts
+app/api/estudio/agentesadms/chat/route.ts
+app/api/studio-lab/copilot-action/route.ts
+app/api/studio-lab/copilot-chat/route.ts
+app/api/studio-lab/copilot/route.ts
+app/api/studio/brain/route.ts
+app/api/studio/catalogo-paginas/route.ts
+app/api/studio/chat-dashboard/route.ts
+app/api/studio/copilot-kanban/route.ts
+app/api/studio/dashboard/route.ts
+app/api/studio/links-resumo/route.ts
+app/api/studio/mia-brain/route.ts
+app/api/studio/servicos-e-indique/links/route.ts
+app/api/studio/servicos-e-indique/route.ts
+app/api/studio/servicos-e-indique/stripe-sync/route.ts
+app/api/studio/stripe/products/route.ts
+app/api/studio/user-agent/chat/route.ts
+app/api/studio/user-agent/complete-step/route.ts
+app/api/studio/user-agent/status/route.ts
+app/api/studio/user-auth-diagnostics/route.ts
+app/estudio-lab/agentesadms/AdmsVoiceRobotOverlay.tsx
+app/estudio-lab/agentesadms/AgentesAdmsClient.tsx
+app/estudio-lab/agentesadms/adms-robot-overlay.css
+app/estudio-lab/agentesadms/agentesadms.css
+app/estudio-lab/agentesadms/page.tsx
+app/estudio-lab/agentesadms/template.tsx
+app/estudio-lab/configuracoes/page.tsx
+app/estudio-lab/copilot/page.tsx
+app/estudio-lab/copilot/template.tsx
+app/estudio-lab/crescimento/page.tsx
+app/estudio-lab/crescimento/template.tsx
+app/estudio-lab/produtor-musical/MusicProducerClient.tsx
+app/estudio-lab/produtor-musical/page.tsx
+app/estudio-lab/usuarios/page.tsx
+app/estudiolab/copilot/page.tsx
+app/estudiolab/copilot/template.tsx
+app/studio-lab/HideLegacySupportButton.tsx
+app/studio-lab/MiaStudioChat.module.css
+app/studio-lab/MiaStudioChat.tsx
+app/studio-lab/copilot/page.tsx
+app/studio-lab/layout.tsx
+app/studio-lab/page.tsx
+app/studio-lab/template.tsx
+app/studio/catalogo-paginas/page.tsx
+app/studio/estudioantigo/page.tsx
+app/studio/indique/page.tsx
+app/studio/mia-brain/page.tsx
+app/studio/page.tsx
+app/studio/servicos-e-indique/page.tsx
+app/studio/stripe-planos/page.tsx
+app/studio/template.tsx
+app/studio/usuarios-diagnostico/page.tsx
+app/studio/usuarios/page.tsx
+app/studiolab/copilot/page.tsx
+app/studiolab/copilot/template.tsx
+
+### 2) COMPONENTES DO STUDIO
+components/StudioMenuCollapse.tsx
+components/studio/UserAccessAgentPanel.tsx
+data/admin-agents.json
+data/brain-executor-tasks.json
+data/email-templates/agent-purchase-instructions.json
+data/studio-brain.json
+data/studio-dashboard-fallback.json
+data/studio-map-20260504-121245.txt
+data/user-access-agent/progress.json
+lib/agents/user-access-agent.ts
+lib/brain/mia.ts
+lib/studio/admin-agents-store.ts
+lib/studio/studio-dashboard-store.ts
+
+### 3) CÉREBRO AZUL / SKILLS, SE EXISTIR
+/opt/blue-brain/src/api/index.ts
+/opt/blue-brain/src/api/index.ts.backup-agentes-comerciais-20260504-043857
+/opt/blue-brain/src/api/index.ts.backup-agentes-fase3-20260503-214723
+/opt/blue-brain/src/api/index.ts.backup-agentes-marketing-loja-20260504-033347
+/opt/blue-brain/src/api/index.ts.backup-antes-painel
+/opt/blue-brain/src/api/index.ts.backup-api-completa-agentes-20260504-033752
+/opt/blue-brain/src/api/index.ts.backup-corrigir-executeTask-6-agentes
+/opt/blue-brain/src/api/index.ts.backup-corrigir-root-panel
+/opt/blue-brain/src/api/index.ts.backup-final-panel-auth
+/opt/blue-brain/src/api/index.ts.backup-ligar-4-agentes
+/opt/blue-brain/src/api/index.ts.backup-ligar-new-wave-20260504-033517
+/opt/blue-brain/src/api/index.ts.backup-ligar-new-wave-final-20260504-033641
+/opt/blue-brain/src/api/index.ts.backup-novos-agentes-20260504-031406
+/opt/blue-brain/src/api/index.ts.backup-painel-20260503-172131
+/opt/blue-brain/src/config/env.ts
+/opt/blue-brain/src/executor/blue-executor.ts
+/opt/blue-brain/src/guard/blue-guard.ts
+/opt/blue-brain/src/knowledge/sualuma-access-matrix.md
+/opt/blue-brain/src/llm/ollama.ts
+/opt/blue-brain/src/llm/provider.ts
+/opt/blue-brain/src/panel/index.html
+/opt/blue-brain/src/panel/index.html.backup-chat-agentes-20260503-223646
+/opt/blue-brain/src/skills/agent-builder.ts
+/opt/blue-brain/src/skills/agent-factory.ts
+/opt/blue-brain/src/skills/business-agent.ts
+/opt/blue-brain/src/skills/commercial-ops-agents.ts
+/opt/blue-brain/src/skills/commercial-ops-agents.ts.backup-fix-askllm-20260504-044104
+/opt/blue-brain/src/skills/ethical-prospector.ts
+/opt/blue-brain/src/skills/facebook-groups-finder.ts
+/opt/blue-brain/src/skills/growth-agent.ts
+/opt/blue-brain/src/skills/launch-doctor.ts
+/opt/blue-brain/src/skills/launch-doctor.ts.backup-access-matrix
+/opt/blue-brain/src/skills/launch-doctor.ts.backup-json-robusto-20260504-030439
+/opt/blue-brain/src/skills/n8n-builder.ts
+/opt/blue-brain/src/skills/new-wave-agents.ts
+/opt/blue-brain/src/skills/site-builder.ts
+/opt/blue-brain/src/skills/store-manager.ts
+/opt/blue-brain/src/skills/user-doctor.ts
+/opt/blue-brain/src/skills/user-doctor.ts.backup-access-matrix
+/opt/blue-brain/src/skills/user-doctor.ts.backup-json-robusto-20260504-012942
+/opt/blue-brain/src/skills/ux-doctor.ts
+/opt/blue-brain/src/skills/ux-doctor.ts.backup-json-robusto-20260504-030439
+/opt/blue-brain/src/skills/vps-doctor.ts
+
+### 4) ABAS, AGENTES E PALAVRAS IMPORTANTES ENCONTRADAS
+app/member-user/page.tsx:2:import { getDashboardAccess } from "@/lib/auth/dashboard-access";
+app/member-user/_OriginalMemberUserPage.tsx:62:          <a href="https://dashboardcliente.sualuma.online" className="rounded-[24px] border border-cyan-400/20 bg-cyan-400/10 p-5">
+app/member-user/_DashboardContentPage.tsx:1:import { redirectAdminToStudio } from "@/lib/auth/admin-redirect";
+app/member-user/_DashboardContentPage.tsx:7:  await redirectAdminToStudio();
+app/loja-agentes/sucesso/page.tsx:31:          Seu agente vai aparecer na Mia
+app/loja-agentes/sucesso/page.tsx:47:          <strong>chat.sualuma.online → Mia → Meus Agentes</strong>
+app/loja-agentes/sucesso/page.tsx:52:          acesso e próximos passos para usar o agente comprado.
+app/loja-agentes/sucesso/page.tsx:68:          Abrir Mia
+app/loja-agentes/page.tsx:84:            Compre agentes, pacotes e extras. Depois da compra, tudo aparece
+app/loja-agentes/page.tsx:85:            dentro da Mia em:{" "}
+app/loja-agentes/page.tsx:86:            <strong>chat.sualuma.online → Mia → Meus Agentes</strong>.
+app/loja-agentes/page.tsx:180:                de agentes da Mia.
+app/loja-agentes/ComprarButton.tsx:97:        {loading ? "Abrindo checkout..." : "Comprar e liberar na Mia"}
+app/member-services/_OriginalMemberServicesPage.tsx:62:          <a href="https://dashboardcliente.sualuma.online" className="rounded-[24px] border border-cyan-400/20 bg-cyan-400/10 p-5">
+app/member-services/page.tsx:2:import { getDashboardAccess } from "@/lib/auth/dashboard-access";
+app/member-services/_DashboardContentPage.tsx:1:import { redirectAdminToStudio } from "@/lib/auth/admin-redirect";
+app/member-services/_DashboardContentPage.tsx:7:  await redirectAdminToStudio();
+app/studio/estudioantigo/page.tsx:96:      description: "Atendimento e respostas do time/automação.",
+app/studio/estudioantigo/page.tsx:105:      description: "Venda de serviços, agentes e oportunidades internas.",
+app/studio/estudioantigo/page.tsx:122:      title: "Chat Mia",
+app/studio/estudioantigo/page.tsx:182:      href: "#financeiro",
+app/studio/estudioantigo/page.tsx:240:      title: "Explora o Studio / Portal",
+app/studio/estudioantigo/page.tsx:261:      title: "Compra serviço / agente / plano",
+app/studio/estudioantigo/page.tsx:343:export default function StudioPage() {
+app/studio/estudioantigo/page.tsx:355:        const res = await fetch("/api/studio/brain", { cache: "no-store" });
+app/studio/estudioantigo/page.tsx:418:            <p className="brandEyebrow">Studio Admin</p>
+app/studio/estudioantigo/page.tsx:419:            <h1 className="brandTitle">Cérebro do Studio</h1>
+app/studio/estudioantigo/page.tsx:425:          <a href="#operacional">Cérebro Operacional</a>
+app/studio/estudioantigo/page.tsx:427:          <a href="#financeiro">Financeiro</a>
+app/studio/estudioantigo/page.tsx:440:          <span>O Studio tenta atualizar sozinho a cada 30 segundos.</span>
+app/studio/estudioantigo/page.tsx:448:              {loading ? "Atualizando..." : "Studio online"}
+app/studio/estudioantigo/page.tsx:451:              Seu painel administrativo, financeiro e operacional
+app/studio/estudioantigo/page.tsx:461:              <a className="summaryCard" href="#financeiro">
+app/studio/estudioantigo/page.tsx:465:              <a className="summaryCard" href="#financeiro">
+app/studio/estudioantigo/page.tsx:474:                <span>Usuários ativos</span>
+app/studio/estudioantigo/page.tsx:491:            <div className="robotWrap" aria-label="Robô do Studio">
+app/studio/estudioantigo/page.tsx:517:              <p className="sectionEyebrow">Cérebro Operacional</p>
+app/studio/estudioantigo/page.tsx:547:                          <span className="ownerTag">{item.owner ?? "Studio"}</span>
+app/studio/estudioantigo/page.tsx:601:        <section className="section" id="financeiro">
+app/studio/estudioantigo/page.tsx:605:              <h3>Resultado financeiro resumido</h3>
+app/studio/servicos-e-indique/page.tsx:41:    detail: "Fluxos, agentes, atendimento e processos automáticos.",
+app/studio/servicos-e-indique/page.tsx:74:    detail: "Pedido de automação recebido pelo painel.",
+app/studio/servicos-e-indique/page.tsx:225:export default function StudioServicosEIndiquePage() {
+app/studio/servicos-e-indique/page.tsx:251:        setSource("Conectado às APIs do Studio");
+app/studio/servicos-e-indique/page.tsx:253:        console.error("[Studio Serviços e Indique] Erro ao carregar dados:", error);
+app/studio/servicos-e-indique/page.tsx:270:    <main className="tdah-dashboard">
+app/studio/servicos-e-indique/page.tsx:273:          <p className="eyebrow">Studio Sualuma • Economia interna</p>
+app/studio/servicos-e-indique/page.tsx:282:            <a href="/studio/stripe-planos">Planos e Stripe</a>
+app/studio/servicos-e-indique/page.tsx:414:        <article className="panel brain">
+app/studio/servicos-e-indique/page.tsx:415:          <div className="brain-emoji">🧠</div>
+app/studio/servicos-e-indique/page.tsx:443:        .tdah-dashboard {
+app/studio/servicos-e-indique/page.tsx:464:        .brain p:first-child {
+app/studio/servicos-e-indique/page.tsx:647:        .brain h2 {
+app/studio/servicos-e-indique/page.tsx:836:        .brain {
+app/studio/servicos-e-indique/page.tsx:843:        .brain-emoji {
+app/studio/servicos-e-indique/page.tsx:855:        .brain p {
+app/studio/servicos-e-indique/page.tsx:913:          .tdah-dashboard {
+app/studio/servicos-e-indique/page.tsx:923:          .brain {
+app/studio/stripe-planos/page.tsx:49:  if (cat === "agentes") return "Agentes";
+app/studio/stripe-planos/page.tsx:54:export default function StudioStripePlanosPage() {
+app/studio/stripe-planos/page.tsx:71:      const res = await fetch(`/api/studio/stripe/products?ts=${Date.now()}`, {
+app/studio/stripe-planos/page.tsx:106:      const res = await fetch("/api/studio/stripe/products", {
+app/studio/stripe-planos/page.tsx:158:        <p className="eyebrow">Studio Sualuma • Stripe</p>
+app/studio/stripe-planos/page.tsx:297:                <form method="POST" action="/api/stripe/checkout-price">
+app/studio/stripe-planos/page.tsx:330:              <option value="agentes">Agentes</option>
+app/studio/page.tsx:3:export default function StudioRedirectPage() {
+app/studio/indique/page.tsx:32:export default function StudioIndiquePage() {
+app/studio/catalogo-paginas/page.tsx:29:export default function CatalogoPaginasStudioPage() {
+app/studio/catalogo-paginas/page.tsx:95:          <p className="eyebrow">Studio Sualuma • Catálogo</p>
+app/studio/template.tsx:4:export default async function StudioProtectedTemplate({
+app/studio/usuarios-diagnostico/page.tsx:62:export default function UsuariosDiagnosticoPage() {
+app/studio/usuarios-diagnostico/page.tsx:142:          <p className="eyebrow">Sualuma Studio</p>
+app/studio/usuarios-diagnostico/page.tsx:144:          <p>Estou lendo sessão, subdomínios, ambiente e checklist do agente.</p>
+app/studio/usuarios-diagnostico/page.tsx:169:            <p className="eyebrow">Sualuma Studio</p>
+app/studio/usuarios-diagnostico/page.tsx:170:            <h1>Central de Usuários</h1>
+app/studio/usuarios-diagnostico/page.tsx:173:              permissões e alertas do agente.
+app/studio/usuarios-diagnostico/page.tsx:178:            <a href="/studio">Studio</a>
+app/studio/usuarios-diagnostico/page.tsx:180:            <a href="/studio/usuarios">Usuários</a>
+app/studio/usuarios-diagnostico/page.tsx:220:        <section className="agentWrap">
+app/studio/usuarios-diagnostico/page.tsx:487:  .agentWrap {
+app/studio/usuarios-diagnostico/page.tsx:589:  .agentWrap,
+app/studio/usuarios/page.tsx:3:export default function StudioUsuariosRedirect() {
+app/studio/mia-brain/page.tsx:5:type MiaData = {
+app/studio/mia-brain/page.tsx:27:  { id: "cerebro", label: "Cérebro da Mia", icon: "🧠" },
+app/studio/mia-brain/page.tsx:30:  { id: "prompt-studio", label: "Prompt Studio", icon: "⌥" },
+app/studio/mia-brain/page.tsx:227:    <div className="brain-stage">
+app/studio/mia-brain/page.tsx:228:      <div className="brain-tag tag-1">Modelos de IA</div>
+app/studio/mia-brain/page.tsx:229:      <div className="brain-tag tag-2">Voz & Áudio</div>
+app/studio/mia-brain/page.tsx:230:      <div className="brain-tag tag-3">Memória</div>
+app/studio/mia-brain/page.tsx:231:      <div className="brain-tag tag-4">Dados</div>
+app/studio/mia-brain/page.tsx:232:      <div className="brain-tag tag-5">Prompt Studio</div>
+app/studio/mia-brain/page.tsx:233:      <div className="brain-tag tag-6">Skills</div>
+app/studio/mia-brain/page.tsx:234:      <div className="brain-tag tag-7">APIs</div>
+app/studio/mia-brain/page.tsx:235:      <div className="brain-tag tag-8">Automação</div>
+app/studio/mia-brain/page.tsx:236:      <canvas ref={canvasRef} className="brain-canvas" />
+app/studio/mia-brain/page.tsx:254:export default function MiaBrainPage() {
+app/studio/mia-brain/page.tsx:256:  const [data, setData] = useState<MiaData | null>(null);
+app/studio/mia-brain/page.tsx:264:      const res = await fetch("/api/studio/mia-brain", { cache: "no-store" });
+app/studio/mia-brain/page.tsx:266:      if (!json.ok) throw new Error(json.error || "Erro ao carregar Mia Brain.");
+app/studio/mia-brain/page.tsx:301:      const res = await fetch("/api/studio/mia-brain", {
+app/studio/mia-brain/page.tsx:322:      const res = await fetch("/api/studio/mia-brain", {
+app/studio/mia-brain/page.tsx:328:            provider_slug: "mia-brain",
+app/studio/mia-brain/page.tsx:329:            model_slug: "dashboard",
+app/studio/mia-brain/page.tsx:331:            event_type: "dashboard_test",
+app/studio/mia-brain/page.tsx:333:            message: "Teste manual feito pelo painel Mia Brain.",
+app/studio/mia-brain/page.tsx:637:            <div className="glass brain-card">
+app/studio/mia-brain/page.tsx:692:          <div className="glass brain-big">
+app/studio/mia-brain/page.tsx:693:            <SectionTitle title="Cérebro da Mia" subtitle="Núcleo visual de orquestração das IAs, skills e APIs" />
+app/studio/mia-brain/page.tsx:714:          <SectionTitle title="APIs Conectadas" subtitle="Ative, pause e acompanhe os providers da Mia" />
+app/studio/mia-brain/page.tsx:732:          <SectionTitle title="Skills" subtitle="Habilidades operacionais da Mia" />
+app/studio/mia-brain/page.tsx:741:          <SectionTitle title="Prompt Studio" subtitle="Prompts salvos no banco da Mia" />
+app/studio/mia-brain/page.tsx:813:          <SectionTitle title="Memória" subtitle="Área reservada para memórias, arquivos e instruções da Mia" />
+app/studio/mia-brain/page.tsx:814:          <p>Próximo passo: criar tabela de memórias da Mia e conectar upload de documentos, prompts fixos e contexto do sistema.</p>
+app/studio/mia-brain/page.tsx:821:        <SectionTitle title="Configurações" subtitle="Configurações operacionais da Mia Brain" />
+app/studio/mia-brain/page.tsx:896:        .brain-card{position:relative;min-height:390px;overflow:hidden;background:
+app/studio/mia-brain/page.tsx:903:        .brain-stage{height:100%;min-height:370px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+app/studio/mia-brain/page.tsx:904:        .brain-canvas{width:100%;height:100%;display:block}
+app/studio/mia-brain/page.tsx:905:        .brain-tag{position:absolute;z-index:3;background:rgba(8,9,16,.82);border:1px solid rgba(255,79,163,.32);color:var(--pink);font-size:11px;border-radius:999px;padding:7px 11px;box-shadow:0 0 14px rgba(255,79,163,.12);white-space:nowrap}
+app/studio/mia-brain/page.tsx:975:        .brain-big{min-height:560px;padding:16px}
+app/studio/mia-brain/page.tsx:1004:          .brain-tag{display:none}
+app/studio/mia-brain/page.tsx:1014:              <strong>Mia Brain</strong>
+app/studio/mia-brain/page.tsx:1041:              <h1><span>Mia</span> Brain</h1>
+app/studio/mia-brain/page.tsx:1059:            {loading ? <div className="loading">Carregando dados reais da Mia Brain...</div> : <RenderActiveSection />}
+app/flowmind/lib/commerce.ts:40:    description: "Plano mensal para solopreneurs com agentes e templates principais.",
+app/flowmind/lib/templateEngine.ts:30:    agent: string;
+app/flowmind/lib/templateEngine.ts:45:const templateBlueprints: Record<
+app/flowmind/lib/templateEngine.ts:54:      agent: "Vera",
+app/flowmind/lib/templateEngine.ts:113:      agent: "Dona",
+app/flowmind/lib/templateEngine.ts:172:      agent: "Rica",
+app/flowmind/lib/templateEngine.ts:229:      agent: "Rica",
+app/flowmind/lib/templateEngine.ts:282:const fallbackBlueprint = {
+app/flowmind/lib/templateEngine.ts:287:    agent: "Dona",
+app/flowmind/lib/templateEngine.ts:335:  const blueprint = templateBlueprints[slug] || fallbackBlueprint;
+app/flowmind/lib/templates.ts:13:  agent: string;
+app/flowmind/lib/templates.ts:28:    agent: "Vera",
+app/flowmind/lib/templates.ts:41:    agent: "Dona",
+app/flowmind/lib/templates.ts:53:    includes: ["Mapa financeiro", "Meta de renda", "Plano de ação", "Checkpoints"],
+app/flowmind/lib/templates.ts:54:    agent: "Rica",
+app/flowmind/lib/templates.ts:67:    agent: "Dona",
+app/flowmind/lib/templates.ts:80:    agent: "Rica",
+app/flowmind/lib/templates.ts:93:    agent: "Calma",
+app/flowmind/lib/templates.ts:106:    agent: "Rica",
+app/flowmind/lib/templates.ts:119:    agent: "Calma",
+app/flowmind/lib/templates.ts:132:    agent: "Bússola",
+app/flowmind/components/FlowMindApp.tsx:13:  | "agentes"
+app/flowmind/components/FlowMindApp.tsx:17:  | "financeiro"
+app/flowmind/components/FlowMindApp.tsx:23:  from: "agent" | "user";
+app/flowmind/components/FlowMindApp.tsx:32:      from: "agent",
+app/flowmind/components/FlowMindApp.tsx:37:      from: "agent",
+app/flowmind/components/FlowMindApp.tsx:45:      from: "agent",
+app/flowmind/components/FlowMindApp.tsx:50:      from: "agent",
+app/flowmind/components/FlowMindApp.tsx:58:      from: "agent",
+app/flowmind/components/FlowMindApp.tsx:63:      from: "agent",
+app/flowmind/components/FlowMindApp.tsx:71:const agentResponses: Record<AgentKey, string[]> = {
+app/flowmind/components/FlowMindApp.tsx:86:const agents = [
+app/flowmind/components/FlowMindApp.tsx:216:  function sendReply(agent: AgentKey, text: string) {
+app/flowmind/components/FlowMindApp.tsx:219:      [agent]: [
+app/flowmind/components/FlowMindApp.tsx:220:        ...old[agent].map((msg) => ({ ...msg, replies: undefined })),
+app/flowmind/components/FlowMindApp.tsx:223:          from: "agent",
+app/flowmind/components/FlowMindApp.tsx:225:            agentResponses[agent][
+app/flowmind/components/FlowMindApp.tsx:226:              Math.floor(Math.random() * agentResponses[agent].length)
+app/flowmind/components/FlowMindApp.tsx:234:  function sendMessage(agent: AgentKey) {
+app/flowmind/components/FlowMindApp.tsx:235:    const text = inputs[agent].trim();
+app/flowmind/components/FlowMindApp.tsx:238:    setInputs((old) => ({ ...old, [agent]: "" }));
+app/flowmind/components/FlowMindApp.tsx:241:      [agent]: [
+app/flowmind/components/FlowMindApp.tsx:242:        ...old[agent],
+app/flowmind/components/FlowMindApp.tsx:245:          from: "agent",
+app/flowmind/components/FlowMindApp.tsx:247:            agent === "vera"
+app/flowmind/components/FlowMindApp.tsx:249:              : agent === "dona"
+app/flowmind/components/FlowMindApp.tsx:327:            href="/flowmind/agentes"
+app/flowmind/components/FlowMindApp.tsx:328:            className={section === "agentes" ? "nav-item active" : "nav-item"}
+app/flowmind/components/FlowMindApp.tsx:329:            onClick={() => openSection("agentes")}
+app/flowmind/components/FlowMindApp.tsx:331:            <span className="nav-icon">🤖</span> Meus agentes
+app/flowmind/components/FlowMindApp.tsx:359:            className={section === "financeiro" ? "nav-item active" : "nav-item"}
+app/flowmind/components/FlowMindApp.tsx:360:            onClick={() => openSection("financeiro")}
+app/flowmind/components/FlowMindApp.tsx:595:                Vendas, clientes, entregas, financeiro e ações de crescimento.
+app/flowmind/components/FlowMindApp.tsx:666:          {section === "agentes" && (
+app/flowmind/components/FlowMindApp.tsx:669:              <div className="section-sub">5 agentes disponíveis · 3 ativos</div>
+app/flowmind/components/FlowMindApp.tsx:672:                {agents.map((agent) => (
+app/flowmind/components/FlowMindApp.tsx:674:                    key={agent.name}
+app/flowmind/components/FlowMindApp.tsx:675:                    className="card agent-full-card"
+app/flowmind/components/FlowMindApp.tsx:677:                      agent.key === "vera" ||
+app/flowmind/components/FlowMindApp.tsx:678:                      agent.key === "dona" ||
+app/flowmind/components/FlowMindApp.tsx:679:                      agent.key === "rica"
+app/flowmind/components/FlowMindApp.tsx:680:                        ? openSection(agent.key)
+app/flowmind/components/FlowMindApp.tsx:684:                    <div className="agent-big-emoji">{agent.emoji}</div>
+app/flowmind/components/FlowMindApp.tsx:685:                    <div className="agent-big-name">{agent.name}</div>
+app/flowmind/components/FlowMindApp.tsx:686:                    <div className="agent-big-role">{agent.role}</div>
+app/flowmind/components/FlowMindApp.tsx:687:                    <p>{agent.desc}</p>
+app/flowmind/components/FlowMindApp.tsx:688:                    <span className={`agent-status ${agent.statusClass}`}>
+app/flowmind/components/FlowMindApp.tsx:689:                      {agent.status}
+app/flowmind/components/FlowMindApp.tsx:694:                <div className="card create-agent-card">
+app/flowmind/components/FlowMindApp.tsx:696:                  <div>Criar agente personalizado</div>
+app/flowmind/components/FlowMindApp.tsx:705:              agent={activeAgent}
+app/flowmind/components/FlowMindApp.tsx:715:          {section === "financeiro" && (
+app/flowmind/components/FlowMindApp.tsx:877:        <button className="card-action" onClick={() => openSection("agentes")}>
+app/flowmind/components/FlowMindApp.tsx:882:      <button className="agent-card" onClick={() => openSection("dona")}>
+app/flowmind/components/FlowMindApp.tsx:883:        <div className="agent-avatar sage-bg">⚡</div>
+app/flowmind/components/FlowMindApp.tsx:884:        <div className="agent-info">
+app/flowmind/components/FlowMindApp.tsx:885:          <div className="agent-name">Dona</div>
+app/flowmind/components/FlowMindApp.tsx:886:          <div className="agent-desc">Ajustou sua lista para hoje às 8h</div>
+app/flowmind/components/FlowMindApp.tsx:888:        <span className="agent-status status-active">Ativa</span>
+app/flowmind/components/FlowMindApp.tsx:891:      <button className="agent-card" onClick={() => openSection("rica")}>
+app/flowmind/components/FlowMindApp.tsx:892:        <div className="agent-avatar red-bg">💰</div>
+app/flowmind/components/FlowMindApp.tsx:893:        <div className="agent-info">
+app/flowmind/components/FlowMindApp.tsx:894:          <div className="agent-name">Rica</div>
+app/flowmind/components/FlowMindApp.tsx:895:          <div className="agent-desc">Aguardando seu update de vendas</div>
+app/flowmind/components/FlowMindApp.tsx:897:        <span className="agent-status status-alert">1 alerta</span>
+app/flowmind/components/FlowMindApp.tsx:900:      <button className="agent-card" onClick={() => openSection("vera")}>
+app/flowmind/components/FlowMindApp.tsx:901:        <div className="agent-avatar lilac-bg">🧭</div>
+app/flowmind/components/FlowMindApp.tsx:902:        <div className="agent-info">
+app/flowmind/components/FlowMindApp.tsx:903:          <div className="agent-name">Vera</div>
+app/flowmind/components/FlowMindApp.tsx:904:          <div className="agent-desc">Revisão semanal pronta para domingo</div>
+app/flowmind/components/FlowMindApp.tsx:906:        <span className="agent-status status-waiting">Aguardando</span>
+app/flowmind/components/FlowMindApp.tsx:1100:  agent,
+app/flowmind/components/FlowMindApp.tsx:1108:  agent: AgentKey;
+app/flowmind/components/FlowMindApp.tsx:1113:  sendReply: (agent: AgentKey, text: string) => void;
+app/flowmind/components/FlowMindApp.tsx:1114:  sendMessage: (agent: AgentKey) => void;
+app/flowmind/components/FlowMindApp.tsx:1120:  }[agent];
+app/flowmind/components/FlowMindApp.tsx:1130:        <div className="agent-list">
+app/flowmind/components/FlowMindApp.tsx:1132:            className={agent === "vera" ? "agent-btn active-agent" : "agent-btn"}
+app/flowmind/components/FlowMindApp.tsx:1135:            <div className="agent-btn-emoji">🧭</div>
+app/flowmind/components/FlowMindApp.tsx:1136:            <div className="agent-btn-info">
+app/flowmind/components/FlowMindApp.tsx:1137:              <div className="agent-btn-name">Vera</div>
+app/flowmind/components/FlowMindApp.tsx:1138:              <div className="agent-btn-desc">Estrategista</div>
+app/flowmind/components/FlowMindApp.tsx:1143:            className={agent === "dona" ? "agent-btn active-agent" : "agent-btn"}
+app/flowmind/components/FlowMindApp.tsx:1146:            <div className="agent-btn-emoji">⚡</div>
+app/flowmind/components/FlowMindApp.tsx:1147:            <div className="agent-btn-info">
+app/flowmind/components/FlowMindApp.tsx:1148:              <div className="agent-btn-name">Dona</div>
+app/flowmind/components/FlowMindApp.tsx:1149:              <div className="agent-btn-desc">Gerente do Dia</div>
+app/flowmind/components/FlowMindApp.tsx:1154:            className={agent === "rica" ? "agent-btn active-agent" : "agent-btn"}
+app/flowmind/components/FlowMindApp.tsx:1157:            <div className="agent-btn-emoji">💰</div>
+app/flowmind/components/FlowMindApp.tsx:1158:            <div className="agent-btn-info">
+app/flowmind/components/FlowMindApp.tsx:1159:              <div className="agent-btn-name">Rica</div>
+app/flowmind/components/FlowMindApp.tsx:1160:              <div className="agent-btn-desc">Coach de Vendas</div>
+app/flowmind/components/FlowMindApp.tsx:1167:            <div className="chat-agent-emoji">{meta[0]}</div>
+app/flowmind/components/FlowMindApp.tsx:1169:              <div className="chat-agent-name">{meta[1]}</div>
+app/flowmind/components/FlowMindApp.tsx:1170:              <div className="chat-agent-role">{meta[2]}</div>
+app/flowmind/components/FlowMindApp.tsx:1178:            {chats[agent].map((msg, index) => (
+app/flowmind/components/FlowMindApp.tsx:1189:                        onClick={() => sendReply(agent, reply)}
+app/flowmind/components/FlowMindApp.tsx:1205:              value={inputs[agent]}
+app/flowmind/components/FlowMindApp.tsx:1207:                setInputs((old) => ({ ...old, [agent]: e.target.value }))
+app/flowmind/components/FlowMindApp.tsx:1212:                  sendMessage(agent);
+app/flowmind/components/FlowMindApp.tsx:1216:            <button className="chat-send" onClick={() => sendMessage(agent)}>
+app/flowmind/flowmind.css:795:.agent-card {
+app/flowmind/flowmind.css:808:.agent-card:last-child {
+app/flowmind/flowmind.css:812:.agent-avatar {
+app/flowmind/flowmind.css:833:.agent-info {
+app/flowmind/flowmind.css:837:.agent-name {
+app/flowmind/flowmind.css:843:.agent-desc {
+app/flowmind/flowmind.css:849:.agent-status {
+app/flowmind/flowmind.css:1149:.agent-full-card {
+app/flowmind/flowmind.css:1153:.agent-big-emoji {
+app/flowmind/flowmind.css:1158:.agent-big-name {
+app/flowmind/flowmind.css:1165:.agent-big-role {
+app/flowmind/flowmind.css:1172:.create-agent-card {
+app/flowmind/flowmind.css:1195:.agent-list {
+app/flowmind/flowmind.css:1200:.agent-btn {
+app/flowmind/flowmind.css:1215:.agent-btn.active-agent {
+app/flowmind/flowmind.css:1219:.agent-btn-emoji {
+app/flowmind/flowmind.css:1223:.agent-btn-name {
+app/flowmind/flowmind.css:1229:.agent-btn-desc {
+app/flowmind/flowmind.css:1252:.chat-agent-emoji {
+app/flowmind/flowmind.css:1256:.chat-agent-name {
+app/flowmind/flowmind.css:1262:.chat-agent-role {
+app/flowmind/flowmind.css:1299:.message.agent {
+app/flowmind/flowmind.css:1314:.message.agent .msg-bubble {
+app/flowmind/flowmind.css:1772:  .agent-list {
+app/flowmind/meus-templates/page.tsx:17:    agent: string;
+app/flowmind/meus-templates/page.tsx:76:          <p>Abra a loja, escolha um template e clique em “Usar este template”.</p>
+app/flowmind/meus-templates/page.tsx:78:            Abrir loja de templates
+app/flowmind/meus-templates/page.tsx:98:                  <strong>{workspace.plan.agent}</strong>
+app/flowmind/content/templates/bussola-semanal.md:29:A agente principal é a **Bússola**.
+app/flowmind/content/templates/1-ano-12-semanas.md:48:A agente principal desse template é a **Vera**.
+app/flowmind/content/templates/organiza-minha-cabeca.md:40:A agente principal é a **Dona**.
+app/flowmind/content/templates/casa-sem-caos.md:30:A agente principal é a **Calma**.
+app/flowmind/content/templates/mae-empreendedora.md:36:A agente principal é a **Dona**.
+app/flowmind/content/templates/lancamento-em-30-dias.md:38:A agente principal é a **Rica** em modo turbo.
+app/flowmind/content/templates/saida-financeira.md:14:A pessoa preenche um mapa financeiro simples.
+app/flowmind/content/templates/saida-financeira.md:46:A agente principal é a **Rica**.
+app/flowmind/content/templates/prospeccao-sem-vergonha.md:35:A agente principal é a **Rica**.
+app/flowmind/content/templates/recomeco-gentil.md:38:A agente principal é a **Calma**.
+app/flowmind/planos/page.tsx:98:            <Link href="/flowmind/agentes">Agentes</Link>
+app/flowmind/planos/page.tsx:180:          Abrir loja de templates
+app/flowmind/templates/page.tsx:32:            <Link href="/flowmind/agentes">Agentes</Link>
+app/flowmind/templates/[slug]/page.tsx:123:          <Link href="/flowmind/templates">← Voltar para loja</Link>
+app/flowmind/templates/[slug]/page.tsx:145:                <b>{template.agent}</b>
+app/flowmind/agentes/page.tsx:4:  return <FlowMindApp initialSection="agentes" />;
+app/prestador/planos/page.tsx:105:      const response = await fetch("/api/stripe/checkout-service-plan", {
+app/estudiolab/copilot/page.tsx:6:  redirect("/estudio-lab/copilot");
+app/estudiolab/copilot/template.tsx:8:  await requireAdmin("/estudiolab/copilot");
+app/automations/page.tsx:25:            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/55">Gerencie automações, agentes e fluxos do seu sistema.</p>
+app/automations/page.tsx:62:          <a href="https://dashboardcliente.sualuma.online" className="rounded-[24px] border border-cyan-400/20 bg-cyan-400/10 p-5">
+app/video-editor/page.tsx:62:          <a href="https://dashboardcliente.sualuma.online" className="rounded-[24px] border border-cyan-400/20 bg-cyan-400/10 p-5">
+app/page.tsx.save.1:155:              Seu sistema visual para agentes, automações, criação e escala.
+app/plans/page.tsx:48:    note: "Melhor equilíbrio entre estrutura, automação e custo.",
+app/plans/page.tsx:54:    description: "Para empresas que querem operar com automação e escala.",
+app/plans/page.tsx:72:      "Acesso ampliado aos agentes",
+app/services/plans/page.tsx:26:      const response = await fetch("/api/studio/stripe/products?area=services", {
+app/services/plans/page.tsx:52:      const response = await fetch("/api/stripe/checkout-price", {
+app/services/page.tsx:5:    name: "Studio Prime Web",
+app/services/page.tsx:23:    desc: "Integrações com n8n, agentes, automações e fluxos operacionais.",
+app/services/page.tsx:135:              placeholder="Buscar criação de sites, automação, branding, copy..."
+app/portal/page.tsx:3:import { getDashboardAccess, getDashboardUrl } from "@/lib/auth/dashboard-access";
+app/portal/page.tsx:28:          <Link className="choice primary" href="https://dashboardcliente.sualuma.online/member-user">
+app/portal/page.tsx:31:            <small>Acessar agentes, Mia, automações e benefícios de IA.</small>
+app/portal/page.tsx.backup-mobile-section-top-2026-04-28-1904:82:            Uma central elegante e inteligente para acessar seus dashboards,
+app/portal/page.tsx.backup-mobile-section-top-2026-04-28-1904:83:            sua empresa, a comunidade, o chat e as ferramentas de vídeo com IA.
+app/portal/_OriginalPortalPage.tsx:112:            Uma central elegante e inteligente para acessar seus dashboards,
+app/portal/_OriginalPortalPage.tsx:113:            sua empresa, a comunidade, o chat e as ferramentas de vídeo com IA.
+app/portal/_OriginalPortalPage.tsx:158:                Acesse seus ambientes principais em um só lugar: dashboards,
+app/portal/_OriginalPortalPage.tsx:159:                comunidade, chat inteligente, automações, serviços e ferramentas
+app/portal/page.tsx.backup-mobile-section-top-2026-04-28-1906:82:            Uma central elegante e inteligente para acessar seus dashboards,
+app/portal/page.tsx.backup-mobile-section-top-2026-04-28-1906:83:            sua empresa, a comunidade, o chat e as ferramentas de vídeo com IA.
+app/portal/page.tsx.backup-ordem-dinheiro-2026-04-28-1907:82:            Uma central elegante e inteligente para acessar seus dashboards,
+app/portal/page.tsx.backup-ordem-dinheiro-2026-04-28-1907:83:            sua empresa, a comunidade, o chat e as ferramentas de vídeo com IA.
+app/portal/page.tsx.backup-troca-entrar-ir-2026-04-28-1924:112:            Uma central elegante e inteligente para acessar seus dashboards,
+app/portal/page.tsx.backup-troca-entrar-ir-2026-04-28-1924:113:            sua empresa, a comunidade, o chat e as ferramentas de vídeo com IA.
+app/mini-company/page.tsx:102:            Planejamento, marketing, vendas, financeiro, tarefas, e-mails,
+app/api/music-producer/analyze/route.ts:97:          "Importar a voz no BandLab ou FL Studio.",
+app/api/studio/brain/route.ts:38:      description: "Atendimento e respostas do time/automação.",
+app/api/studio/brain/route.ts:47:      description: "Venda de serviços, agentes e oportunidades internas.",
+app/api/studio/brain/route.ts:64:      title: "Chat Mia",
+app/api/studio/brain/route.ts:124:      href: "#financeiro",
+app/api/studio/brain/route.ts:158:      title: "Explora o Studio / Portal",
+app/api/studio/brain/route.ts:179:      title: "Compra serviço / agente / plano",
+app/api/studio/brain/route.ts:231:    const file = path.join(process.cwd(), "data", "studio-brain.json");
+app/api/studio/brain/route.ts:261:    owner: String(item.owner || "Studio")
+app/api/studio/brain/route.ts:276:    label: String(item.label || "Indicador financeiro"),
+app/api/studio/dashboard/route.ts:2:import { getStudioDashboardData } from "@/lib/studio/studio-dashboard-store";
+app/api/studio/dashboard/route.ts:8:  const data = await getStudioDashboardData();
+app/api/studio/stripe/products/route.ts:2:import Stripe from "stripe";
+app/api/studio/stripe/products/route.ts:48:  if (name.includes("ia") || name.includes("ai") || name.includes("agente")) return "ia";
+app/api/studio/stripe/products/route.ts:54:  const stripe = getStripe();
+app/api/studio/stripe/products/route.ts:56:  const prices = await stripe.prices.list({
+app/api/studio/stripe/products/route.ts:98:        checkoutPath: "/api/stripe/checkout-price",
+app/api/studio/stripe/products/route.ts:120:      source: "stripe",
+app/api/studio/stripe/products/route.ts:125:    console.error("[studio/stripe/products][GET]", error);
+app/api/studio/stripe/products/route.ts:193:    const stripe = getStripe();
+app/api/studio/stripe/products/route.ts:195:    const product = await stripe.products.create({
+app/api/studio/stripe/products/route.ts:206:    const price = await stripe.prices.create({
+app/api/studio/stripe/products/route.ts:231:    console.error("[studio/stripe/products][POST]", error);
+app/api/studio/servicos-e-indique/route.ts:126:      stripeProductId: plan.stripe_product_id,
+app/api/studio/servicos-e-indique/route.ts:127:      stripePriceId: plan.stripe_price_id,
+app/api/studio/servicos-e-indique/stripe-sync/route.ts:2:import Stripe from "stripe";
+app/api/studio/servicos-e-indique/stripe-sync/route.ts:74:        stripeProductId: plan.stripe_product_id,
+app/api/studio/servicos-e-indique/stripe-sync/route.ts:75:        stripePriceId: plan.stripe_price_id,
+app/api/studio/servicos-e-indique/stripe-sync/route.ts:77:        needsStripe: Number(plan.price_cents || 0) > 0 && (!plan.stripe_product_id || !plan.stripe_price_id),
+app/api/studio/servicos-e-indique/stripe-sync/route.ts:96:    const stripe = getStripe();
+app/api/studio/servicos-e-indique/stripe-sync/route.ts:123:      if (plan.stripe_product_id && plan.stripe_price_id) {
+
+### 5) CONEXÕES API/FETCH/LINKS DENTRO DO STUDIO
+app/studio/estudioantigo/page.tsx:355:        const res = await fetch("/api/studio/brain", { cache: "no-store" });
+app/studio/estudioantigo/page.tsx:424:          <a href="#visao-geral">Visão Geral</a>
+app/studio/estudioantigo/page.tsx:425:          <a href="#operacional">Cérebro Operacional</a>
+app/studio/estudioantigo/page.tsx:426:          <a href="#jornada">Mapa do Usuário</a>
+app/studio/estudioantigo/page.tsx:427:          <a href="#financeiro">Financeiro</a>
+app/studio/estudioantigo/page.tsx:428:          <a href="#notificacoes">Notificações</a>
+app/studio/estudioantigo/page.tsx:461:              <a className="summaryCard" href="#financeiro">
+app/studio/estudioantigo/page.tsx:465:              <a className="summaryCard" href="#financeiro">
+app/studio/estudioantigo/page.tsx:469:              <a className="summaryCard" href="/admin/leads">
+app/studio/estudioantigo/page.tsx:473:              <a className="summaryCard" href="/member-user">
+app/studio/estudioantigo/page.tsx:477:              <a className="summaryCard" href="/chat">
+app/studio/estudioantigo/page.tsx:481:              <a className="summaryCard" href="#operacional">
+app/studio/estudioantigo/page.tsx:540:                      <a className="moduleCard" href={item.href} key={item.id}>
+app/studio/estudioantigo/page.tsx:587:                <a className="mindNode" href={step.href} key={step.id}>
+app/studio/estudioantigo/page.tsx:614:              <a className="financeCard" href={item.href} key={item.id}>
+app/studio/estudioantigo/page.tsx:659:                <a className="notifCard" href={item.href} key={item.id}>
+app/studio/servicos-e-indique/page.tsx:237:          fetch(`/api/studio/servicos-e-indique?ts=${ts}`, { cache: "no-store" }),
+app/studio/servicos-e-indique/page.tsx:238:          fetch(`/api/studio/servicos-e-indique/links?ts=${ts}`, { cache: "no-store" }),
+app/studio/servicos-e-indique/page.tsx:281:            <a href="/studio/indique">Abrir Indicações</a>
+app/studio/servicos-e-indique/page.tsx:282:            <a href="/studio/stripe-planos">Planos e Stripe</a>
+app/studio/servicos-e-indique/page.tsx:283:            <a href="/studio/catalogo-paginas">Catálogo de Links</a>
+app/studio/stripe-planos/page.tsx:71:      const res = await fetch(`/api/studio/stripe/products?ts=${Date.now()}`, {
+app/studio/stripe-planos/page.tsx:106:      const res = await fetch("/api/studio/stripe/products", {
+app/studio/stripe-planos/page.tsx:166:          <a href="/services/plans" target="_blank">
+app/studio/stripe-planos/page.tsx:297:                <form method="POST" action="/api/stripe/checkout-price">
+app/studio/indique/page.tsx:58:      const res = await fetch("/api/studio/servicos-e-indique/links", {
+app/studio/indique/page.tsx:84:      const res = await fetch("/api/studio/servicos-e-indique/links", {
+app/studio/catalogo-paginas/page.tsx:41:      const res = await fetch("/api/studio/catalogo-paginas", {
+app/studio/catalogo-paginas/page.tsx:142:              <a className="miniItem" href={page.url} target="_blank" key={`${page.file}-${page.updatedAtFormatted}`}>
+app/studio/catalogo-paginas/page.tsx:205:                  <a href={page.url} target="_blank">Abrir página</a>
+app/studio/usuarios-diagnostico/page.tsx:76:    fetch("/api/studio/user-auth-diagnostics", { cache: "no-store" })
+app/studio/usuarios-diagnostico/page.tsx:178:            <a href="/studio">Studio</a>
+app/studio/usuarios-diagnostico/page.tsx:179:            <a href="/admin">Admin</a>
+app/studio/usuarios-diagnostico/page.tsx:180:            <a href="/studio/usuarios">Usuários</a>
+app/studio/mia-brain/page.tsx:264:      const res = await fetch("/api/studio/mia-brain", { cache: "no-store" });
+app/studio/mia-brain/page.tsx:301:      const res = await fetch("/api/studio/mia-brain", {
+app/studio/mia-brain/page.tsx:322:      const res = await fetch("/api/studio/mia-brain", {
+app/studio-lab/page.tsx:1086:    links: ["/", "/comunidade", "/perfil", "/posts", "/api/comunidade/posts"],
+app/studio-lab/page.tsx:1092:    links: ["/", "/obrigada", "/campanha", "/api/leads"],
+app/studio-lab/page.tsx:1392:  { title: "API Studio Dashboard", detail: "Rota /api/studio/dashboard retornando dados do banco.", value: "ok", tone: "green" as Tone },
+app/studio-lab/page.tsx:1538:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:1630:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:1745:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:1853:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:1955:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:2007:              href="/studio/catalogo-paginas"
+app/studio-lab/page.tsx:2111:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:2425:                  href={item.url}
+app/studio-lab/page.tsx:2477:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:2542:        const response = await fetch("/api/studio/dashboard", {
+app/studio-lab/page.tsx:2607:        href="/studio/catalogo-paginas"
+app/studio-lab/page.tsx:3274:                    <a href="/studio/stripe-planos" style={{ color: "#fff", textDecoration: "none", border: "1px solid rgba(255,255,255,.22)", borderRadius: 999, padding: "12px 18px", fontWeight: 800, background: "rgba(255,255,255,.08)" }}>
+app/studio-lab/MiaStudioChat.tsx:118:      const res = await fetch("/api/studio/mia-brain", {
+app/studio-lab/MiaStudioChat.tsx:147:            "Não consegui conectar com a Mia agora. A janela abriu, mas a API da Mia não respondeu. Verifique /api/studio/mia-brain.",
+app/estudio-lab/agentesadms/AgentesAdmsClient.tsx:66:      const response = await fetch("/api/estudio/agentesadms/agents", {
+app/estudio-lab/agentesadms/AgentesAdmsClient.tsx:126:    const response = await fetch("/api/estudio/agentesadms/agents", {
+app/estudio-lab/agentesadms/AgentesAdmsClient.tsx:247:      const response = await fetch("/api/estudio/agentesadms/chat", {
+app/estudio-lab/agentesadms/AdmsVoiceRobotOverlay.tsx:169:        const response = await fetch("/api/tts/speak", {
+app/estudio-lab/crescimento/page.tsx:128:        const res = await fetch("/api/agente-crescimento", {
+app/estudio-lab/configuracoes/page.tsx:82:        const response = await fetch("/api/usuario/configuracoes", {
+app/estudio-lab/configuracoes/page.tsx:120:      const response = await fetch("/api/usuario/configuracoes", {
+app/estudio-lab/produtor-musical/MusicProducerClient.tsx:50:      const res = await fetch("/api/music-producer/analyze", {
+components/studio/UserAccessAgentPanel.tsx:71:      const response = await fetch("/api/studio/user-agent/status", {
+components/studio/UserAccessAgentPanel.tsx:142:      const response = await fetch("/api/studio/user-agent/chat", {
+
+### 6) STATUS GIT
+ M components/studio/UserAccessAgentPanel.tsx
+ M data/user-access-agent/progress.json
+ M lib/agents/user-access-agent.ts
+?? app/api/music-producer/
+?? app/api/studio/user-agent/chat/
+?? app/estudio-lab/produtor-musical/
+?? data/studio-map-20260504-121245.txt
+
+### 7) STATUS PM2
+┌────┬────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name               │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 4  │ cerebro-blue       │ default     │ 0.2.0   │ cluster │ 1092320  │ 7h     │ 24   │ online    │ 0%       │ 66.8mb   │ root     │ disabled │
+│ 3  │ luma-os            │ default     │ N/A     │ fork    │ 1246634  │ 17m    │ 123  │ online    │ 0%       │ 55.6mb   │ root     │ disabled │
+│ 0  │ sualuma-backend    │ default     │ 1.0.0   │ fork    │ 122883   │ 2D     │ 11   │ online    │ 0%       │ 35.7mb   │ root     │ disabled │
+│ 1  │ sualuma-brain      │ default     │ 1.0.0   │ fork    │ 122884   │ 2D     │ 11   │ online    │ 0%       │ 43.1mb   │ root     │ disabled │
+└────┴────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘

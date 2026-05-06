@@ -23,6 +23,10 @@ export async function POST(request: NextRequest) {
     const stripe = getStripe();
     const body = await request.json();
 
+    const userId = String(
+      body?.userId || body?.user_id || body?.clientReferenceId || ""
+    ).trim();
+
     const priceId = String(body?.priceId || "").trim();
 
     if (!priceId.startsWith("price_")) {
@@ -58,6 +62,15 @@ export async function POST(request: NextRequest) {
       ...(price.metadata || {}),
     };
 
+    const accessPlanKey = String(
+      body?.plan_key ||
+        body?.planKey ||
+        metadata.plan_key ||
+        metadata.plan ||
+        metadata.slug ||
+        ""
+    ).trim();
+
     const trialDays = toPositiveInteger(metadata.trial_days, 0);
     const mode = price.type === "recurring" ? "subscription" : "payment";
 
@@ -69,6 +82,7 @@ export async function POST(request: NextRequest) {
 
     const sessionParams: any = {
       mode,
+      client_reference_id: userId || undefined,
       line_items: [
         {
           price: price.id,
@@ -80,6 +94,8 @@ export async function POST(request: NextRequest) {
       metadata: {
         price_id: price.id,
         product_id: typeof product === "string" ? product : product?.id || "",
+        plan_key: accessPlanKey,
+        user_id: userId,
         sualuma_area: metadata.sualuma_area || metadata.area || "services",
       },
       allow_promotion_codes: true,

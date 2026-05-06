@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
-export default function ServicosPlanosPage() {
-  redirect("/services/plans");
+export const dynamic = "force-dynamic";
+
+export default function ServicosPlanosRedirectPage() {
+  redirect("/plans?origem=servicos");
 }

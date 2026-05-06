@@ -44,7 +44,7 @@ export default function LojaAgentesSucessoPage() {
             border: "1px solid rgba(0,212,255,.28)"
           }}
         >
-          <strong>chat.sualuma.online → Mia → Meus Agentes</strong>
+          <strong>chat.sualuma.online/chat → Mia → Meus Agentes</strong>
         </div>
 
         <p style={{ color: "#cbd6ff", lineHeight: 1.6 }}>
@@ -53,7 +53,7 @@ export default function LojaAgentesSucessoPage() {
         </p>
 
         <a
-          href="https://chat.sualuma.online"
+          href="https://chat.sualuma.online/chat"
           style={{
             display: "inline-block",
             marginTop: 22,

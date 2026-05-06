@@ -1,0 +1,18 @@
+{
+  "title": "Planos unificados e portal antigo animado",
+  "status": "decisao_aprovada",
+  "summary": "A Sualuma deve usar uma única página oficial de planos em /plans. As páginas antigas de planos ficam em off e redirecionam para /plans. Produtos extras viram upsell/upgrade interno. O portal deve voltar para a versão antiga mais bonita, com animações e visual premium.",
+  "rules": [
+    "A página oficial de planos é /plans.",
+    "/planos, /flowmind/planos, /prestador/planos, /services/plans e /servicos/planos devem continuar redirecionando para /plans.",
+    "Não recriar páginas separadas de venda para FlowMind, prestador ou serviços por enquanto.",
+    "Extras como FlowMatic Rotina Pro, FlowMatic Solo CEO, Agência/Time prestador, créditos extras, agentes extras e templates pagos devem ser tratados como upsell/upgrade.",
+    "Plano Free é gratuito permanente.",
+    "Plano Free libera portal, comunidade, loja de agentes, Mia com créditos limitados, blog, FlowMind Free e painel de prestador.",
+    "Plano Free não libera dashboard de cliente.",
+    "Dashboard de cliente começa no Básico.",
+    "Pop-up de escolha de plano está desabilitado temporariamente apenas para inspeção.",
+    "Portal deve ser a entrada central depois do login.",
+    "Restaurar visual antigo do portal com animações se houver backup."
+  ]
+}

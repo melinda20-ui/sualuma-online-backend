@@ -1,21 +1,37 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { getFlowmindTenant } from "@/lib/flowmind-tenant-auth";
+import { readTenantJson } from "@/lib/tenant/tenant-store";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+type FlowWorkspaceRecord = {
+  id?: string;
+  userId?: string;
+  [key: string]: unknown;
+};
 
 export async function GET() {
-  try {
-    const filePath = path.join(process.cwd(), "data", "flowmind-workspaces.json");
-    const raw = await fs.readFile(filePath, "utf8");
-    const workspaces = JSON.parse(raw);
+  const auth = await getFlowmindTenant();
 
-    return NextResponse.json({
-      ok: true,
-      workspaces: Array.isArray(workspaces) ? workspaces : [],
-    });
-  } catch {
-    return NextResponse.json({
-      ok: true,
-      workspaces: [],
-    });
+  if (!auth.ok) {
+    return auth.response;
   }
+
+  const workspaces = readTenantJson<FlowWorkspaceRecord[]>(
+    auth.tenantId,
+    "flowmind-workspaces",
+    []
+  );
+
+  const safeWorkspaces = Array.isArray(workspaces)
+    ? workspaces.filter((workspace) => {
+        return !workspace.userId || workspace.userId === auth.user.id;
+      })
+    : [];
+
+  return NextResponse.json({
+    ok: true,
+    workspaces: safeWorkspaces,
+  });
 }

@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server'
+import { getClienteTenant, syncClientCustomer } from '@/lib/client-tenant-auth'
 import { makeId, readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request) {
-  const data = await readClientDashboard()
+  const auth = await getClienteTenant()
+  if (!auth.ok) return auth.response
+
+  const data = await readClientDashboard(auth.tenantId)
+  syncClientCustomer(data, auth.user)
   const url = new URL(req.url)
   const projectId = url.searchParams.get('projectId')
 
@@ -17,6 +22,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const auth = await getClienteTenant()
+  if (!auth.ok) return auth.response
+
   try {
     const body = (await req.json()) as Record<string, unknown>
     const title = String(body.title ?? '').trim()
@@ -39,10 +47,11 @@ export async function POST(req: Request) {
       createdAt: new Date().toISOString(),
     }
 
-    const data = await readClientDashboard()
+    const data = await readClientDashboard(auth.tenantId)
+  syncClientCustomer(data, auth.user)
     data.deliveries.unshift(delivery)
 
-    await saveClientDashboard(data)
+    await saveClientDashboard(data, auth.tenantId)
 
     return NextResponse.json(delivery, { status: 201 })
   } catch (error) {

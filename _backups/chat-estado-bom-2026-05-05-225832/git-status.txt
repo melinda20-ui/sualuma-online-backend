@@ -1,0 +1,30 @@
+ M app/api/agent-tasks/chat/route.ts
+ M app/api/chat-antigo/brain/route.ts
+ M app/api/stripe/checkout-price/route.ts
+ M app/api/stripe/checkout-service-plan/route.ts
+ M app/api/stripe/checkout/route.ts
+ M app/api/stripe/webhook/route.ts
+ M app/api/studio/chat-dashboard/route.ts
+ M app/chat-antigo/page.tsx
+ M app/chat/page.tsx
+ M app/loja-agentes/page.tsx
+ M app/loja-agentes/sucesso/page.tsx
+ M components/studio/TaskAgentSmartChat.tsx
+ M data/onboarding-board/board.json
+ M data/user-access-agent/progress.json
+?? _backups/
+?? app/api/loja-agentes/
+?? app/api/platform/me/route.ts.bak-20260505-204709
+?? app/chat-template-rosa/
+?? app/loja-agentes/[slug]/
+?? app/studio/agentesadms/layout.tsx
+?? app/studio/usuarios-diagnostico/page.tsx.bak-access-view-20260505-210751
+?? components/studio/TaskAgentChat.tsx
+?? data/agent-orchestrator/launch-squad-last-report.json
+?? data/chat-backups/
+?? data/diagnostico/
+?? data/discord/
+?? data/loja-agentes/
+?? data/studio-blog-agent/
+?? data/studio-map-20260504-121245.txt
+?? data/system-diagnostics/state.json

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
+import { readFileSync } from "fs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -334,35 +335,165 @@ async function callEndpoint({
   }
 }
 
+
+function readEnvFileValue(filePath: string, key: string) {
+  try {
+    const raw = readFileSync(filePath, "utf8");
+
+    for (const line of raw.split(/\r?\n/)) {
+      const clean = line.trim();
+      if (!clean || clean.startsWith("#")) continue;
+
+      const index = clean.indexOf("=");
+      if (index <= 0) continue;
+
+      const k = clean.slice(0, index).trim();
+      let value = clean.slice(index + 1).trim();
+
+      if (k !== key) continue;
+
+      value = value.replace(/^["']|["']$/g, "");
+      return value;
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+}
+
+function getBlueBrainConfig() {
+  const port =
+    process.env.BLUE_BRAIN_PORT ||
+    readEnvFileValue("/opt/blue-brain/.env", "PORT") ||
+    "4117";
+
+  const key =
+    process.env.BLUE_BRAIN_API_KEY ||
+    process.env.BRAIN_API_KEY ||
+    readEnvFileValue("/opt/blue-brain/.env", "BRAIN_API_KEY");
+
+  const baseUrl = (
+    process.env.BLUE_BRAIN_URL ||
+    `http://127.0.0.1:${port}`
+  ).replace(/\/$/, "");
+
+  return { baseUrl, key };
+}
+
+function pickBlueSkill(message: string) {
+  const m = message.toLowerCase();
+
+  if (m.includes("vps") || m.includes("servidor") || m.includes("nginx") || m.includes("pm2")) return "vps-doctor";
+  if (m.includes("login") || m.includes("usuário") || m.includes("usuario") || m.includes("acesso")) return "user-doctor";
+  if (m.includes("ux") || m.includes("layout") || m.includes("tela") || m.includes("design")) return "ux-doctor";
+  if (m.includes("loja") || m.includes("agente") || m.includes("produto") || m.includes("checkout")) return "store-manager";
+  if (m.includes("lead") || m.includes("prospect") || m.includes("cliente")) return "growth-agent";
+  if (m.includes("post") || m.includes("conteúdo") || m.includes("marketing") || m.includes("venda")) return "growth-agent";
+
+  return "business-agent";
+}
+
+async function callBlueBrainDirect({
+  message,
+  threadId,
+}: {
+  message: string;
+  threadId: string;
+}): Promise<EndpointAttempt & { answer?: string; raw?: unknown }> {
+  const { baseUrl, key } = getBlueBrainConfig();
+
+  if (!key) {
+    return {
+      endpoint: `${baseUrl}/v1/tasks`,
+      ok: false,
+      error: "BRAIN_API_KEY não encontrada no /opt/blue-brain/.env.",
+    };
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 45000);
+
+  const skill = pickBlueSkill(message);
+
+  const goal = [
+    "Você é a Mia no chat oficial da Sualuma.",
+    "Responda em português brasileiro, com clareza, honestidade e sem inventar dados.",
+    "Se não souber algo, diga que não tem essa informação.",
+    "",
+    `Thread: ${threadId}`,
+    `Mensagem do usuário: ${message}`,
+  ].join("\n");
+
+  try {
+    const response = await fetch(`${baseUrl}/v1/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-brain-key": key,
+        "x-sualuma-source": "chat-oficial",
+      },
+      body: JSON.stringify({
+        goal,
+        skill,
+        mode: "assist",
+      }),
+      signal: controller.signal,
+    });
+
+    const rawText = await response.text();
+
+    let data: unknown = rawText;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      data = rawText;
+    }
+
+    const answer = pickAnswer(data);
+
+    if (response.ok && answer) {
+      return {
+        endpoint: `${baseUrl}/v1/tasks`,
+        ok: true,
+        status: response.status,
+        answer,
+        answer_preview: answer.slice(0, 180),
+        raw: data,
+      };
+    }
+
+    return {
+      endpoint: `${baseUrl}/v1/tasks`,
+      ok: false,
+      status: response.status,
+      error: answer || safeText(data, 800),
+      raw: data,
+    };
+  } catch (error: any) {
+    return {
+      endpoint: `${baseUrl}/v1/tasks`,
+      ok: false,
+      error: error?.name === "AbortError" ? "timeout no Cérebro Blue" : error?.message || String(error),
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 function fallbackAnswer(message: string, brain: AnyObj, attempts: EndpointAttempt[]) {
-  const activeProviders = (brain.providers || [])
-    .filter((p: AnyObj) => p.status === "active")
-    .map((p: AnyObj) => p.name)
-    .slice(0, 6)
-    .join(", ");
-
-  const activeSkills = (brain.skills || [])
-    .filter((s: AnyObj) => s.status === "active")
-    .map((s: AnyObj) => s.name)
-    .slice(0, 6)
-    .join(", ");
-
   const failed = attempts
     .map((a) => `${a.endpoint}: ${a.error || a.status || "falhou"}`)
     .join(" | ");
 
   return [
-    "Mia conectada ao Chat Antigo.",
+    "Não consegui conectar ao Cérebro Blue agora.",
     "",
-    `Recebi sua mensagem: "${message}"`,
+    "Não vou inventar uma resposta falsa.",
     "",
-    "Contexto ativo do cérebro:",
-    `- Provedores ativos: ${activeProviders || "nenhum provedor ativo encontrado"}`,
-    `- Skills ativas: ${activeSkills || "nenhuma skill ativa encontrada"}`,
+    `Sua mensagem foi: "${message}"`,
     "",
-    "Eu tentei chamar o roteador real da Mia, mas nenhum endpoint devolveu resposta final agora.",
-    "",
-    `Tentativas: ${failed || "sem detalhes"}`,
+    `Falha técnica: ${failed || "sem detalhes"}`,
   ].join("\n");
 }
 
@@ -442,28 +573,49 @@ export async function POST(req: NextRequest) {
   let usedEndpoint: string | null = null;
   let rawResponse: unknown = null;
 
-  for (const endpoint of CANDIDATE_ENDPOINTS) {
-    const attempt = await callEndpoint({
-      origin,
-      endpoint,
-      message,
-      threadId,
-      brain,
-    });
+  const blueAttempt = await callBlueBrainDirect({
+    message,
+    threadId,
+  });
 
-    attempts.push({
-      endpoint: attempt.endpoint,
-      ok: attempt.ok,
-      status: attempt.status,
-      error: attempt.error,
-      answer_preview: attempt.answer_preview,
-    });
+  attempts.push({
+    endpoint: blueAttempt.endpoint,
+    ok: blueAttempt.ok,
+    status: blueAttempt.status,
+    error: blueAttempt.error,
+    answer_preview: blueAttempt.answer_preview,
+  });
 
-    if (attempt.ok && attempt.answer) {
-      answer = attempt.answer;
-      usedEndpoint = endpoint;
-      rawResponse = attempt.raw;
-      break;
+  if (blueAttempt.ok && blueAttempt.answer) {
+    answer = blueAttempt.answer;
+    usedEndpoint = blueAttempt.endpoint;
+    rawResponse = blueAttempt.raw;
+  }
+
+  if (!answer && process.env.ALLOW_LEGACY_CHAT_FALLBACK === "true") {
+    for (const endpoint of CANDIDATE_ENDPOINTS) {
+      const attempt = await callEndpoint({
+        origin,
+        endpoint,
+        message,
+        threadId,
+        brain,
+      });
+
+      attempts.push({
+        endpoint: attempt.endpoint,
+        ok: attempt.ok,
+        status: attempt.status,
+        error: attempt.error,
+        answer_preview: attempt.answer_preview,
+      });
+
+      if (attempt.ok && attempt.answer) {
+        answer = attempt.answer;
+        usedEndpoint = endpoint;
+        rawResponse = attempt.raw;
+        break;
+      }
     }
   }
 

@@ -1,0 +1,86 @@
+{
+  "name": "Automação Editorial Sualuma",
+  "updatedAt": "2026-05-06T22:22:44.985178+00:00",
+  "keepLayout": true,
+  "importantRule": "Manter o mesmo layout visual do blog. A automação deve mexer no conteúdo, rascunhos, imagens, SEO e publicação, mas não redesenhar o layout.",
+  "problemDetected": {
+    "adminContent": "Admin Conteúdo mostra 1 rascunho real via /api/posts.",
+    "staticBlog": "Blog estático mostra vários cards/artigos que ainda não parecem estar sincronizados com o Admin Conteúdo.",
+    "blogAgent": "Agente de Blog está contando posts de outra fonte e não está criando rascunhos reais no Admin Conteúdo."
+  },
+  "goal": "Criar uma automação real onde o sistema detecta temas em alta, gera rascunhos, pede aprovação, adiciona imagens, revisa SEO e publica no blog.",
+  "pipeline": [
+    {
+      "step": 1,
+      "agent": "Agente Google/SEO/Radar",
+      "action": "Criar uma página no Studio mostrando tendências do nicho Sualuma: IA, automação, pequenos negócios, marketing, sites, produtividade, MEI/autônomos e prestação de serviços.",
+      "output": "Lista de temas em alta com prioridade, fonte, intenção de busca, dificuldade e sugestão de título."
+    },
+    {
+      "step": 2,
+      "agent": "Agente de Blog",
+      "action": "Ler a lista de tendências e pegar um tema por vez para criar rascunho completo no Admin Conteúdo usando /api/posts.",
+      "output": "Post salvo como rascunho real, não mockado."
+    },
+    {
+      "step": 3,
+      "agent": "Agente de Tarefas",
+      "action": "Quando o rascunho ficar pronto, criar/atualizar tarefa no Kanban avisando Luma que o rascunho está pronto para revisão.",
+      "output": "Tarefa em andamento ou em espera com link para revisar."
+    },
+    {
+      "step": 4,
+      "agent": "Luma/Admin",
+      "action": "Luma revisa e aprova o rascunho.",
+      "output": "Status aprovado para imagens."
+    },
+    {
+      "step": 5,
+      "agent": "Agente de Imagens",
+      "action": "Criar/adicionar imagem principal e imagens internas no artigo, mantendo identidade visual do Blog Sualuma.",
+      "output": "Rascunho com imagens aplicadas."
+    },
+    {
+      "step": 6,
+      "agent": "Luma/Admin",
+      "action": "Luma aprova a versão com imagens.",
+      "output": "Status aprovado para SEO/publicação."
+    },
+    {
+      "step": 7,
+      "agent": "Agente Google/SEO",
+      "action": "Revisar título, slug, descrição, palavra-chave, intenção de busca, links internos e prontidão para indexação.",
+      "output": "Parecer de SEO: pode publicar ou precisa ajustar."
+    },
+    {
+      "step": 8,
+      "agent": "Agente de Tarefas",
+      "action": "Se aprovado pelo SEO, avisar o Agente de Blog que pode publicar.",
+      "output": "Tarefa movida para publicação."
+    },
+    {
+      "step": 9,
+      "agent": "Agente de Blog",
+      "action": "Publicar o artigo no blog real.",
+      "output": "Post publicado e visível no blog."
+    },
+    {
+      "step": 10,
+      "agent": "Agente de Blog",
+      "action": "Importar ou recriar todos os artigos/cards do blog estático dentro do Admin Conteúdo como rascunhos reais para passarem pelo mesmo fluxo.",
+      "output": "Blog estático e Admin Conteúdo sincronizados."
+    },
+    {
+      "step": 11,
+      "agent": "Produto/Template",
+      "action": "Depois que a automação funcionar para a Sualuma, transformar em template/produto vendável para clientes usarem no próprio negócio.",
+      "output": "Template de automação editorial pronto para vender."
+    }
+  ],
+  "contentIdeasSource": {
+    "page": "/studio/ideias-conteudo",
+    "api": "/api/studio/content-ideas",
+    "radarApi": "/api/studio/google-content-radar",
+    "file": "data/content-ideas/ideas.json"
+  }
+}

@@ -1,4 +1,5 @@
 import { readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
+import { getClienteTenant } from '@/lib/client-tenant-auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -235,7 +236,10 @@ export async function GET(req: Request) {
       `)
     }
 
-    const data = await readClientDashboard() as any
+    const auth = await getClienteTenant()
+    if (!auth.ok) return auth.response
+
+    const data = await readClientDashboard(auth.tenantId) as any
     const meeting = data.meetings.find((item: any) => item.id === meetingId)
 
     if (!meeting) {
@@ -344,7 +348,10 @@ export async function POST(req: Request) {
       `)
     }
 
-    const data = await readClientDashboard() as any
+    const auth = await getClienteTenant()
+    if (!auth.ok) return auth.response
+
+    const data = await readClientDashboard(auth.tenantId) as any
     const meeting = data.meetings.find((item: any) => item.id === meetingId)
 
     if (!meeting) {
@@ -364,7 +371,7 @@ export async function POST(req: Request) {
 
     meeting.calendarLink = googleCalendarLink
 
-    await saveClientDashboard(data)
+    await saveClientDashboard(data, auth.tenantId)
 
     const dataFormatada = formatDateBR(meeting.scheduledAt)
 

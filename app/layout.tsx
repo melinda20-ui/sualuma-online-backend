@@ -1,3 +1,4 @@
+import TemporaryDisablePlanPopup from "@/components/TemporaryDisablePlanPopup";
 import StudioMenuCollapse from "@/components/StudioMenuCollapse";
 import './globals.css'
 import AuthWelcomeEmail from "@/components/AuthWelcomeEmail";
@@ -19,7 +20,8 @@ export default function RootLayout({
       <body>
         
         
-        <AuthCookieBridge />{children}          <AuthWelcomeEmail />
+        <AuthCookieBridge /><TemporaryDisablePlanPopup />
+          {children}          <AuthWelcomeEmail />
                   <ChoosePlanPopup />
                 <StudioMenuCollapse />
       </body>

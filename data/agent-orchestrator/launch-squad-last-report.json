@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "updatedAt": "2026-05-06T21:27:31.963Z",
+  "health": 100,
+  "openTasks": 59,
+  "downTargets": 0,
+  "hints": [],
+  "discord": {
+    "ok": true,
+    "status": 204,
+    "text": ""
+  }
+}

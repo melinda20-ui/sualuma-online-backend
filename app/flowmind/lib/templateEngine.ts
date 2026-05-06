@@ -326,13 +326,17 @@ const fallbackBlueprint = {
 
 export function generateWorkspaceFromTemplate({
   slug,
-  userId = "demo-user",
+  userId,
 }: {
   slug: string;
   userId?: string;
 }): FlowWorkspace {
   const template = getTemplateBySlug(slug);
   const blueprint = templateBlueprints[slug] || fallbackBlueprint;
+
+  if (!userId) {
+    throw new Error("userId obrigatório para criar workspace FlowMind.");
+  }
 
   return {
     id: id("workspace"),

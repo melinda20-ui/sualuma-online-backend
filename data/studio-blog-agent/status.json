@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "agent": "Nova · Agente de Blog",
+  "total": 3,
+  "published": 0,
+  "drafts": 3,
+  "withImage": 0,
+  "withSeo": 3,
+  "indexed": 0,
+  "missingImage": 3,
+  "missingSeo": 0,
+  "notIndexed": 3,
+  "health": 25,
+  "updatedAt": "2026-05-06T22:34:47.793Z"
+}

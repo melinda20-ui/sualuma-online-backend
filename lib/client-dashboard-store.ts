@@ -1,5 +1,10 @@
 import { promises as fs } from 'fs'
 import path from 'path'
+import {
+  readTenantJson,
+  tenantIdFromUserId,
+  writeTenantJson,
+} from '@/lib/tenant/tenant-store'
 
 export type Customer = {
   id: string
@@ -93,6 +98,7 @@ export type ClientDashboardData = {
 }
 
 const filePath = path.join(process.cwd(), 'data', 'client-dashboard.json')
+const tenantDashboardFile = 'client-dashboard'
 
 const defaultDashboard: ClientDashboardData = {
   customer: {
@@ -127,7 +133,21 @@ function normalizeDashboard(data: Partial<ClientDashboardData>): ClientDashboard
   }
 }
 
-export async function readClientDashboard(): Promise<ClientDashboardData> {
+export function clientTenantIdFromUserId(userId: string) {
+  return tenantIdFromUserId(userId)
+}
+
+export async function readClientDashboard(tenantId?: string): Promise<ClientDashboardData> {
+  if (tenantId) {
+    const data = readTenantJson<Partial<ClientDashboardData>>(
+      tenantId,
+      tenantDashboardFile,
+      defaultDashboard
+    )
+
+    return normalizeDashboard(data)
+  }
+
   try {
     const file = await fs.readFile(filePath, 'utf8')
     const parsed = JSON.parse(file) as Partial<ClientDashboardData>
@@ -138,9 +158,16 @@ export async function readClientDashboard(): Promise<ClientDashboardData> {
   }
 }
 
-export async function saveClientDashboard(data: ClientDashboardData) {
+export async function saveClientDashboard(data: ClientDashboardData, tenantId?: string) {
+  const normalized = normalizeDashboard(data)
+
+  if (tenantId) {
+    writeTenantJson(tenantId, tenantDashboardFile, normalized)
+    return
+  }
+
   await fs.mkdir(path.dirname(filePath), { recursive: true })
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8')
+  await fs.writeFile(filePath, JSON.stringify(normalized, null, 2), 'utf8')
 }
 
 export function makeId(prefix: string) {

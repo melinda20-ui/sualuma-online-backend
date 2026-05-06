@@ -1,0 +1,45 @@
+{
+  "updatedAt": "2026-05-06",
+  "source": "Atualização manual da Luma",
+  "officialPlans": [
+    {
+      "id": "free",
+      "name": "Free",
+      "status": "official",
+      "notes": "Plano gratuito permanente. Dá acesso à comunidade, loja de agentes, Mia com limite de créditos, portal, blog, participação básica como prestador e FlowMind Free. Não libera dashboard de cliente."
+    },
+    {
+      "id": "basico",
+      "name": "Básico",
+      "status": "official",
+      "trialDays": 7,
+      "notes": "Inclui benefícios do Free, FlowMind para produtividade/organização, chat, dashboard de cliente, promover serviços, contratar prestadores, comunidade, FlowMind Free, três agentes e créditos diários."
+    },
+    {
+      "id": "prime",
+      "name": "Prime",
+      "status": "official",
+      "trialDays": 7,
+      "notes": "Inclui Free + Básico, dois agentes extras, mais créditos e FlowMind Free/básico."
+    },
+    {
+      "id": "premium",
+      "name": "Premium",
+      "status": "official",
+      "trialDays": 7,
+      "notes": "Inclui planos anteriores e Flowmatic Rotina Pro."
+    },
+    {
+      "id": "pro_ia_pro",
+      "name": "Pro / IA Pro",
+      "status": "official",
+      "trialDays": 30,
+      "notes": "Inclui planos anteriores, quatro agentes extras, mais créditos, Flowmatic Solo CEO, prioridade para prestador e opção de add-on Agência Time por R$42,50."
+    }
+  ],
+  "deprecatedRules": [
+    "Não usar mais a regra antiga que dizia que Prime não existe.",
+    "Não usar mais teste grátis de 30 dias como plano principal separado.",
+    "Não usar estrutura antiga com vários planos soltos."
+  ]
+}

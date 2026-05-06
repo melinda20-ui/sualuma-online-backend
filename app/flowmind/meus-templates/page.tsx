@@ -1,11 +1,13 @@
-import fs from "fs/promises";
-import path from "path";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { tenantIdFromUserId, readTenantJson } from "@/lib/tenant/tenant-store";
 
 export const dynamic = "force-dynamic";
 
 type Workspace = {
   id: string;
+  userId?: string;
   templateSlug: string;
   templateName: string;
   createdAt: string;
@@ -37,14 +39,30 @@ type Workspace = {
 };
 
 async function getWorkspaces(): Promise<Workspace[]> {
-  try {
-    const filePath = path.join(process.cwd(), "data", "flowmind-workspaces.json");
-    const raw = await fs.readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    redirect(`/login?next=${encodeURIComponent("/flowmind/meus-templates")}`);
   }
+
+  const tenantId = tenantIdFromUserId(user.id);
+
+  const workspaces = readTenantJson<Workspace[]>(
+    tenantId,
+    "flowmind-workspaces",
+    []
+  );
+
+  return Array.isArray(workspaces)
+    ? workspaces.filter((workspace) => {
+        return !workspace.userId || workspace.userId === user.id;
+      })
+    : [];
 }
 
 export default async function Page() {
@@ -64,9 +82,8 @@ export default async function Page() {
         <div className="fm-commerce-kicker">MEUS TEMPLATES</div>
         <h1>Templates ativados dentro do Flowmatic.</h1>
         <p>
-          Aqui aparecem os templates que já viraram plano, tarefas, hábitos e
-          check-ins. Por enquanto está salvo em JSON local; depois vamos levar para
-          Supabase por usuário.
+          Aqui aparecem apenas os templates da sua conta. Cada usuário agora tem
+          sua própria casa dentro do FlowMind.
         </p>
       </header>
 

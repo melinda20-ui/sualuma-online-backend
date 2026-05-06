@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { makeId, readClientDashboard, saveClientDashboard } from '@/lib/client-dashboard-store'
+import { getClienteTenant } from '@/lib/client-tenant-auth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -55,7 +56,10 @@ async function sendSingleEmail(payload: {
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as Record<string, unknown>
-    const data = await readClientDashboard() as any
+    const auth = await getClienteTenant()
+    if (!auth.ok) return auth.response
+
+    const data = await readClientDashboard(auth.tenantId) as any
 
     const customer = data.customer || {}
 
@@ -126,7 +130,7 @@ export async function POST(req: Request) {
 
     data.meetings.unshift(meeting)
 
-    await saveClientDashboard(data)
+    await saveClientDashboard(data, auth.tenantId)
 
     const publicBaseUrl = 'https://dashboardcliente.sualuma.online'
     const confirmUrl = `${publicBaseUrl}/api/cliente/reunioes/confirmar?meetingId=${encodeURIComponent(meetingId)}`

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getFlowmindTenant } from "@/lib/flowmind-tenant-auth";
 import Stripe from "stripe";
 import { getFlowmaticCheckoutItem } from "../../../flowmind/lib/commerce";
 
@@ -27,7 +28,16 @@ export async function POST(req: NextRequest) {
 
     const kind = String(body.kind || "");
     const slug = String(body.slug || "");
-    const userId = String(body.userId || "demo-user");
+    const userId = String(
+      body.userId || body.user_id || body.clientReferenceId || ""
+    ).trim();
+
+    if (!userId) {
+      return NextResponse.json(
+        { ok: false, error: "Usuário não identificado para checkout." },
+        { status: 401 }
+      );
+    }
 
     const item = getFlowmaticCheckoutItem(kind, slug);
 

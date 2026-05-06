@@ -1,188 +1,290 @@
-import fs from "fs";
-import path from "path";
-import ComprarButton from "./ComprarButton";
+import Link from "next/link";
+import productsData from "@/data/loja-agentes/produtos.json";
 
 type Product = {
   id: string;
-  name: string;
+  slug: string;
+  title: string;
+  icon: string;
   category: string;
-  price_brl: number;
-  badge?: string;
-  description: string;
-  delivery: string;
-  access_location: string;
-  order_bump?: {
-    name: string;
-    price_brl: number;
-    description: string;
-  };
-  upsell?: {
-    name: string;
-    price_brl: number;
-    description: string;
-  };
-  downsell?: {
-    name: string;
-    price_brl: number;
-    description: string;
-  };
+  tags: string[];
+  shortDescription: string;
+  price: number | null;
+  badge: string;
+  directCheckout: boolean;
+  visibility: string;
+  adminOnly: boolean;
+  featured: boolean;
+  recommended: boolean;
 };
 
-function getStore() {
-  const filePath = path.join(process.cwd(), "data", "store-products.json");
-  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+const products = productsData as Product[];
+
+function money(value: number | null) {
+  if (value == null) return "Sob encomenda";
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  }).format(value);
 }
 
 export default function LojaAgentesPage() {
-  const store = getStore();
-  const products: Product[] = store.products;
+  const publicProducts = products.filter((p) => p.visibility === "publico");
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top,#17245f 0,#080a17 45%,#04050b 100%)",
-        color: "#eef4ff",
-        fontFamily: "Arial, system-ui, sans-serif",
-        padding: "34px 18px"
-      }}
-    >
-      <section style={{ maxWidth: 1180, margin: "0 auto" }}>
-        <div
-          style={{
-            border: "1px solid rgba(255,255,255,.14)",
-            borderRadius: 28,
-            padding: "34px 24px",
-            background:
-              "linear-gradient(135deg,rgba(88,101,242,.22),rgba(0,212,255,.08))",
-            boxShadow: "0 24px 80px rgba(0,0,0,.35)"
-          }}
-        >
-          <p style={{ color: "#8ee8ff", fontWeight: 700, marginBottom: 10 }}>
-            Sualuma Marketplace
-          </p>
+    <main className="loja-page">
+      <style>{`
+        .loja-page {
+          min-height: 100vh;
+          background:
+            radial-gradient(circle at top left, rgba(155,93,229,.22), transparent 32%),
+            radial-gradient(circle at top right, rgba(255,45,155,.16), transparent 34%),
+            linear-gradient(135deg,#09090f,#10101c 55%,#07070c);
+          color: #f4f1ff;
+          font-family: Arial, system-ui, sans-serif;
+          padding: 34px 18px 80px;
+        }
+        .wrap { max-width: 1180px; margin: 0 auto; }
+        .hero {
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 30px;
+          padding: 42px 26px;
+          background: linear-gradient(135deg,rgba(155,93,229,.18),rgba(255,45,155,.08));
+          box-shadow: 0 24px 80px rgba(0,0,0,.42);
+          margin-bottom: 28px;
+        }
+        .eyebrow {
+          display: inline-flex;
+          border: 1px solid rgba(155,93,229,.45);
+          background: rgba(155,93,229,.14);
+          color: #c7a6ff;
+          border-radius: 999px;
+          padding: 7px 14px;
+          font-weight: 800;
+          font-size: 12px;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          margin-bottom: 18px;
+        }
+        h1 {
+          font-size: clamp(34px,6vw,64px);
+          line-height: 1;
+          margin: 0 0 18px;
+          letter-spacing: -.04em;
+          background: linear-gradient(135deg,#fff,#c084fc,#ff2d9b);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .sub {
+          max-width: 760px;
+          color: #b7b3d6;
+          font-size: 18px;
+          line-height: 1.65;
+          margin: 0 0 24px;
+        }
+        .trust {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .trust span {
+          border: 1px solid rgba(255,255,255,.1);
+          background: rgba(255,255,255,.05);
+          border-radius: 999px;
+          padding: 9px 13px;
+          color: #d8d4ef;
+          font-size: 13px;
+        }
+        .section-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          gap: 18px;
+          margin: 36px 0 18px;
+        }
+        h2 { margin: 0; font-size: 26px; }
+        .count { color: #8f8aa8; font-size: 14px; }
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill,minmax(270px,1fr));
+          gap: 18px;
+        }
+        .card {
+          border: 1px solid rgba(255,255,255,.1);
+          border-radius: 22px;
+          padding: 22px;
+          background: rgba(255,255,255,.045);
+          box-shadow: 0 18px 50px rgba(0,0,0,.28);
+          display: flex;
+          flex-direction: column;
+          min-height: 310px;
+          position: relative;
+          overflow: hidden;
+        }
+        .card:before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg,rgba(155,93,229,.08),transparent 55%);
+          pointer-events: none;
+        }
+        .card > * { position: relative; z-index: 1; }
+        .top {
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          align-items: flex-start;
+          margin-bottom: 16px;
+        }
+        .icon { font-size: 42px; filter: drop-shadow(0 0 14px rgba(155,93,229,.45)); }
+        .badge {
+          border: 1px solid rgba(255,255,255,.14);
+          background: rgba(255,255,255,.07);
+          color: #ffd6f0;
+          border-radius: 999px;
+          padding: 6px 10px;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+        .cat {
+          color: #8f8aa8;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: .08em;
+          font-weight: 800;
+          margin-bottom: 8px;
+        }
+        .title {
+          color: #fff;
+          font-size: 19px;
+          line-height: 1.22;
+          margin: 0 0 10px;
+        }
+        .desc {
+          color: #b7b3d6;
+          font-size: 14px;
+          line-height: 1.55;
+          margin: 0 0 18px;
+          flex: 1;
+        }
+        .footer {
+          border-top: 1px solid rgba(255,255,255,.08);
+          padding-top: 16px;
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: center;
+        }
+        .price strong {
+          display: block;
+          font-size: 18px;
+          color: #fff;
+        }
+        .price small { color: #8f8aa8; font-size: 12px; }
+        .actions {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+        .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 11px;
+          padding: 10px 13px;
+          font-size: 13px;
+          font-weight: 800;
+          text-decoration: none;
+          color: #fff;
+        }
+        .details {
+          border: 1px solid rgba(255,255,255,.12);
+          background: rgba(255,255,255,.06);
+        }
+        .buy {
+          background: linear-gradient(135deg,#9b5de5,#ff2d9b);
+          box-shadow: 0 10px 26px rgba(155,93,229,.35);
+        }
+        .order {
+          border: 1px solid rgba(255,214,0,.35);
+          color: #ffd600;
+          background: rgba(255,214,0,.09);
+        }
+        @media (max-width: 640px) {
+          .loja-page { padding: 22px 14px 60px; }
+          .hero { padding: 30px 20px; border-radius: 24px; }
+          .footer { align-items: flex-start; flex-direction: column; }
+          .actions { width: 100%; }
+          .btn { flex: 1; }
+        }
+      `}</style>
 
-          <h1
-            style={{
-              fontSize: "clamp(32px,6vw,64px)",
-              lineHeight: 1,
-              margin: 0
-            }}
-          >
-            Loja de Agentes Sualuma
-          </h1>
-
-          <p
-            style={{
-              maxWidth: 760,
-              color: "#c9d6ff",
-              fontSize: 18,
-              marginTop: 18
-            }}
-          >
-            Compre agentes, pacotes e extras. Depois da compra, tudo aparece
-            dentro da Mia em:{" "}
-            <strong>chat.sualuma.online → Mia → Meus Agentes</strong>.
+      <div className="wrap">
+        <section className="hero">
+          <span className="eyebrow">Loja de Agentes Sualuma</span>
+          <h1>Agentes de IA para o seu negócio crescer</h1>
+          <p className="sub">
+            Escolha agentes para diagnosticar, vender, organizar e automatizar seu negócio.
+            Os agentes ficam disponíveis no Painel de Agentes dentro da Mia.
           </p>
+          <div className="trust">
+            <span>🤖 Acesso pela Mia</span>
+            <span>🔒 Compra segura</span>
+            <span>⚡ Implantação guiada</span>
+            <span>📱 Funciona no celular</span>
+          </div>
+        </section>
+
+        <div className="section-head">
+          <div>
+            <h2>Agentes disponíveis</h2>
+            <p className="count">{publicProducts.length} agentes encontrados</p>
+          </div>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
-            gap: 18,
-            marginTop: 24
-          }}
-        >
-          {products.map((product) => (
-            <article
-              key={product.id}
-              style={{
-                border: "1px solid rgba(255,255,255,.14)",
-                borderRadius: 24,
-                padding: 22,
-                background: "rgba(255,255,255,.07)",
-                backdropFilter: "blur(16px)",
-                boxShadow: "0 18px 48px rgba(0,0,0,.28)"
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: 10,
-                  alignItems: "flex-start"
-                }}
-              >
-                <span style={{ color: "#9fb0ff", fontSize: 13 }}>
-                  {product.category}
-                </span>
-
-                {product.badge && (
-                  <span
-                    style={{
-                      background: "rgba(0,212,255,.16)",
-                      border: "1px solid rgba(0,212,255,.35)",
-                      color: "#8ee8ff",
-                      padding: "6px 10px",
-                      borderRadius: 999,
-                      fontSize: 12,
-                      fontWeight: 700
-                    }}
-                  >
-                    {product.badge}
-                  </span>
-                )}
+        <section className="grid">
+          {publicProducts.map((product) => (
+            <article key={product.id} className="card">
+              <div className="top">
+                <span className="icon">{product.icon || "🤖"}</span>
+                {product.badge && <span className="badge">{product.badge}</span>}
               </div>
 
-              <h2 style={{ fontSize: 23, margin: "16px 0 10px" }}>
-                {product.name}
-              </h2>
+              <div className="cat">{product.category}</div>
+              <h3 className="title">{product.title}</h3>
+              <p className="desc">{product.shortDescription}</p>
 
-              <p style={{ color: "#cbd6ff", minHeight: 88 }}>
-                {product.description}
-              </p>
+              <div className="footer">
+                <div className="price">
+                  <strong>{money(product.price)}</strong>
+                  <small>{product.adminOnly ? "implantação privada" : "por mês"}</small>
+                </div>
 
-              <div style={{ fontSize: 34, fontWeight: 900, margin: "18px 0" }}>
-                R$ {product.price_brl}
+                <div className="actions">
+                  <Link className="btn details" href={`/loja-agentes/${product.slug}`}>
+                    Detalhes
+                  </Link>
+
+                  {product.adminOnly ? (
+                    <Link
+                      className="btn order"
+                      href={`/site-demo-request?tipo=agente-admin&agent=${product.id}`}
+                    >
+                      Solicitar
+                    </Link>
+                  ) : (
+                    <Link className="btn buy" href={`/checkout?produto=${product.id}`}>
+                      Comprar
+                    </Link>
+                  )}
+                </div>
               </div>
-
-              <p style={{ color: "#9fe7bd", fontSize: 14, lineHeight: 1.5 }}>
-                ✅ {product.delivery}
-              </p>
-
-              <p style={{ color: "#f6d98b", fontSize: 14, lineHeight: 1.5 }}>
-                📍 {product.access_location}
-              </p>
-
-              {product.upsell && (
-                <p style={{ color: "#b7c3ff", fontSize: 13, marginTop: 12 }}>
-                  Upsell sugerido: {product.upsell.name} — R${" "}
-                  {product.upsell.price_brl}
-                </p>
-              )}
-
-              {product.downsell && (
-                <p style={{ color: "#a8b2d8", fontSize: 13, marginTop: 6 }}>
-                  Downsell: {product.downsell.name} — R${" "}
-                  {product.downsell.price_brl}
-                </p>
-              )}
-
-              <ComprarButton
-                productId={product.id}
-                orderBump={product.order_bump}
-              />
-
-              <p style={{ color: "#8390c8", fontSize: 12, marginTop: 12 }}>
-                Checkout seguro via Stripe. A liberação final será pelo painel
-                de agentes da Mia.
-              </p>
             </article>
           ))}
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }

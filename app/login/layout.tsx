@@ -9,7 +9,7 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
     <>
       <LoginMobileTitleFix />
       <LoginMobileRobotBelowText />
-      
+
       {children}
       <LoginSignupRedirect />
     </>

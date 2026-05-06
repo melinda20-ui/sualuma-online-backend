@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}));
 
     const slug = String(body.slug || body.planSlug || "").trim();
+    const userId = String(body.userId || body.user_id || body.clientReferenceId || "").trim();
 
     if (!slug) {
       return NextResponse.json(
@@ -109,6 +110,7 @@ export async function POST(request: NextRequest) {
 
     const session = await stripe.checkout.sessions.create({
       mode: isSubscription ? "subscription" : "payment",
+      client_reference_id: userId || undefined,
       line_items: [
         {
           price: plan.stripe_price_id,
@@ -122,6 +124,7 @@ export async function POST(request: NextRequest) {
         service_plan_id: plan.id,
         service_plan_slug: plan.slug,
         service_plan_type: plan.type,
+        user_id: userId,
       },
       allow_promotion_codes: true,
     });
