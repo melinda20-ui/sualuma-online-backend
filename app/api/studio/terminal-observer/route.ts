@@ -6,12 +6,18 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const ROOT = process.cwd();
+
 const OBSERVER_DIR = path.join(ROOT, "data", "terminal-observer");
+const INBOX_DIR = path.join(ROOT, "data", "agent-inbox");
+
 const SUMMARY_FILE = path.join(OBSERVER_DIR, "summary.json");
 const EVENTS_FILE = path.join(OBSERVER_DIR, "events.jsonl");
+const BROADCAST_FILE = path.join(OBSERVER_DIR, "agent-broadcast.json");
+const INBOX_FILE = path.join(INBOX_DIR, "terminal-events.jsonl");
 
 function isAuthorized(request: NextRequest) {
   const expected = process.env.TERMINAL_OBSERVER_KEY || process.env.BRAIN_API_KEY || "";
+
   const direct =
     request.headers.get("x-terminal-observer-key") ||
     request.headers.get("x-brain-key") ||
@@ -34,9 +40,10 @@ function readJson<T>(file: string, fallback: T): T {
   }
 }
 
-function readEvents(limit = 80) {
+function readJsonl(file: string, limit = 80) {
   try {
-    const raw = fs.readFileSync(EVENTS_FILE, "utf8").trim();
+    const raw = fs.readFileSync(file, "utf8").trim();
+
     if (!raw) return [];
 
     return raw
@@ -65,12 +72,26 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const observer = readJson(SUMMARY_FILE, {
+    ok: false,
+    message: "Resumo ainda não gerado.",
+  });
+
+  const events = readJsonl(EVENTS_FILE, 80);
+  const inbox = readJsonl(INBOX_FILE, 80);
+  const broadcast = readJson(BROADCAST_FILE, null);
+
   return NextResponse.json({
     ok: true,
-    observer: readJson(SUMMARY_FILE, {
-      ok: false,
-      message: "Resumo ainda não gerado.",
-    }),
-    events: readEvents(80),
+    mode: "safe-manual-read-only",
+    observer,
+    events,
+    inbox,
+    broadcast,
+    counts: {
+      events: events.length,
+      inbox: inbox.length,
+    },
+    updatedAt: new Date().toISOString(),
   });
 }

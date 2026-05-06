@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "agent": "sualuma-terminal-observer",
+  "mode": "safe-manual-read-only",
+  "note": "Modo seguro: não altera bashrc, não fica preso no terminal e não executa comandos sozinho. Apenas registra eventos quando chamado manualmente.",
+  "updatedAt": "2026-05-06T22:54:42.660Z",
+  "totalRecentEvents": 3,
+  "lastEvent": {
+    "id": "terminal-1778108082659-yrlg8r",
+    "createdAt": "2026-05-06T22:54:42.659Z",
+    "source": "manual-safe-terminal-observer",
+    "mode": "read-only",
+    "command": "Chave interna TERMINAL_OBSERVER_KEY configurada e API do observador pronta para leitura autorizada",
+    "exitCode": 0,
+    "classification": "evento_manual_observado",
+    "cwd": "/root/luma-os",
+    "message": "Evento registrado pelo observador seguro: Chave interna TERMINAL_OBSERVER_KEY configurada e API do observador pronta para leitura autorizada"
+  },
+  "lastClassification": "evento_manual_observado",
+  "recentErrors": [],
+  "recentBuilds": [],
+  "recentRestarts": [],
+  "files": {
+    "events": "data/terminal-observer/events.jsonl",
+    "inbox": "data/agent-inbox/terminal-events.jsonl",
+    "summary": "data/terminal-observer/summary.json",
+    "broadcast": "data/terminal-observer/agent-broadcast.json"
+  }
+}
