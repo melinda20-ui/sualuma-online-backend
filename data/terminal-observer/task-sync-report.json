@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "agent": "sualuma-task-terminal-sync",
+  "mode": "safe-auto-task-sync",
+  "rule": "Não cria tarefas novas. Apenas muda tarefas existentes para doing ou done quando o evento do terminal bate com segurança.",
+  "updatedAt": "2026-05-06T23:13:01.917Z",
+  "totalEventsSeen": 4,
+  "changes": [],
+  "skipped": []
+}
