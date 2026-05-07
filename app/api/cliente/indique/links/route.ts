@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getClienteTenant } from "@/lib/client-tenant-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,38 @@ function makeCode(name: string, email: string) {
   const baseName = slugify(name || email.split("@")[0] || "cliente");
   const suffix = Math.random().toString(36).slice(2, 7).toUpperCase();
   return `${baseName || "cliente"}-${suffix}`.toUpperCase();
+}
+
+function getUserName(user: any) {
+  const meta = user?.user_metadata || {};
+
+  return String(
+    meta.name ||
+      meta.full_name ||
+      meta.fullName ||
+      user?.email?.split("@")?.[0] ||
+      "Cliente Sualuma"
+  ).trim();
+}
+
+function getUserEmail(user: any) {
+  return String(user?.email || "").trim().toLowerCase();
+}
+
+function safeDestinationUrl(value: unknown) {
+  const raw = String(value || DEFAULT_DESTINATION_URL).trim();
+
+  try {
+    const url = new URL(raw);
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return DEFAULT_DESTINATION_URL;
+    }
+
+    return url.toString().replace(/\/$/, "");
+  } catch {
+    return DEFAULT_DESTINATION_URL;
+  }
 }
 
 async function supabaseFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -99,25 +132,24 @@ async function getDefaultCampaignId() {
   return campaigns?.[0]?.id || null;
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const email = req.nextUrl.searchParams.get("email")?.trim().toLowerCase();
+    const auth = await getClienteTenant();
+
+    if (!auth.ok) {
+      return auth.response;
+    }
+
+    const email = getUserEmail(auth.user);
 
     if (!email) {
-      return NextResponse.json({
-        ok: true,
-        source: "supabase",
-        message: "Informe um email para listar os links do cliente.",
-        links: [],
-        summary: {
-          links: 0,
-          clicks: 0,
-          leads: 0,
-          conversions: 0,
-          revenueFormatted: moneyFromCents(0),
-          payoutFormatted: moneyFromCents(0),
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Sua conta precisa ter email para listar links de indicação.",
         },
-      });
+        { status: 400 }
+      );
     }
 
     const links = await supabaseFetch<any[]>(
@@ -149,6 +181,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       source: "supabase",
+      isolatedBy: "authenticated_user_email",
       links: mapped,
       summary: {
         ...summary,
@@ -169,17 +202,23 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await getClienteTenant();
+
+    if (!auth.ok) {
+      return auth.response;
+    }
+
     const body = await req.json().catch(() => ({}));
 
-    const referrerName = String(body.referrerName || body.name || "").trim();
-    const referrerEmail = String(body.referrerEmail || body.email || "").trim().toLowerCase();
-    const destinationUrl = String(body.destinationUrl || DEFAULT_DESTINATION_URL).trim();
+    const referrerName = getUserName(auth.user);
+    const referrerEmail = getUserEmail(auth.user);
+    const destinationUrl = safeDestinationUrl(body.destinationUrl);
 
     if (!referrerEmail || !referrerEmail.includes("@")) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Informe um email válido para gerar o link.",
+          error: "Sua conta precisa ter email válido para gerar link.",
         },
         { status: 400 }
       );
@@ -206,14 +245,23 @@ export async function POST(req: NextRequest) {
         metadata: {
           source: "dashboardcliente",
           created_by: "client_self_service",
+          auth_user_id: auth.user.id,
+          tenant_id: auth.tenantId,
         },
       }),
     });
 
+    const created = inserted?.[0];
+
+    if (!created) {
+      throw new Error("Link não retornado pelo Supabase.");
+    }
+
     return NextResponse.json({
       ok: true,
       source: "supabase",
-      link: mapLink(inserted?.[0]),
+      isolatedBy: "authenticated_user_email",
+      link: mapLink(created),
     });
   } catch (error: any) {
     return NextResponse.json(
