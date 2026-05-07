@@ -1,11 +1,13 @@
 {
-  "lastSummaryAt": "2026-05-06T22:34:47.787Z",
+  "lastSummaryAt": "2026-05-07T11:14:45.115Z",
   "statuses": {
+    "manual:atualizar-pagina-de-planos-com-o-novo-layout-do-claude-e-incluir-paginas-de-upcell-e-upgrades-d-acordo-com-o-plano-atual": "open",
+    "539419aa-e8fa-483f-aa43-79740648254b": "open",
     "Blog: corrigir posts sem imagem": "open",
     "Blog: verificar indexação no Google": "open",
     "blog-agent-status": "open",
     "701e85eb-4c5a-4afc-b2b7-65623ba73bda": "doing",
-    "3dcc1412-cad2-4b79-9e54-8618b198aaa8": "doing",
+    "3dcc1412-cad2-4b79-9e54-8618b198aaa8": "done",
     "manual:construir-agente-de-terminal-para-informar-todos-os-outros-quando-a-eu-fizer-alguma-alteracao-la": "doing",
     "manual:liberar-acesso-da-pamela-com-acesso-pro-para-ela-experimentar-pois-ela-vai-vender-nosso-sistema-coloca-como-urgente": "open",
     "manual:revisar-indexacao-de-paginas-no-google-console-porque-atuamente-so-aparece-a-home": "open",

@@ -1,0 +1,17 @@
+📌 Atualização de tarefas — Sualuma
+Gerado em: 2026-05-07T11:45:57.018547+00:00
+
+Tarefas alteradas: 0
+Tarefas criadas: 75
+Tarefas removidas: 0
+
+
+🆕 Tarefas criadas:
+- atualizar pagina de planos com o novo layout do claude e incluir paginas de upcell e upgrades d acordo com o plano atual | open | medium
+- Exibir Agente Google/SEO/Radar na página Ideias de Conteúdo | open | high
+- Blog: corrigir posts sem imagem | open | high
+- Blog: verificar indexação no Google | open | high
+- Monitorar publicações, imagens, SEO e indexação do blog | open | high
+- Automação editorial Sualuma: tendências, rascunhos, imagens, SEO e publicação | doing | urgent
+- URGENTE: Observador do Terminal em modo seguro manual | done | urgent
+- construir agente de terminal para informar todos os outros quando a eu fizer alguma alteração la | doing | medium

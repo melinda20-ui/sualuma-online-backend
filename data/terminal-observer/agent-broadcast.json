@@ -3,34 +3,52 @@
   "from": "sualuma-terminal-observer",
   "type": "terminal_summary",
   "priority": "normal",
-  "updatedAt": "2026-05-06T22:54:42.660Z",
+  "updatedAt": "2026-05-07T11:24:37.807Z",
   "summary": {
     "ok": true,
     "agent": "sualuma-terminal-observer",
-    "mode": "safe-manual-read-only",
-    "note": "Modo seguro: não altera bashrc, não fica preso no terminal e não executa comandos sozinho. Apenas registra eventos quando chamado manualmente.",
-    "updatedAt": "2026-05-06T22:54:42.660Z",
-    "totalRecentEvents": 3,
+    "mode": "safe-runner-read-only",
+    "note": "Comandos executados via sr são registrados para o Agente de Tarefas. O observador não executa nada sozinho.",
+    "updatedAt": "2026-05-07T11:24:37.807Z",
+    "totalRecentEvents": 5,
     "lastEvent": {
-      "id": "terminal-1778108082659-yrlg8r",
-      "createdAt": "2026-05-06T22:54:42.659Z",
-      "source": "manual-safe-terminal-observer",
-      "mode": "read-only",
-      "command": "Chave interna TERMINAL_OBSERVER_KEY configurada e API do observador pronta para leitura autorizada",
-      "exitCode": 0,
-      "classification": "evento_manual_observado",
+      "id": "terminal-1778153077806-2glzbe",
+      "createdAt": "2026-05-07T11:24:37.806Z",
+      "source": "sualuma-run",
+      "mode": "read-only-log-after-command",
       "cwd": "/root/luma-os",
-      "message": "Evento registrado pelo observador seguro: Chave interna TERMINAL_OBSERVER_KEY configurada e API do observador pronta para leitura autorizada"
+      "command": "echo teste-do-sualuma-run-ok",
+      "exitCode": 0,
+      "success": true,
+      "classification": "comando_ok",
+      "durationMs": 10,
+      "focus": {
+        "taskId": "32cf0468-2d07-4f97-ab9b-a1637861db43",
+        "title": "URGENTE: concluir isolamento por usuário em toda a plataforma",
+        "priority": "urgent",
+        "selectedAt": "2026-05-07T11:24:37.748Z"
+      },
+      "outputTail": "teste-do-sualuma-run-ok\n\n",
+      "message": "Comando executado via sr: echo teste-do-sualuma-run-ok"
     },
-    "lastClassification": "evento_manual_observado",
+    "lastClassification": "comando_ok",
     "recentErrors": [],
-    "recentBuilds": [],
-    "recentRestarts": [],
+    "currentFocus": {
+      "ok": true,
+      "taskId": "32cf0468-2d07-4f97-ab9b-a1637861db43",
+      "title": "URGENTE: concluir isolamento por usuário em toda a plataforma",
+      "status": "doing",
+      "priority": "urgent",
+      "query": "isolamento",
+      "selectedAt": "2026-05-07T11:24:37.748Z",
+      "note": "Tarefa em foco para comandos registrados pelo sr/sualuma-run."
+    },
     "files": {
       "events": "data/terminal-observer/events.jsonl",
       "inbox": "data/agent-inbox/terminal-events.jsonl",
       "summary": "data/terminal-observer/summary.json",
-      "broadcast": "data/terminal-observer/agent-broadcast.json"
+      "broadcast": "data/terminal-observer/agent-broadcast.json",
+      "focus": "data/terminal-observer/current-focus.json"
     }
   }
 }

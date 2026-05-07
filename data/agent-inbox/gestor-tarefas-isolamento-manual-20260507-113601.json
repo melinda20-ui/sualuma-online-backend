@@ -1,0 +1,25 @@
+{
+  "to": "gestor-de-tarefas",
+  "from": "relatorio-manual-isolamento-usuarios",
+  "type": "manual_status_update",
+  "priority": "urgent",
+  "createdAt": "2026-05-07T11:36:01.368348+00:00",
+  "instruction": "Atualizar a tarefa existente 'URGENTE: concluir isolamento por usuário em toda a plataforma'. Não criar tarefa nova. Usar este relatório para marcar o que já foi feito, o que está em validação e o que continua pendente.",
+  "reportFile": "data/relatorios/isolamento-usuarios-feito-20260507-113601.md",
+  "summary": {
+    "concluido_parcial_validar": [
+      "Cliente / Dashboard do cliente",
+      "FlowMind / Flowmatic",
+      "Chat / Mia com user_id"
+    ],
+    "em_andamento": [
+      "Comunidade",
+      "Studio/Admin",
+      "Auditoria geral de acesso por plano"
+    ],
+    "pendente_urgente": [
+      "Loja de agentes: compras, créditos e agentes comprados por usuário",
+      "Prestador de serviços: dashboard, kanban, reuniões, oportunidades e chat"
+    ]
+  }
+}
