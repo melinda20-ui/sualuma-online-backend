@@ -1,0 +1,30 @@
+* [33mb97e337[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: isolar links de indicação do cliente por usuário logado 20260507-121804
+* [33m67524ab[m feat: adicionar atalhos seguros sf e sr para tarefas e terminal 20260507-121200
+* [33m3ec2b8f[m[33m ([m[1;33mtag: [m[1;33mcheckpoint-app-mobile-20260507-120657[m[33m)[m checkpoint: tarefa app mobile criada e estados atualizados 20260507-120657
+* [33mdf6d0ac[m fix: enviar resumo de tarefas para Discord com chave interna 20260507-115231
+* [33m7ba8e3c[m[33m ([m[1;33mtag: [m[1;33mcheckpoint-tarefas-20260507-114556[m[33m)[m checkpoint: estado atual e atualização das tarefas 20260507-114556
+* [33m5f77af6[m feat: sincronizar eventos do terminal com status do Kanban sem criar tarefas
+* [33m7d2ddc8[m feat: conectar observador de terminal em modo seguro manual
+* [33m20767a9[m[33m ([m[1;33mtag: [m[1;33mcheckpoint-terminal-agent-20260506-225003[m[33m)[m checkpoint: estado atual antes de retomar agente terminal 20260506-225003
+* [33ma87e4c0[m feat: mostra acessos liberados por plano no diagnostico
+* [33m6793841[m feat: platform me retorna plano permissoes e agentes
+* [33m0432efb[m feat: diagnostico real de planos e acessos de usuarios
+* [33med4d7b0[m feat: adicionar audio e acoes ao agente de tarefas
+* [33m40b1735[m feat: salvar canvas onboarding e integrações do studio
+* [33m8c76c77[m fix: proteger tarefas contra sobrescrita dos agentes
+* [33m8a42df0[m feat: criar jornada optin e onboarding board
+* [33m129a421[m fix: corrigir falsos positivos do diagnostico automatico
+* [33m4b6ba76[m feat: ativar squad de lancamento noturno no discord
+* [33m50cce00[m feat: automatizar agentes com diagnostico tarefas blog e discord
+* [33maf53cca[m feat: adicionar mia financeira no painel de metas
+* [33mab3a90f[m style: redesenhar painel de metas financeiras
+* [33mf864938[m feat: criar agente de blog com metricas de seo
+* [33mf17db6f[m feat: criar painel privado de metas financeiras
+* [33mf59f0ae[m feat: travar campaign agent ate abrir lancamento
+* [33m0016cde[m feat: adicionar atalho do funil sualuma no studio lab
+* [33m2b401a0[m feat: criar mapa visual do funil sualuma
+* [33ma5a8b59[m fix: integrar card de sugestoes da Mia no layout do studio lab
+* [33mea2d45c[m fix: corrigir setter de funis no admin de emails
+* [33m2a31934[m fix: clarificar status e edição de funis no admin de emails
+* [33m993ad5f[m feat: editar funis e emails no admin de emails
+* [33mf596a40[m feat: conectar campaign agent ao admin de emails
