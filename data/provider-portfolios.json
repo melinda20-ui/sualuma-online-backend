@@ -69,5 +69,35 @@
       }
     ],
     "updatedAt": "2026-04-28T04:57:01.727Z"
+  },
+  "lumabusiness1.0@gmail.com": {
+    "ok": true,
+    "email": "lumabusiness1.0@gmail.com",
+    "profile": {
+      "name": "Prestador Sualuma",
+      "title": "Especialista em sites, automações e presença digital",
+      "bio": "Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.",
+      "photoUrl": "",
+      "platformJobs": 18,
+      "outsideJobs": 43,
+      "clients": 54,
+      "satisfaction": 98
+    },
+    "projects": [
+      {
+        "id": "port-demo-1",
+        "title": "Site institucional futurista",
+        "category": "Sites",
+        "url": "https://sualuma.online",
+        "youtubeUrl": "",
+        "imageUrl": "",
+        "result": "Modelo de apresentação profissional para empresas digitais.",
+        "description": "Projeto usado como exemplo inicial do portfólio.",
+        "communityPublishedAt": "",
+        "communityPostId": "",
+        "createdAt": "2026-05-12T22:01:33.266Z"
+      }
+    ],
+    "updatedAt": "2026-05-12T22:06:31.737Z"
   }
 }
