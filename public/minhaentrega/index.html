@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Entrega | Meu Serviço</title>
+  <meta name="description" content="Acompanhe o andamento da sua entrega com etapas, arquivos, aprovações e status." />
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color:#fff;
+      background:
+        radial-gradient(circle at top left, rgba(124,58,237,.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(34,211,238,.10), transparent 25%),
+        linear-gradient(180deg,#040816 0%,#091120 100%);
+      min-height:100vh;
+    }
+    .container {
+      width:min(1180px,92%);
+      margin:0 auto;
+      padding:30px 0 60px;
+    }
+    .top {
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:24px;
+    }
+    h1 {
+      font-size:clamp(2rem,4vw,3.2rem);
+      margin-bottom:8px;
+    }
+    .sub {
+      color:#c8d2ff;
+      line-height:1.8;
+      max-width:800px;
+    }
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:14px 18px;
+      border-radius:14px;
+      background:linear-gradient(90deg,#7c3aed,#22d3ee);
+      color:#fff;
+      text-decoration:none;
+      font-weight:700;
+      box-shadow:0 16px 40px rgba(0,0,0,.24);
+    }
+    .stats {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+      margin-bottom:24px;
+    }
+    .card {
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 14px 40px rgba(0,0,0,.18);
+    }
+    .card h3 {
+      font-size:15px;
+      color:#d5ddff;
+      margin-bottom:10px;
+    }
+    .big {
+      font-size:30px;
+      font-weight:800;
+    }
+    .main-grid {
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:18px;
+    }
+    .kanban {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:18px;
+    }
+    .column {
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:20px;
+      padding:16px;
+    }
+    .column h4 {
+      font-size:18px;
+      margin-bottom:14px;
+    }
+    .task {
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .task strong {
+      display:block;
+      margin-bottom:6px;
+    }
+    .task p {
+      color:#c8d2ff;
+      font-size:14px;
+      line-height:1.7;
+    }
+    .status {
+      display:inline-block;
+      margin-top:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      background:rgba(34,211,238,.14);
+      color:#9be7f7;
+      border:1px solid rgba(34,211,238,.22);
+    }
+    .side-list {
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+    .file-link {
+      display:block;
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      color:#fff;
+      text-decoration:none;
+    }
+    .muted {
+      color:#c8d2ff;
+      font-size:14px;
+      line-height:1.8;
+    }
+    @media (max-width: 1100px) {
+      .stats { grid-template-columns:repeat(2,1fr); }
+      .main-grid { grid-template-columns:1fr; }
+      .kanban { grid-template-columns:1fr; }
+    }
+    @media (max-width: 700px) {
+      .stats { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top">
+      <div>
+        <h1>Minha entrega</h1>
+        <div class="sub">
+          Acompanhe o progresso do seu projeto, veja em que etapa está o trabalho, receba arquivos e aprove ou solicite ajustes.
+        </div>
+      </div>
+
+      <a class="btn" href="https://meuservico.sualuma.online">Voltar ao painel</a>
+    </div>
+
+    <section class="stats">
+      <div class="card">
+        <h3>Projeto atual</h3>
+        <div class="big">Landing page</div>
+      </div>
+      <div class="card">
+        <h3>Status</h3>
+        <div class="big">Em produção</div>
+      </div>
+      <div class="card">
+        <h3>Prazo estimado</h3>
+        <div class="big">5 dias</div>
+      </div>
+      <div class="card">
+        <h3>Revisões</h3>
+        <div class="big">1 restante</div>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <div class="card">
+        <h3>Etapas da entrega</h3>
+
+        <div class="kanban">
+          <div class="column">
+            <h4>A fazer</h4>
+            <div class="task">
+              <strong>Receber materiais finais</strong>
+              <p>Logo, textos, imagens e referências visuais.</p>
+              <div class="status">Pendente</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <h4>Em andamento</h4>
+            <div class="task">
+              <strong>Montagem da estrutura</strong>
+              <p>Construção da página e organização visual do conteúdo.</p>
+              <div class="status">Produzindo</div>
+            </div>
+            <div class="task">
+              <strong>Copy principal</strong>
+              <p>Organização das seções de venda e textos principais.</p>
+              <div class="status">Em produção</div>
+            </div>
+          </div>
+
+          <div class="column">
+            <h4>Concluído</h4>
+            <div class="task">
+              <strong>Briefing inicial</strong>
+              <p>Entendimento da oferta e da estrutura do projeto.</p>
+              <div class="status">Finalizado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Arquivos e aprovações</h3>
+        <div class="side-list">
+          <a class="file-link" href="#">
+            Layout inicial<br>
+            <span class="muted">Clique para visualizar</span>
+          </a>
+          <a class="file-link" href="#">
+            Copy da página<br>
+            <span class="muted">Clique para visualizar</span>
+          </a>
+          <a class="file-link" href="#">
+            Link de aprovação<br>
+            <span class="muted">Aprovar ou pedir ajustes</span>
+          </a>
+        </div>
+
+        <div style="margin-top:18px;">
+          <h3>Observações</h3>
+          <p class="muted">
+            Este painel pode ser conectado depois ao backend para puxar arquivos, mensagens, imagens e links reais de aprovação.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

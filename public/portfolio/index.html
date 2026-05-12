@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Portfólio | Sualuma</title>
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%,rgba(24,242,255,.18),transparent 32%),
+        radial-gradient(circle at 100% 0%,rgba(141,92,255,.25),transparent 36%),
+        #050714;
+      color:#fff;
+      overflow-x:hidden;
+    }
+    a{text-decoration:none;color:inherit}
+    .wrap{
+      width:min(1180px,100%);
+      margin:0 auto;
+      padding:18px;
+    }
+    .top{
+      position:sticky;
+      top:0;
+      z-index:50;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      padding:12px 0 14px;
+      background:linear-gradient(180deg,#050714 70%,rgba(5,7,20,0));
+      backdrop-filter:blur(16px);
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.07);
+      color:#fff;
+      border-radius:20px;
+      padding:14px 16px;
+      font-weight:1000;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:52px;
+      text-align:center;
+      font-size:15px;
+    }
+    .btn.primary{
+      background:linear-gradient(135deg,#8d5cff,#18f2ff);
+      border-color:rgba(255,255,255,.1);
+      box-shadow:0 18px 40px rgba(24,242,255,.13);
+    }
+    .btn.danger{
+      background:rgba(255,60,120,.16);
+      border-color:rgba(255,60,120,.28);
+    }
+    .btn.small{
+      min-height:44px;
+      padding:11px 13px;
+      border-radius:16px;
+      font-size:14px;
+    }
+    .hero,.card{
+      border:1px solid rgba(255,255,255,.13);
+      background:
+        radial-gradient(circle at 0% 0%,rgba(24,242,255,.12),transparent 36%),
+        radial-gradient(circle at 100% 0%,rgba(141,92,255,.22),transparent 38%),
+        rgba(255,255,255,.045);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:0 18px 60px rgba(0,0,0,.22);
+      margin-bottom:18px;
+    }
+    .hero{
+      display:grid;
+      gap:18px;
+    }
+    .heroTop{
+      display:flex;
+      align-items:center;
+      gap:16px;
+    }
+    .avatar{
+      width:82px;
+      height:82px;
+      border-radius:24px;
+      object-fit:cover;
+      background:linear-gradient(135deg,#8d5cff,#18f2ff);
+      display:grid;
+      place-items:center;
+      font-size:30px;
+      font-weight:1000;
+      flex:0 0 auto;
+      overflow:hidden;
+    }
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    h1{
+      font-size:clamp(32px,10vw,64px);
+      line-height:.95;
+      margin:0 0 8px;
+    }
+    h2{
+      font-size:clamp(25px,7vw,38px);
+      margin:0 0 12px;
+      line-height:1.08;
+    }
+    h3{
+      font-size:23px;
+      margin:0 0 8px;
+      line-height:1.12;
+    }
+    p{
+      color:#d7ddff;
+      line-height:1.52;
+      font-size:17px;
+      margin:0 0 14px;
+    }
+    .tag{
+      display:inline-flex;
+      width:max-content;
+      max-width:100%;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(24,242,255,.28);
+      background:rgba(24,242,255,.1);
+      color:#aaf9ff;
+      font-weight:1000;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      font-size:12px;
+      margin-bottom:12px;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .stat{
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.055);
+      border-radius:20px;
+      padding:14px;
+    }
+    .stat strong{
+      display:block;
+      font-size:30px;
+      line-height:1;
+    }
+    .stat span{
+      color:#cdd3ff;
+      font-weight:800;
+      font-size:13px;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+    input,textarea{
+      width:100%;
+      border:1px solid rgba(255,255,255,.13);
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-radius:18px;
+      padding:15px;
+      font-size:16px;
+      outline:none;
+      margin:7px 0;
+    }
+    textarea{
+      min-height:120px;
+      resize:vertical;
+    }
+    .filebox{
+      border:1px dashed rgba(24,242,255,.34);
+      background:rgba(24,242,255,.055);
+      border-radius:20px;
+      padding:13px;
+      margin:8px 0 12px;
+    }
+    .filebox strong{
+      display:block;
+      margin-bottom:8px;
+    }
+    input[type=file]{
+      padding:12px;
+    }
+    .previewImg{
+      width:76px;
+      height:76px;
+      border-radius:18px;
+      object-fit:cover;
+      border:1px solid rgba(255,255,255,.14);
+      display:none;
+      margin-top:10px;
+    }
+    .sectionTitle{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin:18px 0 12px;
+    }
+    .sectionTitle h2{
+      margin:0;
+    }
+    .projects{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:16px;
+    }
+    .project{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.055);
+      border-radius:26px;
+      overflow:hidden;
+    }
+    .project img{
+      width:100%;
+      height:210px;
+      object-fit:cover;
+      display:block;
+      background:rgba(255,255,255,.05);
+    }
+    .projectBody{
+      padding:18px;
+    }
+    .projectActions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:9px;
+      margin-top:14px;
+    }
+    .projectActions .wide{
+      grid-column:1/-1;
+    }
+    .pill{
+      display:inline-flex;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(24,242,255,.1);
+      border:1px solid rgba(24,242,255,.26);
+      color:#aaf9ff;
+      font-weight:900;
+      font-size:12px;
+      margin-bottom:10px;
+    }
+    .published{
+      display:inline-flex;
+      padding:10px 12px;
+      border-radius:999px;
+      background:rgba(18,255,150,.1);
+      border:1px solid rgba(18,255,150,.24);
+      color:#99ffd0;
+      font-weight:1000;
+      font-size:12px;
+      margin-top:8px;
+    }
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:28px;
+      transform:translateX(-50%) translateY(20px);
+      background:#070817;
+      color:#fff;
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:22px;
+      padding:15px 18px;
+      font-weight:1000;
+      max-width:min(520px,90vw);
+      opacity:0;
+      pointer-events:none;
+      transition:.2s;
+      z-index:9999;
+      box-shadow:0 18px 50px rgba(0,0,0,.4);
+      text-align:center;
+    }
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+    @media(max-width:760px){
+      .wrap{
+        padding:14px;
+        padding-bottom:90px;
+      }
+      .top{
+        gap:9px;
+        padding-top:10px;
+      }
+      .btn{
+        min-height:50px;
+        padding:13px 12px;
+        border-radius:18px;
+        font-size:15px;
+      }
+      .hero,.card{
+        border-radius:26px;
+        padding:18px;
+        margin-bottom:16px;
+      }
+      .heroTop{
+        align-items:flex-start;
+      }
+      .avatar{
+        width:68px;
+        height:68px;
+        border-radius:20px;
+        font-size:25px;
+      }
+      h1{
+        font-size:38px;
+      }
+      h2{
+        font-size:29px;
+      }
+      h3{
+        font-size:24px;
+      }
+      p{
+        font-size:16px;
+      }
+      .grid{
+        grid-template-columns:1fr;
+      }
+      .projects{
+        grid-template-columns:1fr;
+        gap:14px;
+      }
+      .project{
+        border-radius:24px;
+      }
+      .project img{
+        height:190px;
+      }
+      .projectBody{
+        padding:17px;
+      }
+      .projectActions{
+        grid-template-columns:1fr;
+      }
+      .projectActions .wide{
+        grid-column:auto;
+      }
+      .stats{
+        grid-template-columns:1fr 1fr;
+      }
+      .stat strong{
+        font-size:28px;
+      }
+      input,textarea{
+        border-radius:17px;
+        padding:14px;
+      }
+    }
+  
+    /* portfolio-link-preview-v1-start */
+    .portfolioAutoPreview{
+      width:100%;
+      margin:16px 0;
+      border:1px solid rgba(255,255,255,.13);
+      background:rgba(255,255,255,.055);
+      border-radius:24px;
+      overflow:hidden;
+      display:none;
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .portfolioAutoPreview.show{
+      display:grid;
+      grid-template-columns:230px minmax(0,1fr);
+    }
+
+    .portfolioAutoPreviewImage{
+      width:100%;
+      min-height:160px;
+      background:
+        radial-gradient(circle at 20% 10%,rgba(24,242,255,.16),transparent 35%),
+        radial-gradient(circle at 90% 0%,rgba(141,92,255,.18),transparent 38%),
+        rgba(255,255,255,.05);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .portfolioAutoPreviewImage::after{
+      content:"Prévia do site";
+      position:absolute;
+      left:12px;
+      bottom:12px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,.58);
+      color:#fff;
+      font-size:12px;
+      font-weight:1000;
+      backdrop-filter:blur(8px);
+    }
+
+    .portfolioAutoPreviewImage img{
+      width:100%;
+      height:100%;
+      min-height:160px;
+      object-fit:cover;
+      display:block;
+      background:rgba(255,255,255,.06);
+    }
+
+    .portfolioAutoPreviewBody{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width:0;
+    }
+
+    .portfolioAutoPreviewBody strong{
+      display:block;
+      color:#fff;
+      font-size:18px;
+      line-height:1.2;
+      margin-bottom:8px;
+    }
+
+    .portfolioAutoPreviewBody p{
+      margin:0 0 9px;
+      color:#cfd5ff;
+      font-size:14px;
+      line-height:1.35;
+    }
+
+    .portfolioAutoPreviewBody span{
+      display:block;
+      color:#aaf9ff;
+      font-size:12px;
+      font-weight:1000;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    @media(max-width:860px){
+      .portfolioAutoPreview.show{
+        grid-template-columns:1fr;
+      }
+
+      .portfolioAutoPreviewImage,
+      .portfolioAutoPreviewImage img{
+        min-height:190px;
+        height:190px;
+      }
+    }
+    /* portfolio-link-preview-v1-end */
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <a class="btn" href="https://meuservico.sualuma.online/?v=portfolio-home#prestador">Dashboard</a>
+      <a class="btn primary" href="https://trabalhosja.sualuma.online/?v=portfolio">Comunidade</a>
+    </div>
+
+    <div id="app">
+      <section class="hero">
+        <h2>Carregando portfólio...</h2>
+        <p>Buscando dados salvos.</p>
+      </section>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+const API = "/api/prestador/portfolio-sync";
+const COMMUNITY_API = "/api/comunidade/posts";
+let state = null;
+let editingId = null;
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>el.classList.remove("show"), 4500);
+}
+
+function esc(v){
+  return String(v ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+function initials(name){
+  return String(name || "P S").split(" ").filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase() || "PS";
+}
+
+function fallbackState(){
+  return {
+    ok:true,
+    profile:{
+      name:"Prestador Sualuma",
+      title:"Especialista em sites, automações e presença digital",
+      bio:"Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.",
+      photoUrl:"",
+      platformJobs:18,
+      outsideJobs:43,
+      clients:54,
+      satisfaction:98
+    },
+    projects:[]
+  };
+}
+
+async function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    if(!file) return resolve("");
+    if(!file.type.startsWith("image/")){
+      toast("Envie apenas imagem.");
+      return resolve("");
+    }
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 1000;
+        let w = img.width;
+        let h = img.height;
+
+        if(w > h && w > maxSide){
+          h = Math.round(h * (maxSide / w));
+          w = maxSide;
+        } else if(h > maxSide){
+          w = Math.round(w * (maxSide / h));
+          h = maxSide;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#050714";
+        ctx.fillRect(0,0,w,h);
+        ctx.drawImage(img,0,0,w,h);
+
+        let data = canvas.toDataURL("image/jpeg", .72);
+        if(data.length > 850000) data = canvas.toDataURL("image/jpeg", .55);
+
+        resolve(data);
+      };
+      img.onerror = reject;
+      img.src = ev.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function fetchJson(url, opts = {}){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 12000);
+
+  try{
+    const res = await fetch(url, {
+      credentials:"include",
+      cache:"no-store",
+      signal: controller.signal,
+      ...opts
+    });
+
+    const text = await res.text();
+    let json;
+
+    try{
+      json = JSON.parse(text);
+    }catch(e){
+      throw new Error("A API respondeu HTML/erro. Status: " + res.status);
+    }
+
+    if(!res.ok || !json.ok){
+      throw new Error(json.error || ("Erro na API. Status: " + res.status));
+    }
+
+    return json;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+async function load(){
+  try{
+    state = await fetchJson(API + "?t=" + Date.now());
+  }catch(e){
+    console.error(e);
+    state = fallbackState();
+    toast("Não consegui carregar a API. Abri em modo seguro.");
+  }
+  render();
+}
+
+async function save(body){
+  const json = await fetchJson(API, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify(body)
+  });
+  state = json;
+  render();
+  return json;
+}
+
+async function publishCommunity(id){
+  const item = (state.projects || []).find(x => String(x.id) === String(id));
+  if(!item) return toast("Trabalho não encontrado.");
+
+  try{
+    toast("Publicando na comunidade...");
+
+    const payload = {
+      source:"portfolio",
+      sourceId:item.id,
+      type:"portfolio_project",
+      category:item.category || "Trabalhos",
+      title:item.title || "Novo trabalho publicado",
+      content:item.description || item.result || "Novo trabalho publicado no portfólio.",
+      body:item.description || item.result || "Novo trabalho publicado no portfólio.",
+      imageUrl:item.imageUrl || "",
+      linkUrl:item.url || "",
+      url:item.url || "",
+      videoUrl:item.youtubeUrl || "",
+      youtubeUrl:item.youtubeUrl || "",
+      authorName:state.profile?.name || "Prestador Sualuma",
+      authorTitle:state.profile?.title || "",
+      authorPhotoUrl:state.profile?.photoUrl || ""
+    };
+
+    const res = await fetch(COMMUNITY_API, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      credentials:"include",
+      cache:"no-store",
+      body:JSON.stringify(payload)
+    });
+
+    const text = await res.text();
+    let json;
+    try{ json = JSON.parse(text); }
+    catch(e){ throw new Error("Comunidade respondeu HTML/erro. Status: " + res.status); }
+
+    if(!res.ok || !json.ok){
+      throw new Error(json.error || "Não consegui publicar na comunidade.");
+    }
+
+    await save({
+      action:"mark_published",
+      id:item.id,
+      communityPostId:json.id || json.post?.id || json.data?.id || ""
+    });
+
+    toast("Publicado na comunidade.");
+  }catch(err){
+    console.error(err);
+    toast(err.message || "Erro ao publicar na comunidade.");
+  }
+}
+
+function render(){
+  const p = state.profile || fallbackState().profile;
+  const projects = Array.isArray(state.projects) ? state.projects : [];
+  const editing = projects.find(x => x.id === editingId);
+
+  document.getElementById("app").innerHTML = `
+    <section class="hero">
+      <div class="heroTop">
+        <div class="avatar">
+          ${p.photoUrl ? `<img src="${esc(p.photoUrl)}" alt="">` : esc(initials(p.name))}
+        </div>
+        <div>
+          <span class="tag">Portfólio multimídia</span>
+          <h1>${esc(p.name)}</h1>
+          <p><strong>${esc(p.title)}</strong></p>
+        </div>
+      </div>
+
+      <p>${esc(p.bio)}</p>
+
+      <div class="stats">
+        <div class="stat"><strong>${esc(p.platformJobs || 0)}</strong><span>Na plataforma</span></div>
+        <div class="stat"><strong>${esc(p.outsideJobs || 0)}</strong><span>Fora</span></div>
+        <div class="stat"><strong>${esc(p.clients || 0)}</strong><span>Clientes</span></div>
+        <div class="stat"><strong>${esc(p.satisfaction || 0)}%</strong><span>Satisfação</span></div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Editar perfil</h2>
+        <p>Esses dados aparecem no seu portfólio público e na comunidade.</p>
+        <form id="profileForm">
+          <input name="name" placeholder="Seu nome profissional" value="${esc(p.name)}">
+          <input name="title" placeholder="Especialidade" value="${esc(p.title)}">
+          <input name="photoUrl" placeholder="Link da foto de perfil" value="${esc(p.photoUrl || "")}">
+          <div class="filebox">
+            <strong>Ou envie uma foto</strong>
+            <input id="profileFile" type="file" accept="image/*">
+            <img id="profilePreview" class="previewImg">
+          </div>
+          <textarea name="bio" placeholder="Sua bio">${esc(p.bio)}</textarea>
+          <button class="btn primary" type="submit">Salvar perfil</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>${editing ? "Editar trabalho" : "Adicionar trabalho"}</h2>
+        <p>Publique imagem, prévia do site, vídeo do YouTube e resultado.</p>
+        <form id="projectForm">
+          <input name="title" placeholder="Título do projeto" value="${esc(editing?.title || "")}">
+          <input name="category" placeholder="Categoria. Ex: Site, Landing Page, Automação" value="${esc(editing?.category || "")}">
+          <input name="url" placeholder="Link do site para prévia" value="${esc(editing?.url || "")}">
+          <input name="youtubeUrl" placeholder="Link do vídeo YouTube" value="${esc(editing?.youtubeUrl || "")}">
+          <input name="imageUrl" placeholder="Link da imagem/capa" value="${esc(editing?.imageUrl || "")}">
+          <div class="filebox">
+            <strong>Ou envie uma imagem/capa</strong>
+            <input id="projectFile" type="file" accept="image/*">
+            <img id="projectPreview" class="previewImg">
+          </div>
+          <input name="result" placeholder="Resultado gerado. Ex: +30% contatos" value="${esc(editing?.result || "")}">
+          <textarea name="description" placeholder="Descrição do trabalho">${esc(editing?.description || "")}</textarea>
+          <button class="btn primary" type="submit">${editing ? "Salvar alterações" : "Salvar trabalho"}</button>
+          ${editing ? `<button class="btn" type="button" onclick="cancelEdit()">Cancelar edição</button>` : ""}
+        </form>
+      </section>
+    </div>
+
+    <div class="sectionTitle">
+      <h2>Trabalhos publicados</h2>
+      <a class="btn small" href="#projectForm">+ Novo</a>
+    </div>
+
+    <div class="projects">
+      ${projects.length ? projects.map(item => `
+        <article class="project">
+          ${item.imageUrl ? `<img src="${esc(item.imageUrl)}" alt="">` : ""}
+          <div class="projectBody">
+            <span class="pill">${esc(item.category || "Portfólio")}</span>
+            <h3>${esc(item.title)}</h3>
+            <p>${esc(item.description || item.result || "")}</p>
+            ${item.result ? `<p><strong>Resultado:</strong> ${esc(item.result)}</p>` : ""}
+            ${item.communityPublishedAt ? `<div class="published">Publicado na comunidade</div>` : ""}
+            <div class="projectActions">
+              ${item.url ? `<a class="btn small" href="${esc(item.url)}" target="_blank">Abrir site</a>` : ""}
+              ${item.youtubeUrl ? `<a class="btn small" href="${esc(item.youtubeUrl)}" target="_blank">Ver vídeo</a>` : ""}
+              ${!item.communityPublishedAt ? `<button class="btn primary small wide" onclick="publishCommunity('${esc(item.id)}')">Publicar na comunidade</button>` : `<a class="btn primary small wide" href="https://trabalhosja.sualuma.online/?v=portfolio-post" target="_blank">Ver na comunidade</a>`}
+              <button class="btn small" onclick="editProject('${esc(item.id)}')">Editar</button>
+              <button class="btn danger small" onclick="deleteProject('${esc(item.id)}')">Excluir</button>
+            </div>
+          </div>
+        </article>
+      `).join("") : `
+        <article class="project">
+          <div class="projectBody">
+            <h3>Nenhum trabalho publicado ainda.</h3>
+            <p>Adicione seu primeiro trabalho acima.</p>
+          </div>
+        </article>
+      `}
+    </div>
+  `;
+
+  bindForms();
+}
+
+function bindForms(){
+  const profileFile = document.getElementById("profileFile");
+  const profilePreview = document.getElementById("profilePreview");
+
+  profileFile?.addEventListener("change", async () => {
+    const data = await compressImage(profileFile.files[0]);
+    if(data){
+      profilePreview.src = data;
+      profilePreview.style.display = "block";
+    }
+  });
+
+  const projectFile = document.getElementById("projectFile");
+  const projectPreview = document.getElementById("projectPreview");
+
+  projectFile?.addEventListener("change", async () => {
+    const data = await compressImage(projectFile.files[0]);
+    if(data){
+      projectPreview.src = data;
+      projectPreview.style.display = "block";
+    }
+  });
+
+  document.getElementById("profileForm")?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    let photoUrl = String(fd.get("photoUrl") || "");
+    const file = document.getElementById("profileFile")?.files?.[0];
+
+    if(file){
+      toast("Comprimindo foto...");
+      photoUrl = await compressImage(file);
+    }
+
+    try{
+      toast("Salvando perfil...");
+      await save({
+        action:"profile",
+        name:fd.get("name"),
+        title:fd.get("title"),
+        bio:fd.get("bio"),
+        photoUrl
+      });
+      toast("Perfil salvo.");
+    }catch(err){
+      console.error(err);
+      toast(err.message || "Erro ao salvar perfil.");
+    }
+  });
+
+  document.getElementById("projectForm")?.addEventListener("submit", async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    let imageUrl = String(fd.get("imageUrl") || "");
+    const file = document.getElementById("projectFile")?.files?.[0];
+
+    if(file){
+      toast("Comprimindo imagem...");
+      imageUrl = await compressImage(file);
+    }
+
+    try{
+      toast("Salvando trabalho...");
+      await save({
+        action: editingId ? "update" : "add",
+        id: editingId || undefined,
+        title:fd.get("title"),
+        category:fd.get("category"),
+        url:fd.get("url"),
+        youtubeUrl:fd.get("youtubeUrl"),
+        imageUrl,
+        result:fd.get("result"),
+        description:fd.get("description")
+      });
+
+      editingId = null;
+      toast("Trabalho salvo. Agora você pode publicar na comunidade.");
+    }catch(err){
+      console.error(err);
+      toast(err.message || "Erro ao salvar trabalho.");
+    }
+  });
+}
+
+function editProject(id){
+  editingId = id;
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function cancelEdit(){
+  editingId = null;
+  render();
+}
+
+async function deleteProject(id){
+  if(!confirm("Excluir este trabalho?")) return;
+
+  try{
+    toast("Excluindo...");
+    await save({ action:"delete", id });
+    toast("Trabalho excluído.");
+  }catch(err){
+    console.error(err);
+    toast(err.message || "Erro ao excluir.");
+  }
+}
+
+load();
+</script>
+
+<script id="portfolio-link-preview-v1-script">
+(function(){
+  function esc(v){
+    return String(v || "").replace(/[&<>"']/g, m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m]));
+  }
+
+  function validExternalUrl(value){
+    try{
+      const url = new URL(value);
+      return ["http:", "https:"].includes(url.protocol) ? url.toString() : "";
+    }catch{
+      return "";
+    }
+  }
+
+  function siteName(url){
+    try{
+      return new URL(url).hostname.replace(/^www\./, "");
+    }catch{
+      return url;
+    }
+  }
+
+  function screenshotUrl(url){
+    try{
+      return "https://s.wordpress.com/mshots/v1/" + encodeURIComponent(new URL(url).toString()) + "?w=900";
+    }catch{
+      return "";
+    }
+  }
+
+  async function getPreviewData(url){
+    let data = {
+      title:url,
+      description:"Visualização automática do link publicado.",
+      image:screenshotUrl(url),
+      siteName:siteName(url),
+      url
+    };
+
+    try{
+      const res = await fetch("https://trabalhosja.sualuma.online/api/comunidade/link-preview?url=" + encodeURIComponent(url), {
+        cache:"no-store"
+      });
+
+      const json = await res.json();
+
+      if(json && json.ok){
+        data.title = json.title || data.title;
+        data.description = json.description || data.description;
+        data.image = json.image || data.image;
+        data.siteName = json.siteName || data.siteName;
+      }
+    }catch{}
+
+    return data;
+  }
+
+  function shouldIgnoreLink(a){
+    const href = validExternalUrl(a.href);
+    if(!href) return true;
+
+    const text = String(a.textContent || "").trim().toLowerCase();
+
+    if(
+      text.includes("dashboard") ||
+      text.includes("comunidade") ||
+      text.includes("salvar") ||
+      text.includes("editar") ||
+      text.includes("excluir") ||
+      text.includes("publicar")
+    ){
+      return true;
+    }
+
+    return false;
+  }
+
+  function findProjectCard(anchor){
+    return anchor.closest(".projectCard,.workCard,.portfolioCard,.pf-card,.pf-final-card,.card,article,section,div");
+  }
+
+  async function addPreviewForLink(anchor){
+    if(shouldIgnoreLink(anchor)) return;
+
+    const url = validExternalUrl(anchor.href);
+    if(!url) return;
+
+    const card = findProjectCard(anchor);
+    if(!card) return;
+
+    if(card.querySelector(`.portfolioAutoPreview[data-url="${CSS.escape(url)}"]`)) return;
+
+    const preview = document.createElement("a");
+    preview.className = "portfolioAutoPreview";
+    preview.href = url;
+    preview.target = "_blank";
+    preview.rel = "noopener";
+    preview.dataset.url = url;
+    preview.innerHTML = `
+      <div class="portfolioAutoPreviewImage">
+        <img alt="Gerando prévia..." loading="lazy">
+      </div>
+      <div class="portfolioAutoPreviewBody">
+        <strong>Gerando prévia...</strong>
+        <p>Carregando visualização do site.</p>
+        <span>${esc(siteName(url))}</span>
+      </div>
+    `;
+
+    const insertBefore = anchor.closest("a,button")?.parentElement || anchor;
+    insertBefore.parentElement?.insertBefore(preview, insertBefore);
+
+    const data = await getPreviewData(url);
+
+    preview.classList.add("show");
+    preview.innerHTML = `
+      <div class="portfolioAutoPreviewImage">
+        ${data.image ? `<img src="${esc(data.image)}" alt="Prévia de ${esc(data.siteName)}" loading="lazy">` : ""}
+      </div>
+      <div class="portfolioAutoPreviewBody">
+        <strong>${esc(data.title || data.siteName)}</strong>
+        <p>${esc(data.description || "Visualização automática do link publicado.")}</p>
+        <span>${esc(data.siteName || url)}</span>
+      </div>
+    `;
+  }
+
+  async function hydratePortfolioPreviews(){
+    const links = Array.from(document.querySelectorAll("a[href^='http']"));
+
+    for(const link of links){
+      const text = String(link.textContent || "").toLowerCase();
+      const href = String(link.href || "");
+
+      if(
+        text.includes("abrir site") ||
+        text.includes("abrir trabalho") ||
+        text.includes("ver site") ||
+        text.includes("prévia") ||
+        text.includes("preview") ||
+        (
+          !href.includes("meuservico.sualuma.online") &&
+          !href.includes("trabalhosja.sualuma.online") &&
+          !href.includes("dashboardcliente.sualuma.online")
+        )
+      ){
+        addPreviewForLink(link);
+      }
+    }
+  }
+
+  window.hydratePortfolioPreviews = hydratePortfolioPreviews;
+
+  const observer = new MutationObserver(() => {
+    clearTimeout(window.__portfolioPreviewTimer);
+    window.__portfolioPreviewTimer = setTimeout(hydratePortfolioPreviews, 350);
+  });
+
+  observer.observe(document.body, { childList:true, subtree:true });
+
+  setTimeout(hydratePortfolioPreviews, 500);
+  setTimeout(hydratePortfolioPreviews, 1500);
+})();
+</script>
+
+</body>
+</html>

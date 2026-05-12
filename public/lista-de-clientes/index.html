@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de Clientes | Meu Serviço</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      color:#fff;
+      background: linear-gradient(180deg,#040816 0%,#091120 100%);
+      min-height:100vh;
+      padding:28px;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: clamp(2rem,4vw,3rem);
+      margin-bottom: 10px;
+    }
+    p {
+      color:#c8d2ff;
+      margin-bottom: 22px;
+    }
+    .table-wrap {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+    table {
+      width:100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding:16px;
+      text-align:left;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      vertical-align: top;
+    }
+    th {
+      background: rgba(255,255,255,.04);
+      color:#fff;
+      font-size:14px;
+    }
+    td {
+      color:#dce3ff;
+      font-size:14px;
+    }
+    .status {
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(34,211,238,.14);
+      color:#9be7f7;
+      display:inline-block;
+      font-size:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Lista de clientes e leads</h1>
+    <p>Aqui vão aparecer os dados salvos pelo formulário do domínio principal.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>WhatsApp</th>
+            <th>Perfil</th>
+            <th>Maior necessidade</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="clientTableBody">
+          <tr>
+            <td colspan="6">Carregando dados...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function loadClients() {
+      const tbody = document.getElementById("clientTableBody");
+
+      try {
+        const res = await fetch("https://dashboardcliente.sualuma.online/api/waitlist");
+        const data = await res.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6">Nenhum cliente encontrado ainda.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.map(item => `
+          <tr>
+            <td>${item.name || ""}</td>
+            <td>${item.email || ""}</td>
+            <td>${item.whatsapp || ""}</td>
+            <td>${item.business_type || ""}</td>
+            <td>${item.biggest_need || ""}</td>
+            <td><span class="status">Novo lead</span></td>
+          </tr>
+        `).join("");
+      } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="6">Erro ao carregar os dados.</td></tr>';
+      }
+    }
+
+    loadClients();
+  </script>
+</body>
+</html>
