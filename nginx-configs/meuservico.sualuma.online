@@ -1,0 +1,49 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name meuservico.sualuma.online;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name meuservico.sualuma.online;
+
+    ssl_certificate /etc/letsencrypt/live/meuservico.sualuma.online/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/meuservico.sualuma.online/privkey.pem;
+
+    # Provider SPA
+    location = /prestador-spa/ {
+        alias /root/luma-os/public/prestador-spa/;
+    }
+
+    location = /prestador-spa {
+        return 302 /prestador-spa/;
+    }
+
+    location = / { return 302 /prestador-spa/; }
+    location = /provider-services { return 302 /prestador-spa/#prestador; }
+
+    # Static pages
+    location /minhaentrega/   { alias /root/luma-os/public/minhaentrega/; }
+    location /lista-de-clientes/ { alias /root/luma-os/public/lista-de-clientes/; }
+    location /portfolio/      { alias /root/luma-os/public/portfolio/; }
+    location /logodosite.png  { root /root/luma-os/public; }
+
+    # Everything else → Next.js
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
