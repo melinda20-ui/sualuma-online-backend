@@ -1966,9 +1966,9 @@ function renderPosts(posts){
           </div>
 
           <div class="postMeta">
-            <button class="postAuthor" style="background:none;border:0;padding:0" onclick="openProfile()">
+            <a class="postAuthor" href="/perfil/${btoa(post.authorEmail || '').replace(/=+$/, '')}" style="text-decoration:none">
               ${esc(author)}
-            </button>
+            </a>
             <div class="postTime">${esc(category)} · ${esc(timeLabel(post.createdAt))}</div>
           </div>
 
@@ -3076,8 +3076,28 @@ loadFeed();
     if(closeEditPostOriginal) closeEditPostOriginal(e);
   };
 
+  /* ─── Update Perfil button to link to user's profile ─── */
+  function updateProfileButton(){
+    const perfilBtn = document.querySelector('.topActions .btn:first-child');
+    if(!perfilBtn || perfilBtn.getAttribute('data-profile-linked')) return;
+
+    // Try to get current user email from the profile modal
+    fetch("/api/comunidade/perfil", { credentials:"include", cache:"no-store" })
+      .then(res => res.json())
+      .then(json => {
+        if(json.ok && json.user?.email){
+          const email = json.user.email;
+          const slug = btoa(email).replace(/=+$/, '');
+          perfilBtn.setAttribute('data-profile-linked', '1');
+          perfilBtn.outerHTML = '<a class="btn" href="/perfil/' + slug + '" style="display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:11px 15px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:#fff;font-weight:1000;cursor:pointer;text-decoration:none;transition:.18s ease">Meu perfil</a>';
+        }
+      })
+      .catch(() => {});
+  }
+
   /* ─── Init ─── */
   setTimeout(updateComposer, 1000);
+  setTimeout(updateProfileButton, 1500);
 })();
 </script>
 </body>

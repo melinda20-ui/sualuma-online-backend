@@ -108,6 +108,8 @@ export async function GET(req: NextRequest) {
     const q = normalizeText(req.nextUrl.searchParams.get("q"));
     const categoryParam = req.nextUrl.searchParams.get("category");
     const category = normalizeText(categoryParam);
+    const authorEmailParam = req.nextUrl.searchParams.get("authorEmail");
+    const authorEmail = authorEmailParam ? normalizeEmail(authorEmailParam) : "";
     const includeArchived = req.nextUrl.searchParams.get("includeArchived") === "1";
 
     let filtered = posts.map((p: any) => ({
@@ -121,6 +123,10 @@ export async function GET(req: NextRequest) {
 
     if (category && category !== "geral") {
       filtered = filtered.filter((p: any) => normalizeText(p.category) === category);
+    }
+
+    if (authorEmail) {
+      filtered = filtered.filter((p: any) => normalizeEmail(p.authorEmail) === authorEmail);
     }
 
     if (q) {
