@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { isAdminEmail } from "./admin-access";
 
 export type PackageCode = "ia_client" | "services_client";
 
@@ -99,6 +100,21 @@ export async function getCurrentUserPackageAccess() {
     };
   }
 
+  const email = user.email || null;
+  const isAdmin = isAdminEmail(email);
+
+  if (isAdmin) {
+    return {
+      user,
+      email,
+      packages: [],
+      hasIaClient: true,
+      hasServicesClient: true,
+      hasCompleteAccess: true,
+      error: null,
+    };
+  }
+
   const { data } = await supabase
     .from("user_package_access")
     .select("package_code,status,plan_name,plan_slug,current_period_end")
@@ -123,7 +139,7 @@ export async function getCurrentUserPackageAccess() {
 
   return {
     user,
-    email: user.email || null,
+    email,
     packages,
     hasIaClient,
     hasServicesClient,
