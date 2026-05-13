@@ -62,6 +62,8 @@ export default function ProfileClient({ slug }: { slug: string }) {
   const [editBio, setEditBio] = useState("");
   const [editLink, setEditLink] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useState<any>(null);
 
   useEffect(() => {
     async function load() {
@@ -126,6 +128,23 @@ export default function ProfileClient({ slug }: { slug: string }) {
 
   const hasPosts = posts.length > 0;
   const hasPortfolio = portfolio.length > 0;
+
+  async function uploadFoto(file: File) {
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("foto", file);
+      const res = await fetch("/api/comunidade/upload-foto", {
+        method: "POST", credentials: "include", body: form,
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || "Erro ao enviar foto.");
+      setProfile((prev) => prev ? { ...prev, photoUrl: json.photoUrl } : prev);
+    } catch (e: any) {
+      alert(e.message || "Erro ao enviar foto.");
+    }
+    setUploading(false);
+  }
 
   async function saveProfile() {
     setSaving(true);
@@ -311,6 +330,30 @@ export default function ProfileClient({ slug }: { slug: string }) {
               padding: 22,
             }}>
               <h2 style={{ fontSize: 24, fontWeight: 1000, margin: "0 0 16px" }}>Editar perfil</h2>
+
+              {/* Photo upload */}
+              <div style={{ marginBottom: 16, textAlign: "center" }}>
+                <div style={{
+                  width: 100, height: 100, borderRadius: "50%", overflow: "hidden", margin: "0 auto 10px",
+                  background: "linear-gradient(135deg, #8d5cff, #18f2ff)",
+                  display: "grid", placeItems: "center", fontSize: 32, fontWeight: 1000, color: "#fff",
+                }}>
+                  {profile?.photoUrl ? (
+                    <img src={profile.photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    initials(profile?.name || "U")
+                  )}
+                </div>
+                <label style={{
+                  display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer",
+                  borderRadius: 14, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.07)",
+                  color: "#fff", padding: "8px 14px", fontWeight: 900, fontSize: 13,
+                }}>
+                  {uploading ? "Enviando..." : "📷 Trocar foto"}
+                  <input type="file" accept="image/*" style={{ display: "none" }}
+                    onChange={e => { const f = e.target.files?.[0]; if (f) uploadFoto(f); }} />
+                </label>
+              </div>
 
               <label style={{ display: "block", fontSize: 13, fontWeight: 900, color: "#cfd5ff", marginBottom: 4 }}>Bio</label>
               <textarea value={editBio} onChange={e => setEditBio(e.target.value)}
