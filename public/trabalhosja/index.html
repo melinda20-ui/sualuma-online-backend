@@ -1318,7 +1318,7 @@
     q=(q||"").trim();
     feed.innerHTML=`<div class="feed-empty"><i class="ti ti-loader"></i> Carregando publicações…</div>`;
     try{
-      let url="/api/comunidade/posts?t="+Date.now();
+      let url="/api/comunidade/posts?limit=20&t="+Date.now();
       if(q) url+="&q="+encodeURIComponent(q);
       if(selectedCategory&&normalize(selectedCategory)!==normalize("Geral")) url+="&category="+encodeURIComponent(selectedCategory);
       const res=await fetch(url,{credentials:"include",cache:"no-store"});
@@ -1328,7 +1328,9 @@
         feed.innerHTML=`<div class="feed-empty"><i class="ti ti-cloud-off"></i> API temporariamente indisponível.<br><span style="font-size:12px">Status: ${res.status}</span></div>`;
         return;
       }
-      renderPosts(json.posts||json.data||[]);
+      const posts=(json.posts||json.data||[]);
+      renderPosts(posts);
+      if(!q) saveFeedCache(posts);
     }catch(err){
       feed.innerHTML=`<div class="feed-empty"><i class="ti ti-cloud-off"></i> Erro ao carregar feed.<br><span style="font-size:12px">${esc(err.message)}</span></div>`;
     }
@@ -1610,27 +1612,45 @@
     }catch(err){ toast(err.message||"Erro ao salvar."); }
   }
 
-  /* ─── CHECK AUTH ─── */
+  /* ─── CHECK AUTH (real) ─── */
   async function checkAuth(){
     try{
-      const res=await fetch("/api/comunidade/posts?limit=1&t="+Date.now(),{credentials:"include",cache:"no-store"});
+      const res=await fetch("/api/comunidade/perfil",{credentials:"include",cache:"no-store"});
       const json=await res.json();
-      if(json.ok){
+      if(json.ok && json.user && json.user.email){
         document.getElementById("loginBtn").style.display="none";
         document.getElementById("profileBtn").style.display="flex";
-        // Update composer avatar if user name available
-        if(json.user?.name){
-          document.getElementById("composerAvatar").textContent=initials(json.user.name);
-          document.getElementById("profileBtn").textContent=initials(json.user.name);
+        const name=json.user.name||"";
+        if(name){
+          document.getElementById("composerAvatar").textContent=initials(name);
+          document.getElementById("profileBtn").textContent=initials(name);
         }
-      }else{
-        document.getElementById("loginBtn").style.display="inline-flex";
-        document.getElementById("profileBtn").style.display="none";
+        return;
       }
-    }catch(e){
-      document.getElementById("loginBtn").style.display="inline-flex";
-      document.getElementById("profileBtn").style.display="none";
+    }catch(e){}
+    document.getElementById("loginBtn").style.display="inline-flex";
+    document.getElementById("profileBtn").style.display="none";
+  }
+
+  /* ─── CACHE: show saved feed instantly then refresh ─── */
+  (function(){
+    const saved=localStorage.getItem("tj_feed_cache");
+    const ts=localStorage.getItem("tj_feed_cache_ts");
+    if(saved&&ts&&(Date.now()-parseInt(ts)<300000)){ // 5 min cache
+      try{
+        const posts=JSON.parse(saved);
+        if(Array.isArray(posts)&&posts.length){
+          renderPosts(posts);
+        }
+      }catch(e){}
     }
+  })();
+
+  function saveFeedCache(posts){
+    try{
+      localStorage.setItem("tj_feed_cache",JSON.stringify(posts));
+      localStorage.setItem("tj_feed_cache_ts",String(Date.now()));
+    }catch(e){}
   }
 
   function quickMessage(name){
