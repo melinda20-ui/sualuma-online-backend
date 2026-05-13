@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 
 interface Post {
@@ -57,6 +57,11 @@ export default function ProfileClient({ slug }: { slug: string }) {
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editBio, setEditBio] = useState("");
+  const [editLink, setEditLink] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -68,18 +73,24 @@ export default function ProfileClient({ slug }: { slug: string }) {
           return;
         }
 
-        const [profileRes, postsRes] = await Promise.all([
+        const [profileRes, postsRes, meRes] = await Promise.all([
           fetch("/api/comunidade/perfil-publico?email=" + encodeURIComponent(email), { cache: "no-store" }),
           fetch("/api/comunidade/posts?authorEmail=" + encodeURIComponent(email) + "&t=" + Date.now(), { cache: "no-store" }),
+          fetch("/api/comunidade/perfil", { credentials: "include", cache: "no-store" }),
         ]);
 
         const profileJson = await profileRes.json();
         const postsJson = await postsRes.json();
+        const meJson = await meRes.json();
 
         if (!profileJson.ok) {
           setError("Perfil não encontrado.");
           setLoading(false);
           return;
+        }
+
+        if (meJson.ok && meJson.user?.email && meJson.user.email.toLowerCase() === email.toLowerCase()) {
+          setIsOwner(true);
         }
 
         setProfile(profileJson.profile);
@@ -116,6 +127,31 @@ export default function ProfileClient({ slug }: { slug: string }) {
   const hasPosts = posts.length > 0;
   const hasPortfolio = portfolio.length > 0;
 
+  async function saveProfile() {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/comunidade/perfil-publico", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ bio: editBio, customLink: editLink }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || "Erro ao salvar.");
+      setProfile((prev) => prev ? { ...prev, bio: json.profile.bio, customLink: json.profile.customLink } : prev);
+      setEditing(false);
+    } catch (e: any) {
+      alert(e.message || "Erro ao salvar.");
+    }
+    setSaving(false);
+  }
+
+  function openEdit() {
+    setEditBio(profile?.bio || "");
+    setEditLink(profile?.customLink || "");
+    setEditing(true);
+  }
+
   return (
     <main style={{ minHeight: "100vh", background: "#050714", color: "#fff", fontFamily: "Inter, Arial, sans-serif" }}>
       <div style={{ maxWidth: 935, margin: "0 auto", padding: "30px 16px 60px" }}>
@@ -133,8 +169,20 @@ export default function ProfileClient({ slug }: { slug: string }) {
             )}
           </div>
           <div style={{ flex: 1, minWidth: 200 }}>
-            <h1 style={{ fontSize: 28, fontWeight: 1000, margin: "0 0 4px", lineHeight: 1.2 }}>{profile.name}</h1>
-            {profile.bio && <p style={{ color: "#cfd5ff", margin: "0 0 6px", lineHeight: 1.5, fontSize: 15 }}>{profile.bio}</p>}
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <h1 style={{ fontSize: 28, fontWeight: 1000, margin: "0 0 4px", lineHeight: 1.2 }}>{profile.name}</h1>
+              {isOwner && (
+                <button onClick={openEdit} style={{
+                  border: "1px solid rgba(255,255,255,.15)", borderRadius: 14, background: "rgba(255,255,255,.08)",
+                  color: "#fff", padding: "6px 12px", fontSize: 13, fontWeight: 900, cursor: "pointer",
+                }}>✏️ Editar perfil</button>
+              )}
+            </div>
+            {profile.bio ? (
+              <p style={{ color: "#cfd5ff", margin: "0 0 6px", lineHeight: 1.5, fontSize: 15 }}>{profile.bio}</p>
+            ) : isOwner ? (
+              <p style={{ color: "#9da7d9", margin: "0 0 6px", fontSize: 14, fontStyle: "italic" }}>Clique em "Editar perfil" para adicionar uma bio.</p>
+            ) : null}
             {profile.customLink && (
               <a href={profile.customLink} target="_blank" rel="noopener"
                 style={{ color: "#18f2ff", fontWeight: 800, fontSize: 14, display: "inline-flex", alignItems: "center", gap: 4 }}>
@@ -250,6 +298,51 @@ export default function ProfileClient({ slug }: { slug: string }) {
             </div>
           )}
         </section>
+
+        {/* Edit modal */}
+        {editing && (
+          <div style={{
+            position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,.72)", backdropFilter: "blur(12px)",
+            display: "grid", placeItems: "center", padding: 16,
+          }} onClick={() => setEditing(false)}>
+            <div onClick={e => e.stopPropagation()} style={{
+              width: "min(500px,100%)", border: "1px solid rgba(255,255,255,.14)", borderRadius: 28,
+              background: "radial-gradient(circle at 0 0,rgba(24,242,255,.13),transparent 36%),radial-gradient(circle at 100% 0,rgba(141,92,255,.2),transparent 40%),#080a18",
+              padding: 22,
+            }}>
+              <h2 style={{ fontSize: 24, fontWeight: 1000, margin: "0 0 16px" }}>Editar perfil</h2>
+
+              <label style={{ display: "block", fontSize: 13, fontWeight: 900, color: "#cfd5ff", marginBottom: 4 }}>Bio</label>
+              <textarea value={editBio} onChange={e => setEditBio(e.target.value)}
+                placeholder="Conte um pouco sobre você..."
+                style={{
+                  width: "100%", minHeight: 90, resize: "vertical", borderRadius: 18,
+                  border: "1px solid rgba(255,255,255,.13)", background: "rgba(255,255,255,.08)",
+                  color: "#fff", padding: 14, outline: "none", marginBottom: 14, font: "inherit",
+                }} />
+
+              <label style={{ display: "block", fontSize: 13, fontWeight: 900, color: "#cfd5ff", marginBottom: 4 }}>Link personalizado</label>
+              <input value={editLink} onChange={e => setEditLink(e.target.value)}
+                placeholder="https://meusite.com"
+                style={{
+                  width: "100%", borderRadius: 18, border: "1px solid rgba(255,255,255,.13)",
+                  background: "rgba(255,255,255,.08)", color: "#fff", padding: "14px", outline: "none",
+                  marginBottom: 18, font: "inherit",
+                }} />
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                <button onClick={() => setEditing(false)} style={{
+                  borderRadius: 18, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.075)",
+                  color: "#fff", padding: "14px", fontWeight: 1000, cursor: "pointer", font: "inherit",
+                }}>Cancelar</button>
+                <button onClick={saveProfile} disabled={saving} style={{
+                  borderRadius: 18, border: "none", background: "linear-gradient(135deg,#8d5cff,#18f2ff)",
+                  color: "#fff", padding: "14px", fontWeight: 1000, cursor: "pointer", opacity: saving ? .6 : 1, font: "inherit",
+                }}>{saving ? "Salvando..." : "Salvar"}</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Back link */}
         <div style={{ textAlign: "center", marginTop: 40 }}>
