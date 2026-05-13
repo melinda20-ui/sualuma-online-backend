@@ -1132,7 +1132,7 @@
 
   const AVATAR_CLASSES = ["av-brand","av-blue","av-green","av-pink","av-amber","av-purple","av-cyan"];
 
-  function esc(v){ return String(v||"").replace(/[&<>"']/g,m=>{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]); }
+  function esc(v){ return String(v||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
 
   function initials(name){
     const parts = String(name||"Usuário").trim().split(/\s+/).filter(Boolean);
@@ -1612,25 +1612,31 @@
     }catch(err){ toast(err.message||"Erro ao salvar."); }
   }
 
-  /* ─── CHECK AUTH (real) ─── */
-  async function checkAuth(){
-    try{
-      const res=await fetch("/api/comunidade/perfil",{credentials:"include",cache:"no-store"});
-      const json=await res.json();
-      if(json.ok && json.user && json.user.email){
-        document.getElementById("loginBtn").style.display="none";
-        document.getElementById("profileBtn").style.display="flex";
-        const name=json.user.name||"";
-        if(name){
-          document.getElementById("composerAvatar").textContent=initials(name);
-          document.getElementById("profileBtn").textContent=initials(name);
-        }
-        return;
-      }
-    }catch(e){}
-    document.getElementById("loginBtn").style.display="inline-flex";
-    document.getElementById("profileBtn").style.display="none";
-  }
+  /* ─── CHECK AUTH via Clerk (cross-subdomain) ─── */
+  (function(){
+    var s=document.createElement("script");
+    s.src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js";
+    s.onload=function(){
+      try{
+        var c=new window.Clerk("pk_test_bGFyZ2UtcXVhaWwtMjEuY2xlcmsuYWNjb3VudHMuZGV2JA");
+        c.load().then(function(){
+          if(c.session){
+            document.getElementById("loginBtn").style.display="none";
+            document.getElementById("profileBtn").style.display="flex";
+            var u=c.user;
+            if(u){
+              var name=u.fullName||u.username||(u.emailAddresses&&u.emailAddresses[0]&&u.emailAddresses[0].emailAddress)||"";
+              if(name){
+                document.getElementById("composerAvatar").textContent=initials(name);
+                document.getElementById("profileBtn").textContent=initials(name);
+              }
+            }
+          }
+        }).catch(function(){});
+      }catch(e){}
+    };
+    document.head.appendChild(s);
+  })();
 
   /* ─── CACHE: show saved feed instantly then refresh ─── */
   (function(){
@@ -1660,7 +1666,6 @@
   /* ─── INIT ─── */
   loadFeed();
   loadBlog();
-  checkAuth();
   </script>
 
 </body>
