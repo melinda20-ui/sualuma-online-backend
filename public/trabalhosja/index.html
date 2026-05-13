@@ -1612,53 +1612,103 @@
     }catch(err){ toast(err.message||"Erro ao salvar."); }
   }
 
-  /* ─── CHECK AUTH via Supabase (cross-subdomain cookie) ─── */
+  /* ─── CHECK AUTH via Supabase (multi-method) ─── */
   (function(){
-    var SUPABASE_URL="https://vadljxyykrhyeuarzyat.supabase.co";
+    var SUPABASE_APP_URL="https://vadljxyykrhyeuarzyat.supabase.co";
     var SUPABASE_ANON_KEY="sb_publishable_1O8rZojnDMZeYkBOtFF6jA_8m64Y-Yo";
-    function getCookie(name){
-      var m=document.cookie.match(new RegExp("(^| )"+name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"=([^;]*)"));
-      return m?decodeURIComponent(m[2]):null;
-    }
-    function findSupabaseToken(){
-      var c=document.cookie.split("; ");
-      for(var i=0;i<c.length;i++){
-        if(c[i].startsWith("sb-")&&c[i].includes("-auth-token")){
-          try{
-            var val=decodeURIComponent(c[i].split("=").slice(1).join("="));
-            var parsed=JSON.parse(val);
-            return parsed.access_token||null;
-          }catch(e){}
-        }
-      }
-      return null;
-    }
+    var STORAGE_KEY="sb-vadljxyykrhyeuarzyat-auth-token";
+
     function setLoggedIn(displayName){
-      document.getElementById("loginBtn").style.display="none";
-      document.getElementById("profileBtn").style.display="flex";
-      if(displayName){
-        document.getElementById("composerAvatar").textContent=initials(displayName);
-        document.getElementById("profileBtn").textContent=initials(displayName);
+      var loginBtn=document.getElementById("loginBtn");
+      var profileBtn=document.getElementById("profileBtn");
+      if(loginBtn) loginBtn.style.display="none";
+      if(profileBtn){
+        profileBtn.style.display="flex";
+        if(displayName) profileBtn.textContent=initials(displayName);
       }
+      var composerAvatar=document.getElementById("composerAvatar");
+      if(composerAvatar&&displayName) composerAvatar.textContent=initials(displayName);
     }
-    var token=findSupabaseToken();
-    if(token){
-      setLoggedIn();
-      fetch(SUPABASE_URL+"/auth/v1/user",{
-        headers:{
-          "apikey":SUPABASE_ANON_KEY,
-          "Authorization":"Bearer "+token
-        }
-      })
-      .then(function(r){return r.json();})
-      .then(function(data){
-        if(data&&data.id){
-          var name=data.user_metadata?.full_name||data.user_metadata?.name||data.email||"";
-          setLoggedIn(name);
-        }
-      })
-      .catch(function(){});
+
+    /* Method 1: server via /perfil (relies on cookie sent cross-subdomain) */
+    function tryServerAuth(){
+      fetch("/api/comunidade/perfil",{credentials:"include"})
+        .then(function(r){return r.json()})
+        .then(function(j){
+          if(j.ok&&j.user){
+            setLoggedIn(j.user.name||j.user.email||"");
+          }
+        })
+        .catch(function(){});
     }
+
+    /* Method 2: read cookie sb-*-auth-token directly and call Supabase REST */
+    function tryCookieAuth(){
+      try{
+        var cookies=document.cookie.split("; ");
+        for(var i=0;i<cookies.length;i++){
+          if(cookies[i].startsWith("sb-")&&cookies[i].includes("-auth-token")){
+            var raw=decodeURIComponent(cookies[i].substring(cookies[i].indexOf("=")+1));
+            var parsed=JSON.parse(raw);
+            var token=parsed.access_token;
+            if(token){
+              setLoggedIn();
+              fetch(SUPABASE_APP_URL+"/auth/v1/user",{
+                headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+token}
+              }).then(function(r){return r.json()}).then(function(d){
+                if(d&&d.id) setLoggedIn(d.user_metadata?.full_name||d.user_metadata?.name||d.email||"");
+              }).catch(function(){});
+              return true;
+            }
+          }
+        }
+      }catch(e){}
+      return false;
+    }
+
+    /* Method 3: try Supabase SDK from CDN (reads localStorage) */
+    function trySDKAuth(){
+      var s=document.createElement("script");
+      s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+      s.onload=function(){
+        try{
+          var sb=window.supabase.createClient(SUPABASE_APP_URL,SUPABASE_ANON_KEY,{
+            auth:{
+              storageKey:STORAGE_KEY,
+              autoRefreshToken:true,
+              persistSession:true,
+              storage:{
+                getItem:function(key){
+                  var v=localStorage.getItem(key);
+                  if(v) return v;
+                  try{
+                    var cs=document.cookie.split("; ");
+                    for(var i=0;i<cs.length;i++){
+                      if(cs[i].trim().startsWith(key+"=")||cs[i].trim().startsWith("sb-")){
+                        var raw=decodeURIComponent(cs[i].substring(cs[i].indexOf("=")+1));
+                        try{var p=JSON.parse(raw); if(p&&p.access_token) return raw; }catch(e){}
+                      }
+                    }
+                  }catch(e){}
+                  return null;
+                },
+                setItem:function(k,v){ try{localStorage.setItem(k,v)}catch(e){} },
+                removeItem:function(k){ try{localStorage.removeItem(k)}catch(e){} }
+              }
+            }
+          });
+          sb.auth.getSession().then(function(res){
+            if(res.data&&res.data.session){
+              setLoggedIn(res.data.session.user?.user_metadata?.full_name||res.data.session.user?.email||"");
+            }
+          }).catch(function(){});
+        }catch(e){}
+      };
+      document.head.appendChild(s);
+    }
+
+    tryServerAuth();
+    if(!tryCookieAuth()) trySDKAuth();
   })();
 
   /* ─── CACHE: show saved feed instantly then refresh ─── */
