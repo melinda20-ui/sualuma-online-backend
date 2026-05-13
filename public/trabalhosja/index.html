@@ -831,8 +831,8 @@
       <a href="#" class="nav-item" onclick="openProfile();return false">
         <i class="ti ti-user" aria-hidden="true"></i> Perfil
       </a>
-      <a href="#" class="nav-item" onclick="openEditPhotoBio();return false">
-        <i class="ti ti-camera" aria-hidden="true"></i> Editar foto/bio
+      <a href="https://meuservico.sualuma.online/prestador-spa" class="nav-item">
+        <i class="ti ti-user-circle" aria-hidden="true"></i> Meu perfil no Meu Serviço
       </a>
       <a href="https://meuservico.sualuma.online/#prestador-servicos" class="nav-item">
         <i class="ti ti-file-text" aria-hidden="true"></i> Ver propostas
@@ -898,9 +898,15 @@
         <h2>Últimos artigos do blog</h2>
         <p>Conteúdos recentes para aprender, se inspirar e continuar navegando.</p>
         <div class="blogFixedTrack" id="blogTrack">
-          <div class="blogFixedCard">
-            <div class="blogFixedImage">Carregando...</div>
-          </div>
+          <a class="blogFixedCard" href="https://blog.sualuma.online" target="_blank" rel="noopener">
+            <div class="blogFixedImage">Blog</div>
+            <div class="blogFixedBody">
+              <span class="blogFixedBadge">Blog Sualuma</span>
+              <h3>Artigos sobre IA, serviços e empreendedorismo</h3>
+              <p>Conteúdos para quem quer crescer com serviços digitais.</p>
+              <span class="blogFixedRead">Abrir blog →</span>
+            </div>
+          </a>
         </div>
       </div>
     </main>
@@ -926,25 +932,11 @@
       <div>
         <div class="widget-title">Pessoas online</div>
         <div class="online-list">
-          <div class="person">
-            <div class="person-av av-blue">AS</div>
+          <div class="person" style="opacity:0.5;cursor:default">
+            <div class="person-av av-blue" style="opacity:0.5">?</div>
             <div class="person-info">
-              <div class="person-name">Ana Sites</div>
-              <div class="person-role">Web designer</div>
-            </div>
-          </div>
-          <div class="person">
-            <div class="person-av av-green">RA</div>
-            <div class="person-info">
-              <div class="person-name">Rafa Automação</div>
-              <div class="person-role">n8n e IA</div>
-            </div>
-          </div>
-          <div class="person">
-            <div class="person-av av-pink">BS</div>
-            <div class="person-info">
-              <div class="person-name">Bia Social</div>
-              <div class="person-role">Social media</div>
+              <div class="person-name">Conecte-se ao marketplace</div>
+              <div class="person-role">Pessoas online aparecem aqui</div>
             </div>
           </div>
         </div>
@@ -1074,7 +1066,7 @@
       </div>
       <div style="text-align:center;margin-bottom:14px">
         <div id="profileAvatar" class="avatar av-brand" style="width:48px;height:48px;font-size:16px;margin:0 auto 8px">LR</div>
-        <div id="profileText" style="font-size:13px;color:var(--text-secondary)">Carregando...</div>
+        <div id="profileText" style="font-size:13px;color:var(--text-secondary)">Clique nos links abaixo para acessar seu painel</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
         <a class="btn-primary" style="text-align:center;text-decoration:none" href="https://meuservico.sualuma.online/portfolio/">🖼️ Abrir meu portfólio</a>
@@ -1258,12 +1250,12 @@
   function renderPosts(posts){
     currentPosts=posts;
     if(!posts.length){
-      feed.innerHTML=`<div class="feed-empty"><i class="ti ti-news-off"></i> Nenhum post encontrado.<br><span style="font-size:12px">Publique um trabalho pelo portfólio para aparecer aqui.</span></div>`;
+      feed.innerHTML=`<div class="feed-empty"><i class="ti ti-news-off"></i> Nenhuma publicação encontrada.<br><span style="font-size:12px">Acesse o <a href="https://meuservico.sualuma.online/portfolio/" style="color:var(--accent);text-decoration:underline">portfólio no Meu Serviço</a> para divulgar seus trabalhos na comunidade.</span></div>`;
       return;
     }
     feed.innerHTML=posts.map(post=>{
       const id=esc(post.id||Math.random().toString(16).slice(2));
-      const author=post.authorName||"Prestador Sualuma";
+      const author=post.authorName||"Prestador do Meu Serviço";
       const category=post.category||"Geral";
       const title=post.title||"";
       const content=post.content||post.body||"";
@@ -1332,7 +1324,7 @@
       renderPosts(posts);
       if(!q) saveFeedCache(posts);
     }catch(err){
-      feed.innerHTML=`<div class="feed-empty"><i class="ti ti-cloud-off"></i> Erro ao carregar feed.<br><span style="font-size:12px">${esc(err.message)}</span></div>`;
+      feed.innerHTML=`<div class="feed-empty"><i class="ti ti-cloud-off"></i> Não foi possível carregar o feed agora.<br><span style="font-size:12px">Veja prestadores e portfólios no <a href="https://meuservico.sualuma.online/prestador-spa" style="color:var(--accent);text-decoration:underline">Meu Serviço</a>.</span></div>`;
     }
   }
 
@@ -1563,9 +1555,9 @@
       track.innerHTML=`<a class="blogFixedCard" href="https://blog.sualuma.online" target="_blank" rel="noopener">
         <div class="blogFixedImage">B</div>
         <div class="blogFixedBody">
-          <span class="blogFixedBadge">Blog</span>
-          <h3>Leia os artigos da Sualuma</h3>
-          <p>Conteúdos sobre IA, serviços digitais, automações e freelas.</p>
+          <span class="blogFixedBadge">Blog Sualuma</span>
+          <h3>Artigos sobre IA, serviços e empreendedorismo</h3>
+          <p>Conteúdos para quem quer crescer com serviços digitais.</p>
           <span class="blogFixedRead">Abrir blog →</span>
         </div>
       </a>`;
