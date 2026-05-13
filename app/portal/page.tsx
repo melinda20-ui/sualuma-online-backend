@@ -26,10 +26,10 @@ const cards = [
   },
   {
     title: "Comunidade",
-    desc: "Conecte-se com pessoas, descubra oportunidades e acompanhe novidades.",
-    href: "/marketplace",
+    desc: "Participe do feed, publique trabalhos, comente e conecte-se com pessoas.",
+    href: "https://trabalhosja.sualuma.online",
     tag: "Comunidade",
-    external: false,
+    external: true,
   },
   {
     title: "Chat Inteligente",
