@@ -1612,30 +1612,53 @@
     }catch(err){ toast(err.message||"Erro ao salvar."); }
   }
 
-  /* ─── CHECK AUTH via Clerk (cross-subdomain) ─── */
+  /* ─── CHECK AUTH via Supabase (cross-subdomain cookie) ─── */
   (function(){
-    var s=document.createElement("script");
-    s.src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@5/dist/clerk.browser.js";
-    s.onload=function(){
-      try{
-        var c=new window.Clerk("pk_test_bGFyZ2UtcXVhaWwtMjEuY2xlcmsuYWNjb3VudHMuZGV2JA");
-        c.load().then(function(){
-          if(c.session){
-            document.getElementById("loginBtn").style.display="none";
-            document.getElementById("profileBtn").style.display="flex";
-            var u=c.user;
-            if(u){
-              var name=u.fullName||u.username||(u.emailAddresses&&u.emailAddresses[0]&&u.emailAddresses[0].emailAddress)||"";
-              if(name){
-                document.getElementById("composerAvatar").textContent=initials(name);
-                document.getElementById("profileBtn").textContent=initials(name);
-              }
-            }
-          }
-        }).catch(function(){});
-      }catch(e){}
-    };
-    document.head.appendChild(s);
+    var SUPABASE_URL="https://vadljxyykrhyeuarzyat.supabase.co";
+    var SUPABASE_ANON_KEY="sb_publishable_1O8rZojnDMZeYkBOtFF6jA_8m64Y-Yo";
+    function getCookie(name){
+      var m=document.cookie.match(new RegExp("(^| )"+name.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"=([^;]*)"));
+      return m?decodeURIComponent(m[2]):null;
+    }
+    function findSupabaseToken(){
+      var c=document.cookie.split("; ");
+      for(var i=0;i<c.length;i++){
+        if(c[i].startsWith("sb-")&&c[i].includes("-auth-token")){
+          try{
+            var val=decodeURIComponent(c[i].split("=").slice(1).join("="));
+            var parsed=JSON.parse(val);
+            return parsed.access_token||null;
+          }catch(e){}
+        }
+      }
+      return null;
+    }
+    function setLoggedIn(displayName){
+      document.getElementById("loginBtn").style.display="none";
+      document.getElementById("profileBtn").style.display="flex";
+      if(displayName){
+        document.getElementById("composerAvatar").textContent=initials(displayName);
+        document.getElementById("profileBtn").textContent=initials(displayName);
+      }
+    }
+    var token=findSupabaseToken();
+    if(token){
+      setLoggedIn();
+      fetch(SUPABASE_URL+"/auth/v1/user",{
+        headers:{
+          "apikey":SUPABASE_ANON_KEY,
+          "Authorization":"Bearer "+token
+        }
+      })
+      .then(function(r){return r.json();})
+      .then(function(data){
+        if(data&&data.id){
+          var name=data.user_metadata?.full_name||data.user_metadata?.name||data.email||"";
+          setLoggedIn(name);
+        }
+      })
+      .catch(function(){});
+    }
   })();
 
   /* ─── CACHE: show saved feed instantly then refresh ─── */
