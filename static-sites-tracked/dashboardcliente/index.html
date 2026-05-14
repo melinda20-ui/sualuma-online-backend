@@ -459,15 +459,25 @@
     }
 
     function chat(){
-      setTitle('Chat IA','Área preparada para conversar com a IA da plataforma.')
+      setTitle('Mensagens','Central de conversa entre cliente, equipe e prestadores.')
 
       return `
-        <div class="card">
-          <h3>Chat IA da Sualuma</h3>
-          <p>Em breve o cérebro de IA vai ficar conectado aqui para ler contexto do projeto, gerar tarefas, orientar próximos passos e chamar agentes.</p>
-          <div class="list">
-            <div class="item"><div><h4>O que posso pedir?</h4><p>Resumo do projeto, próximos passos, ideias de melhoria, textos e organização das entregas.</p></div><span class="badge">IA</span></div>
-            <div class="item"><div><h4>Status</h4><p>Interface pronta para conectar ao cérebro de IA.</p></div><span class="badge warn">Em configuração</span></div>
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Conversas recentes</h3>
+            <div class="list">
+              <div class="item"><div><h4>Nenhuma conversa recente</h4><p>Suas mensagens com prestadores aparecerão aqui.</p></div><span class="badge ok">Vazio</span></div>
+            </div>
+            <div style="margin-top:18px">
+              <a class="btn" href="#mensagens">Ir para mensagens</a>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Enviar mensagem</h3>
+            <p>Use a página de mensagens para conversar com seus prestadores e equipe.</p>
+            <div style="margin-top:18px">
+              <a class="btn" href="#mensagens">Abrir mensagens</a>
+            </div>
           </div>
         </div>
       `

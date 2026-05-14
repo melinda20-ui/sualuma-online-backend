@@ -758,6 +758,14 @@
       return data?.session || null;
     }
 
+    try {
+      const { data } = await supabaseClient.auth.refreshSession();
+      if (data?.session) {
+        await syncCookiesFromSession();
+        return data.session;
+      }
+    } catch(e) {}
+
     return null;
   }
 
