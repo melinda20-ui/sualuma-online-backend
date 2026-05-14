@@ -204,7 +204,7 @@ function getProviderProfile(dashboard: any, user: any) {
         meta.name ||
         meta.nome ||
         user?.email?.split("@")?.[0] ||
-        "Prestador Sualuma",
+        "Prestador",
       title: "Prestador da comunidade Sualuma",
       email: user?.email || "",
       bio: "",

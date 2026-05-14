@@ -54,7 +54,7 @@ function getUserName(user: any) {
       meta.full_name ||
       meta.fullName ||
       user?.email?.split("@")?.[0] ||
-      "Cliente Sualuma"
+      "Cliente"
   ).trim();
 }
 

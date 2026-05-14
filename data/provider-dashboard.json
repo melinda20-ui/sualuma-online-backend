@@ -1,16 +1,14 @@
 {
-  "updatedAt": "2026-04-28T04:34:54.051Z",
+  "updatedAt": "2026-05-13T19:01:39.056Z",
   "providerProfile": {
-    "name": "Prestador Sualuma",
-    "title": "Especialista em sites, automações e entregas digitais",
-    "email": "prestador@sualuma.online",
+    "name": "--- ilustrativo: substitua pelo seu nome ---",
+    "title": "--- ilustrativo: substitua pela sua especialidade ---",
+    "email": "",
     "phone": "",
-    "city": "Brasil",
-    "bio": "Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.",
-    "avatarInitial": "P",
-    "onboardingComplete": false,
-    "photoUrl": "",
-    "updatedAt": "2026-04-28T04:34:54.051Z"
+    "city": "",
+    "bio": "Configure seu perfil no painel acima para preencher seus dados reais.",
+    "avatarInitial": "?",
+    "onboardingComplete": false
   },
   "setup": [
     {
@@ -23,7 +21,7 @@
       "id": "recebimento",
       "title": "Dados de recebimento",
       "description": "Chave Pix, banco ou conta para saque.",
-      "done": true
+      "done": false
     },
     {
       "id": "portfolio",
@@ -45,114 +43,35 @@
     }
   ],
   "stats": {
-    "earningsMonth": 7400,
-    "availableBalance": 2100,
-    "activeClients": 6,
-    "sentProposals": 14,
-    "acceptedProposals": 5,
-    "rejectedProposals": 3,
-    "pendingProposals": 6,
-    "referralEarnings": 900
+    "earningsMonth": 0,
+    "availableBalance": 0,
+    "activeClients": 0,
+    "sentProposals": 0,
+    "acceptedProposals": 0,
+    "rejectedProposals": 0,
+    "pendingProposals": 0,
+    "referralEarnings": 0
   },
   "payout": {
-    "status": "withdrawal_requested",
-    "pixKey": "15593688613",
-    "bankName": "teste",
-    "holderName": "Ludmila Ramos Cavalcante",
-    "document": "15593688613",
-    "updatedAt": "2026-04-28T01:03:39.444Z"
+    "status": "pending",
+    "pixKey": "",
+    "bankName": "",
+    "holderName": "",
+    "document": "",
+    "updatedAt": ""
   },
-  "payoutRequests": [
-    {
-      "id": "saque-1777338219444-kco52z",
-      "amount": 2100,
-      "status": "solicitado",
-      "createdAt": "2026-04-28T01:03:39.444Z"
-    },
-    {
-      "id": "saque-1777338214774-jm4ucc",
-      "amount": 2100,
-      "status": "solicitado",
-      "createdAt": "2026-04-28T01:03:34.774Z"
-    }
-  ],
-  "proposals": [
-    {
-      "id": "prop-demo-1",
-      "clientName": "Cliente Sualuma",
-      "projectTitle": "Site institucional principal",
-      "amount": 2500,
-      "status": "aceita",
-      "createdAt": "2026-04-27T20:54:55.446Z"
-    },
-    {
-      "id": "prop-demo-2",
-      "clientName": "Loja Parceira",
-      "projectTitle": "Página de vendas com automação",
-      "amount": 1500,
-      "status": "pendente",
-      "createdAt": "2026-04-27T20:54:55.446Z"
-    }
-  ],
-  "projects": [
-    {
-      "id": "proj-site-principal",
-      "title": "Site institucional principal",
-      "clientName": "Cliente Sualuma",
-      "status": "em_andamento",
-      "progress": 72,
-      "repoUrl": "",
-      "snapshots": []
-    },
-    {
-      "id": "proj-pagina-vendas",
-      "title": "Página de vendas",
-      "clientName": "Cliente Sualuma",
-      "status": "aguardando_revisao",
-      "progress": 88,
-      "repoUrl": "",
-      "snapshots": []
-    }
-  ],
-  "portfolio": [
-    {
-      "id": "port-demo-1",
-      "title": "Site institucional futurista",
-      "category": "Sites",
-      "url": "https://sualuma.online",
-      "description": "Modelo de apresentação profissional para empresas digitais.",
-      "createdAt": "2026-04-27T20:54:55.446Z",
-      "coverImage": "",
-      "youtubeUrl": "",
-      "clientName": "",
-      "status": "publicado",
-      "updatedAt": "2026-04-28T04:34:54.051Z"
-    }
-  ],
+  "proposals": [],
+  "projects": [],
+  "portfolio": [],
+  "community": [],
   "referrals": {
     "summary": {
-      "totalClicks": 38,
-      "totalLeads": 11,
-      "totalConversions": 3,
-      "totalEarned": 900
+      "totalClicks": 0,
+      "totalLeads": 0,
+      "totalConversions": 0,
+      "totalEarned": 0
     },
-    "programs": [
-      {
-        "id": "site-direto",
-        "title": "Indique serviços SOS Publicidade Online",
-        "reward": "R$300 por cada página/site contratado diretamente"
-      },
-      {
-        "id": "assinatura-sualuma",
-        "title": "Indique planos da Sualuma Online",
-        "reward": "10% por cada pessoa que assinar um plano"
-      },
-      {
-        "id": "prestador-indicado",
-        "title": "Indique novos prestadores",
-        "reward": "5% nas duas primeiras propostas aceitas do prestador indicado"
-      }
-    ],
+    "programs": [],
     "items": []
   },
   "github": {
@@ -165,114 +84,9 @@
   "whatsapp": {
     "status": "pending",
     "phone": "",
-    "qrCodeHint": "QR Code será ativado quando conectarmos o worker do WhatsApp.",
+    "qrCodeHint": "QR Code aparecerá quando o WhatsApp for conectado.",
     "connectedAt": ""
   },
-  "aiAgents": [
-    {
-      "id": "agent-propostas",
-      "name": "Agente de Propostas",
-      "description": "Ajuda a montar propostas mais rápidas e profissionais.",
-      "status": "pronto"
-    },
-    {
-      "id": "agent-entregas",
-      "name": "Agente de Entregas",
-      "description": "Organiza etapas, arquivos, revisões e próximos passos.",
-      "status": "pronto"
-    },
-    {
-      "id": "agent-github",
-      "name": "Agente GitHub",
-      "description": "Ajuda a salvar versões e recuperar projetos.",
-      "status": "em_configuracao"
-    }
-  ],
-  "notifications": [],
-  "community": [
-    {
-      "id": "post-demo-1",
-      "author": "Equipe Sualuma",
-      "title": "Bem-vindo à comunidade dos prestadores",
-      "content": "Use esse espaço para trocar ideias, pedir ajuda, compartilhar dificuldades e evoluir junto com outros prestadores.",
-      "createdAt": "2026-04-27T20:54:55.446Z"
-    }
-  ],
-  "platformFeeRate": 0.05,
-  "financialLedger": [
-    {
-      "id": "fin-site-demo-1",
-      "type": "service_income",
-      "title": "Site institucional principal",
-      "clientName": "Cliente Sualuma",
-      "grossAmount": 2500,
-      "platformFeeRate": 0.05,
-      "platformFeeAmount": 125,
-      "netAmount": 2375,
-      "status": "liberado",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    },
-    {
-      "id": "fin-page-demo-1",
-      "type": "service_income",
-      "title": "Página de vendas",
-      "clientName": "Cliente Sualuma",
-      "grossAmount": 1500,
-      "platformFeeRate": 0.05,
-      "platformFeeAmount": 75,
-      "netAmount": 1425,
-      "status": "aguardando revisão",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    },
-    {
-      "id": "fin-auto-demo-1",
-      "type": "service_income",
-      "title": "Automação inicial",
-      "clientName": "Loja Parceira",
-      "grossAmount": 3400,
-      "platformFeeRate": 0.05,
-      "platformFeeAmount": 170,
-      "netAmount": 3230,
-      "status": "liberado",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    }
-  ],
-  "billingItems": [
-    {
-      "id": "bill-platform-fee-info",
-      "type": "platform_fee",
-      "title": "Taxa da plataforma",
-      "description": "5% sobre cada serviço prestado dentro da Sualuma.",
-      "amount": 370,
-      "status": "calculado",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    },
-    {
-      "id": "bill-ai-plan-demo",
-      "type": "ai_plan",
-      "title": "Plano de IA",
-      "description": "Nenhum plano de IA contratado no momento.",
-      "amount": 0,
-      "status": "não contratado",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    },
-    {
-      "id": "bill-marketplace-demo",
-      "type": "marketplace_product",
-      "title": "Produtos de automação/agentes",
-      "description": "Nenhum produto comprado no marketplace até agora.",
-      "amount": 0,
-      "status": "sem compra",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    },
-    {
-      "id": "bill-service-pro-demo",
-      "type": "service_pro_plan",
-      "title": "Plano Pro de Serviços",
-      "description": "Prioridade nas propostas ainda não ativada.",
-      "amount": 0,
-      "status": "não contratado",
-      "date": "2026-04-28T00:56:06.092686+00:00"
-    }
-  ]
+  "aiAgents": [],
+  "notifications": []
 }

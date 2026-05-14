@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
       clean(body.authorName) ||
       clean(user?.user_metadata?.name) ||
       clean(user?.email) ||
-      "Prestador Sualuma";
+      "Prestador";
 
     const authorTitle =
       clean(body.authorTitle) ||

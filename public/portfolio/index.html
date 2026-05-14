@@ -509,14 +509,14 @@ function fallbackState(){
   return {
     ok:true,
     profile:{
-      name:"Prestador Sualuma",
-      title:"Especialista em sites, automações e presença digital",
-      bio:"Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.",
+      name:"--- ilustrativo ---",
+      title:"--- ilustrativo: substitua pela sua especialidade ---",
+      bio:"Configure seu perfil para começar a receber propostas.",
       photoUrl:"",
-      platformJobs:18,
-      outsideJobs:43,
-      clients:54,
-      satisfaction:98
+      platformJobs:0,
+      outsideJobs:0,
+      clients:0,
+      satisfaction:0
     },
     projects:[]
   };
@@ -640,7 +640,7 @@ async function publishCommunity(id){
       url:item.url || "",
       videoUrl:item.youtubeUrl || "",
       youtubeUrl:item.youtubeUrl || "",
-      authorName:state.profile?.name || "Prestador Sualuma",
+      authorName:state.profile?.name || "--- ilustrativo ---",
       authorTitle:state.profile?.title || "",
       authorPhotoUrl:state.profile?.photoUrl || ""
     };

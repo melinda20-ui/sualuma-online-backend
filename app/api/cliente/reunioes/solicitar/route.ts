@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     ).trim()
 
     const clientName = String(
-      body.clientName || customer.name || 'Cliente Sualuma'
+      body.clientName || customer.name || ''
     ).trim()
 
     const clientEmail = String(

@@ -22,73 +22,7 @@ function now() {
   return new Date().toISOString()
 }
 
-const defaultJobs = [
-  {
-    id: 'job-site-restaurante',
-    title: 'Criar site institucional para restaurante',
-    company: 'Restaurante parceiro',
-    category: 'Sites',
-    budget: 'R$ 1.500 - R$ 2.500',
-    deadline: '15 dias',
-    location: 'Brasil',
-    description: 'Empresa precisa de um site moderno com cardápio, botão de WhatsApp, localização, fotos e página de contato.',
-    skills: ['WordPress', 'Design', 'SEO básico', 'WhatsApp'],
-    status: 'aberto',
-    createdAt: now(),
-  },
-  {
-    id: 'job-pagina-vendas',
-    title: 'Página de vendas para serviço digital',
-    company: 'Autônomo digital',
-    category: 'Página de vendas',
-    budget: 'R$ 800 - R$ 1.500',
-    deadline: '7 dias',
-    location: 'Remoto',
-    description: 'Precisa de uma landing page com headline forte, CTA, formulário e integração com WhatsApp.',
-    skills: ['Copywriting', 'Landing page', 'Formulário', 'HTML/CSS'],
-    status: 'aberto',
-    createdAt: now(),
-  },
-  {
-    id: 'job-automacao-leads',
-    title: 'Automação simples para captura de leads',
-    company: 'Empresa local',
-    category: 'Automação',
-    budget: 'R$ 500 - R$ 1.200',
-    deadline: '10 dias',
-    location: 'Remoto',
-    description: 'Criar fluxo para capturar leads do formulário, salvar em planilha/banco e enviar aviso por e-mail ou WhatsApp.',
-    skills: ['n8n', 'Supabase', 'E-mail', 'Webhook'],
-    status: 'aberto',
-    createdAt: now(),
-  },
-  {
-    id: 'job-social-media',
-    title: 'Organização de calendário de conteúdo',
-    company: 'Salão de beleza',
-    category: 'Social Media',
-    budget: 'R$ 790/mês',
-    deadline: 'Mensal',
-    location: 'Brasil',
-    description: 'Cliente precisa de linha editorial, ideias de posts, roteiros curtos e organização semanal de conteúdo.',
-    skills: ['Conteúdo', 'Instagram', 'Roteiros', 'Estratégia'],
-    status: 'aberto',
-    createdAt: now(),
-  },
-  {
-    id: 'job-loja-online',
-    title: 'Ajustes em loja online e páginas legais',
-    company: 'Loja virtual',
-    category: 'E-commerce',
-    budget: 'R$ 600 - R$ 1.400',
-    deadline: '12 dias',
-    location: 'Remoto',
-    description: 'Revisar navegação, banners, FAQ, política de envio, política de troca e páginas de suporte.',
-    skills: ['Shopify', 'UX', 'FAQ', 'E-commerce'],
-    status: 'aberto',
-    createdAt: now(),
-  }
-]
+const defaultJobs: any[] = []
 
 function ensureOpportunities(data: any) {
   if (!Array.isArray(data.availableJobs)) {

@@ -48,7 +48,7 @@ export function syncClientCustomer<T extends { customer?: Record<string, any> }>
       meta.full_name ||
       meta.fullName ||
       currentCustomer.name ||
-      'Cliente Sualuma'
+      ''
   ).trim()
 
   const email = String(user.email || currentCustomer.email || '').trim()
@@ -56,9 +56,9 @@ export function syncClientCustomer<T extends { customer?: Record<string, any> }>
   data.customer = {
     ...currentCustomer,
     id: user.id,
-    name: name || currentCustomer.name || 'Cliente Sualuma',
-    email: email || currentCustomer.email || 'cliente@sualuma.online',
-    avatar: String((name || email || 'S').charAt(0) || 'S').toUpperCase(),
+    name: name || currentCustomer.name || '',
+    email: email || currentCustomer.email || '',
+    avatar: String((name || email || '?').charAt(0) || '?').toUpperCase(),
   }
 
   return data

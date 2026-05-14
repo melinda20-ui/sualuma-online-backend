@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
     if (action === 'add_proposal') {
       const proposal = {
         id: id('proposal'),
-        clientName: text(body.clientName, 'Cliente Sualuma'),
+        clientName: text(body.clientName, ''),
         projectTitle: text(body.projectTitle, 'Nova proposta'),
         amount: money(body.amount),
         status: 'pendente',

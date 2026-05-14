@@ -39,8 +39,8 @@ export async function POST(req: Request) {
     const message = {
       id: makeId('msg'),
       projectId: String(body.projectId ?? '').trim(),
-      from: String(body.from ?? 'Cliente Sualuma'),
-      to: String(body.to ?? 'Sualuma Online'),
+      from: String(body.from ?? ''),
+      to: String(body.to ?? ''),
       text,
       read: body.read === true,
       createdAt: new Date().toISOString(),

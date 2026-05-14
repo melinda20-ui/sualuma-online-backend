@@ -245,11 +245,7 @@
       loaded: false
     }
 
-    const fallbackProjects = [
-      { title:'Site institucional principal', status:'Em andamento', progress:72, text:'Estrutura inicial aprovada. Equipe trabalhando na parte visual e organização das seções.' },
-      { title:'Página de vendas', status:'Aguardando revisão', progress:88, text:'Primeira versão enviada. Falta revisar detalhes finais e aprovar ajustes.' },
-      { title:'Integração da área de membros', status:'Concluído', progress:100, text:'Área interna inicial estruturada para comunicação, entregas e acompanhamento.' }
-    ]
+    const fallbackProjects = []
 
     function money(value){
       return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value||0))
@@ -298,20 +294,17 @@
     }
 
     function projectsList(){
-      return `
-        <div class="list">
-          ${fallbackProjects.map(p=>`
-            <div class="item">
-              <div style="width:100%">
-                <h4>${p.title}</h4>
-                <p>${p.text}</p>
-                <div class="bar"><i style="width:${p.progress}%"></i></div>
-              </div>
-              <span class="badge ${p.progress>=100?'ok':p.progress>80?'warn':''}">${p.status}</span>
-            </div>
-          `).join('')}
+      const items = fallbackProjects.length ? fallbackProjects.map(p=>`
+        <div class="item">
+          <div style="width:100%">
+            <h4>${p.title}</h4>
+            <p>${p.text}</p>
+            <div class="bar"><i style="width:${p.progress}%"></i></div>
+          </div>
+          <span class="badge ${p.progress>=100?'ok':p.progress>80?'warn':''}">${p.status}</span>
         </div>
-      `
+      `).join('') : '<div class="item"><div><h4>Nenhum projeto ainda</h4><p>Os projetos aparecerão aqui quando o prestador conectar seu dashboard.</p></div></div>'
+      return `<div class="list">${items}</div>`
     }
 
     function visao(){
@@ -329,9 +322,9 @@
         </div>
 
         <div class="grid cols-3" style="margin-bottom:18px">
-          <div class="card metric"><span>Projetos em andamento</span><b>2</b></div>
-          <div class="card metric"><span>Entrega pendente de revisão</span><b>1</b></div>
-          <div class="card metric"><span>Mensagens aguardando resposta</span><b>3</b></div>
+          <div class="card metric"><span>Projetos em andamento</span><b>0</b></div>
+          <div class="card metric"><span>Entrega pendente de revisão</span><b>0</b></div>
+          <div class="card metric"><span>Mensagens aguardando resposta</span><b>0</b></div>
         </div>
 
         <div class="grid cols-2">
@@ -368,9 +361,7 @@
           <div class="card">
             <h3>Próximos passos</h3>
             <div class="list">
-              <div class="item"><div><h4>Enviar materiais do projeto</h4><p>Logos, referências, textos, fotos, links e observações.</p></div><span class="badge warn">Pendente</span></div>
-              <div class="item"><div><h4>Revisar primeira entrega</h4><p>Aprovar ou pedir ajustes na página de vendas.</p></div><span class="badge warn">Revisão</span></div>
-              <div class="item"><div><h4>Confirmar reunião</h4><p>Escolha a melhor data proposta pela equipe.</p></div><span class="badge ok">Disponível</span></div>
+              <div class="item"><div><h4>Nenhum passo pendente</h4><p>Os próximos passos aparecerão automaticamente aqui quando houver atividades no seu projeto.</p></div><span class="badge ok">Livre</span></div>
             </div>
           </div>
         </div>
@@ -385,9 +376,7 @@
           <div class="card">
             <h3>Conversas recentes</h3>
             <div class="list">
-              <div class="item"><div><h4>Equipe Sualuma</h4><p>Recebemos seus materiais. A próxima etapa é revisar a copy.</p></div><span class="badge">Hoje</span></div>
-              <div class="item"><div><h4>Prestador de Site</h4><p>Enviei uma proposta de nova data para a reunião.</p></div><span class="badge warn">Responder</span></div>
-              <div class="item"><div><h4>Suporte</h4><p>Seu painel foi atualizado com a nova central de notificações.</p></div><span class="badge ok">Lido</span></div>
+              <div class="item"><div><h4>Nenhuma conversa recente</h4><p>As mensagens entre você, o prestador e a equipe aparecerão aqui.</p></div><span class="badge ok">Vazio</span></div>
             </div>
           </div>
           <div class="card">
@@ -450,9 +439,9 @@
         </div>
 
         <div class="grid cols-3">
-          ${card('Sites e páginas','Prestadores para criar sites, landing pages e páginas de venda.','💻')}
-          ${card('Automação e IA','Agentes e automações para atendimento, conteúdo, vendas e processos.','🤖')}
-          ${card('Social media','Prestadores para estratégia, copy, calendário e edição de conteúdo.','📱')}
+          <div class="card"><div style="font-size:30px;margin-bottom:12px">💻</div><h3>Ilustrativo: categorias de serviço</h3><p>As categorias reais aparecerão quando o marketplace for conectado ao seu dashboard.</p></div>
+          <div class="card"><div style="font-size:30px;margin-bottom:12px">🤖</div><h3>Ilustrativo: automação e IA</h3><p>Os agentes e automações disponíveis serão listados aqui futuramente.</p></div>
+          <div class="card"><div style="font-size:30px;margin-bottom:12px">📱</div><h3>Ilustrativo: social media</h3><p>Prestadores e serviços aparecerão aqui quando disponíveis.</p></div>
         </div>
       `
     }
@@ -462,9 +451,9 @@
 
       return `
         <div class="grid cols-3">
-          ${card('Agente de Briefing','Coleta informações do cliente e transforma em tarefa organizada.','🧠')}
-          ${card('Agente de Conteúdo','Gera ideias, posts, scripts e textos de campanha.','✍️')}
-          ${card('Agente de Entrega','Organiza etapas, aprovações, arquivos e histórico.','📦')}
+          <div class="card"><div style="font-size:30px;margin-bottom:12px">🧠</div><h3>Ilustrativo: Agente de Briefing</h3><p>Os agentes reais aparecerão aqui quando configurados pelo prestador do seu projeto.</p></div>
+          <div class="card"><div style="font-size:30px;margin-bottom:12px">✍️</div><h3>Ilustrativo: Agente de Conteúdo</h3><p>Os agentes reais aparecerão aqui quando configurados pelo prestador do seu projeto.</p></div>
+          <div class="card"><div style="font-size:30px;margin-bottom:12px">📦</div><h3>Ilustrativo: Agente de Entrega</h3><p>Os agentes reais aparecerão aqui quando configurados pelo prestador do seu projeto.</p></div>
         </div>
       `
     }

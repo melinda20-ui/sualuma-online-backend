@@ -49,24 +49,7 @@ function ensureClientKanban(data: any) {
   if (!Array.isArray(data.projects)) data.projects = []
 
   if (!data.projects.length) {
-    data.projects = [
-      {
-        id: 'proj-site-principal',
-        title: 'Site institucional principal',
-        clientName: data.customer?.name || 'Cliente Sualuma',
-        status: 'execucao',
-        progress: 55,
-        description: 'Projeto principal em andamento.',
-      },
-      {
-        id: 'proj-pagina-vendas',
-        title: 'Página de vendas',
-        clientName: data.customer?.name || 'Cliente Sualuma',
-        status: 'revisao',
-        progress: 85,
-        description: 'Entrega aguardando revisão do cliente.',
-      },
-    ]
+    data.projects = []
   }
 
   return data
@@ -79,8 +62,8 @@ function kanbanItems(data: any) {
     return {
       id: project.id,
       title: project.title || project.name || 'Projeto sem título',
-      clientName: project.clientName || data.customer?.name || 'Cliente Sualuma',
-      description: project.description || project.summary || 'Projeto conectado ao dashboard do cliente.',
+      clientName: project.clientName || data.customer?.name || '',
+      description: project.description || project.summary || '',
       status,
       progress: Number(project.progress || progressFor(status)),
     }

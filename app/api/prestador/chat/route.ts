@@ -23,12 +23,12 @@ function now() {
 }
 
 function slug(value: string) {
-  return String(value || 'cliente-sualuma')
+  return String(value || '---ilustrativo---')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '') || 'cliente-sualuma'
+    .replace(/(^-|-$)/g, '') || '---ilustrativo---'
 }
 
 function ensureChats(data: any) {
@@ -36,39 +36,10 @@ function ensureChats(data: any) {
 
   if (!data.providerChats.clientThreads) {
     data.providerChats.clientThreads = {}
-
-    const oldMessages = Array.isArray(data.providerChats.clientMessages)
-      ? data.providerChats.clientMessages
-      : []
-
-    data.providerChats.clientThreads['cliente-sualuma'] = oldMessages.length ? oldMessages : [
-      {
-        id: 'client-chat-demo-1',
-        from: 'client',
-        name: 'Cliente Sualuma',
-        message: 'Oi, gostaria de confirmar os próximos passos do projeto.',
-        createdAt: now(),
-      },
-      {
-        id: 'client-chat-demo-2',
-        from: 'provider',
-        name: 'Prestador',
-        message: 'Claro! Vou organizar as etapas e te aviso por aqui.',
-        createdAt: now(),
-      },
-    ]
   }
 
   if (!Array.isArray(data.providerChats.aiMessages)) {
-    data.providerChats.aiMessages = [
-      {
-        id: 'ai-chat-demo-1',
-        from: 'ai',
-        name: 'Sualuma IA',
-        message: 'Olá! Posso ajudar a montar propostas, organizar entregas, responder clientes, criar checklists e planejar execução.',
-        createdAt: now(),
-      },
-    ]
+    data.providerChats.aiMessages = []
   }
 
   return data
@@ -85,44 +56,20 @@ function getClients(data: any) {
     if (p.clientName) names.add(p.clientName)
   })
 
-  if (!names.size) names.add('Cliente Sualuma')
-
   return Array.from(names).map((name) => ({
     key: slug(name),
     name,
   }))
 }
 
-function aiReply(message: string) {
-  const text = message.toLowerCase()
-
-  if (text.includes('proposta')) {
-    return 'Vamos montar uma proposta forte: comece com uma saudação, cite o problema do cliente, explique o escopo, informe prazo, valor, revisões inclusas e próximos passos para aprovação.'
-  }
-
-  if (text.includes('cliente')) {
-    return 'Sugestão de resposta: “Perfeito, recebi sua mensagem. Vou revisar os detalhes e te retorno com o próximo passo organizado ainda hoje.”'
-  }
-
-  if (text.includes('kanban') || text.includes('etapa')) {
-    return 'Sugestão de kanban: Briefing recebido → Em execução → Aguardando revisão → Ajustes finais → Concluído.'
-  }
-
-  if (text.includes('reunião') || text.includes('reuniao')) {
-    return 'Para reunião, envie objetivo, data, horário, link e pauta. Depois registre o resumo no projeto para o cliente acompanhar.'
-  }
-
-  if (text.includes('github') || text.includes('salvar')) {
-    return 'Antes de alterar o projeto, salve uma versão. Depois registre: o que mudou, onde mudou e qual é o ponto de recuperação.'
-  }
-
-  return 'Transformando isso em ação prática: defina o objetivo, liste tarefas, escolha a prioridade de agora e registre o próximo passo no projeto.'
+function aiReply(_message: string) {
+  return '--- ilustrativo: esta resposta será substituída pela IA real quando configurada. ---'
 }
 
 export async function GET(request: NextRequest) {
   try {
     const type = request.nextUrl.searchParams.get('type') === 'ai' ? 'ai' : 'client'
-    const clientKey = request.nextUrl.searchParams.get('clientKey') || 'cliente-sualuma'
+    const clientKey = request.nextUrl.searchParams.get('clientKey') || ''
 
     const data = ensureChats(await readScopedDashboard(request, 'provider'))
     const clients = getClients(data)
@@ -137,7 +84,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const safeClientKey = clientKey || clients[0]?.key || 'cliente-sualuma'
+    const safeClientKey = clientKey || clients[0]?.key || ''
 
     if (!data.providerChats.clientThreads[safeClientKey]) {
       data.providerChats.clientThreads[safeClientKey] = []
@@ -161,8 +108,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}))
     const type = body.type === 'ai' ? 'ai' : 'client'
     const message = String(body.message || '').trim()
-    const clientKey = String(body.clientKey || 'cliente-sualuma')
-    const clientName = String(body.clientName || 'Cliente Sualuma')
+    const clientKey = String(body.clientKey || '')
+    const clientName = String(body.clientName || '')
 
     if (!message) {
       return json({ ok: false, error: 'Mensagem vazia.' }, 400)

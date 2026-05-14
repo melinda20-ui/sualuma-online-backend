@@ -103,7 +103,7 @@ const tenantDashboardFile = 'client-dashboard'
 const defaultDashboard: ClientDashboardData = {
   customer: {
     id: 'cliente-demo',
-    name: 'Cliente Sualuma',
+    name: '--- ilustrativo: substitua pelo nome do cliente ---',
     email: 'cliente@sualuma.online',
     plan: 'Cliente',
     avatar: 'S',

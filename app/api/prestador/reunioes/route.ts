@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       const meeting = {
         id: `reuniao-prestador-${Date.now()}`,
         title: String(body.title || 'Reunião do projeto'),
-        clientName: String(body.clientName || clientDashboard.customer?.name || 'Cliente Sualuma'),
+        clientName: String(body.clientName || clientDashboard.customer?.name || ''),
         providerName: String(body.providerName || 'Prestador'),
         date: String(body.date || ''),
         time: String(body.time || ''),

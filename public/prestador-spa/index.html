@@ -419,7 +419,7 @@
   </main>
 
   <script>
-    const API_ROOT = location.hostname.includes('meuservico') ? 'https://dashboardcliente.sualuma.online' : location.origin
+    const API_ROOT = location.hostname.includes('meuservico') ? 'https://meuservico.sualuma.online' : location.origin
     let providerData = null
 
     function money(value){
@@ -630,10 +630,10 @@
     }
 
     async function addProposal(){
-      const clientName = prompt('Nome do cliente ou empresa:', 'Cliente Sualuma')
+      const clientName = prompt('Nome do cliente ou empresa:', '')
       if(!clientName) return
-      const projectTitle = prompt('Nome do projeto:', 'Novo site institucional')
-      const amount = prompt('Valor da proposta:', '2500')
+      const projectTitle = prompt('Nome do projeto:', '')
+      const amount = prompt('Valor da proposta:', '')
       await apiPost('add_proposal',{clientName,projectTitle,amount})
     }
 
@@ -699,7 +699,6 @@
 
     window.addEventListener('hashchange',route)
     route()
-    loadProvider()
   </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -792,6 +791,7 @@
 
   function roleFromPage() {
     if (location.hostname.includes('meuservico') && (
+      location.pathname.includes('prestador') ||
       location.hash.includes('prestador') ||
       location.hash.includes('github') ||
       location.hash.includes('whatsapp') ||
@@ -806,6 +806,7 @@
     if (location.hostname.includes('dashboardcliente')) return true;
 
     if (location.hostname.includes('meuservico') && (
+      location.pathname.includes('prestador') ||
       location.hash.includes('prestador') ||
       location.hash.includes('github') ||
       location.hash.includes('whatsapp') ||
@@ -2120,13 +2121,13 @@
       await apiPost('complete_setup', { stepId });
     },
     async addProposal() {
-      const clientName = prompt('Nome do cliente ou empresa:', 'Cliente Sualuma');
+      const clientName = prompt('Nome do cliente ou empresa:', '');
       if (!clientName) return;
 
-      const projectTitle = prompt('Nome do projeto:', 'Novo site institucional');
+      const projectTitle = prompt('Nome do projeto:', '');
       if (!projectTitle) return;
 
-      const amount = prompt('Valor da proposta:', '2500');
+      const amount = prompt('Valor da proposta:', '');
       await apiPost('add_proposal', { clientName, projectTitle, amount });
     },
     async updateProposal(proposalId, status) {
@@ -3946,7 +3947,7 @@
         <section class="v7-card">
           <h3>Agendar reunião</h3>
           <div class="v7-grid" style="margin-top:14px">
-            <div class="v7-field"><label>Cliente</label><input id="v7MeetingClient" class="v7-input" placeholder="Cliente Sualuma" /></div>
+            <div class="v7-field"><label>Cliente</label><input id="v7MeetingClient" class="v7-input" placeholder="ex: Nome do cliente" /></div>
             <div class="v7-field"><label>Título</label><input id="v7MeetingTitle" class="v7-input" placeholder="Reunião do projeto" /></div>
             <div class="v7-field"><label>Data</label><input id="v7MeetingDate" class="v7-input" type="date" /></div>
             <div class="v7-field"><label>Horário</label><input id="v7MeetingTime" class="v7-input" type="time" /></div>
@@ -4136,7 +4137,7 @@
       await postJson('/api/prestador/chat', {
         type: 'client',
         clientKey: state.chat.clientKey,
-        clientName: client?.name || 'Cliente Sualuma',
+        clientName: client?.name || '',
         message
       });
 
@@ -4164,8 +4165,8 @@
     async scheduleMeeting() {
       const body = {
         action: 'schedule_meeting',
-        clientName: document.getElementById('v7MeetingClient')?.value || 'Cliente Sualuma',
-        title: document.getElementById('v7MeetingTitle')?.value || 'Reunião do projeto',
+        clientName: document.getElementById('v7MeetingClient')?.value || '',
+        title: document.getElementById('v7MeetingTitle')?.value || '',
         date: document.getElementById('v7MeetingDate')?.value || '',
         time: document.getElementById('v7MeetingTime')?.value || '',
         link: document.getElementById('v7MeetingLink')?.value || '',
@@ -4630,8 +4631,8 @@
     async scheduleMeeting(){
       const body = {
         action:'schedule_meeting',
-        clientName:document.getElementById('v11MeetingClient')?.value || 'Cliente Sualuma',
-        title:document.getElementById('v11MeetingTitle')?.value || 'Reunião do projeto',
+        clientName:document.getElementById('v11MeetingClient')?.value || '',
+        title:document.getElementById('v11MeetingTitle')?.value || '',
         date:document.getElementById('v11MeetingDate')?.value || '',
         time:document.getElementById('v11MeetingTime')?.value || '',
         link:document.getElementById('v11MeetingLink')?.value || '',
@@ -6586,7 +6587,7 @@
   }
 
   function initials(name){
-    return String(name || 'Prestador Sualuma')
+    return String(name || '?')
       .split(' ')
       .filter(Boolean)
       .slice(0,2)
@@ -6715,8 +6716,8 @@
     const profile = data.providerProfile || {};
     const works = Array.isArray(data.portfolio) ? data.portfolio : [];
 
-    const name = profile.name || 'Prestador Sualuma';
-    const title = profile.title || 'Especialista em sites, automação e presença digital';
+    const name = profile.name || '--- ilustrativo ---';
+    const title = profile.title || '--- ilustrativo: substitua pela sua especialidade ---';
     const bio = profile.bio || 'Configure seu perfil para começar a receber propostas, entregar projetos e usar os agentes da Sualuma.';
     const photo = profile.photoUrl || profile.avatarUrl || profile.imageUrl || '';
 
