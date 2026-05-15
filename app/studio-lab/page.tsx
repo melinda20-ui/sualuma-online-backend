@@ -1,10 +1,31 @@
 "use client";
 
 import MiaPanelTruthCard from "@/components/studio/MiaPanelTruthCard";
+import SystemTruthPanel from "@/components/studio/SystemTruthPanel";
 
 import SualumaPublicChat from "@/components/SualumaPublicChat";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+
+const AGENT_API = "/api/agent-api";
+
+type SystemStatus = {
+  api: string;
+  gemini: string;
+  ollama: { online: boolean; models: string[] } | string;
+  uptime: number;
+  memory?: { heapUsed: number; heapTotal: number; rss: number };
+};
+
+function fmtUptime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  return `${h}h ${m}m`;
+}
+
+function fmtMemory(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
 
 type StudioView =
   | "visao"
@@ -72,63 +93,28 @@ const tabs: { id: StudioView; label: string; icon: string; badge?: string }[] = 
   { id: "stripe", label: "Stripe", icon: "💳", badge: "Pagamentos" },
 ];
 
+const IS_DEMO = true; // Sem fonte de dados real — substitua conectando um backend
+
 const empireHealth = [
-  { title: "Sistema", value: "92%", tone: "green" as Tone, detail: "APIs principais online" },
-  { title: "UX", value: "78%", tone: "yellow" as Tone, detail: "Onboarding precisa atenção" },
-  { title: "Agentes", value: "84%", tone: "blue" as Tone, detail: "2 fluxos com lentidão" },
-  { title: "Financeiro", value: "+18%", tone: "pink" as Tone, detail: "Receita subindo no mês" },
+  { title: "Sistema", value: IS_DEMO ? "—" : "92%", tone: "blue" as Tone, detail: "Conecte o backend para ver dados reais" },
+  { title: "UX", value: IS_DEMO ? "—" : "78%", tone: "blue" as Tone, detail: "Conecte o backend para ver dados reais" },
+  { title: "Agentes", value: IS_DEMO ? "—" : "84%", tone: "blue" as Tone, detail: "Conecte o backend para ver dados reais" },
+  { title: "Financeiro", value: IS_DEMO ? "—" : "+18%", tone: "blue" as Tone, detail: "Conecte o backend para ver dados reais" },
 ];
 
-const sitemapItems = [
-  { area: "sualuma.online", path: "/", status: "Online", tone: "green" as Tone, response: "214ms" },
-  { area: "sualuma.online", path: "/planos", status: "Online", tone: "green" as Tone, response: "298ms" },
-  { area: "blog.sualuma.online", path: "/", status: "Online", tone: "green" as Tone, response: "344ms" },
-  { area: "studio.sualuma.online", path: "/studio-lab", status: "Preview", tone: "blue" as Tone, response: "187ms" },
-  { area: "trabalhosja.sualuma.online", path: "/comunidade", status: "Atenção", tone: "yellow" as Tone, response: "682ms" },
-  { area: "sospublicidade.sualuma.online", path: "/obrigada", status: "Verificar", tone: "red" as Tone, response: "404?" },
-];
+const sitemapItems: { area: string; path: string; status: string; tone: Tone; response: string }[] = [];
 
-const agents = [
-  { name: "Mia Orquestradora", task: "Entende pedidos e chama agentes", status: "Ativo", roi: "Alto", tone: "pink" as Tone },
-  { name: "Agente de Suporte", task: "Responde dúvidas e abre tickets", status: "Teste", roi: "Médio", tone: "blue" as Tone },
-  { name: "Agente Sitemap", task: "Verifica páginas quebradas", status: "Novo", roi: "Alto", tone: "green" as Tone },
-  { name: "Agente Serviços", task: "Monitora empresas e prestadores", status: "Rascunho", roi: "Médio", tone: "yellow" as Tone },
-];
+const agents: { name: string; task: string; status: string; roi: string; tone: Tone }[] = [];
 
-const serviceSignals = [
-  { title: "Prestadores ativos", value: "42", detail: "8 precisam atualizar perfil", tone: "green" as Tone },
-  { title: "Empresas contratando", value: "13", detail: "3 pararam no orçamento", tone: "pink" as Tone },
-  { title: "Gargalos", value: "5", detail: "Briefing incompleto e atraso", tone: "yellow" as Tone },
-  { title: "Contratações", value: "9", detail: "Nesta semana", tone: "blue" as Tone },
-];
+const serviceSignals: { title: string; value: string; detail: string; tone: Tone }[] = [];
 
-const communitySignals = [
-  { title: "Posts criados", value: "128", detail: "Alta de 21%", tone: "pink" as Tone },
-  { title: "Comentários", value: "746", detail: "Sentimento positivo", tone: "green" as Tone },
-  { title: "Denúncias", value: "3", detail: "Revisar diretrizes", tone: "yellow" as Tone },
-  { title: "Usuários com erro", value: "11", detail: "Login e upload", tone: "red" as Tone },
-];
+const communitySignals: { title: string; value: string; detail: string; tone: Tone }[] = [];
 
-const ideaStore = [
-  { idea: "Agente que monta proposta comercial", score: "Aplicar agora", impact: "Alto", effort: "Médio", tone: "green" as Tone },
-  { idea: "Ranking de prestadores por entrega", score: "Aplicar depois", impact: "Médio", effort: "Alto", tone: "yellow" as Tone },
-  { idea: "Resumo diário da Mia por WhatsApp", score: "Aplicar agora", impact: "Alto", effort: "Baixo", tone: "pink" as Tone },
-  { idea: "Marketplace de templates", score: "Manter pensamento", impact: "Alto", effort: "Alto", tone: "blue" as Tone },
-];
+const ideaStore: { idea: string; score: string; impact: string; effort: string; tone: Tone }[] = [];
 
-const users = [
-  { name: "Ana Paula", email: "ana@email.com", plan: "Premium", last: "há 4 min", issue: "Sem erro", tone: "green" as Tone },
-  { name: "Carlos Lima", email: "carlos@email.com", plan: "Free", last: "há 18 min", issue: "Login travou", tone: "yellow" as Tone },
-  { name: "Marina Alves", email: "marina@email.com", plan: "Prime", last: "há 1h", issue: "Pagamento pendente", tone: "red" as Tone },
-  { name: "João Pedro", email: "joao@email.com", plan: "Pro", last: "hoje", issue: "Sessão ativa", tone: "blue" as Tone },
-];
+const users: { name: string; email: string; plan: string; last: string; issue: string; tone: Tone }[] = [];
 
-const notifications = [
-  { title: "Sitemap detectou possível 404", detail: "sospublicidade.sualuma.online/obrigada", tone: "red" as Tone },
-  { title: "Mia encontrou gargalo no onboarding", detail: "Usuários abandonando depois do cadastro", tone: "yellow" as Tone },
-  { title: "Agente Sitemap pode ser criado agora", detail: "Impacto alto para manutenção do império", tone: "green" as Tone },
-  { title: "Receita do mês subiu", detail: "Financeiro aponta crescimento de 18%", tone: "pink" as Tone },
-];
+const notifications: { title: string; detail: string; tone: Tone }[] = [];
 
 
 const uxStatusLabel: Record<JourneyStatus, string> = {
@@ -915,539 +901,153 @@ function UXTreeInline() {
 
 
 
-const blogReportCards = [
-  { title: "Posts publicados", value: "38", detail: "Conteúdos ativos no blog", tone: "pink" as Tone },
-  { title: "Acessos no blog", value: "12.480", detail: "Últimos 30 dias", tone: "blue" as Tone },
-  { title: "Cliques para loja/site", value: "1.284", detail: "Tráfego enviado para conversão", tone: "green" as Tone },
-  { title: "Posts com problema", value: "4", detail: "Revisar links, SEO ou imagem", tone: "yellow" as Tone },
-];
-
-const blogReportRows = [
-  { title: "Melhor post da semana", detail: "Como automatizar atendimento e vender mais", value: "2.140 acessos", tone: "pink" as Tone },
-  { title: "Post com maior conversão", detail: "Guia de criação de site profissional", value: "18,4%", tone: "green" as Tone },
-  { title: "Alerta SEO", detail: "4 posts sem meta description forte", value: "corrigir", tone: "yellow" as Tone },
-  { title: "Link quebrado encontrado", detail: "Um CTA antigo pode estar indo para página errada", value: "verificar", tone: "red" as Tone },
-];
-
-
-const blogSeoCards = [
-  { title: "SEO geral", value: "74/100", detail: "Bom, mas ainda tem espaço para crescer", tone: "yellow" as Tone },
-  { title: "Posts indexáveis", value: "34", detail: "Conteúdos prontos para ranquear", tone: "green" as Tone },
-  { title: "Problemas SEO", value: "9", detail: "Títulos, metas, links e imagens", tone: "red" as Tone },
-  { title: "Oportunidades", value: "18", detail: "Novas pautas e palavras-chave", tone: "pink" as Tone },
-];
-
-const blogSeoRows = [
-  { title: "Meta descriptions fracas", detail: "Alguns posts precisam de descrição mais persuasiva para melhorar clique no Google.", value: "4 posts", tone: "yellow" as Tone },
-  { title: "Títulos pouco estratégicos", detail: "Criar títulos com promessa clara, palavra-chave e benefício direto.", value: "3 posts", tone: "pink" as Tone },
-  { title: "Imagens sem ALT forte", detail: "Adicionar texto alternativo com contexto e palavra-chave principal.", value: "7 imagens", tone: "red" as Tone },
-  { title: "Links internos insuficientes", detail: "Conectar posts do blog com páginas de serviço, planos e loja.", value: "alta prioridade", tone: "blue" as Tone },
-  { title: "Posts com potencial de ranqueamento", detail: "Conteúdos sobre IA, automação, sites e captação podem puxar tráfego qualificado.", value: "18 ideias", tone: "green" as Tone },
-];
-
-const blogKeywordRows = [
-  { title: "automação para pequenos negócios", detail: "Boa intenção comercial para atrair empreendedores.", value: "prioridade", tone: "pink" as Tone },
-  { title: "site profissional para empresa", detail: "Pode levar para página de construção de sites.", value: "vendas", tone: "green" as Tone },
-  { title: "como usar IA para vender mais", detail: "Boa pauta para topo de funil e autoridade.", value: "conteúdo", tone: "blue" as Tone },
-  { title: "ferramentas para microempreendedor", detail: "Pode conectar com Minha Empresa, serviços e automações.", value: "estratégico", tone: "yellow" as Tone },
-];
-
-const blogSeoChecklist = [
-  { title: "Sitemap do blog", detail: "Confirmar se o sitemap do blog está atualizado e enviado ao Google Search Console.", value: "verificar", tone: "blue" as Tone },
-  { title: "Canonical das páginas", detail: "Evitar duplicação e deixar claro qual URL deve ranquear.", value: "técnico", tone: "yellow" as Tone },
-  { title: "Schema/JSON-LD", detail: "Adicionar estrutura de Article, Breadcrumb e Organization.", value: "ganho SEO", tone: "pink" as Tone },
-  { title: "Velocidade mobile", detail: "O blog precisa carregar rápido no celular para melhorar experiência e ranking.", value: "importante", tone: "green" as Tone },
-];
-
-const emailReportCards = [
-  { title: "E-mails enviados", value: "8.420", detail: "Campanhas e automações", tone: "pink" as Tone },
-  { title: "Taxa de abertura", value: "41,8%", detail: "Média dos últimos envios", tone: "green" as Tone },
-  { title: "Cliques", value: "1.126", detail: "Pessoas que clicaram nos CTAs", tone: "blue" as Tone },
-  { title: "Falhas/Bounces", value: "72", detail: "E-mails que precisam limpeza", tone: "red" as Tone },
-];
-
-const emailReportRows = [
-  { title: "Campanha com melhor resultado", detail: "Lista de espera do Studio Sualuma", value: "52% abertura", tone: "pink" as Tone },
-  { title: "Automação principal", detail: "Boas-vindas após cadastro", value: "ativa", tone: "green" as Tone },
-  { title: "Alerta de entregabilidade", detail: "Limpar contatos inválidos e revisar assunto", value: "prioridade", tone: "yellow" as Tone },
-  { title: "Oportunidade", detail: "Criar sequência para leads que não compraram", value: "alto impacto", tone: "blue" as Tone },
-];
-
-
-const financeDashboardCards = [
-  { title: "Receita do mês", value: "R$ 48.750", detail: "+18,6% vs mês anterior", tone: "pink" as Tone },
-  { title: "Lucro líquido", value: "R$ 36.320", detail: "Margem estimada de 74,5%", tone: "green" as Tone },
-  { title: "Gastos totais", value: "R$ 12.430", detail: "Ferramentas, operação e marketing", tone: "red" as Tone },
-  { title: "Reinvestimento", value: "R$ 8.600", detail: "Reserva sugerida para crescer", tone: "blue" as Tone },
-];
-
-const financeRevenueRows = [
-  { title: "Planos e assinaturas", detail: "Receita recorrente dos usuários ativos no Studio e áreas membros.", value: "R$ 21.400", tone: "pink" as Tone },
-  { title: "Serviços contratados", detail: "Construção de sites, automações, suporte e projetos vendidos.", value: "R$ 14.200", tone: "green" as Tone },
-  { title: "Indicações / afiliados", detail: "Comissões, indicações internas e parcerias estratégicas.", value: "R$ 7.150", tone: "yellow" as Tone },
-  { title: "Marketplace e extras", detail: "Produtos digitais, upgrades, templates e recursos adicionais.", value: "R$ 6.000", tone: "blue" as Tone },
-];
-
-const financeCostRows = [
-  { title: "Infraestrutura", detail: "VPS, domínios, banco de dados, armazenamento e serviços técnicos.", value: "R$ 2.150", tone: "blue" as Tone },
-  { title: "IA e ferramentas", detail: "APIs, modelos, automações, editores e ferramentas de produtividade.", value: "R$ 3.280", tone: "yellow" as Tone },
-  { title: "Marketing", detail: "Testes de aquisição, criativos, tráfego, influenciadores e distribuição.", value: "R$ 2.900", tone: "pink" as Tone },
-  { title: "Operação", detail: "Equipe, suporte, freelancers, manutenção e execução de entregas.", value: "R$ 4.100", tone: "green" as Tone },
-];
-
-const financeProjectionRows = [
-  { title: "Projeção conservadora", detail: "Mantendo o ritmo atual sem escalar campanha.", value: "R$ 58 mil", tone: "blue" as Tone },
-  { title: "Projeção agressiva", detail: "Com correção de funil, blog, e-mail e melhoria de conversão.", value: "R$ 92 mil", tone: "pink" as Tone },
-  { title: "Meta de caixa", detail: "Reserva mínima para operar com segurança e reinvestir.", value: "R$ 20 mil", tone: "green" as Tone },
-  { title: "Ponto de atenção", detail: "Custo com ferramentas pode crescer se agentes não forem otimizados.", value: "monitorar", tone: "yellow" as Tone },
-];
-
-const financeMiaRows = [
-  { title: "Prioridade 1", detail: "Separar receita recorrente de receita avulsa para enxergar previsibilidade.", value: "fazer agora", tone: "pink" as Tone },
-  { title: "Prioridade 2", detail: "Criar categoria de reinvestimento para marketing, produto e infraestrutura.", value: "essencial", tone: "green" as Tone },
-  { title: "Prioridade 3", detail: "Medir ROI de cada agente: quanto economiza, vende ou evita suporte.", value: "alto impacto", tone: "blue" as Tone },
-  { title: "Alerta", detail: "Sem integração no banco, os números ainda são demonstrativos.", value: "mockado", tone: "yellow" as Tone },
-];
-
-const financeBars = [
-  { label: "Planos", value: "44%", tone: "pink" as Tone },
-  { label: "Serviços", value: "29%", tone: "green" as Tone },
-  { label: "Indicações", value: "15%", tone: "yellow" as Tone },
-  { label: "Marketplace", value: "12%", tone: "blue" as Tone },
-];
-
-const financeCostBars = [
-  { label: "Operação", value: "33%", tone: "green" as Tone },
-  { label: "Ferramentas/IA", value: "26%", tone: "yellow" as Tone },
-  { label: "Marketing", value: "23%", tone: "pink" as Tone },
-  { label: "Infra", value: "18%", tone: "blue" as Tone },
-];
-
-
-const systemTaskRows = [
-  { title: "Corrigir páginas de entrada", detail: "Home, blog, planos e páginas de captura precisam estar sem erro para receber leads.", value: "em risco", tone: "red" as Tone, tag: "Sistema" },
-  { title: "Ativar rastreio por subdomínio", detail: "Monitorar tráfego e origem dos leads por área do ecossistema.", value: "em andamento", tone: "yellow" as Tone, tag: "Marketing" },
-  { title: "Finalizar UX da árvore", detail: "Mapear jornadas principais e transformar em fluxos conectados ao banco.", value: "ativo", tone: "pink" as Tone, tag: "UX" },
-  { title: "Criar Agente Sitemap", detail: "Detectar páginas quebradas automaticamente e alimentar notificações.", value: "em andamento", tone: "green" as Tone, tag: "Agentes" },
-  { title: "Melhorar onboarding", detail: "Diminuir abandono depois do cadastro e guiar usuário até a primeira ação.", value: "em risco", tone: "red" as Tone, tag: "Usuários" },
-  { title: "Conectar financeiro ao banco", detail: "Trocar dados mockados por dados reais do Supabase e Stripe depois.", value: "ativo", tone: "blue" as Tone, tag: "Financeiro" },
-];
-
-const supportRows = [
-  { title: "Usuário travou no login", detail: "Falha provável: confirmação de e-mail ou sessão expirada.", value: "urgente", tone: "red" as Tone },
-  { title: "Pagamento pendente", detail: "Usuário tentou contratar plano, mas não completou checkout.", value: "verificar", tone: "yellow" as Tone },
-  { title: "Erro ao abrir área de serviços", detail: "Possível falha de permissão ou plano sem acesso liberado.", value: "suporte", tone: "pink" as Tone },
-  { title: "Dúvida sobre proposta", detail: "Empresa quer contratar, mas não sabe qual fluxo seguir.", value: "oportunidade", tone: "green" as Tone },
-];
-
-const serviceDeepRows = [
-  { title: "Catálogo de serviços", detail: "Listagem de serviços ativos, pausados, em análise e sem categoria.", value: "42 ativos", tone: "green" as Tone },
-  { title: "Empresas sem contratação", detail: "Entraram, visualizaram, mas não fecharam nenhum prestador.", value: "13 empresas", tone: "yellow" as Tone },
-  { title: "Gargalo de briefing", detail: "Muitas empresas param antes de explicar o que precisam.", value: "alto impacto", tone: "red" as Tone },
-  { title: "Prestadores parados", detail: "Profissionais cadastrados que ainda não receberam oportunidade.", value: "8 perfis", tone: "blue" as Tone },
-  { title: "Serviços mais procurados", detail: "Sites, automação, social media e suporte com IA.", value: "top 4", tone: "pink" as Tone },
-];
-
-const userControlRows = [
-  { title: "Ana Paula", detail: "Premium • última sessão há 4 min • usando área de serviços normalmente.", value: "ativo", tone: "green" as Tone },
-  { title: "Carlos Lima", detail: "Free • parou na tela de login • possível e-mail não confirmado.", value: "erro login", tone: "red" as Tone },
-  { title: "Marina Alves", detail: "Prime • checkout iniciado, pagamento pendente, acesso ainda não liberado.", value: "pendente", tone: "yellow" as Tone },
-  { title: "João Pedro", detail: "Pro • sessão ativa • pediu suporte em proposta de serviço.", value: "suporte", tone: "blue" as Tone },
-];
-
-const userActionRows = [
-  { title: "Liberar acesso", detail: "Ativar acesso manual para um usuário sem entrar no Supabase.", value: "ação futura", tone: "green" as Tone },
-  { title: "Cancelar acesso", detail: "Bloquear plano, área ou recurso específico de um usuário.", value: "ação futura", tone: "red" as Tone },
-  { title: "Ver jornada", detail: "Abrir histórico de páginas, erros, cliques e último ponto onde parou.", value: "prioridade", tone: "pink" as Tone },
-  { title: "Reenviar e-mail", detail: "Reenviar confirmação, boas-vindas ou link de acesso.", value: "útil", tone: "blue" as Tone },
-];
-
-const subdomainRows = [
-  {
-    name: "sualuma.online",
-    status: "Online",
-    tone: "green" as Tone,
-    links: ["/", "/planos", "/login", "/cadastro", "/site-service", "/site-demo-request"],
-  },
-  {
-    name: "blog.sualuma.online",
-    status: "Online",
-    tone: "green" as Tone,
-    links: ["/", "/posts", "/categorias/ia", "/categorias/automacao", "/sitemap.xml"],
-  },
-  {
-    name: "studio.sualuma.online",
-    status: "Ativo",
-    tone: "pink" as Tone,
-    links: ["/studio-lab", "/studio", "/studio/ux-tree", "/admin", "/admin/leads"],
-  },
-  {
-    name: "trabalhosja.sualuma.online",
-    status: "Atenção",
-    tone: "yellow" as Tone,
-    links: ["/", "/comunidade", "/perfil", "/posts", "/api/comunidade/posts"],
-  },
-  {
-    name: "sospublicidade.sualuma.online",
-    status: "Verificar",
-    tone: "red" as Tone,
-    links: ["/", "/obrigada", "/campanha", "/api/leads"],
-  },
-];
-
-const cnpjNotificationRows = [
-  { title: "Declaração mensal", detail: "Verificar se há pendência ou obrigação recorrente do mês.", value: "atenção", tone: "yellow" as Tone },
-  { title: "Comprovantes e notas", detail: "Organizar documentos enviados e pendentes para não perder histórico.", value: "organizar", tone: "blue" as Tone },
-  { title: "Situação cadastral", detail: "Monitorar se o CNPJ segue regular e sem alerta crítico.", value: "ok", tone: "green" as Tone },
-];
-
-const cnpjDeepRows = [
-  { title: "Situação do CNPJ", detail: "Acompanhar se está ativo, regular, pendente ou com alguma restrição.", value: "regular", tone: "green" as Tone },
-  { title: "Obrigações do mês", detail: "Guias, declarações, notas, comprovantes e prazos importantes.", value: "3 itens", tone: "yellow" as Tone },
-  { title: "Documentos salvos", detail: "Notas fiscais, comprovantes, certificados e documentos do negócio.", value: "28 docs", tone: "blue" as Tone },
-  { title: "Alertas importantes", detail: "Pendências que podem prejudicar emissão, venda ou regularidade.", value: "1 alerta", tone: "red" as Tone },
-];
-
-
-const storeHubCards = [
-  { title: "Produtos ativos", value: "64", detail: "Agentes, automações, skills e templates publicados", tone: "green" as Tone },
-  { title: "Em revisão", value: "9", detail: "Produtos aguardando curadoria ou ajustes", tone: "yellow" as Tone },
-  { title: "Arquivados", value: "14", detail: "Itens pausados ou removidos da vitrine", tone: "blue" as Tone },
-  { title: "Alertas", value: "6", detail: "Produtos sem categoria, preço ou descrição forte", tone: "red" as Tone },
-];
-
-const storeProductRows = [
-  { title: "Agente Propostas Comerciais", detail: "Categoria: Agentes • Status: publicado • Conversão alta", value: "ativo", tone: "green" as Tone },
-  { title: "Automação Follow-up WhatsApp", detail: "Categoria: Automações • Falta revisar descrição e gatilho", value: "revisar", tone: "yellow" as Tone },
-  { title: "Skill SEO para Blog", detail: "Categoria: Skills • Produto novo para marketplace interno", value: "novo", tone: "pink" as Tone },
-  { title: "Template Página de Vendas", detail: "Categoria: Templates • Precisa trocar imagem e CTA", value: "editar", tone: "blue" as Tone },
-  { title: "Agente Suporte Inicial", detail: "Categoria: Agentes • Produto com erro no fluxo de teste", value: "em risco", tone: "red" as Tone },
-];
-
-const marketplaceRows = [
-  { title: "Marketplace interno", detail: "Hub principal de agentes, skills, automações e templates.", value: "64 produtos", tone: "pink" as Tone },
-  { title: "Área de serviços", detail: "Produtos que ajudam prestadores e empresas a contratar melhor.", value: "18 produtos", tone: "green" as Tone },
-  { title: "Área de cursos", detail: "Templates, aulas, materiais e recursos vendidos separadamente.", value: "12 itens", tone: "blue" as Tone },
-  { title: "Vitrine pública", detail: "Produtos que podem aparecer para captação e SEO.", value: "22 itens", tone: "yellow" as Tone },
-];
-
-const storeActionRows = [
-  { title: "Arquivar produto", detail: "Remover produto da vitrine sem apagar do banco.", value: "ação futura", tone: "blue" as Tone },
-  { title: "Tirar do ar", detail: "Pausar venda quando tiver erro, reclamação ou checkout quebrado.", value: "segurança", tone: "red" as Tone },
-  { title: "Trocar categoria", detail: "Mover entre Agentes, Automações, Skills e Templates.", value: "organização", tone: "green" as Tone },
-  { title: "Revisar SEO do produto", detail: "Melhorar título, promessa, descrição, tag e palavra-chave.", value: "vendas", tone: "pink" as Tone },
-];
-
-const storeCategoryRows = [
-  { title: "Agentes", detail: "Produtos que executam tarefas, atendem usuários ou tomam decisões.", value: "22", tone: "pink" as Tone },
-  { title: "Automações", detail: "Fluxos que conectam ações, notificações, e-mails e integrações.", value: "17", tone: "green" as Tone },
-  { title: "Skills", detail: "Habilidades reaproveitáveis para agentes, usuários e sistemas.", value: "11", tone: "blue" as Tone },
-  { title: "Templates", detail: "Modelos prontos de páginas, prompts, documentos e sistemas.", value: "14", tone: "yellow" as Tone },
-];
-
-const communityDeepCards = [
-  { title: "Posts criados", value: "128", detail: "Publicações totais da comunidade", tone: "pink" as Tone },
-  { title: "Denúncias abertas", value: "3", detail: "Precisam moderação", tone: "red" as Tone },
-  { title: "Retenção semanal", value: "68%", detail: "Usuários que voltaram a interagir", tone: "green" as Tone },
-  { title: "Debates fortes", value: "7", detail: "Tópicos com alta interação", tone: "blue" as Tone },
-];
-
-const communityModerationRows = [
-  { title: "Denúncia contra @marcos.dev", detail: "Motivo: autopromoção repetida em comentários. Denunciado por @ana.paula.", value: "enviar aviso", tone: "yellow" as Tone },
-  { title: "Post removido de @lojaexpress", detail: "Motivo: link externo sem contexto e possível spam.", value: "revisado", tone: "red" as Tone },
-  { title: "Comentário sinalizado de @criadora.ai", detail: "Motivo: linguagem agressiva em debate sobre preços.", value: "analisar", tone: "pink" as Tone },
-  { title: "Usuário @bruno.mkt ultrapassou limite", detail: "Publicou 12 respostas em sequência em menos de 10 minutos.", value: "limite", tone: "blue" as Tone },
-];
-
-const communityRetentionRows = [
-  { title: "Retenção D1", detail: "Usuários que voltam no dia seguinte após primeiro post.", value: "42%", tone: "yellow" as Tone },
-  { title: "Retenção D7", detail: "Usuários que continuam ativos depois de uma semana.", value: "68%", tone: "green" as Tone },
-  { title: "Usuários silenciosos", detail: "Entram, leem, mas não postam nem comentam.", value: "31%", tone: "blue" as Tone },
-  { title: "Usuários super ativos", detail: "Criam posts, comentam e compartilham com frequência.", value: "9%", tone: "pink" as Tone },
-];
-
-const communityTopicRows = [
-  { title: "IA para vender mais", detail: "Tema com mais buscas e comentários nos últimos 7 dias.", value: "alta", tone: "pink" as Tone },
-  { title: "Como conseguir clientes", detail: "Debate forte entre prestadores e empresas.", value: "crescendo", tone: "green" as Tone },
-  { title: "Automação no WhatsApp", detail: "Muitos usuários procurando fluxos prontos.", value: "produto", tone: "blue" as Tone },
-  { title: "Preço de site", detail: "Discussão com alto engajamento e possível oportunidade comercial.", value: "debate", tone: "yellow" as Tone },
-];
-
-const communityHashtagRows = [
-  { title: "#automacao", detail: "Usada em posts sobre n8n, WhatsApp, e-mail e processos.", value: "248 usos", tone: "green" as Tone },
-  { title: "#ia", detail: "Tema central de agentes, prompts e ferramentas.", value: "231 usos", tone: "pink" as Tone },
-  { title: "#clientes", detail: "Relacionada a captação, vendas e funil.", value: "176 usos", tone: "blue" as Tone },
-  { title: "#siteprofissional", detail: "Boa para conectar comunidade com serviço de sites.", value: "91 usos", tone: "yellow" as Tone },
-];
-
-const communitySeoRows = [
-  { title: "Transformar debates em posts SEO", detail: "Debates fortes podem virar artigos no blog para atrair tráfego orgânico.", value: "alto impacto", tone: "green" as Tone },
-  { title: "Criar páginas por hashtag", detail: "Cada hashtag forte pode ter página indexável com posts e materiais relacionados.", value: "SEO", tone: "pink" as Tone },
-  { title: "Melhorar títulos dos posts", detail: "Usuários postam títulos fracos; a Mia pode sugerir títulos melhores.", value: "melhorar", tone: "yellow" as Tone },
-  { title: "Linkar comunidade com marketplace", detail: "Quando um tópico cresce, sugerir agente, automação ou template relacionado.", value: "vendas", tone: "blue" as Tone },
-];
-
-const communityMiaRows = [
-  { title: "Sugestão da Mia", detail: "Criar alerta automático para usuários denunciados 2 vezes em 7 dias.", value: "prioridade", tone: "red" as Tone },
-  { title: "Oportunidade", detail: "Criar agente que transforma debates fortes em posts de blog e e-mails.", value: "crescimento", tone: "pink" as Tone },
-  { title: "Retenção", detail: "Enviar notificação para usuários silenciosos com tópicos que eles leram.", value: "reativar", tone: "green" as Tone },
-  { title: "Monetização", detail: "Tópicos mais pesquisados devem alimentar produtos da loja.", value: "loja", tone: "blue" as Tone },
-];
-
-
-const googlePresenceCards = [
-  { title: "Receita anúncios", value: "R$ 342,80", detail: "Estimativa demonstrativa do blog", tone: "green" as Tone },
-  { title: "Cliques orgânicos", value: "3.842", detail: "Visitas vindas do Google", tone: "pink" as Tone },
-  { title: "Posição média", value: "18,6", detail: "Ranking médio das palavras-chave", tone: "yellow" as Tone },
-  { title: "Backlinks", value: "27", detail: "Sites mencionando ou linkando a Sualuma", tone: "blue" as Tone },
-];
-
-const googleAdsRows = [
-  { title: "Ganhos com anúncios", detail: "Valor estimado gerado por banners e blocos de anúncio no blog.", value: "R$ 342,80", tone: "green" as Tone },
-  { title: "Impressões de anúncios", detail: "Quantidade de vezes que os anúncios apareceram para visitantes.", value: "42.180", tone: "blue" as Tone },
-  { title: "CTR dos anúncios", detail: "Percentual de pessoas que clicaram nos anúncios exibidos.", value: "1,8%", tone: "yellow" as Tone },
-  { title: "RPM estimado", detail: "Receita estimada a cada mil visualizações monetizadas.", value: "R$ 8,12", tone: "pink" as Tone },
-];
-
-const googleSearchRows = [
-  { title: "Páginas indexadas", detail: "URLs que o Google já reconhece e pode exibir nos resultados.", value: "86 URLs", tone: "green" as Tone },
-  { title: "Páginas com problema", detail: "URLs que precisam revisar erro, canonical, sitemap ou conteúdo fino.", value: "9 URLs", tone: "red" as Tone },
-  { title: "Melhor palavra-chave", detail: "Termo que mais trouxe tráfego orgânico para o ecossistema.", value: "automação com IA", tone: "pink" as Tone },
-  { title: "Oportunidade rápida", detail: "Criar clusters de conteúdo sobre IA, clientes, sites e automações.", value: "alto impacto", tone: "blue" as Tone },
-];
-
-const googleKeywordRows = [
-  { title: "automação com IA", detail: "Boa intenção comercial para vender agentes e automações.", value: "posição 11", tone: "pink" as Tone },
-  { title: "como conseguir clientes online", detail: "Pode ligar blog, comunidade e serviços.", value: "posição 18", tone: "green" as Tone },
-  { title: "site profissional para empresa", detail: "Leva para construção de sites e página de demonstração.", value: "posição 24", tone: "blue" as Tone },
-  { title: "ferramentas para empreendedor", detail: "Pode puxar tráfego para Minha Empresa e Studio.", value: "posição 31", tone: "yellow" as Tone },
-];
-
-const googleBacklinkRows = [
-  { title: "blog parceiro citou Sualuma", detail: "Menção positiva em artigo sobre ferramentas de IA para negócios.", value: "backlink bom", tone: "green" as Tone },
-  { title: "post social sem link", detail: "Alguém mencionou a marca, mas não colocou link para o site.", value: "pedir link", tone: "yellow" as Tone },
-  { title: "diretório de ferramentas", detail: "Possível oportunidade para cadastrar agentes e templates.", value: "oportunidade", tone: "blue" as Tone },
-  { title: "menção sem contexto", detail: "Verificar se a citação está correta e se não prejudica a marca.", value: "analisar", tone: "red" as Tone },
-];
-
-const googleMiaRows = [
-  { title: "Criar cluster SEO", detail: "Organizar posts por temas: IA, automação, sites, clientes e CNPJ.", value: "prioridade", tone: "pink" as Tone },
-  { title: "Melhorar links internos", detail: "Todo post forte deve mandar para loja, serviços, planos ou comunidade.", value: "vendas", tone: "green" as Tone },
-  { title: "Buscar backlinks", detail: "Transformar menções sociais e parcerias em links para o domínio.", value: "autoridade", tone: "blue" as Tone },
-  { title: "Monetização de anúncios", detail: "Testar posição dos anúncios sem prejudicar leitura nem conversão.", value: "otimizar", tone: "yellow" as Tone },
-];
-
-const googleTrendBars = [
-  { label: "IA e automação", value: "42%", tone: "pink" as Tone },
-  { label: "Sites e vendas", value: "28%", tone: "green" as Tone },
-  { label: "CNPJ e empresa", value: "18%", tone: "blue" as Tone },
-  { label: "Templates/skills", value: "12%", tone: "yellow" as Tone },
-];
-
-const socialMentionRows = [
-  { title: "Instagram", detail: "Menções sobre automação, IA e criação de sites.", value: "18 menções", tone: "pink" as Tone },
-  { title: "TikTok", detail: "Conteúdos curtos falando de IA para negócios e renda.", value: "7 menções", tone: "blue" as Tone },
-  { title: "YouTube", detail: "Possível oportunidade de vídeos e comentários citando a marca.", value: "4 menções", tone: "red" as Tone },
-  { title: "Comunidade", detail: "Tópicos internos que podem virar posts, e-mails e produtos.", value: "32 sinais", tone: "green" as Tone },
-];
-
-const socialSentimentRows = [
-  { title: "Sentimento positivo", detail: "Pessoas associando Sualuma a automação, IA e crescimento.", value: "72%", tone: "green" as Tone },
-  { title: "Dúvidas frequentes", detail: "Usuários perguntam preço, como funciona e para quem serve.", value: "18%", tone: "yellow" as Tone },
-  { title: "Críticas ou confusão", detail: "Algumas pessoas ainda não entendem se é serviço, curso ou plataforma.", value: "10%", tone: "red" as Tone },
-];
-
-
-const trendNewsCards = [
-  { title: "Trends sociais", value: "18", detail: "Assuntos crescendo nas redes sociais", tone: "pink" as Tone },
-  { title: "Pesquisas Google 24h", value: "42", detail: "Buscas quentes ligadas ao nicho", tone: "green" as Tone },
-  { title: "Notícias tech", value: "12", detail: "Atualizações relevantes para IA e SaaS", tone: "blue" as Tone },
-  { title: "Empreendedorismo", value: "9", detail: "Sinais fortes para conteúdo e vendas", tone: "yellow" as Tone },
-];
-
-const socialTrendRows = [
-  { title: "IA para vender mais", detail: "Tema crescendo em vídeos curtos, posts educativos e debates de negócios.", value: "alta", tone: "pink" as Tone },
-  { title: "Automação no WhatsApp", detail: "Pessoas procurando formas de automatizar atendimento e follow-up.", value: "subindo", tone: "green" as Tone },
-  { title: "Como conseguir clientes", detail: "Dor recorrente de autônomos, prestadores e pequenos negócios.", value: "forte", tone: "blue" as Tone },
-  { title: "Ferramentas para empreender", detail: "Conteúdos comparando plataformas, IA, CRM e gestão.", value: "oportunidade", tone: "yellow" as Tone },
-];
-
-const googleHotSearchRows = [
-  { title: "como usar IA no meu negócio", detail: "Busca com intenção educativa e comercial.", value: "post + vídeo", tone: "pink" as Tone },
-  { title: "automação para pequenos negócios", detail: "Boa para landing page, blog e oferta de agente.", value: "captar leads", tone: "green" as Tone },
-  { title: "site profissional barato", detail: "Termo sensível a preço, mas pode converter com proposta certa.", value: "vendas", tone: "yellow" as Tone },
-  { title: "ferramentas para microempreendedor", detail: "Conecta com CNPJ, Minha Empresa, comunidade e serviços.", value: "estratégico", tone: "blue" as Tone },
-];
-
-const techNewsRows = [
-  { title: "IA generativa entrando em pequenas empresas", detail: "Sinal para conteúdo sobre automação prática e economia de tempo.", value: "tech", tone: "pink" as Tone },
-  { title: "Ferramentas no-code e low-code crescendo", detail: "Excelente gancho para vender automações e sistemas internos.", value: "produto", tone: "green" as Tone },
-  { title: "Busca por agentes de IA aumentando", detail: "Criar conteúdos comparando agente, automação e chatbot.", value: "SEO", tone: "blue" as Tone },
-  { title: "Privacidade e dados em plataformas digitais", detail: "Gancho para falar de segurança, acesso e controle do usuário.", value: "confiança", tone: "yellow" as Tone },
-];
-
-const entrepreneurNewsRows = [
-  { title: "Empreendedores buscando reduzir custo operacional", detail: "Falar sobre IA como funcionária digital e painel de controle.", value: "conteúdo", tone: "green" as Tone },
-  { title: "Crescimento de negócios solo com automação", detail: "A sua história e o Studio viram narrativa forte de marca.", value: "branding", tone: "pink" as Tone },
-  { title: "Prestadores tentando vender serviço online", detail: "Conectar comunidade, serviços, marketplace e templates.", value: "oferta", tone: "blue" as Tone },
-  { title: "Pequenas empresas sem clareza de funil", detail: "Criar isca: checklist de funil com IA.", value: "lead magnet", tone: "yellow" as Tone },
-];
-
-const organicMarketingCards = [
-  { title: "Ideias orgânicas", value: "36", detail: "Testes possíveis sem tráfego pago", tone: "pink" as Tone },
-  { title: "Fóruns monitorados", value: "14", detail: "Locais onde o nicho conversa", tone: "blue" as Tone },
-  { title: "Oportunidades hoje", value: "8", detail: "Ganchos para postar nas próximas 24h", tone: "green" as Tone },
-  { title: "Conteúdos urgentes", value: "5", detail: "Criar antes que a trend esfrie", tone: "yellow" as Tone },
-];
-
-const organicIdeaRows = [
-  { title: "Post carrossel: 7 formas de usar IA para conseguir clientes", detail: "Conteúdo educativo com CTA para blog, comunidade e loja.", value: "Instagram", tone: "pink" as Tone },
-  { title: "Short: eu construindo uma startup sozinha com IA", detail: "Conteúdo de bastidor para gerar autoridade e identificação.", value: "Reels/TikTok", tone: "green" as Tone },
-  { title: "Artigo SEO: automação para pequenos negócios", detail: "Atrair busca qualificada e linkar para agentes/automações.", value: "Blog", tone: "blue" as Tone },
-  { title: "Thread: o que automatizar primeiro em uma empresa pequena", detail: "Boa para comunidades, LinkedIn e fóruns.", value: "Social", tone: "yellow" as Tone },
-  { title: "Checklist gratuito: raio-x do negócio digital", detail: "Isca para capturar leads e alimentar e-mail marketing.", value: "Lead", tone: "pink" as Tone },
-];
-
-const forumRadarRows = [
-  { title: "Reddit / empreendedores", detail: "Discussões sobre IA, captação, automação e pequenos negócios.", value: "monitorar", tone: "pink" as Tone },
-  { title: "Quora / dúvidas de negócio", detail: "Perguntas viram posts, vídeos e respostas com autoridade.", value: "conteúdo", tone: "blue" as Tone },
-  { title: "Comunidades Facebook", detail: "Autônomos perguntando sobre clientes, site, CNPJ e vendas.", value: "leads", tone: "green" as Tone },
-  { title: "LinkedIn", detail: "Debates sobre produtividade, IA e transformação de negócios.", value: "autoridade", tone: "yellow" as Tone },
-  { title: "Product Hunt / Indie Hackers", detail: "Sinais sobre SaaS, agentes, automações e produtos digitais.", value: "inspiração", tone: "pink" as Tone },
-];
-
-const forumAlertRows = [
-  { title: "Fórum 01 falou sobre automação para WhatsApp", detail: "Comentaram dificuldade de responder leads rápido.", value: "criar post", tone: "green" as Tone },
-  { title: "Fórum 03 discutiu preço de site profissional", detail: "Gancho para conteúdo comparando site barato vs site que vende.", value: "vendas", tone: "pink" as Tone },
-  { title: "Fórum 07 perguntou sobre ferramentas para MEI", detail: "Conecta com CNPJ, Minha Empresa e painel do empreendedor.", value: "oportunidade", tone: "blue" as Tone },
-  { title: "Fórum 12 citou medo de IA substituir pessoas", detail: "Criar conteúdo: IA como equipe, não como ameaça.", value: "educativo", tone: "yellow" as Tone },
-];
-
-const miaOrganicRows = [
-  { title: "Criar agente Radar de Trends", detail: "Buscar trends sociais, buscas do Google, notícias e fóruns todo dia.", value: "prioridade", tone: "pink" as Tone },
-  { title: "Transformar trend em conteúdo", detail: "Cada trend deve gerar post, short, e-mail e oferta relacionada.", value: "sistema", tone: "green" as Tone },
-  { title: "Criar biblioteca de fóruns", detail: "Separar fóruns por tema: IA, negócios, CNPJ, serviços, automação.", value: "organizar", tone: "blue" as Tone },
-  { title: "Criar alerta de oportunidade", detail: "Quando um tema crescer, a Mia sugere conteúdo e produto para vender.", value: "crescimento", tone: "yellow" as Tone },
-];
-
-const hotOpportunityRows = [
-  { title: "Gancho do dia", detail: "Empreendedores estão procurando IA prática, não teoria. Mostrar exemplos reais.", value: "postar hoje", tone: "pink" as Tone },
-  { title: "Produto para empurrar", detail: "Agente de propostas comerciais combina com as buscas atuais.", value: "loja", tone: "green" as Tone },
-  { title: "Conteúdo para blog", detail: "Como automatizar atendimento sem parecer robô.", value: "SEO", tone: "blue" as Tone },
-  { title: "Conteúdo de autoridade", detail: "Mostrar como o Studio controla uma startup de uma pessoa só.", value: "marca", tone: "yellow" as Tone },
-];
-
-
-const stripeDashboardCards = [
-  { title: "Receita Stripe", value: "R$ 32.480", detail: "Pagamentos processados no mês", tone: "green" as Tone },
-  { title: "MRR estimado", value: "R$ 18.900", detail: "Receita recorrente mensal", tone: "pink" as Tone },
-  { title: "Pagamentos falhados", value: "7", detail: "Cartões recusados ou cobrança não concluída", tone: "red" as Tone },
-  { title: "Assinaturas ativas", value: "126", detail: "Clientes com plano ativo", tone: "blue" as Tone },
-];
-
-const stripePaymentRows = [
-  { title: "Pagamento aprovado", detail: "Plano Premium • cliente: Ana Paula • cartão final 4242", value: "R$ 197", tone: "green" as Tone },
-  { title: "Pagamento pendente", detail: "Plano Pro • cliente: Marina Alves • aguardando confirmação", value: "R$ 497", tone: "yellow" as Tone },
-  { title: "Pagamento falhou", detail: "Plano Prime • cliente: Carlos Lima • cartão recusado", value: "falhou", tone: "red" as Tone },
-  { title: "Checkout iniciado", detail: "Usuário abriu checkout, mas ainda não finalizou a compra", value: "recuperar", tone: "pink" as Tone },
-];
-
-const stripeSubscriptionRows = [
-  { title: "Premium", detail: "Plano mais vendido, boa retenção e menor suporte.", value: "72 clientes", tone: "pink" as Tone },
-  { title: "Prime", detail: "Plano intermediário, precisa melhorar ativação pós-compra.", value: "34 clientes", tone: "blue" as Tone },
-  { title: "Pro", detail: "Plano com maior ticket, ideal para empresas e prestadores.", value: "20 clientes", tone: "green" as Tone },
-  { title: "Cancelamentos", detail: "Usuários que cancelaram ou não renovaram no mês.", value: "5 churn", tone: "red" as Tone },
-];
-
-const stripeActionRows = [
-  { title: "Reenviar link de checkout", detail: "Mandar novo link para cliente que iniciou compra e não concluiu.", value: "ação futura", tone: "pink" as Tone },
-  { title: "Cancelar assinatura", detail: "Cancelar plano do usuário direto pelo Studio, sem abrir Stripe.", value: "ação futura", tone: "red" as Tone },
-  { title: "Ver fatura", detail: "Abrir histórico de cobranças, recibos e status de pagamento.", value: "essencial", tone: "blue" as Tone },
-  { title: "Aplicar cupom", detail: "Liberar desconto ou condição especial para cliente específico.", value: "vendas", tone: "green" as Tone },
-];
-
-const stripeAlertRows = [
-  { title: "7 pagamentos falharam", detail: "Criar automação para recuperar cartão recusado e checkout abandonado.", value: "urgente", tone: "red" as Tone },
-  { title: "Plano Pro converte pouco", detail: "Melhorar página de comparação e benefícios do plano maior.", value: "otimizar", tone: "yellow" as Tone },
-  { title: "Premium está performando bem", detail: "Pode virar plano principal da comunicação de vendas.", value: "escalar", tone: "green" as Tone },
-  { title: "Mia sugere recuperação", detail: "Enviar e-mail/WhatsApp para quem iniciou checkout e não pagou.", value: "alto ROI", tone: "pink" as Tone },
-];
-
-const stripeRevenueBars = [
-  { label: "Premium", value: "48%", tone: "pink" as Tone },
-  { label: "Prime", value: "27%", tone: "blue" as Tone },
-  { label: "Pro", value: "20%", tone: "green" as Tone },
-  { label: "Extras", value: "5%", tone: "yellow" as Tone },
-];
-
-
-const healthGeneralCards = [
-  { title: "Saúde geral", value: "87%", detail: "Sistema está operacional, com pontos de atenção", tone: "green" as Tone },
-  { title: "APIs online", value: "12/14", detail: "Serviços principais respondendo", tone: "blue" as Tone },
-  { title: "Alertas ativos", value: "5", detail: "Itens que precisam revisão", tone: "yellow" as Tone },
-  { title: "Riscos críticos", value: "2", detail: "Podem afetar lead, login ou venda", tone: "red" as Tone },
-];
-
-const healthSystemRows = [
-  { title: "Aplicação principal", detail: "Next.js rodando via PM2, respondendo no domínio e subdomínio.", value: "online", tone: "green" as Tone },
-  { title: "Banco Postgres local", detail: "Postgres respondeu e a API do Studio já conseguiu ler dados reais.", value: "online", tone: "green" as Tone },
-  { title: "API Studio Dashboard", detail: "Rota /api/studio/dashboard retornando dados do banco.", value: "ok", tone: "green" as Tone },
-  { title: "Nginx / proxy", detail: "Proxy ativo, mas precisa monitorar 502 quando o app reinicia.", value: "atenção", tone: "yellow" as Tone },
-];
-
-const healthApiRows = [
-  { title: "API de leads", detail: "Responsável por capturar formulários, lista de espera e campanhas.", value: "monitorar", tone: "blue" as Tone },
-  { title: "API comunidade", detail: "Posts, comentários, compartilhamentos e perfis precisam rastreio constante.", value: "ativa", tone: "green" as Tone },
-  { title: "API cliente", detail: "Dashboard, entregas, reuniões, mensagens e notificações do cliente.", value: "ativa", tone: "green" as Tone },
-  { title: "API prestador", detail: "Oportunidades, kanban, reuniões e portfolio precisam logs de erro.", value: "atenção", tone: "yellow" as Tone },
-  { title: "API Stripe futura", detail: "Ainda visual/mockada; depois conecta backend seguro com chave secreta.", value: "pendente", tone: "yellow" as Tone },
-];
-
-const healthJourneyRows = [
-  { title: "Cadastro/Login", detail: "Usuário consegue entrar, mas precisamos monitorar confirmação de e-mail e sessão expirada.", value: "bom", tone: "green" as Tone },
-  { title: "Onboarding", detail: "Ainda precisa guiar melhor a primeira ação depois do cadastro.", value: "médio", tone: "yellow" as Tone },
-  { title: "Ativação", detail: "Usuário precisa entender rápido onde clicar e qual benefício usar primeiro.", value: "atenção", tone: "yellow" as Tone },
-  { title: "Compra", detail: "Checkout, pagamento e liberação de acesso precisam ficar 100% rastreáveis.", value: "em risco", tone: "red" as Tone },
-  { title: "Suporte", detail: "Precisa mostrar erro, último clique, plano e histórico sem abrir Supabase.", value: "prioridade", tone: "pink" as Tone },
-];
-
-const healthBusinessRows = [
-  { title: "Serviços", detail: "Área estratégica para transformar usuários em clientes e prestadores.", value: "ativo", tone: "green" as Tone },
-  { title: "Comunidade", detail: "Precisa monitorar denúncias, hashtags, retenção e debates fortes.", value: "ativo", tone: "green" as Tone },
-  { title: "Admin Loja", detail: "Produtos digitais: agentes, automações, skills e templates.", value: "ativo", tone: "green" as Tone },
-  { title: "Google / SEO", detail: "Central de presença digital pronta visualmente; falta conectar Search Console.", value: "em andamento", tone: "blue" as Tone },
-  { title: "Stripe", detail: "Aba criada; próxima etapa é API segura no backend.", value: "pendente", tone: "yellow" as Tone },
-];
-
-const healthRiskRows = [
-  { title: "Visual conectado em massa", detail: "Conectar muitas abas ao banco de uma vez pode quebrar a página. Fazer uma por vez.", value: "risco", tone: "red" as Tone },
-  { title: "Reinício do app", detail: "Durante restart, o Nginx pode mostrar 502 por alguns segundos.", value: "normal", tone: "yellow" as Tone },
-  { title: "Logs antigos do PM2", detail: "Existem erros antigos nos logs. Não significam necessariamente erro atual.", value: "limpar depois", tone: "blue" as Tone },
-  { title: "Ambiente misto", detail: "Projeto tem Supabase remoto e Postgres local. Precisamos padronizar leitura por área.", value: "atenção", tone: "yellow" as Tone },
-];
-
-const healthMiaRows = [
-  { title: "Próxima ação segura", detail: "Conectar primeiro Tarefas do Sistema ao banco, testar, salvar no Git e só depois ir para outra aba.", value: "fazer agora", tone: "pink" as Tone },
-  { title: "Monitoramento automático", detail: "Criar agente que verifica páginas, APIs, banco, e-mails e pagamentos a cada intervalo.", value: "agente futuro", tone: "green" as Tone },
-  { title: "Mapa de incidentes", detail: "Registrar cada erro com data, área, gravidade, causa e solução aplicada.", value: "importante", tone: "blue" as Tone },
-  { title: "Painel de confiança", detail: "Mostrar para você o que está verde, amarelo e vermelho sem precisar abrir terminal.", value: "alto impacto", tone: "yellow" as Tone },
-];
-
-const healthChecklistRows = [
-  { title: "Banco responde", detail: "API precisa retornar source postgres.", value: "ok", tone: "green" as Tone },
-  { title: "Build passa", detail: "npm run build precisa terminar sem erro.", value: "ok", tone: "green" as Tone },
-  { title: "PM2 online", detail: "Processo luma-os precisa estar online e escutando porta 3000.", value: "ok", tone: "green" as Tone },
-  { title: "Nginx responde", detail: "Domínio e subdomínio precisam abrir sem 502.", value: "ok", tone: "green" as Tone },
-  { title: "Página não quebra", detail: "Depois de cada conexão, abrir Studio Lab e testar navegação.", value: "obrigatório", tone: "pink" as Tone },
-];
-
-const healthBars = [
-  { label: "Sistema", value: "92%", tone: "green" as Tone },
-  { label: "Banco", value: "88%", tone: "blue" as Tone },
-  { label: "UX", value: "78%", tone: "yellow" as Tone },
-  { label: "Pagamentos", value: "58%", tone: "red" as Tone },
-  { label: "SEO/Google", value: "64%", tone: "pink" as Tone },
-];
+const blogReportCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const blogReportRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+
+const blogSeoCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const blogSeoRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const blogKeywordRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const blogSeoChecklist: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const emailReportCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const emailReportRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+
+const financeDashboardCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const financeRevenueRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const financeCostRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const financeProjectionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const financeMiaRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const financeBars: { label: string; value: string; tone: Tone }[] = [];
+
+const financeCostBars: { label: string; value: string; tone: Tone }[] = [];
+
+
+const systemTaskRows: { title: string; detail: string; value: string; tone: Tone; tag?: string }[] = [];
+
+const supportRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const serviceDeepRows: { title: string; detail: string; value: string; tone: Tone; tag?: string }[] = [];
+
+const userControlRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const userActionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const subdomainRows: { name: string; status: string; tone: Tone; links: string[] }[] = [];
+
+const cnpjNotificationRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const cnpjDeepRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+
+const storeHubCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const storeProductRows: { title: string; detail?: string; value?: string; tone?: Tone; category?: string; status?: string }[] = [];
+
+const marketplaceRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const storeActionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const storeCategoryRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const communityDeepCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const communityModerationRows: { title: string; detail?: string; value?: string; tone?: Tone; reported_user?: string; reporter_user?: string; reason?: string; status?: string }[] = [];
+
+const communityRetentionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const communityTopicRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const communityHashtagRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const communitySeoRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const communityMiaRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+
+const googlePresenceCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const googleAdsRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const googleSearchRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const googleKeywordRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const googleBacklinkRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const googleMiaRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const googleTrendBars: { label: string; value: string; tone: Tone }[] = [];
+
+const socialMentionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const socialSentimentRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+
+const trendNewsCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const socialTrendRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const googleHotSearchRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const techNewsRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const entrepreneurNewsRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const organicMarketingCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const organicIdeaRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const forumRadarRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const forumAlertRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const miaOrganicRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const hotOpportunityRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+
+const stripeDashboardCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const stripePaymentRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const stripeSubscriptionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const stripeActionRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const stripeAlertRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const stripeRevenueBars: { label: string; value: string; tone: Tone }[] = [];
+
+
+const healthGeneralCards: { title: string; value: string; detail: string; tone: Tone }[] = [];
+
+const healthSystemRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthApiRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthJourneyRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthBusinessRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthRiskRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthMiaRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthChecklistRows: { title: string; detail: string; value: string; tone: Tone }[] = [];
+
+const healthBars: { label: string; value: string; tone: Tone }[] = [];
 
 function ToneDot({ tone }: { tone: Tone }) {
   return <span className={`tone-dot ${tone}`} />;
@@ -1460,16 +1060,18 @@ function MetricCard({
   tone,
 }: {
   title: string;
-  value: string;
-  detail: string;
+  value?: string | null;
+  detail?: string;
   tone: Tone;
 }) {
+  const displayValue = value && value !== "" ? value : "—";
+  const displayDetail = detail && detail !== "" ? detail : "Sem dados disponíveis";
   return (
     <div className={`metric-card ${tone}`}>
       <span className="metric-glow" />
       <small>{title}</small>
-      <strong>{value}</strong>
-      <p>{detail}</p>
+      <strong>{displayValue}</strong>
+      <p>{displayDetail}</p>
       <div className="mini-line" />
     </div>
   );
@@ -2705,6 +2307,8 @@ const currentTab = useMemo(() => tabs.find((tab) => tab.id === activeView) || ta
 
         {activeView === "visao" && (
           <>
+
+          <SystemTruthPanel />
 
           <StudioQuickShortcutsPanel />
             <section className="hero-grid">

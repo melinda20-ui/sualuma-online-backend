@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
+import PlansContent from "@/components/plans/PlansContent";
 
-export const dynamic = "force-dynamic";
-
-export default function FlowMindPlanosRedirectPage() {
-  redirect("/plans?origem=flowmind");
+export default function FlowMindPlanosPage() {
+  return <PlansContent filter="flowmind" />;
 }

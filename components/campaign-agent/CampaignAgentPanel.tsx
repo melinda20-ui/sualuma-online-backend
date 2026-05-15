@@ -54,10 +54,15 @@ export default function CampaignAgentPanel() {
   const [message, setMessage] = useState("");
 
   async function load() {
-    const res = await fetch("/api/campaign-agent", { cache: "no-store" });
-    const json = await res.json();
-    setData(json);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/campaign-agent", { cache: "no-store" });
+      const json = await res.json();
+      setData(json);
+    } catch {
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function action(action: string) {

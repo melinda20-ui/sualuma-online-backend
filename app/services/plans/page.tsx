@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
+import PlansContent from "@/components/plans/PlansContent";
 
-export const dynamic = "force-dynamic";
-
-export default function ServicesPlansRedirectPage() {
-  redirect("/plans?origem=servicos");
+export default function ServicesPlansPage() {
+  return <PlansContent filter="cliente" />;
 }

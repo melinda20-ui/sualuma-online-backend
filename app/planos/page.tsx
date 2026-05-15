@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
+import PlansContent from "@/components/plans/PlansContent";
 
-export const dynamic = "force-dynamic";
-
-export default function PlanosRedirectPage() {
-  redirect("/plans");
+export default function PlanosPage() {
+  return <PlansContent filter="all" />;
 }
