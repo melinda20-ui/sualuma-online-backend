@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const TARGET_TEXTS = [
   "escolha seu plano",
@@ -8,6 +9,15 @@ const TARGET_TEXTS = [
   "voce ainda nao tem plano",
   "você ainda não tem plano",
   "selecione um plano para continuar",
+];
+
+// Rotas que são páginas de planos legítimas — nunca suprimir nelas
+const PLAN_PAGE_PREFIXES = [
+  "/prestador/planos",
+  "/plans",
+  "/planos",
+  "/services/plans",
+  "/member/plans",
 ];
 
 function normalizeText(value: string) {
@@ -64,6 +74,23 @@ function hidePlanPopup() {
       popup !== document.body &&
       popup !== document.documentElement
     ) {
+      // Só esconde se for realmente um popup/overlay (fixed/modal)
+      const style = window.getComputedStyle(popup);
+      const role = popup.getAttribute("role") || "";
+      const ariaModal = popup.getAttribute("aria-modal") || "";
+      const className = String(popup.className || "").toLowerCase();
+
+      const isRealPopup =
+        style.position === "fixed" ||
+        role === "dialog" ||
+        ariaModal === "true" ||
+        className.includes("modal") ||
+        className.includes("popup") ||
+        className.includes("overlay") ||
+        className.includes("gate");
+
+      if (!isRealPopup) continue;
+
       popup.setAttribute("data-sualuma-plan-popup-disabled", "true");
       popup.style.setProperty("display", "none", "important");
       popup.style.setProperty("pointer-events", "none", "important");
@@ -73,7 +100,15 @@ function hidePlanPopup() {
 }
 
 export default function TemporaryDisablePlanPopup() {
+  const pathname = usePathname();
+
+  const isOnPlanPage = PLAN_PAGE_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix)
+  );
+
   useEffect(() => {
+    if (isOnPlanPage) return;
+
     hidePlanPopup();
 
     const observer = new MutationObserver(() => {
@@ -91,7 +126,7 @@ export default function TemporaryDisablePlanPopup() {
       observer.disconnect();
       window.clearInterval(interval);
     };
-  }, []);
+  }, [isOnPlanPage]);
 
   return null;
 }
